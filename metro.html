@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metro Networks — Izaland Transit</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --font-body:'Satoshi','Inter',sans-serif;
+      --font-display:'Cabinet Grotesk','Satoshi',sans-serif;
+      --text-xs:clamp(0.75rem,0.7rem + 0.25vw,0.875rem);
+      --text-sm:clamp(0.875rem,0.8rem + 0.35vw,1rem);
+      --text-base:clamp(1rem,0.95rem + 0.25vw,1.125rem);
+      --text-lg:clamp(1.125rem,1rem + 0.75vw,1.5rem);
+      --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+      --text-2xl:clamp(2rem,1.2rem + 2.5vw,3.5rem);
+      --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;
+      --space-6:1.5rem;--space-8:2rem;--space-12:3rem;--space-16:4rem;
+      --radius-sm:.375rem;--radius-md:.5rem;--radius-lg:.75rem;--radius-xl:1rem;
+      --transition:180ms cubic-bezier(0.16,1,0.3,1);
+    }
+    [data-theme="dark"]{
+      --bg:#0f1117;--surface:#161b27;--surface-2:#1c2235;--border:#2a3147;
+      --text:#e2e8f0;--text-muted:#94a3b8;--text-faint:#4a5568;
+      --accent:#3b82f6;--accent-hover:#2563eb;--accent-glow:rgba(59,130,246,0.15);
+      --metro:#14b8a6;--metro-glow:rgba(20,184,166,0.15);
+    }
+    [data-theme="light"]{
+      --bg:#f8fafc;--surface:#ffffff;--surface-2:#f1f5f9;--border:#e2e8f0;
+      --text:#1e293b;--text-muted:#64748b;--text-faint:#cbd5e1;
+      --accent:#2563eb;--accent-hover:#1d4ed8;--accent-glow:rgba(37,99,235,0.1);
+      --metro:#0d9488;--metro-glow:rgba(13,148,136,0.1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;}
+    body{min-height:100dvh;font-family:var(--font-body);color:var(--text);background:var(--bg);line-height:1.6;}
+
+    /* NAV */
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-8);background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
+    .nav-logo{display:flex;align-items:center;gap:var(--space-3);text-decoration:none;color:var(--text);}
+    .nav-logo-text{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;letter-spacing:-0.02em;}
+    .nav-logo-sub{font-size:var(--text-xs);color:var(--text-muted);}
+    .nav-links{display:flex;gap:var(--space-6);align-items:center;}
+    .nav-links a{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;font-weight:500;transition:color var(--transition);}
+    .nav-links a:hover{color:var(--text);}
+    .nav-links a.active{color:var(--metro);}
+    .theme-btn{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:var(--radius-md);padding:var(--space-2);cursor:pointer;display:flex;transition:color var(--transition),border-color var(--transition);}
+    .theme-btn:hover{color:var(--text);border-color:var(--text-muted);}
+
+    /* PAGE HEADER */
+    .page-header{padding:var(--space-8) var(--space-8) 0;max-width:1400px;margin:0 auto;}
+    .back-link{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-6);transition:color var(--transition);}
+    .back-link:hover{color:var(--text);}
+    .page-label{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--metro);margin-bottom:var(--space-2);}
+    .page-title{font-family:var(--font-display);font-size:var(--text-xl);font-weight:800;letter-spacing:-.02em;margin-bottom:var(--space-3);}
+    .page-desc{font-size:var(--text-sm);color:var(--text-muted);max-width:70ch;margin-bottom:var(--space-6);}
+
+    /* STATS STRIP */
+    .stats-strip{display:flex;gap:var(--space-4);flex-wrap:wrap;max-width:1400px;margin:0 auto var(--space-8);padding:0 var(--space-8);}
+    .stat-pill{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-3) var(--space-6);display:flex;flex-direction:column;gap:2px;}
+    .stat-pill-val{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;color:var(--metro);letter-spacing:-.02em;}
+    .stat-pill-lbl{font-size:var(--text-xs);color:var(--text-muted);}
+
+    /* TABLE */
+    .table-container{max-width:1400px;margin:0 auto var(--space-12);padding:0 var(--space-8);overflow-x:auto;}
+    .metro-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);background:var(--surface);border-radius:var(--radius-xl);overflow:hidden;border:1px solid var(--border);}
+    .metro-table thead th{background:var(--surface-2);color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.07em;font-size:var(--text-xs);padding:var(--space-4) var(--space-4);text-align:left;border-bottom:2px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;transition:color var(--transition);}
+    .metro-table thead th:hover{color:var(--text);}
+    .metro-table thead th.sort-asc::after{content:' ↑';color:var(--metro);}
+    .metro-table thead th.sort-desc::after{content:' ↓';color:var(--metro);}
+    .metro-table thead th:not(:first-child){text-align:right;}
+    .metro-table tbody td{padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--border);vertical-align:middle;}
+    .metro-table tbody tr:last-child td{border-bottom:none;}
+    .metro-table tbody tr:hover td{background:var(--surface-2);}
+    .metro-table td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums;}
+
+    /* City name cell */
+    .city-cell{display:flex;align-items:center;gap:var(--space-3);}
+    .city-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .city-name{font-weight:600;color:var(--text);}
+    .city-name a{color:inherit;text-decoration:none;border-bottom:1px dashed var(--border);transition:border-color var(--transition),color var(--transition);}
+    .city-name a:hover{color:var(--metro);border-color:var(--metro);}
+    .city-sub{font-size:var(--text-xs);color:var(--text-muted);}
+
+    /* Line count badges */
+    .lines-badge{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:24px;border-radius:9999px;font-size:.75rem;font-weight:700;padding:0 var(--space-2);}
+    .lines-lg{background:rgba(20,184,166,.18);color:var(--metro);}
+    .lines-md{background:rgba(59,130,246,.14);color:var(--accent);}
+    .lines-sm{background:var(--surface-2);color:var(--text-muted);}
+
+    /* km bar */
+    .km-cell{display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+    .km-val{font-weight:600;}
+    .km-bar-wrap{width:80px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+    .km-bar{height:100%;border-radius:2px;background:var(--metro);}
+
+    /* data year chip */
+    .year-chip{font-size:.7rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1px 6px;color:var(--text-muted);}
+    .users-val{font-weight:600;}
+    .users-na{color:var(--text-faint);font-size:.75rem;}
+
+    /* detail sections */
+    .detail-section{max-width:1400px;margin:0 auto var(--space-12);padding:0 var(--space-8);}
+    .detail-section h2{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;letter-spacing:-.02em;margin-bottom:var(--space-2);display:flex;align-items:center;gap:var(--space-3);}
+    .detail-section p{font-size:var(--text-sm);color:var(--text-muted);max-width:70ch;}
+    .wip-banner{display:inline-flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);font-weight:600;padding:var(--space-2) var(--space-4);background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.25);border-radius:var(--radius-md);margin-top:var(--space-4);}
+
+    footer{border-top:1px solid var(--border);padding:var(--space-8);text-align:center;font-size:var(--text-sm);color:var(--text-muted);}
+    footer a{color:var(--accent);text-decoration:none;}
+    @media(max-width:768px){
+      nav{padding:var(--space-3) var(--space-4);}
+      .page-header,.stats-strip,.table-container,.detail-section{padding-left:var(--space-4);padding-right:var(--space-4);}
+      .nav-links{gap:var(--space-3);}
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="var(--accent)"/>
+        <rect x="6" y="14" width="20" height="3" rx="1.5" fill="white"/>
+        <rect x="6" y="9" width="14" height="3" rx="1.5" fill="white" opacity="0.7"/>
+        <rect x="6" y="19" width="17" height="3" rx="1.5" fill="white" opacity="0.5"/>
+        <circle cx="24" cy="22" r="3" fill="white"/>
+        <circle cx="24" cy="22" r="1.5" fill="var(--accent)"/>
+      </svg>
+      <div>
+        <div class="nav-logo-text">IZ Transit</div>
+        <div class="nav-logo-sub">Izaland · OpenGeoFiction</div>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="izx.html">IZX</a>
+      <a href="metro.html" class="active">Metro</a>
+      <a href="#">Map</a>
+      <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <a href="index.html" class="back-link">← Back to portal</a>
+    <div class="page-label">Urban Rail · Subway Networks</div>
+    <h1 class="page-title">Metro &amp; Subway Systems</h1>
+    <p class="page-desc">Izaland hosts 17 urban metro and subway networks across its major cities, ranging from Sainðaul’s 19-line megasystem to the single-line light metro of Riimibaiken and Shirukami. All networks use the IZWay contactless card and standard 1,435 mm gauge.</p>
+  </div>
+
+  <!-- STATS STRIP -->
+  <div class="stats-strip">
+    <div class="stat-pill"><div class="stat-pill-val">17</div><div class="stat-pill-lbl">cities with metro</div></div>
+    <div class="stat-pill"><div class="stat-pill-val">79</div><div class="stat-pill-lbl">total lines</div></div>
+    <div class="stat-pill"><div class="stat-pill-val">1,933 km</div><div class="stat-pill-lbl">total network length</div></div>
+    <div class="stat-pill"><div class="stat-pill-val">1,435 mm</div><div class="stat-pill-lbl">standard gauge (all systems)</div></div>
+    <div class="stat-pill"><div class="stat-pill-val">IZWay</div><div class="stat-pill-lbl">national smart card</div></div>
+  </div>
+
+  <!-- MAIN TABLE -->
+  <div class="table-container">
+    <table class="metro-table" id="metroTable">
+      <thead>
+        <tr>
+          <th data-col="city">City</th>
+          <th data-col="lines">Lines</th>
+          <th data-col="km">System length</th>
+          <th data-col="stations">Stations</th>
+          <th data-col="users">Daily users</th>
+          <th data-col="year">Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Row template:
+             city-dot colour chosen by rough population tier
+             km-bar width = (km / 674) * 100  (max = Sainðaul)
+        -->
+        <tr data-city="saindaul" data-lines="19" data-km="673.93" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#14b8a6;"></div>
+              <div>
+                <div class="city-name"><a href="#saindaul">Sainðaul</a></div>
+                <div class="city-sub">Capital</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-lg">19</span></td>
+          <td><div class="km-cell"><span class="km-val">673.93 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:100%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+        <tr data-city="warohan" data-lines="8" data-km="217.90" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#3b82f6;"></div>
+              <div>
+                <div class="city-name"><a href="#warohan">Warohan</a></div>
+                <div class="city-sub">2nd city · Nankai terminus</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-md">8</span></td>
+          <td><div class="km-cell"><span class="km-val">217.90 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:32%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+        <tr data-city="panaireki" data-lines="8" data-km="193.81" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#3b82f6;"></div>
+              <div>
+                <div class="city-name"><a href="#panaireki">Panaireki</a></div>
+                <div class="city-sub">IZX Keishin K12</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-md">8</span></td>
+          <td><div class="km-cell"><span class="km-val">193.81 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:29%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+        <tr data-city="riyatoma" data-lines="4" data-km="114.26" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#8b5cf6;"></div>
+              <div>
+                <div class="city-name"><a href="#riyatoma">Riyatoma</a></div>
+                <div class="city-sub">IZX Ryānkai</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">4</span></td>
+          <td><div class="km-cell"><span class="km-val">114.26 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:17%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+        <tr data-city="sannupuri" data-lines="4" data-km="107.59" data-stations="" data-users="1256000" data-year="2020">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#8b5cf6;"></div>
+              <div>
+                <div class="city-name"><a href="#sannupuri">Sannupuri</a></div>
+                <div class="city-sub">IZX Ryānkai terminus</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">4</span></td>
+          <td><div class="km-cell"><span class="km-val">107.59 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:16%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-val">1,256,000</span></td>
+          <td><span class="year-chip">2020</span></td>
+        </tr>
+        <tr data-city="kichatsura" data-lines="4" data-km="93.47" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#8b5cf6;"></div>
+              <div>
+                <div class="city-name"><a href="#kichatsura">Kichatsura</a></div>
+                <div class="city-sub">IZX Keishin K10</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">4</span></td>
+          <td><div class="km-cell"><span class="km-val">93.47 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:14%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+        <tr data-city="makkenoke" data-lines="3" data-km="95.66" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#f59e0b;"></div>
+              <div>
+                <div class="city-name"><a href="#makkenoke">Makkenoke</a></div>
+                <div class="city-sub">—</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">3</span></td>
+          <td><div class="km-cell"><span class="km-val">95.66 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:14%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+        <tr data-city="nugamochi" data-lines="3" data-km="59.56" data-stations="" data-users="300000" data-year="2021">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#f59e0b;"></div>
+              <div>
+                <div class="city-name"><a href="#nugamochi">Nugamochi</a></div>
+                <div class="city-sub">IZX Keishin K11</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">3</span></td>
+          <td><div class="km-cell"><span class="km-val">59.56 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:9%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-val">300,000</span></td>
+          <td><span class="year-chip">2021</span></td>
+        </tr>
+        <tr data-city="daishin" data-lines="3" data-km="73.54" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#f59e0b;"></div>
+              <div>
+                <div class="city-name"><a href="#daishin">Daishin</a></div>
+                <div class="city-sub">IZX Nankai terminus (N4)</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">3</span></td>
+          <td><div class="km-cell"><span class="km-val">73.54 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:11%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+        <tr data-city="kanlisahna" data-lines="2" data-km="71.35" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#94a3b8;"></div>
+              <div>
+                <div class="city-name"><a href="#kanlisahna">Kanlisahna</a></div>
+                <div class="city-sub">—</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">2</span></td>
+          <td><div class="km-cell"><span class="km-val">71.35 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:11%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+        <tr data-city="isadashi" data-lines="2" data-km="48.17" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#94a3b8;"></div>
+              <div>
+                <div class="city-name"><a href="#isadashi">Isadashi</a></div>
+                <div class="city-sub">IZX Ryānkai</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">2</span></td>
+          <td><div class="km-cell"><span class="km-val">48.17 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:7%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+        <tr data-city="illashiya" data-lines="2" data-km="46.90" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#94a3b8;"></div>
+              <div>
+                <div class="city-name"><a href="#illashiya">Illashiya</a></div>
+                <div class="city-sub">IZX Keishin K104</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">2</span></td>
+          <td><div class="km-cell"><span class="km-val">46.90 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:7%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+        <tr data-city="nagareki" data-lines="2" data-km="57.59" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#94a3b8;"></div>
+              <div>
+                <div class="city-name"><a href="#nagareki">Nagareki</a></div>
+                <div class="city-sub">IZX Nagareki terminus</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">2</span></td>
+          <td><div class="km-cell"><span class="km-val">57.59 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:9%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+        <tr data-city="sahnajima" data-lines="2" data-km="29.95" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#94a3b8;"></div>
+              <div>
+                <div class="city-name"><a href="#sahnajima">Sahnajima</a></div>
+                <div class="city-sub">—</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">2</span></td>
+          <td><div class="km-cell"><span class="km-val">29.95 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:4%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+        <tr data-city="shirukami" data-lines="1" data-km="17.17" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#475569;"></div>
+              <div>
+                <div class="city-name"><a href="#shirukami">Shirukami</a></div>
+                <div class="city-sub">IZX Nagareki</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">1</span></td>
+          <td><div class="km-cell"><span class="km-val">17.17 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:3%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+        <tr data-city="pewanari" data-lines="1" data-km="21.69" data-stations="15" data-users="126000" data-year="2021">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#475569;"></div>
+              <div>
+                <div class="city-name"><a href="#pewanari">Pewanari</a></div>
+                <div class="city-sub">—</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">1</span></td>
+          <td><div class="km-cell"><span class="km-val">21.69 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:3%"></div></div></div></td>
+          <td>15</td>
+          <td><span class="users-val">126,000</span></td>
+          <td><span class="year-chip">2021</span></td>
+        </tr>
+        <tr data-city="riimibaiken" data-lines="1" data-km="11.47" data-stations="" data-users="" data-year="">
+          <td>
+            <div class="city-cell">
+              <div class="city-dot" style="background:#475569;"></div>
+              <div>
+                <div class="city-name"><a href="#riimibaiken">Riimibaiken</a></div>
+                <div class="city-sub">—</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="lines-badge lines-sm">1</span></td>
+          <td><div class="km-cell"><span class="km-val">11.47 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:2%"></div></div></div></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+          <td><span class="users-na">—</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CITY DETAIL STUBS -->
+  <div class="detail-section" id="saindaul">
+    <h2>🚇 Sainðaul Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 19 lines · 673.93 km</span></h2>
+    <p>The Sainðaul Metro (Capital Subway) is the largest urban rail network in Izaland and one of the most extensive in the Axian region, with 19 lines covering the metropolitan area of the capital city. Lines are integrated with Izarail suburban rail and the IZX Keishin Line at Sainðaul Central (K01).</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="warohan">
+    <h2>🚇 Warohan Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 8 lines · 217.90 km</span></h2>
+    <p>The Warohan Metro serves Izaland’s second city and the southern terminus of the IZX Keishin Line (K17) and the Nankai Line (K17–N4). The network interconnects with the IZX station at Warohan Central.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="panaireki">
+    <h2>🚇 Panaireki Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 8 lines · 193.81 km</span></h2>
+    <p>Panaireki’s metro network is one of the busiest outside the capital, serving the city’s commercial and industrial districts. The IZX Keishin station (K12) provides a direct intercity link.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="kichatsura">
+    <h2>🚇 Kichatsura Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 4 lines · 93.47 km</span></h2>
+    <p>Kichatsura’s four metro lines radiate from the IZX Keishin hub at Shin-Kichatsura Teba (K10), where the Sakamuso Branch also converges.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="sannupuri">
+    <h2>🚇 Sannupuri Subway <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 4 lines · 107.59 km</span></h2>
+    <p>Sannupuri operates four subway lines serving the western terminus of the IZX Ryānkai Line. Daily ridership reached 1,256,000 in 2020.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="riyatoma">
+    <h2>🚇 Riyatoma Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 4 lines · 114.26 km</span></h2>
+    <p>Riyatoma’s metro network connects the coastal city centre with suburban districts and the IZX Ryānkai station.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="makkenoke">
+    <h2>🚇 Makkenoke Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 3 lines · 95.66 km</span></h2>
+    <p>Three-line network serving Makkenoke’s urban core.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="daishin">
+    <h2>🚇 Daishin Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 3 lines · 73.54 km</span></h2>
+    <p>Daishin is the southern terminus of the IZX Nankai Line (N4). Its three metro lines connect the IZX station with the city’s port, commercial and residential districts.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="nugamochi">
+    <h2>🚇 Nugamochi Subway <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 3 lines · 59.56 km</span></h2>
+    <p>Nugamochi’s three subway lines recorded 300,000 daily riders in 2021. The city is served by the IZX Keishin Line at K11.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="illashiya">
+    <h2>🚇 Illashiya Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 2 lines · 46.90 km</span></h2>
+    <p>Illashiya is served by the IZX Keishin Sakamuso Branch at K104. Its two metro lines link the IZX station with the wider urban area.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="kanlisahna">
+    <h2>🚇 Kanlisahna Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 2 lines · 71.35 km</span></h2>
+    <p>Two-line metro network serving Kanlisahna’s urban core and its connection to the national rail network.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="sahnajima">
+    <h2>🚇 Sahnajima Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 2 lines · 29.95 km</span></h2>
+    <p>Compact two-line network for Sahnajima’s urban core.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="isadashi">
+    <h2>🚇 Isadashi Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 2 lines · 48.17 km</span></h2>
+    <p>Isadashi is served by the IZX Ryānkai Line. Its metro lines connect the high-speed rail station with the city’s districts.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="nagareki">
+    <h2>🚇 Nagareki Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 2 lines · 57.59 km</span></h2>
+    <p>Two-line network at the terminus of the IZX Nagareki Line, connecting rail passengers with the city’s main urban districts.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="shirukami">
+    <h2>🚇 Shirukami Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 1 line · 17.17 km</span></h2>
+    <p>Single-line metro serving Shirukami’s city centre, located along the IZX Nagareki corridor.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="pewanari">
+    <h2>🚇 Pewanari Light Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 1 line · 21.69 km · 15 stations</span></h2>
+    <p>Pewanari operates a single light-metro line with 15 stations. Daily ridership reached 126,000 in 2021, making it one of the best-used per-km compact systems in Izaland.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+  <div class="detail-section" id="riimibaiken">
+    <h2>🚇 Riimibaiken Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 1 line · 11.47 km</span></h2>
+    <p>The shortest metro system in Izaland — a single line serving Riimibaiken’s compact city centre.</p>
+    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  </div>
+
+  <footer>
+    <p>Izaland Transit Portal · <a href="https://opengeofiction.net" target="_blank" rel="noopener">OpenGeoFiction</a> · Metro data from Izaland wiki</p>
+  </footer>
+
+  <script>
+    /* ─ theme toggle ─ */
+    (function(){
+      const t=document.querySelector('[data-theme-toggle]'),r=document.documentElement;
+      let d=r.getAttribute('data-theme')||'dark';
+      t&&t.addEventListener('click',()=>{
+        d=d==='dark'?'light':'dark';
+        r.setAttribute('data-theme',d);
+        t.innerHTML=d==='dark'
+          ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+          :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+      });
+    })();
+
+    /* ─ sortable table ─ */
+    (function(){
+      const table=document.getElementById('metroTable');
+      const headers=table.querySelectorAll('thead th');
+      let sortCol=null,sortDir=1;
+      headers.forEach((th,i)=>{
+        th.addEventListener('click',()=>{
+          const col=th.dataset.col;
+          if(!col)return;
+          if(sortCol===col){sortDir*=-1;}else{sortCol=col;sortDir=1;}
+          headers.forEach(h=>{h.classList.remove('sort-asc','sort-desc');});
+          th.classList.add(sortDir===1?'sort-asc':'sort-desc');
+          const tbody=table.querySelector('tbody');
+          const rows=[...tbody.querySelectorAll('tr')];
+          rows.sort((a,b)=>{
+            let av=a.dataset[col]||'',bv=b.dataset[col]||'';
+            const an=parseFloat(av),bn=parseFloat(bv);
+            if(!isNaN(an)&&!isNaN(bn))return (an-bn)*sortDir;
+            return av.localeCompare(bv)*sortDir;
+          });
+          rows.forEach(r=>tbody.appendChild(r));
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
