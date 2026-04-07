@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Izaland Transit Portal</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-body: 'Satoshi', 'Inter', sans-serif;
+      --font-display: 'Cabinet Grotesk', 'Satoshi', sans-serif;
+      --text-xs:   clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm:   clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg:   clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl:   clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl:  clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+      --space-4: 1rem; --space-6: 1.5rem; --space-8: 2rem;
+      --space-12: 3rem; --space-16: 4rem;
+      --radius-sm: 0.375rem; --radius-md: 0.5rem;
+      --radius-lg: 0.75rem; --radius-xl: 1rem;
+      --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    [data-theme="dark"] {
+      --bg: #0f1117;
+      --surface: #161b27;
+      --surface-2: #1c2235;
+      --border: #2a3147;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --text-faint: #4a5568;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-glow: rgba(59,130,246,0.15);
+      --izx-red: #ef4444;
+      --izx-gold: #f59e0b;
+      --metro-teal: #14b8a6;
+    }
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --text-faint: #cbd5e1;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-glow: rgba(37,99,235,0.1);
+      --izx-red: #dc2626;
+      --izx-gold: #d97706;
+      --metro-teal: #0d9488;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+    body {
+      min-height: 100dvh;
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-4) var(--space-8);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: var(--space-3);
+      text-decoration: none; color: var(--text);
+    }
+    .nav-logo-text {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .nav-logo-sub { font-size: var(--text-xs); color: var(--text-muted); }
+    .nav-links { display: flex; gap: var(--space-6); align-items: center; }
+    .nav-links a {
+      font-size: var(--text-sm); color: var(--text-muted);
+      text-decoration: none; font-weight: 500;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); }
+    .theme-btn {
+      background: none; border: 1px solid var(--border);
+      color: var(--text-muted); border-radius: var(--radius-md);
+      padding: var(--space-2); cursor: pointer; display: flex;
+      transition: color var(--transition), border-color var(--transition);
+    }
+    .theme-btn:hover { color: var(--text); border-color: var(--text-muted); }
+    /* HERO */
+    .hero {
+      padding: var(--space-16) var(--space-8);
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-12);
+      align-items: center;
+    }
+    .hero-label {
+      font-size: var(--text-xs); font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: var(--space-4);
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: var(--space-6);
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero-desc {
+      font-size: var(--text-base); color: var(--text-muted);
+      max-width: 48ch; margin-bottom: var(--space-8);
+    }
+    .hero-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+    .btn-primary {
+      padding: var(--space-3) var(--space-6);
+      background: var(--accent); color: white;
+      border: none; border-radius: var(--radius-md);
+      font-size: var(--text-sm); font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .btn-secondary {
+      padding: var(--space-3) var(--space-6);
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      font-size: var(--text-sm); font-weight: 500;
+      cursor: pointer; text-decoration: none;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .btn-secondary:hover { border-color: var(--text-muted); background: var(--surface); }
+    /* HERO VISUAL */
+    .hero-visual {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      position: relative; overflow: hidden;
+    }
+    .hero-visual::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 30%, var(--accent-glow) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .network-stats {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+    }
+    .stat-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+    }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: var(--text-xl); font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .stat-value.izx { color: var(--izx-red); }
+    .stat-value.rail { color: var(--accent); }
+    .stat-value.metro { color: var(--metro-teal); }
+    .stat-value.airports { color: var(--izx-gold); }
+    .stat-label { font-size: var(--text-xs); color: var(--text-muted); margin-top: var(--space-1); }
+    /* SECTIONS */
+    section { padding: var(--space-12) var(--space-8); max-width: 1200px; margin: 0 auto; }
+    .section-header { margin-bottom: var(--space-8); }
+    .section-label {
+      font-size: var(--text-xs); font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--accent); margin-bottom: var(--space-2);
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: var(--text-xl); font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    /* FEATURE CARDS */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+      gap: var(--space-4);
+    }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      text-decoration: none; color: inherit;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+      display: flex; flex-direction: column; gap: var(--space-3);
+    }
+    .feature-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), 0 8px 32px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+    .feature-card.wip { opacity: 0.6; pointer-events: none; }
+    .feature-icon {
+      font-size: 2rem; line-height: 1;
+    }
+    .feature-title {
+      font-family: var(--font-display);
+      font-size: var(--text-lg); font-weight: 700;
+    }
+    .feature-desc { font-size: var(--text-sm); color: var(--text-muted); }
+    .feature-badge {
+      display: inline-block;
+      font-size: var(--text-xs); font-weight: 600;
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-full);
+      margin-top: auto; align-self: flex-start;
+    }
+    .badge-live { background: rgba(20,184,166,0.15); color: var(--metro-teal); }
+    .badge-wip { background: rgba(245,158,11,0.15); color: var(--izx-gold); }
+    /* IZX MINI DIAGRAM */
+    .izx-preview {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      overflow-x: auto;
+    }
+    .izx-line {
+      display: flex; align-items: center;
+      gap: 0; margin-bottom: var(--space-3);
+      font-size: var(--text-xs);
+    }
+    .izx-line-label {
+      width: 120px; flex-shrink: 0;
+      font-weight: 600; color: var(--text-muted);
+      font-size: var(--text-xs);
+    }
+    .izx-track {
+      flex: 1; height: 4px;
+      position: relative;
+      display: flex; align-items: center;
+    }
+    .izx-track::before {
+      content: '';
+      position: absolute; left: 0; right: 0; height: 3px;
+      border-radius: 2px;
+    }
+    .izx-track.keishin::before { background: var(--izx-red); }
+    .izx-track.nagareki::before { background: var(--accent); }
+    .izx-track.ryankai::before { background: var(--metro-teal); }
+    .izx-track.nankai::before { background: var(--izx-gold); }
+    .izx-stop {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      position: absolute;
+      cursor: pointer;
+      transition: transform var(--transition);
+    }
+    .izx-stop:hover { transform: scale(1.5); }
+    .keishin .izx-stop { background: var(--izx-red); }
+    .nagareki .izx-stop { background: var(--accent); }
+    .ryankai .izx-stop { background: var(--metro-teal); }
+    .nankai .izx-stop { background: var(--izx-gold); }
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: var(--space-8);
+      text-align: center;
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; gap: var(--space-8); padding: var(--space-8) var(--space-4); }
+      nav { padding: var(--space-3) var(--space-4); }
+      .nav-links { gap: var(--space-3); }
+      section { padding: var(--space-8) var(--space-4); }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="nav-logo">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Izaland Transit">
+        <rect width="32" height="32" rx="8" fill="var(--accent)"/>
+        <rect x="6" y="14" width="20" height="3" rx="1.5" fill="white"/>
+        <rect x="6" y="9" width="14" height="3" rx="1.5" fill="white" opacity="0.7"/>
+        <rect x="6" y="19" width="17" height="3" rx="1.5" fill="white" opacity="0.5"/>
+        <circle cx="24" cy="22" r="3" fill="white"/>
+        <circle cx="24" cy="22" r="1.5" fill="var(--accent)"/>
+      </svg>
+      <div>
+        <div class="nav-logo-text">IZ Transit</div>
+        <div class="nav-logo-sub">Izaland • OpenGeoFiction</div>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="izx.html">IZX</a>
+      <a href="#metro">Metro</a>
+      <a href="#map">Map</a>
+      <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-label">OpenGeoFiction · Izaland</div>
+      <h1>The <span>Izaland</span> Transit Portal</h1>
+      <p class="hero-desc">Explore the transport network of Izaland — interactive maps, IZX high-speed rail diagrams, metro schematics and route planning for a fictional nation with 118 million inhabitants.</p>
+      <div class="hero-actions">
+        <a href="izx.html" class="btn-primary">🚄 IZX Diagram</a>
+        <a href="#features" class="btn-secondary">Explore features</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div style="font-size:var(--text-xs);color:var(--text-muted);margin-bottom:var(--space-4);font-weight:600;text-transform:uppercase;letter-spacing:.08em">Network at a glance</div>
+      <div class="network-stats">
+        <div class="stat-card">
+          <div class="stat-value izx">2,263</div>
+          <div class="stat-label">km IZX high-speed rail</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value rail">16,418</div>
+          <div class="stat-label">km standard rail</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value metro">606</div>
+          <div class="stat-label">km Sainðaul Metro (18 lines)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value airports">52.3M</div>
+          <div class="stat-label">daily rail passengers</div>
+        </div>
+      </div>
+      <div style="margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--border)">
+        <div style="font-size:var(--text-xs);color:var(--text-muted);margin-bottom:var(--space-3);font-weight:600">IZX LINES PREVIEW</div>
+        <div class="izx-line">
+          <div class="izx-line-label">Saikai Line</div>
+          <div class="izx-track keishin">
+            <div class="izx-stop" style="left:0%" title="Sainðaul"></div>
+            <div class="izx-stop" style="left:20%" title="Komishinan"></div>
+            <div class="izx-stop" style="left:42%" title="Panaireki"></div>
+            <div class="izx-stop" style="left:68%" title="Naeba"></div>
+            <div class="izx-stop" style="left:88%" title="Eyenniyul"></div>
+            <div class="izx-stop" style="left:100%" title="Warohan"></div>
+          </div>
+        </div>
+        <div class="izx-line">
+          <div class="izx-line-label">Nagareki Line</div>
+          <div class="izx-track nagareki">
+            <div class="izx-stop" style="left:0%" title="Sainðaul"></div>
+            <div class="izx-stop" style="left:22%" title="Kawayatsu"></div>
+            <div class="izx-stop" style="left:55%" title="Shirukami"></div>
+            <div class="izx-stop" style="left:78%" title="Reilusahna"></div>
+            <div class="izx-stop" style="left:100%" title="Nagareki"></div>
+          </div>
+        </div>
+        <div class="izx-line">
+          <div class="izx-line-label">Ryānkai Line</div>
+          <div class="izx-track ryankai">
+            <div class="izx-stop" style="left:0%" title="Sainðaul"></div>
+            <div class="izx-stop" style="left:18%" title="Isadashi"></div>
+            <div class="izx-stop" style="left:45%" title="Humabe"></div>
+            <div class="izx-stop" style="left:72%" title="Fukuoka"></div>
+            <div class="izx-stop" style="left:100%" title="Sannupuri"></div>
+          </div>
+        </div>
+        <div class="izx-line">
+          <div class="izx-line-label">Nankai Line</div>
+          <div class="izx-track nankai">
+            <div class="izx-stop" style="left:0%" title="Warohan"></div>
+            <div class="izx-stop" style="left:55%" title="Shin-Nuskajui"></div>
+            <div class="izx-stop" style="left:100%" title="Daishin"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="section-header">
+      <div class="section-label">What's inside</div>
+      <h2 class="section-title">Explore the network</h2>
+    </div>
+    <div class="features-grid">
+      <a href="izx.html" class="feature-card">
+        <div class="feature-icon">🚄</div>
+        <div class="feature-title">IZX High-Speed Rail</div>
+        <div class="feature-desc">Interactive schematic diagram of all IZX lines — Saikai, Nagareki, Ryānkai, Nankai and more. Speeds up to 360 km/h.</div>
+        <div class="feature-badge badge-live">✓ Live</div>
+      </a>
+      <a href="#" class="feature-card wip">
+        <div class="feature-icon">🚇</div>
+        <div class="feature-title">Sainðaul Metro</div>
+        <div class="feature-desc">All 18 lines of the Capital Subway Network — 606 km, integrated with Izarail suburban services.</div>
+        <div class="feature-badge badge-wip">Coming soon</div>
+      </a>
+      <a href="#" class="feature-card wip">
+        <div class="feature-icon">🗺️</div>
+        <div class="feature-title">Interactive Map</div>
+        <div class="feature-desc">MapLibre GL JS map using OGF tile server and live Overpass queries for stations, lines and airports.</div>
+        <div class="feature-badge badge-wip">Coming soon</div>
+      </a>
+      <a href="#" class="feature-card wip">
+        <div class="feature-icon">🕐</div>
+        <div class="feature-title">Timetables</div>
+        <div class="feature-desc">Simulated IZX and intercity schedules. Sainðaul–Warohan in 2h 45m at 260 km/h.</div>
+        <div class="feature-badge badge-wip">Coming soon</div>
+      </a>
+      <a href="#" class="feature-card wip">
+        <div class="feature-icon">🔍</div>
+        <div class="feature-title">Route Planner</div>
+        <div class="feature-desc">Journey planner across IZX, intercity and suburban networks. Multimodal, IZWay-compatible.</div>
+        <div class="feature-badge badge-wip">Coming soon</div>
+      </a>
+      <a href="#" class="feature-card wip">
+        <div class="feature-icon">🃏</div>
+        <div class="feature-title">IZWay Card</div>
+        <div class="feature-desc">Fictional smart card UI — the national transit card accepted on all Izarail and private operators.</div>
+        <div class="feature-badge badge-wip">Coming soon</div>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <p>Izaland Transit Portal · Built on <a href="https://opengeofiction.net" target="_blank" rel="noopener">OpenGeoFiction</a> data · Not affiliated with any real transport operator</p>
+  </footer>
+
+  <script>
+    (function(){
+      const t=document.querySelector('[data-theme-toggle]'),r=document.documentElement;
+      let d=r.getAttribute('data-theme')||'dark';
+      t&&t.addEventListener('click',()=>{
+        d=d==='dark'?'light':'dark';
+        r.setAttribute('data-theme',d);
+        t.innerHTML=d==='dark'
+          ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+          :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+      });
+    })();
+  </script>
+</body>
+</html>
