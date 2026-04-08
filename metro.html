@@ -3,38 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Metro Networks — Izaland Transit</title>
+  <title>Sainðaul Metro — Izaland Transit Portal</title>
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --font-body:'Satoshi','Inter',sans-serif;
-      --font-display:'Cabinet Grotesk','Satoshi',sans-serif;
-      --text-xs:clamp(0.75rem,0.7rem + 0.25vw,0.875rem);
-      --text-sm:clamp(0.875rem,0.8rem + 0.35vw,1rem);
-      --text-base:clamp(1rem,0.95rem + 0.25vw,1.125rem);
-      --text-lg:clamp(1.125rem,1rem + 0.75vw,1.5rem);
-      --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
-      --text-2xl:clamp(2rem,1.2rem + 2.5vw,3.5rem);
-      --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;
-      --space-6:1.5rem;--space-8:2rem;--space-12:3rem;--space-16:4rem;
-      --radius-sm:.375rem;--radius-md:.5rem;--radius-lg:.75rem;--radius-xl:1rem;
-      --transition:180ms cubic-bezier(0.16,1,0.3,1);
+    :root {
+      --font-body: 'Satoshi', 'Inter', sans-serif;
+      --font-display: 'Cabinet Grotesk', 'Satoshi', sans-serif;
+      --text-xs:   clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm:   clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg:   clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl:   clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl:  clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+      --space-4: 1rem; --space-6: 1.5rem; --space-8: 2rem;
+      --space-12: 3rem; --space-16: 4rem;
+      --radius-sm: 0.375rem; --radius-md: 0.5rem;
+      --radius-lg: 0.75rem; --radius-xl: 1rem;
+      --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
     }
-    [data-theme="dark"]{
-      --bg:#0f1117;--surface:#161b27;--surface-2:#1c2235;--border:#2a3147;
-      --text:#e2e8f0;--text-muted:#94a3b8;--text-faint:#4a5568;
-      --accent:#3b82f6;--accent-hover:#2563eb;--accent-glow:rgba(59,130,246,0.15);
-      --metro:#14b8a6;--metro-glow:rgba(20,184,166,0.15);
+    [data-theme="dark"] {
+      --bg: #0f1117; --surface: #161b27; --surface-2: #1c2235;
+      --border: #2a3147; --text: #e2e8f0; --text-muted: #94a3b8; --text-faint: #4a5568;
+      --accent: #3b82f6; --accent-hover: #2563eb; --accent-glow: rgba(59,130,246,0.15);
+      --izx-red: #ef4444; --izx-gold: #f59e0b; --metro-teal: #14b8a6;
     }
-    [data-theme="light"]{
-      --bg:#f8fafc;--surface:#ffffff;--surface-2:#f1f5f9;--border:#e2e8f0;
-      --text:#1e293b;--text-muted:#64748b;--text-faint:#cbd5e1;
-      --accent:#2563eb;--accent-hover:#1d4ed8;--accent-glow:rgba(37,99,235,0.1);
-      --metro:#0d9488;--metro-glow:rgba(13,148,136,0.1);
+    [data-theme="light"] {
+      --bg: #f8fafc; --surface: #ffffff; --surface-2: #f1f5f9;
+      --border: #e2e8f0; --text: #1e293b; --text-muted: #64748b; --text-faint: #cbd5e1;
+      --accent: #2563eb; --accent-hover: #1d4ed8; --accent-glow: rgba(37,99,235,0.1);
+      --izx-red: #dc2626; --izx-gold: #d97706; --metro-teal: #0d9488;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;}
-    body{min-height:100dvh;font-family:var(--font-body);color:var(--text);background:var(--bg);line-height:1.6;}
+    body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--text);background:var(--bg);line-height:1.6;}
 
     /* NAV */
     nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-8);background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
@@ -44,82 +46,357 @@
     .nav-links{display:flex;gap:var(--space-6);align-items:center;}
     .nav-links a{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;font-weight:500;transition:color var(--transition);}
     .nav-links a:hover{color:var(--text);}
-    .nav-links a.active{color:var(--metro);}
+    .nav-links a.active{color:var(--accent);}
     .theme-btn{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:var(--radius-md);padding:var(--space-2);cursor:pointer;display:flex;transition:color var(--transition),border-color var(--transition);}
     .theme-btn:hover{color:var(--text);border-color:var(--text-muted);}
 
     /* PAGE HEADER */
-    .page-header{padding:var(--space-8) var(--space-8) 0;max-width:1400px;margin:0 auto;}
-    .back-link{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-6);transition:color var(--transition);}
-    .back-link:hover{color:var(--text);}
-    .page-label{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--metro);margin-bottom:var(--space-2);}
-    .page-title{font-family:var(--font-display);font-size:var(--text-xl);font-weight:800;letter-spacing:-.02em;margin-bottom:var(--space-3);}
-    .page-desc{font-size:var(--text-sm);color:var(--text-muted);max-width:70ch;margin-bottom:var(--space-6);}
+    .page-header {
+      padding: var(--space-12) var(--space-8) var(--space-8);
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--space-8);
+      align-items: start;
+    }
+    .page-label{font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--metro-teal);margin-bottom:var(--space-3);}
+    .page-title{font-family:var(--font-display);font-size:var(--text-2xl);font-weight:800;line-height:1.05;letter-spacing:-0.03em;margin-bottom:var(--space-4);}
+    .page-desc{font-size:var(--text-base);color:var(--text-muted);max-width:56ch;}
 
-    /* STATS STRIP */
-    .stats-strip{display:flex;gap:var(--space-4);flex-wrap:wrap;max-width:1400px;margin:0 auto var(--space-8);padding:0 var(--space-8);}
-    .stat-pill{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-3) var(--space-6);display:flex;flex-direction:column;gap:2px;}
-    .stat-pill-val{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;color:var(--metro);letter-spacing:-.02em;}
-    .stat-pill-lbl{font-size:var(--text-xs);color:var(--text-muted);}
+    /* METRO LOGO BADGE */
+    .metro-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .metro-logo-circle {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--metro-teal);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 2rem; font-weight: 800;
+      color: white;
+      letter-spacing: -0.05em;
+      box-shadow: 0 0 32px rgba(20,184,166,0.3);
+    }
+    .metro-badge-label{font-size:var(--text-xs);color:var(--text-muted);font-weight:600;text-align:center;}
 
-    /* TABLE */
-    .table-container{max-width:1400px;margin:0 auto var(--space-12);padding:0 var(--space-8);overflow-x:auto;}
-    .metro-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);background:var(--surface);border-radius:var(--radius-xl);overflow:hidden;border:1px solid var(--border);}
-    .metro-table thead th{background:var(--surface-2);color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.07em;font-size:var(--text-xs);padding:var(--space-4) var(--space-4);text-align:left;border-bottom:2px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;transition:color var(--transition);}
-    .metro-table thead th:hover{color:var(--text);}
-    .metro-table thead th.sort-asc::after{content:' ↑';color:var(--metro);}
-    .metro-table thead th.sort-desc::after{content:' ↓';color:var(--metro);}
-    .metro-table thead th:not(:first-child){text-align:right;}
-    .metro-table tbody td{padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--border);vertical-align:middle;}
-    .metro-table tbody tr:last-child td{border-bottom:none;}
-    .metro-table tbody tr:hover td{background:var(--surface-2);}
-    .metro-table td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums;}
+    /* STATS BAR */
+    .stats-bar {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-8) var(--space-8);
+      display: flex;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .stat-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: var(--space-2) var(--space-4);
+      display: flex; align-items: center; gap: var(--space-2);
+      font-size: var(--text-sm);
+    }
+    .stat-pill-value { font-weight: 700; font-family: var(--font-display); }
+    .stat-pill-label { color: var(--text-muted); }
 
-    /* City name cell */
-    .city-cell{display:flex;align-items:center;gap:var(--space-3);}
-    .city-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-    .city-name{font-weight:600;color:var(--text);}
-    .city-name a{color:inherit;text-decoration:none;border-bottom:1px dashed var(--border);transition:border-color var(--transition),color var(--transition);}
-    .city-name a:hover{color:var(--metro);border-color:var(--metro);}
-    .city-sub{font-size:var(--text-xs);color:var(--text-muted);}
+    /* FILTERS */
+    .controls {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-8) var(--space-6);
+      display: flex;
+      gap: var(--space-3);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: var(--space-2) var(--space-4);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .filter-btn:hover { border-color: var(--text-muted); color: var(--text); }
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+    .search-box {
+      margin-left: auto;
+      padding: var(--space-2) var(--space-4);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      color: var(--text);
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color var(--transition);
+      width: 220px;
+    }
+    .search-box:focus { border-color: var(--accent); }
+    .search-box::placeholder { color: var(--text-faint); }
 
-    /* Line count badges */
-    .lines-badge{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:24px;border-radius:9999px;font-size:.75rem;font-weight:700;padding:0 var(--space-2);}
-    .lines-lg{background:rgba(20,184,166,.18);color:var(--metro);}
-    .lines-md{background:rgba(59,130,246,.14);color:var(--accent);}
-    .lines-sm{background:var(--surface-2);color:var(--text-muted);}
+    /* VIEW TOGGLE */
+    .view-toggle {
+      display: flex;
+      gap: var(--space-1);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-1);
+    }
+    .view-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-sm); transition: all var(--transition);
+      font-size: var(--text-sm); font-family: var(--font-body); font-weight: 500;
+    }
+    .view-btn.active { background: var(--surface-2); color: var(--text); }
 
-    /* km bar */
-    .km-cell{display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
-    .km-val{font-weight:600;}
-    .km-bar-wrap{width:80px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
-    .km-bar{height:100%;border-radius:2px;background:var(--metro);}
+    /* LINES GRID */
+    .lines-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-8) var(--space-16);
+    }
 
-    /* data year chip */
-    .year-chip{font-size:.7rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1px 6px;color:var(--text-muted);}
-    .users-val{font-weight:600;}
-    .users-na{color:var(--text-faint);font-size:.75rem;}
+    /* CARD VIEW */
+    .lines-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
+      gap: var(--space-4);
+    }
 
-    /* detail sections */
-    .detail-section{max-width:1400px;margin:0 auto var(--space-12);padding:0 var(--space-8);}
-    .detail-section h2{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;letter-spacing:-.02em;margin-bottom:var(--space-2);display:flex;align-items:center;gap:var(--space-3);}
-    .detail-section p{font-size:var(--text-sm);color:var(--text-muted);max-width:70ch;}
-    .wip-banner{display:inline-flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);font-weight:600;padding:var(--space-2) var(--space-4);background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.25);border-radius:var(--radius-md);margin-top:var(--space-4);}
+    .line-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+      cursor: default;
+    }
+    .line-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .line-card-header {
+      padding: var(--space-4) var(--space-5);
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .line-card-header::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+    }
+    .line-code-badge {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+      letter-spacing: 0.02em;
+    }
+    .line-card-title-wrap { flex: 1; min-width: 0; }
+    .line-card-number { font-size: var(--text-xs); color: var(--text-muted); font-weight: 600; }
+    .line-card-name {
+      font-family: var(--font-display);
+      font-size: var(--text-base);
+      font-weight: 700;
+      line-height: 1.2;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .line-card-year {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 2px var(--space-2);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .line-card-body { padding: var(--space-4) var(--space-5); }
+    .line-meta-row {
+      display: flex;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+    .line-meta-item { flex: 1; }
+    .line-meta-value {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-weight: 800;
+      line-height: 1;
+    }
+    .line-meta-label {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .line-termini {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      background: var(--surface-2);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-3);
+      margin-bottom: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .terminus-name { color: var(--text); font-weight: 600; }
+    .terminus-sep { color: var(--text-faint); }
+    .line-facts {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      line-height: 1.5;
+      border-top: 1px solid var(--border);
+      padding-top: var(--space-3);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .thru-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px var(--space-2);
+      background: rgba(245,158,11,0.12);
+      color: var(--izx-gold);
+      border-radius: 9999px;
+      border: 1px solid rgba(245,158,11,0.2);
+      margin-top: var(--space-2);
+    }
+    .private-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px var(--space-2);
+      background: rgba(239,68,68,0.12);
+      color: var(--izx-red);
+      border-radius: 9999px;
+      border: 1px solid rgba(239,68,68,0.2);
+      margin-top: var(--space-2);
+    }
 
-    footer{border-top:1px solid var(--border);padding:var(--space-8);text-align:center;font-size:var(--text-sm);color:var(--text-muted);}
+    /* TABLE VIEW */
+    .lines-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+    }
+    .lines-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+    .lines-table thead th {
+      background: var(--surface);
+      padding: var(--space-3) var(--space-4);
+      text-align: left;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .lines-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    .lines-table tbody tr:last-child { border-bottom: none; }
+    .lines-table tbody tr:hover { background: var(--surface-2); }
+    .lines-table td {
+      padding: var(--space-3) var(--space-4);
+      vertical-align: middle;
+    }
+    .table-code {
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 36px; height: 28px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-size: var(--text-xs);
+      font-weight: 800;
+      color: white;
+    }
+    .table-line-name {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .table-termini { color: var(--text-muted); font-size: var(--text-xs); white-space: nowrap; }
+    .table-num { font-family: var(--font-display); font-weight: 700; }
+
+    /* HIDDEN */
+    .hidden { display: none !important; }
+
+    /* SECTION DIVIDER */
+    .section-divider {
+      max-width: 1200px;
+      margin: 0 auto var(--space-4);
+      padding: 0 var(--space-8);
+    }
+    .section-divider-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-faint);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .section-divider-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:var(--space-8);text-align:center;font-size:var(--text-sm);color:var(--text-muted);margin-top:var(--space-8);}
     footer a{color:var(--accent);text-decoration:none;}
+    footer a:hover{text-decoration:underline;}
+
+    /* RESPONSIVE */
     @media(max-width:768px){
       nav{padding:var(--space-3) var(--space-4);}
-      .page-header,.stats-strip,.table-container,.detail-section{padding-left:var(--space-4);padding-right:var(--space-4);}
       .nav-links{gap:var(--space-3);}
+      .page-header{grid-template-columns:1fr;padding:var(--space-8) var(--space-4) var(--space-6);}
+      .metro-badge{display:none;}
+      .stats-bar,.controls,.lines-container,.section-divider{padding-left:var(--space-4);padding-right:var(--space-4);}
+      .search-box{width:100%;}
     }
   </style>
 </head>
 <body>
-
   <nav>
     <a href="index.html" class="nav-logo">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Izaland Transit">
         <rect width="32" height="32" rx="8" fill="var(--accent)"/>
         <rect x="6" y="14" width="20" height="3" rx="1.5" fill="white"/>
         <rect x="6" y="9" width="14" height="3" rx="1.5" fill="white" opacity="0.7"/>
@@ -136,416 +413,870 @@
       <a href="index.html">Home</a>
       <a href="izx.html">IZX</a>
       <a href="metro.html" class="active">Metro</a>
-      <a href="#">Map</a>
+      <a href="#map">Map</a>
       <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
     </div>
   </nav>
 
+  <!-- PAGE HEADER -->
   <div class="page-header">
-    <a href="index.html" class="back-link">← Back to portal</a>
-    <div class="page-label">Urban Rail · Subway Networks</div>
-    <h1 class="page-title">Metro &amp; Subway Systems</h1>
-    <p class="page-desc">Izaland hosts 17 urban metro and subway networks across its major cities, ranging from Sainðaul’s 19-line megasystem to the single-line light metro of Riimibaiken and Shirukami. All networks use the IZWay contactless card and standard 1,435 mm gauge.</p>
+    <div>
+      <div class="page-label">Sainðaul Metropolitan Transit</div>
+      <h1 class="page-title">Sainðaul Metro</h1>
+      <p class="page-desc">The underground backbone of the Izaland capital. 19 lines spanning the two sides of the Tandan Strait — from the historic Hibaru Line of 1919 to the newest automated corridors of the modern era.</p>
+    </div>
+    <div class="metro-badge">
+      <div class="metro-logo-circle">SM</div>
+      <div class="metro-badge-label">Sainðaul Metro<br>Established 1919</div>
+    </div>
   </div>
 
-  <!-- STATS STRIP -->
-  <div class="stats-strip">
-    <div class="stat-pill"><div class="stat-pill-val">17</div><div class="stat-pill-lbl">cities with metro</div></div>
-    <div class="stat-pill"><div class="stat-pill-val">79</div><div class="stat-pill-lbl">total lines</div></div>
-    <div class="stat-pill"><div class="stat-pill-val">1,933 km</div><div class="stat-pill-lbl">total network length</div></div>
-    <div class="stat-pill"><div class="stat-pill-val">1,435 mm</div><div class="stat-pill-lbl">standard gauge (all systems)</div></div>
-    <div class="stat-pill"><div class="stat-pill-val">IZWay</div><div class="stat-pill-lbl">national smart card</div></div>
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-pill">
+      <span class="stat-pill-value" style="color:var(--metro-teal)">19</span>
+      <span class="stat-pill-label">metro lines</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-value" style="color:var(--accent)">673.93</span>
+      <span class="stat-pill-label">km of network</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-value" style="color:var(--izx-gold)">1919</span>
+      <span class="stat-pill-label">year opened</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-value" style="color:var(--izx-red)">3</span>
+      <span class="stat-pill-label">lines cross Tandan Strait</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-value">Kishagoi</span>
+      <span class="stat-pill-label">undersea tunnel</span>
+    </div>
   </div>
 
-  <!-- MAIN TABLE -->
-  <div class="table-container">
-    <table class="metro-table" id="metroTable">
-      <thead>
-        <tr>
-          <th data-col="city">City</th>
-          <th data-col="lines">Lines</th>
-          <th data-col="km">System length</th>
-          <th data-col="stations">Stations</th>
-          <th data-col="users">Daily users</th>
-          <th data-col="year">Data</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Row template:
-             city-dot colour chosen by rough population tier
-             km-bar width = (km / 674) * 100  (max = Sainðaul)
-        -->
-        <tr data-city="saindaul" data-lines="19" data-km="673.93" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#14b8a6;"></div>
-              <div>
-                <div class="city-name"><a href="#saindaul">Sainðaul</a></div>
-                <div class="city-sub">Capital</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-lg">19</span></td>
-          <td><div class="km-cell"><span class="km-val">673.93 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:100%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-        <tr data-city="warohan" data-lines="8" data-km="217.90" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#3b82f6;"></div>
-              <div>
-                <div class="city-name"><a href="#warohan">Warohan</a></div>
-                <div class="city-sub">2nd city · Nankai terminus</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-md">8</span></td>
-          <td><div class="km-cell"><span class="km-val">217.90 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:32%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-        <tr data-city="panaireki" data-lines="8" data-km="193.81" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#3b82f6;"></div>
-              <div>
-                <div class="city-name"><a href="#panaireki">Panaireki</a></div>
-                <div class="city-sub">IZX Keishin K12</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-md">8</span></td>
-          <td><div class="km-cell"><span class="km-val">193.81 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:29%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-        <tr data-city="riyatoma" data-lines="4" data-km="114.26" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#8b5cf6;"></div>
-              <div>
-                <div class="city-name"><a href="#riyatoma">Riyatoma</a></div>
-                <div class="city-sub">IZX Ryānkai</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">4</span></td>
-          <td><div class="km-cell"><span class="km-val">114.26 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:17%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-        <tr data-city="sannupuri" data-lines="4" data-km="107.59" data-stations="" data-users="1256000" data-year="2020">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#8b5cf6;"></div>
-              <div>
-                <div class="city-name"><a href="#sannupuri">Sannupuri</a></div>
-                <div class="city-sub">IZX Ryānkai terminus</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">4</span></td>
-          <td><div class="km-cell"><span class="km-val">107.59 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:16%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-val">1,256,000</span></td>
-          <td><span class="year-chip">2020</span></td>
-        </tr>
-        <tr data-city="kichatsura" data-lines="4" data-km="93.47" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#8b5cf6;"></div>
-              <div>
-                <div class="city-name"><a href="#kichatsura">Kichatsura</a></div>
-                <div class="city-sub">IZX Keishin K10</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">4</span></td>
-          <td><div class="km-cell"><span class="km-val">93.47 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:14%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-        <tr data-city="makkenoke" data-lines="3" data-km="95.66" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#f59e0b;"></div>
-              <div>
-                <div class="city-name"><a href="#makkenoke">Makkenoke</a></div>
-                <div class="city-sub">—</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">3</span></td>
-          <td><div class="km-cell"><span class="km-val">95.66 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:14%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-        <tr data-city="nugamochi" data-lines="3" data-km="59.56" data-stations="" data-users="300000" data-year="2021">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#f59e0b;"></div>
-              <div>
-                <div class="city-name"><a href="#nugamochi">Nugamochi</a></div>
-                <div class="city-sub">IZX Keishin K11</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">3</span></td>
-          <td><div class="km-cell"><span class="km-val">59.56 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:9%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-val">300,000</span></td>
-          <td><span class="year-chip">2021</span></td>
-        </tr>
-        <tr data-city="daishin" data-lines="3" data-km="73.54" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#f59e0b;"></div>
-              <div>
-                <div class="city-name"><a href="#daishin">Daishin</a></div>
-                <div class="city-sub">IZX Nankai terminus (N4)</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">3</span></td>
-          <td><div class="km-cell"><span class="km-val">73.54 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:11%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-        <tr data-city="kanlisahna" data-lines="2" data-km="71.35" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#94a3b8;"></div>
-              <div>
-                <div class="city-name"><a href="#kanlisahna">Kanlisahna</a></div>
-                <div class="city-sub">—</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">2</span></td>
-          <td><div class="km-cell"><span class="km-val">71.35 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:11%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-        <tr data-city="isadashi" data-lines="2" data-km="48.17" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#94a3b8;"></div>
-              <div>
-                <div class="city-name"><a href="#isadashi">Isadashi</a></div>
-                <div class="city-sub">IZX Ryānkai</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">2</span></td>
-          <td><div class="km-cell"><span class="km-val">48.17 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:7%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-        <tr data-city="illashiya" data-lines="2" data-km="46.90" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#94a3b8;"></div>
-              <div>
-                <div class="city-name"><a href="#illashiya">Illashiya</a></div>
-                <div class="city-sub">IZX Keishin K104</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">2</span></td>
-          <td><div class="km-cell"><span class="km-val">46.90 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:7%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-        <tr data-city="nagareki" data-lines="2" data-km="57.59" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#94a3b8;"></div>
-              <div>
-                <div class="city-name"><a href="#nagareki">Nagareki</a></div>
-                <div class="city-sub">IZX Nagareki terminus</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">2</span></td>
-          <td><div class="km-cell"><span class="km-val">57.59 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:9%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-        <tr data-city="sahnajima" data-lines="2" data-km="29.95" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#94a3b8;"></div>
-              <div>
-                <div class="city-name"><a href="#sahnajima">Sahnajima</a></div>
-                <div class="city-sub">—</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">2</span></td>
-          <td><div class="km-cell"><span class="km-val">29.95 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:4%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-        <tr data-city="shirukami" data-lines="1" data-km="17.17" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#475569;"></div>
-              <div>
-                <div class="city-name"><a href="#shirukami">Shirukami</a></div>
-                <div class="city-sub">IZX Nagareki</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">1</span></td>
-          <td><div class="km-cell"><span class="km-val">17.17 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:3%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-        <tr data-city="pewanari" data-lines="1" data-km="21.69" data-stations="15" data-users="126000" data-year="2021">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#475569;"></div>
-              <div>
-                <div class="city-name"><a href="#pewanari">Pewanari</a></div>
-                <div class="city-sub">—</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">1</span></td>
-          <td><div class="km-cell"><span class="km-val">21.69 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:3%"></div></div></div></td>
-          <td>15</td>
-          <td><span class="users-val">126,000</span></td>
-          <td><span class="year-chip">2021</span></td>
-        </tr>
-        <tr data-city="riimibaiken" data-lines="1" data-km="11.47" data-stations="" data-users="" data-year="">
-          <td>
-            <div class="city-cell">
-              <div class="city-dot" style="background:#475569;"></div>
-              <div>
-                <div class="city-name"><a href="#riimibaiken">Riimibaiken</a></div>
-                <div class="city-sub">—</div>
-              </div>
-            </div>
-          </td>
-          <td><span class="lines-badge lines-sm">1</span></td>
-          <td><div class="km-cell"><span class="km-val">11.47 km</span><div class="km-bar-wrap"><div class="km-bar" style="width:2%"></div></div></div></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-          <td><span class="users-na">—</span></td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- CONTROLS -->
+  <div class="controls">
+    <button class="filter-btn active" data-filter="all">All lines</button>
+    <button class="filter-btn" data-filter="public">Public</button>
+    <button class="filter-btn" data-filter="private">Private</button>
+    <button class="filter-btn" data-filter="thru">Thru service</button>
+    <button class="filter-btn" data-filter="automated">Automated</button>
+    <div class="view-toggle">
+      <button class="view-btn active" data-view="grid">⊞ Grid</button>
+      <button class="view-btn" data-view="table">≡ Table</button>
+    </div>
+    <input class="search-box" type="search" placeholder="Search lines, stations…" id="searchInput">
   </div>
 
-  <!-- CITY DETAIL STUBS -->
-  <div class="detail-section" id="saindaul">
-    <h2>🚇 Sainðaul Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 19 lines · 673.93 km</span></h2>
-    <p>The Sainðaul Metro (Capital Subway) is the largest urban rail network in Izaland and one of the most extensive in the Axian region, with 19 lines covering the metropolitan area of the capital city. Lines are integrated with Izarail suburban rail and the IZX Keishin Line at Sainðaul Central (K01).</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
+  <!-- LINES — PUBLIC -->
+  <div class="section-divider" id="divider-public">
+    <div class="section-divider-label">Sainðaul Metro — Public Lines</div>
   </div>
-  <div class="detail-section" id="warohan">
-    <h2>🚇 Warohan Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 8 lines · 217.90 km</span></h2>
-    <p>The Warohan Metro serves Izaland’s second city and the southern terminus of the IZX Keishin Line (K17) and the Nankai Line (K17–N4). The network interconnects with the IZX station at Warohan Central.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="panaireki">
-    <h2>🚇 Panaireki Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 8 lines · 193.81 km</span></h2>
-    <p>Panaireki’s metro network is one of the busiest outside the capital, serving the city’s commercial and industrial districts. The IZX Keishin station (K12) provides a direct intercity link.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="kichatsura">
-    <h2>🚇 Kichatsura Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 4 lines · 93.47 km</span></h2>
-    <p>Kichatsura’s four metro lines radiate from the IZX Keishin hub at Shin-Kichatsura Teba (K10), where the Sakamuso Branch also converges.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="sannupuri">
-    <h2>🚇 Sannupuri Subway <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 4 lines · 107.59 km</span></h2>
-    <p>Sannupuri operates four subway lines serving the western terminus of the IZX Ryānkai Line. Daily ridership reached 1,256,000 in 2020.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="riyatoma">
-    <h2>🚇 Riyatoma Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 4 lines · 114.26 km</span></h2>
-    <p>Riyatoma’s metro network connects the coastal city centre with suburban districts and the IZX Ryānkai station.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="makkenoke">
-    <h2>🚇 Makkenoke Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 3 lines · 95.66 km</span></h2>
-    <p>Three-line network serving Makkenoke’s urban core.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="daishin">
-    <h2>🚇 Daishin Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 3 lines · 73.54 km</span></h2>
-    <p>Daishin is the southern terminus of the IZX Nankai Line (N4). Its three metro lines connect the IZX station with the city’s port, commercial and residential districts.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="nugamochi">
-    <h2>🚇 Nugamochi Subway <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 3 lines · 59.56 km</span></h2>
-    <p>Nugamochi’s three subway lines recorded 300,000 daily riders in 2021. The city is served by the IZX Keishin Line at K11.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="illashiya">
-    <h2>🚇 Illashiya Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 2 lines · 46.90 km</span></h2>
-    <p>Illashiya is served by the IZX Keishin Sakamuso Branch at K104. Its two metro lines link the IZX station with the wider urban area.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="kanlisahna">
-    <h2>🚇 Kanlisahna Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 2 lines · 71.35 km</span></h2>
-    <p>Two-line metro network serving Kanlisahna’s urban core and its connection to the national rail network.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="sahnajima">
-    <h2>🚇 Sahnajima Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 2 lines · 29.95 km</span></h2>
-    <p>Compact two-line network for Sahnajima’s urban core.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="isadashi">
-    <h2>🚇 Isadashi Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 2 lines · 48.17 km</span></h2>
-    <p>Isadashi is served by the IZX Ryānkai Line. Its metro lines connect the high-speed rail station with the city’s districts.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="nagareki">
-    <h2>🚇 Nagareki Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 2 lines · 57.59 km</span></h2>
-    <p>Two-line network at the terminus of the IZX Nagareki Line, connecting rail passengers with the city’s main urban districts.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="shirukami">
-    <h2>🚇 Shirukami Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 1 line · 17.17 km</span></h2>
-    <p>Single-line metro serving Shirukami’s city centre, located along the IZX Nagareki corridor.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="pewanari">
-    <h2>🚇 Pewanari Light Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 1 line · 21.69 km · 15 stations</span></h2>
-    <p>Pewanari operates a single light-metro line with 15 stations. Daily ridership reached 126,000 in 2021, making it one of the best-used per-km compact systems in Izaland.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
-  <div class="detail-section" id="riimibaiken">
-    <h2>🚇 Riimibaiken Metro <span style="font-weight:400;color:var(--text-muted);font-size:var(--text-base)">— 1 line · 11.47 km</span></h2>
-    <p>The shortest metro system in Izaland — a single line serving Riimibaiken’s compact city centre.</p>
-    <div class="wip-banner">⏳ Full line map &amp; station list coming soon</div>
-  </div>
+
+  <div class="lines-container">
+    <!-- GRID VIEW -->
+    <div class="lines-grid" id="gridView">
+
+      <!-- Line 2: HB Hibaru -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="hibaru hb 2 naezoto mokoba hintomaui oitsura">
+        <div class="line-card-header" style="--lc:#CC0000">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#CC0000;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#CC0000">HB</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 2</div>
+            <div class="line-card-name">Hibaru Line</div>
+          </div>
+          <div class="line-card-year">est. 1919</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item">
+              <div class="line-meta-value">36.02</div>
+              <div class="line-meta-label">km</div>
+            </div>
+            <div class="line-meta-item">
+              <div class="line-meta-value">27</div>
+              <div class="line-meta-label">stations</div>
+            </div>
+            <div class="line-meta-item">
+              <div class="line-meta-value">2</div>
+              <div class="line-meta-label">branches</div>
+            </div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Naezoto</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Mokoba</span>
+            <span class="terminus-sep">/</span>
+            <span class="terminus-name">Hintomaui</span>
+          </div>
+          <div class="line-facts">The first subway line built in Izaland — and one of the first in Eastern Uletha. Runs west-east through the old city core, serving the central station area, the government district of Amiya, and the Eikuku-ji Temple precinct. Splits eastward into two branches.</div>
+        </div>
+      </div>
+
+      <!-- Line 1: AD Agarai-Dōnpuku -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="agarai donpuku ad 1 ikashumai enikezya yakata">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FE7F00;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#FE7F00">AD</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 1</div>
+            <div class="line-card-name">Agarai-Dōnpuku Line</div>
+          </div>
+          <div class="line-card-year">est. 1924</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">51.66</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">30</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Express</div><div class="line-meta-label">service</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Ikashumai Sports Center</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Enikezya Forum</span>
+          </div>
+          <div class="line-facts">The second-oldest line of the system, upgraded multiple times. Offers express and rapid services. Extension from Ikashumai Sports Center to Yakata targeted for 2024.</div>
+        </div>
+      </div>
+
+      <!-- Line 3: SH Shakihori -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="shakihori sh 3 ansan shakuiadae iyogateri bibawara komayunden rapid">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#009E4F;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#009E4F">SH</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 3</div>
+            <div class="line-card-name">Shakihori Line</div>
+          </div>
+          <div class="line-card-year">est. 1932</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">42.96</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">25</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Rapid</div><div class="line-meta-label">N. section</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Ansan Shakuiadae</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Iyogateri</span>
+          </div>
+          <div class="line-facts">Connects the central districts north-south (Shiitehongi–Herubori). Rapid service north of Komayunden; all-stop south. Extension from Bibawara opened 2019.</div>
+        </div>
+      </div>
+
+      <!-- Line 4: KO Kokendake -->
+      <div class="line-card" data-type="public" data-tags="public thru" data-search="kokendake ko 4 abawauri kawaei oitsura ipporai embassy aguri kushigae rapid">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FFD912;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#FFD912; color:#1e293b">KO</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 4</div>
+            <div class="line-card-name">Kokendake Line</div>
+          </div>
+          <div class="line-card-year">est. 1937</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">18.45</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">15</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">1976</div><div class="line-meta-label">thru since</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Abawauri</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Kawaei</span>
+          </div>
+          <div class="line-facts">Runs parallel to the Hibaru Line, touching the embassy district (Aguri) and old city (Kushigae). First upgraded line to offer rapid service (1998). Thru service onto Shinsabu Oitsura Line.</div>
+          <div class="thru-badge">⇄ Thru: Shinsabu Oitsura Line</div>
+        </div>
+      </div>
+
+      <!-- Line 5: KE Kirifunu Eigandan -->
+      <div class="line-card" data-type="public" data-tags="public thru" data-search="kirifunu eigandan ke 5 jisahara tsuragoi komokata shosen 180kmh fast">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#9E6A51;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#9E6A51">KE</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 5</div>
+            <div class="line-card-name">Kirifunu Eigandan Line</div>
+          </div>
+          <div class="line-card-year">est. 1941</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">16.05</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">13</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">180</div><div class="line-meta-label">km/h max</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Jisahara</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Tsuragoi</span>
+          </div>
+          <div class="line-facts">Reversed "L" shape through central Bajikoe. Since 2013, rapid thru trains reach Komokata at up to 180 km/h on the IR Shosen Line — one of the fastest subway services in the world.</div>
+          <div class="thru-badge">⇄ Thru: IR Shosen Line → Komokata</div>
+        </div>
+      </div>
+
+      <!-- Line 8: HM Hamaas -->
+      <div class="line-card" data-type="public" data-tags="public thru" data-search="hamaas hm 8 kishagoi komayunden islands tandan strait thru">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#00A2D3;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#00A2D3">HM</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 8</div>
+            <div class="line-card-name">Hamaas Line</div>
+          </div>
+          <div class="line-card-year">est. 1958</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">23.95</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">22</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">V</div><div class="line-meta-label">shape</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Kishagoi</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Komayunden</span>
+          </div>
+          <div class="line-facts">"Line of the islands" — V-shaped, linking north-west eastern Sainðaul to the north-east via central locations. Thru services onto IR Tandan Kaihyō Line and Ibaches Main Line.</div>
+          <div class="thru-badge">⇄ Thru: IR Tandan Kaihyō · Ibaches Main</div>
+        </div>
+      </div>
+
+      <!-- Line 6: IP Ipporai -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="ipporai ip 6 saibu panatsawa nari gotsurindai tandan strait 1967 undersea tunnel norihoi">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#3465A4;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#3465A4">IP</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 6</div>
+            <div class="line-card-name">Ipporai Line</div>
+          </div>
+          <div class="line-card-year">est. 1967</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">47.30</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">30</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">1973</div><div class="line-meta-label">strait crossed</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Saibu-Panatsawa</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Nari-Gotsurindai</span>
+          </div>
+          <div class="line-facts">The first subway line to cross the Tandan Strait (undersea tunnel, 1973). Dramatically lightened congestion on IR lines. Extended 2008 and 2018. Possible future extension to Iberotsuna under study.</div>
+        </div>
+      </div>
+
+      <!-- Line 7: BJ Bajikoe -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="bajikoe bj 7 pwakkobe akettun shendao komokata riimibaiken eigandan shutazai chikawari">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#00A0BC;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#00A0BC">BJ</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 7</div>
+            <div class="line-card-name">Bajikoe Line</div>
+          </div>
+          <div class="line-card-year">est. 1972</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">36.47</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">29</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">"5"</div><div class="line-meta-label">shape</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Pwakkobe</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Akettun Shendao</span>
+          </div>
+          <div class="line-facts">Number "5" shaped line linking the Riimibaiken port area to the western CBD under Eigandan Lan and Shutazai-ku. Branch project towards Chikawari pending funding.</div>
+        </div>
+      </div>
+
+      <!-- Line 9: BX Bordeaux -->
+      <div class="line-card" data-type="public" data-tags="public thru automated" data-search="bordeaux bx 9 teyomuka shoryan daishi automated 6 cars shinsabu tsukasai">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#C40062;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#C40062">BX</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 9</div>
+            <div class="line-card-name">Bordeaux Line</div>
+          </div>
+          <div class="line-card-year">est. 1986</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">14.00</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">13</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Auto</div><div class="line-meta-label">driverless</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Teyomuka</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Shōryān Daishi</span>
+          </div>
+          <div class="line-facts">First lower-capacity automated line. 6-car fully driverless trains. Possible extension to Tsukasai (Agarai-Dōnpuku interchange) under study.</div>
+          <div class="thru-badge">⇄ Thru: Shinsabu Line → Hidano</div>
+        </div>
+      </div>
+
+      <!-- Line 10: SO Shakiose -->
+      <div class="line-card" data-type="public" data-tags="public thru" data-search="shakiose so 10 shakihori uhara motu shikisabu rillantsoye">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#C46200;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#C46200">SO</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 10</div>
+            <div class="line-card-name">Shakiose Line</div>
+          </div>
+          <div class="line-card-year">est. 1969</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">32.80</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">29</div><div class="line-meta-label">stations</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Shakihori</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Uhāra-Motu</span>
+          </div>
+          <div class="line-facts">Runs parallel to the Shakihori (green) line between Niji-Shakihori and Rillantsoye. Thru service onto Shikisabu Railway.</div>
+          <div class="thru-badge">⇄ Thru: Shikisabu Railway</div>
+        </div>
+      </div>
+
+      <!-- Line 11: OD Owonideki -->
+      <div class="line-card" data-type="public" data-tags="public thru" data-search="owonideki od 11 itsayuki tonjo jisahara north south boulevard shosen">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#c5e1a5;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#c5e1a5; color:#1e293b">OD</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 11</div>
+            <div class="line-card-name">Owonideki Line</div>
+          </div>
+          <div class="line-card-year">est. 2012</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">23.32</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">22</div><div class="line-meta-label">stations</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Itsayuki-Tonjō</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Jisahara</span>
+          </div>
+          <div class="line-facts">North-south line mostly following Owonideki Boulevard in the western city. Thru service onto IR Shosen Line to Katayoshi-Juwon.</div>
+          <div class="thru-badge">⇄ Thru: IR Shosen Line → Katayoshi-Juwon</div>
+        </div>
+      </div>
+
+      <!-- Line 12: IS Intsushitsa -->
+      <div class="line-card" data-type="public" data-tags="public automated" data-search="intsushitsa is 12 kayatsori mewakate kippai niji yoneo koyabi island automated branch tanjanli">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#86EBEB;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#86EBEB; color:#1e293b">IS</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 12</div>
+            <div class="line-card-name">Intsushitsa Line</div>
+          </div>
+          <div class="line-card-year">est. 1995</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">14.23</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">13</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Auto</div><div class="line-meta-label">driverless</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Kayatsori</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Mewakate-Kippai / Niji-Yōneo</span>
+          </div>
+          <div class="line-facts">Fully automated middle-capacity line connecting eastern center with Koyabi Island. 8.6 km branch to Niji-Yōneo opened 2020. Mixed frequency: 4–6 trains/hr per branch.</div>
+        </div>
+      </div>
+
+      <!-- Line 13: TN Tsuruna -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="tsuruna tn 13 saia cargo center showanul kashimochi airport riimibaiken tahamuro">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#36873c;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#36873c">TN</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 13</div>
+            <div class="line-card-name">Tsuruna Line</div>
+          </div>
+          <div class="line-card-year">est. 2003</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">39.40</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">29</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Spur</div><div class="line-meta-label">branch</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">SAIA Cargo Center</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Showanul / Kashimochi</span>
+          </div>
+          <div class="line-facts">Airport link under Tsuruna Yaon connecting Asunahama International Airport to the west via Riimibaiken and Tahamuro. Southern spur offers IZX interchange at Showanul.</div>
+        </div>
+      </div>
+
+      <!-- Line 14: NO Nanpuku Otsumi -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="nanpuku otsumi no 14 migawarae tanjanli masuda agarai jufurai intsushitsa dankau">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#72E400;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#72E400; color:#1e293b">NO</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 14</div>
+            <div class="line-card-name">Nanpuku Otsumi Line</div>
+          </div>
+          <div class="line-card-year">est. 2004</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">22.57</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">20</div><div class="line-meta-label">stations</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Migawarae</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Tanjānli</span>
+          </div>
+          <div class="line-facts">One of the most heavily used lines, connecting Masuda Agarai, Jufurai, and Intsushitsa Island with north-eastern districts. Extension to Dankau currently under construction.</div>
+        </div>
+      </div>
+
+      <!-- Line 15: UN Urenosomi -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="urenosomi un 15 saia cargo center sakamuso bibaisone semicircle west south">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#db287a;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#db287a">UN</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 15</div>
+            <div class="line-card-name">Urenosomi Line</div>
+          </div>
+          <div class="line-card-year">est. 2010</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">34.31</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">24</div><div class="line-meta-label">stations</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">SAIA Cargo Center</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Sakamuso</span>
+          </div>
+          <div class="line-facts">Draws a semicircle along the western and southern edges of West Sainðaul. Shares track with Line 13 (Tsuruna) between SAIA Cargo Center and Bibaisone.</div>
+        </div>
+      </div>
+
+      <!-- Line 16: KW Kyokwan -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="kyokwan kw 16 tsukitonai kamaishi kaiyan kowen loop koneei bajikoe 71km">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#816cb1;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#816cb1">KW</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 16</div>
+            <div class="line-card-name">Kyokwan Line</div>
+          </div>
+          <div class="line-card-year">est. 2013</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">71.50</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">52</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Mega</div><div class="line-meta-label">loop</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Tsukitonai</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Kamaishi Kaiyan Kōwen</span>
+          </div>
+          <div class="line-facts">Almost-complete mega-loop around both city centres — longest line in the system. Southern completion through Kashimochi and Utsullani Islands estimated at 11.2B Etsi. Shares track with Line 18.</div>
+        </div>
+      </div>
+
+      <!-- Line 17: ZK Zakumi -->
+      <div class="line-card" data-type="public" data-tags="public thru" data-search="zakumi zk 17 tswankanami airport mewakate kippai kungaus sangu shikumun gashi line rapid 55min">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#f985bb;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#f985bb; color:#1e293b">ZK</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 17</div>
+            <div class="line-card-name">Zakumi Line</div>
+          </div>
+          <div class="line-card-year">est. 2013</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">51.83</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">38</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">55′</div><div class="line-meta-label">rapid end-to-end</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Tswankanami Airport</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Mewakate Kippai / Kungaus Sangu</span>
+          </div>
+          <div class="line-facts">West-east in north West Sainðaul, north-south on the eastern side. Two main patterns; rapid trains cover the full line in ~55 min. Shares track with Lines 16 and 18.</div>
+          <div class="thru-badge">⇄ Thru: IR Gashi Line → Kirijima</div>
+        </div>
+      </div>
+
+      <!-- Line 18: JF Jufurai -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="jufurai jf 18 nari gotsurindai mewakate kippai former dunkOn ir">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#999999;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#999999">JF</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 18</div>
+            <div class="line-card-name">Jufurai Line</div>
+          </div>
+          <div class="line-card-year">est. 1998</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">27.51</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">20</div><div class="line-meta-label">stations</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Nari-Gotsurindai</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Mewakate Kippai</span>
+          </div>
+          <div class="line-facts">North-south through eastern Sainðaul. Partially uses former IR Dunkōn Line tracks. Shares terminus track with Line 17 between IDK Arena Station and Mewakate Kippai.</div>
+        </div>
+      </div>
+
+      <!-- Line HO: Hoze-Oyehatton -->
+      <div class="line-card" data-type="public" data-tags="public automated" data-search="hoze oyehatton ho takatsura kadokamahiwa automated light 4 car western business district">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#CD5C5C;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#CD5C5C">HO</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line —</div>
+            <div class="line-card-name">Hoze-Oyehatton Line</div>
+          </div>
+          <div class="line-card-year">est. 2019</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">13.64</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">13</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Auto</div><div class="line-meta-label">driverless</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Takatsura</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Kadokamahiwa</span>
+          </div>
+          <div class="line-facts">Newest line in the public network. Fully automated 4-car light subway serving the western business district. Opened 2019.</div>
+        </div>
+      </div>
+
+    </div><!-- end lines-grid public -->
+
+    <!-- PRIVATE SECTION DIVIDER -->
+    <div style="margin: var(--space-12) 0 var(--space-6);">
+      <div class="section-divider-label" style="font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-faint);display:flex;align-items:center;gap:var(--space-3);" id="divider-private">
+        Private Metro-like Systems
+        <span style="flex:1;height:1px;background:var(--border);display:block;"></span>
+      </div>
+    </div>
+
+    <div class="lines-grid" id="gridViewPrivate">
+      <!-- SX Shubaru Express -->
+      <div class="line-card" data-type="private" data-tags="private" data-search="shubaru express sx herubori torino jutakutsi shiratsuki 160kmh 35min">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#B22222;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#B22222">SX</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Private</div>
+            <div class="line-card-name">Shubaru Express</div>
+          </div>
+          <div class="line-card-year">est. 2016</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">53.89</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">19</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">160</div><div class="line-meta-label">km/h max</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Herubori</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Torino Jutakutsi</span>
+          </div>
+          <div class="line-facts">Private express railway connecting Shiratsuki City to Herubori in under 35 minutes at up to 160 km/h. Limited-stop express pattern only.</div>
+          <div class="private-badge">✦ Privately operated</div>
+        </div>
+      </div>
+    </div><!-- end private grid -->
+
+    <!-- TABLE VIEW (hidden by default) -->
+    <div id="tableView" class="hidden">
+      <div class="lines-table-wrap">
+        <table class="lines-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>#</th>
+              <th>Line Name</th>
+              <th>Opened</th>
+              <th>km</th>
+              <th>Stations</th>
+              <th>Terminus A</th>
+              <th>Terminus B</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr data-type="public" data-search="hibaru hb 2 naezoto mokoba hintomaui">
+              <td><span class="table-code" style="background:#CC0000">HB</span></td>
+              <td class="table-num">2</td>
+              <td class="table-line-name">Hibaru Line</td>
+              <td>1919</td>
+              <td class="table-num">36.02</td>
+              <td class="table-num">27</td>
+              <td class="table-termini">Naezoto</td>
+              <td class="table-termini">Mokoba / Hintomaui</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="agarai donpuku ad 1 ikashumai enikezya">
+              <td><span class="table-code" style="background:#FE7F00">AD</span></td>
+              <td class="table-num">1</td>
+              <td class="table-line-name">Agarai-Dōnpuku Line</td>
+              <td>1924</td>
+              <td class="table-num">51.66</td>
+              <td class="table-num">30</td>
+              <td class="table-termini">Ikashumai Sports Center</td>
+              <td class="table-termini">Enikezya Forum</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="shakihori sh 3 ansan iyogateri">
+              <td><span class="table-code" style="background:#009E4F">SH</span></td>
+              <td class="table-num">3</td>
+              <td class="table-line-name">Shakihori Line</td>
+              <td>1932</td>
+              <td class="table-num">42.96</td>
+              <td class="table-num">25</td>
+              <td class="table-termini">Ansan Shakuiadae</td>
+              <td class="table-termini">Iyogateri</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="kokendake ko 4 abawauri kawaei">
+              <td><span class="table-code" style="background:#FFD912;color:#1e293b">KO</span></td>
+              <td class="table-num">4</td>
+              <td class="table-line-name">Kokendake Line</td>
+              <td>1937</td>
+              <td class="table-num">18.45</td>
+              <td class="table-num">15</td>
+              <td class="table-termini">Abawauri</td>
+              <td class="table-termini">Kawaei</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="kirifunu eigandan ke 5 jisahara tsuragoi">
+              <td><span class="table-code" style="background:#9E6A51">KE</span></td>
+              <td class="table-num">5</td>
+              <td class="table-line-name">Kirifunu Eigandan Line</td>
+              <td>1941</td>
+              <td class="table-num">16.05</td>
+              <td class="table-num">13</td>
+              <td class="table-termini">Jisahara</td>
+              <td class="table-termini">Tsuragoi</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="ipporai ip 6 saibu panatsawa nari gotsurindai">
+              <td><span class="table-code" style="background:#3465A4">IP</span></td>
+              <td class="table-num">6</td>
+              <td class="table-line-name">Ipporai Line</td>
+              <td>1967</td>
+              <td class="table-num">47.30</td>
+              <td class="table-num">30</td>
+              <td class="table-termini">Saibu-Panatsawa</td>
+              <td class="table-termini">Nari-Gotsurindai</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="bajikoe bj 7 pwakkobe akettun shendao">
+              <td><span class="table-code" style="background:#00A0BC">BJ</span></td>
+              <td class="table-num">7</td>
+              <td class="table-line-name">Bajikoe Line</td>
+              <td>1972</td>
+              <td class="table-num">36.47</td>
+              <td class="table-num">29</td>
+              <td class="table-termini">Pwakkobe</td>
+              <td class="table-termini">Akettun Shendao</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="hamaas hm 8 kishagoi komayunden">
+              <td><span class="table-code" style="background:#00A2D3">HM</span></td>
+              <td class="table-num">8</td>
+              <td class="table-line-name">Hamaas Line</td>
+              <td>1958</td>
+              <td class="table-num">23.95</td>
+              <td class="table-num">22</td>
+              <td class="table-termini">Kishagoi</td>
+              <td class="table-termini">Komayunden</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="bordeaux bx 9 teyomuka shoryan daishi">
+              <td><span class="table-code" style="background:#C40062">BX</span></td>
+              <td class="table-num">9</td>
+              <td class="table-line-name">Bordeaux Line</td>
+              <td>1986</td>
+              <td class="table-num">14.00</td>
+              <td class="table-num">13</td>
+              <td class="table-termini">Teyomuka</td>
+              <td class="table-termini">Shōryān Daishi</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="shakiose so 10 shakihori uhara motu">
+              <td><span class="table-code" style="background:#C46200">SO</span></td>
+              <td class="table-num">10</td>
+              <td class="table-line-name">Shakiose Line</td>
+              <td>1969</td>
+              <td class="table-num">32.80</td>
+              <td class="table-num">29</td>
+              <td class="table-termini">Shakihori</td>
+              <td class="table-termini">Uhāra-Motu</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="owonideki od 11 itsayuki tonjo jisahara">
+              <td><span class="table-code" style="background:#c5e1a5;color:#1e293b">OD</span></td>
+              <td class="table-num">11</td>
+              <td class="table-line-name">Owonideki Line</td>
+              <td>2012</td>
+              <td class="table-num">23.32</td>
+              <td class="table-num">22</td>
+              <td class="table-termini">Itsayuki-Tonjō</td>
+              <td class="table-termini">Jisahara</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="intsushitsa is 12 kayatsori mewakate kippai">
+              <td><span class="table-code" style="background:#86EBEB;color:#1e293b">IS</span></td>
+              <td class="table-num">12</td>
+              <td class="table-line-name">Intsushitsa Line</td>
+              <td>1995</td>
+              <td class="table-num">14.23</td>
+              <td class="table-num">13</td>
+              <td class="table-termini">Kayatsori</td>
+              <td class="table-termini">Mewakate-Kippai / Niji-Yōneo</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="tsuruna tn 13 saia cargo showanul kashimochi">
+              <td><span class="table-code" style="background:#36873c">TN</span></td>
+              <td class="table-num">13</td>
+              <td class="table-line-name">Tsuruna Line</td>
+              <td>2003</td>
+              <td class="table-num">39.40</td>
+              <td class="table-num">29</td>
+              <td class="table-termini">SAIA Cargo Center</td>
+              <td class="table-termini">Showanul / Kashimochi</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="nanpuku otsumi no 14 migawarae tanjanli">
+              <td><span class="table-code" style="background:#72E400;color:#1e293b">NO</span></td>
+              <td class="table-num">14</td>
+              <td class="table-line-name">Nanpuku Otsumi Line</td>
+              <td>2004</td>
+              <td class="table-num">22.57</td>
+              <td class="table-num">20</td>
+              <td class="table-termini">Migawarae</td>
+              <td class="table-termini">Tanjānli</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="urenosomi un 15 saia cargo sakamuso">
+              <td><span class="table-code" style="background:#db287a">UN</span></td>
+              <td class="table-num">15</td>
+              <td class="table-line-name">Urenosomi Line</td>
+              <td>2010</td>
+              <td class="table-num">34.31</td>
+              <td class="table-num">24</td>
+              <td class="table-termini">SAIA Cargo Center</td>
+              <td class="table-termini">Sakamuso</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="kyokwan kw 16 tsukitonai kamaishi loop">
+              <td><span class="table-code" style="background:#816cb1">KW</span></td>
+              <td class="table-num">16</td>
+              <td class="table-line-name">Kyokwan Line</td>
+              <td>2013</td>
+              <td class="table-num">71.50</td>
+              <td class="table-num">52</td>
+              <td class="table-termini">Tsukitonai</td>
+              <td class="table-termini">Kamaishi Kaiyan Kōwen</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="zakumi zk 17 tswankanami airport mewakate">
+              <td><span class="table-code" style="background:#f985bb;color:#1e293b">ZK</span></td>
+              <td class="table-num">17</td>
+              <td class="table-line-name">Zakumi Line</td>
+              <td>2013</td>
+              <td class="table-num">51.83</td>
+              <td class="table-num">38</td>
+              <td class="table-termini">Tswankanami Airport</td>
+              <td class="table-termini">Mewakate Kippai / Kungaus Sangu</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="jufurai jf 18 nari gotsurindai mewakate">
+              <td><span class="table-code" style="background:#999999">JF</span></td>
+              <td class="table-num">18</td>
+              <td class="table-line-name">Jufurai Line</td>
+              <td>1998</td>
+              <td class="table-num">27.51</td>
+              <td class="table-num">20</td>
+              <td class="table-termini">Nari-Gotsurindai</td>
+              <td class="table-termini">Mewakate Kippai</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="hoze oyehatton ho takatsura kadokamahiwa">
+              <td><span class="table-code" style="background:#CD5C5C">HO</span></td>
+              <td class="table-num">—</td>
+              <td class="table-line-name">Hoze-Oyehatton Line</td>
+              <td>2019</td>
+              <td class="table-num">13.64</td>
+              <td class="table-num">13</td>
+              <td class="table-termini">Takatsura</td>
+              <td class="table-termini">Kadokamahiwa</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="private" data-search="shubaru express sx herubori torino jutakutsi">
+              <td><span class="table-code" style="background:#B22222">SX</span></td>
+              <td class="table-num">—</td>
+              <td class="table-line-name">Shubaru Express</td>
+              <td>2016</td>
+              <td class="table-num">53.89</td>
+              <td class="table-num">19</td>
+              <td class="table-termini">Herubori</td>
+              <td class="table-termini">Torino Jutakutsi</td>
+              <td><span style="color:var(--izx-red);font-size:var(--text-xs);font-weight:600;">Private</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /lines-container -->
 
   <footer>
-    <p>Izaland Transit Portal · <a href="https://opengeofiction.net" target="_blank" rel="noopener">OpenGeoFiction</a> · Metro data from Izaland wiki</p>
+    <p>Izaland Transit Portal · Built on <a href="https://opengeofiction.net" target="_blank" rel="noopener">OpenGeoFiction</a> data · Not affiliated with any real transport operator</p>
   </footer>
 
   <script>
-    /* ─ theme toggle ─ */
+    // Theme toggle
     (function(){
       const t=document.querySelector('[data-theme-toggle]'),r=document.documentElement;
       let d=r.getAttribute('data-theme')||'dark';
@@ -558,30 +1289,82 @@
       });
     })();
 
-    /* ─ sortable table ─ */
-    (function(){
-      const table=document.getElementById('metroTable');
-      const headers=table.querySelectorAll('thead th');
-      let sortCol=null,sortDir=1;
-      headers.forEach((th,i)=>{
-        th.addEventListener('click',()=>{
-          const col=th.dataset.col;
-          if(!col)return;
-          if(sortCol===col){sortDir*=-1;}else{sortCol=col;sortDir=1;}
-          headers.forEach(h=>{h.classList.remove('sort-asc','sort-desc');});
-          th.classList.add(sortDir===1?'sort-asc':'sort-desc');
-          const tbody=table.querySelector('tbody');
-          const rows=[...tbody.querySelectorAll('tr')];
-          rows.sort((a,b)=>{
-            let av=a.dataset[col]||'',bv=b.dataset[col]||'';
-            const an=parseFloat(av),bn=parseFloat(bv);
-            if(!isNaN(an)&&!isNaN(bn))return (an-bn)*sortDir;
-            return av.localeCompare(bv)*sortDir;
-          });
-          rows.forEach(r=>tbody.appendChild(r));
-        });
+    // View toggle
+    const gridView = document.getElementById('gridView');
+    const gridViewPrivate = document.getElementById('gridViewPrivate');
+    const tableView = document.getElementById('tableView');
+    const dividerPrivate = document.getElementById('divider-private').parentElement;
+
+    document.querySelectorAll('.view-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (btn.dataset.view === 'grid') {
+          gridView.classList.remove('hidden');
+          gridViewPrivate.classList.remove('hidden');
+          tableView.classList.add('hidden');
+          dividerPrivate.classList.remove('hidden');
+        } else {
+          gridView.classList.add('hidden');
+          gridViewPrivate.classList.add('hidden');
+          tableView.classList.remove('hidden');
+          dividerPrivate.classList.add('hidden');
+        }
+        applyFilters();
       });
-    })();
+    });
+
+    // Filter + search
+    let activeFilter = 'all';
+    let searchQuery = '';
+
+    function applyFilters() {
+      const isGrid = !gridView.classList.contains('hidden');
+      if (isGrid) {
+        const allCards = document.querySelectorAll('.line-card');
+        allCards.forEach(card => {
+          const type = card.dataset.type;
+          const tags = card.dataset.tags || '';
+          const search = (card.dataset.search || '') + ' ' + (card.querySelector('.line-card-name')?.textContent || '');
+          let show = true;
+          if (activeFilter !== 'all') {
+            if (activeFilter === 'public') show = type === 'public';
+            else if (activeFilter === 'private') show = type === 'private';
+            else show = tags.includes(activeFilter);
+          }
+          if (searchQuery && !search.toLowerCase().includes(searchQuery.toLowerCase())) show = false;
+          card.style.display = show ? '' : 'none';
+        });
+      } else {
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach(row => {
+          const type = row.dataset.type;
+          const search = (row.dataset.search || '') + ' ' + (row.querySelector('.table-line-name')?.textContent || '');
+          let show = true;
+          if (activeFilter !== 'all') {
+            if (activeFilter === 'public') show = type === 'public';
+            else if (activeFilter === 'private') show = type === 'private';
+            else show = true;
+          }
+          if (searchQuery && !search.toLowerCase().includes(searchQuery.toLowerCase())) show = false;
+          row.style.display = show ? '' : 'none';
+        });
+      }
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        applyFilters();
+      });
+    });
+
+    document.getElementById('searchInput').addEventListener('input', e => {
+      searchQuery = e.target.value;
+      applyFilters();
+    });
   </script>
 </body>
 </html>
