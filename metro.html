@@ -180,7 +180,6 @@
       border-radius: var(--radius-xl);
       overflow: hidden;
       transition: transform var(--transition), box-shadow var(--transition);
-      cursor: default;
     }
     .line-card:hover {
       transform: translateY(-2px);
@@ -263,17 +262,45 @@
     }
     .terminus-name { color: var(--text); font-weight: 600; }
     .terminus-sep { color: var(--text-faint); }
+
+    /* EXPANDABLE FACTS */
+    .line-facts-wrap {
+      border-top: 1px solid var(--border);
+      padding-top: var(--space-3);
+    }
     .line-facts {
       font-size: var(--text-xs);
       color: var(--text-muted);
       line-height: 1.5;
-      border-top: 1px solid var(--border);
-      padding-top: var(--space-3);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
       overflow: hidden;
+      max-height: 2.8em; /* ~2 lines */
+      transition: max-height 380ms cubic-bezier(0.16, 1, 0.3, 1);
     }
+    .line-facts.expanded {
+      max-height: 20em;
+    }
+    .expand-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: var(--space-2);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-faint);
+      font-family: var(--font-body);
+      padding: 0;
+      transition: color var(--transition);
+    }
+    .expand-btn:hover { color: var(--text-muted); }
+    .expand-btn svg {
+      transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+    }
+    .expand-btn.open svg { transform: rotate(180deg); }
+
     .thru-badge {
       display: inline-flex;
       align-items: center;
@@ -513,7 +540,13 @@
             <span class="terminus-sep">/</span>
             <span class="terminus-name">Hintomaui</span>
           </div>
-          <div class="line-facts">The first subway line built in Izaland — and one of the first in Eastern Uletha. Runs west-east through the old city core, serving the central station area, the government district of Amiya, and the Eikuku-ji Temple precinct. Splits eastward into two branches.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">The first subway line built in Izaland — and one of the first in Eastern Uletha. Runs west-east through the old city core, serving the central station area, the government district of Amiya, and the Eikuku-ji Temple precinct. Splits eastward into two branches.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -539,7 +572,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Enikezya Forum</span>
           </div>
-          <div class="line-facts">The second-oldest line of the system, upgraded multiple times. Offers express and rapid services. Extension from Ikashumai Sports Center to Yakata targeted for 2024.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">The second-oldest line of the system, upgraded multiple times. Offers express and rapid services. Extension from Ikashumai Sports Center to Yakata targeted for 2024.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -565,7 +604,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Iyogateri</span>
           </div>
-          <div class="line-facts">Connects the central districts north-south (Shiitehongi–Herubori). Rapid service north of Komayunden; all-stop south. Extension from Bibawara opened 2019.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Connects the central districts north-south (Shiitehongi–Herubori). Rapid service north of Komayunden; all-stop south. Extension from Bibawara opened 2019.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -591,7 +636,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Kawaei</span>
           </div>
-          <div class="line-facts">Runs parallel to the Hibaru Line, touching the embassy district (Aguri) and old city (Kushigae). First upgraded line to offer rapid service (1998). Thru service onto Shinsabu Oitsura Line.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Runs parallel to the Hibaru Line, touching the embassy district (Aguri) and old city (Kushigae). First upgraded line to offer rapid service (1998). Thru service onto Shinsabu Oitsura Line.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
           <div class="thru-badge">⇄ Thru: Shinsabu Oitsura Line</div>
         </div>
       </div>
@@ -618,7 +669,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Tsuragoi</span>
           </div>
-          <div class="line-facts">Reversed "L" shape through central Bajikoe. Since 2013, rapid thru trains reach Komokata at up to 180 km/h on the IR Shosen Line — one of the fastest subway services in the world.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Reversed "L" shape through central Bajikoe. Since 2013, rapid thru trains reach Komokata at up to 180 km/h on the IR Shosen Line — one of the fastest subway services in the world.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
           <div class="thru-badge">⇄ Thru: IR Shosen Line → Komokata</div>
         </div>
       </div>
@@ -645,7 +702,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Komayunden</span>
           </div>
-          <div class="line-facts">"Line of the islands" — V-shaped, linking north-west eastern Sainðaul to the north-east via central locations. Thru services onto IR Tandan Kaihyō Line and Ibaches Main Line.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">"Line of the islands" — V-shaped, linking north-west eastern Sainðaul to the north-east via central locations. Thru services onto IR Tandan Kaihyō Line and Ibaches Main Line.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
           <div class="thru-badge">⇄ Thru: IR Tandan Kaihyō · Ibaches Main</div>
         </div>
       </div>
@@ -672,7 +735,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Nari-Gotsurindai</span>
           </div>
-          <div class="line-facts">The first subway line to cross the Tandan Strait (undersea tunnel, 1973). Dramatically lightened congestion on IR lines. Extended 2008 and 2018. Possible future extension to Iberotsuna under study.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">The first subway line to cross the Tandan Strait (undersea tunnel, 1973). Dramatically lightened congestion on IR lines. Extended 2008 and 2018. Possible future extension to Iberotsuna under study.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -698,7 +767,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Akettun Shendao</span>
           </div>
-          <div class="line-facts">Number "5" shaped line linking the Riimibaiken port area to the western CBD under Eigandan Lan and Shutazai-ku. Branch project towards Chikawari pending funding.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Number "5" shaped line linking the Riimibaiken port area to the western CBD under Eigandan Lan and Shutazai-ku. Branch project towards Chikawari pending funding.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -724,7 +799,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Shōryān Daishi</span>
           </div>
-          <div class="line-facts">First lower-capacity automated line. 6-car fully driverless trains. Possible extension to Tsukasai (Agarai-Dōnpuku interchange) under study.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">First lower-capacity automated line. 6-car fully driverless trains. Possible extension to Tsukasai (Agarai-Dōnpuku interchange) under study.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
           <div class="thru-badge">⇄ Thru: Shinsabu Line → Hidano</div>
         </div>
       </div>
@@ -750,7 +831,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Uhāra-Motu</span>
           </div>
-          <div class="line-facts">Runs parallel to the Shakihori (green) line between Niji-Shakihori and Rillantsoye. Thru service onto Shikisabu Railway.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Runs parallel to the Shakihori (green) line between Niji-Shakihori and Rillantsoye. Thru service onto Shikisabu Railway.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
           <div class="thru-badge">⇄ Thru: Shikisabu Railway</div>
         </div>
       </div>
@@ -776,7 +863,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Jisahara</span>
           </div>
-          <div class="line-facts">North-south line mostly following Owonideki Boulevard in the western city. Thru service onto IR Shosen Line to Katayoshi-Juwon.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">North-south line mostly following Owonideki Boulevard in the western city. Thru service onto IR Shosen Line to Katayoshi-Juwon.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
           <div class="thru-badge">⇄ Thru: IR Shosen Line → Katayoshi-Juwon</div>
         </div>
       </div>
@@ -803,7 +896,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Mewakate-Kippai / Niji-Yōneo</span>
           </div>
-          <div class="line-facts">Fully automated middle-capacity line connecting eastern center with Koyabi Island. 8.6 km branch to Niji-Yōneo opened 2020. Mixed frequency: 4–6 trains/hr per branch.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Fully automated middle-capacity line connecting eastern center with Koyabi Island. 8.6 km branch to Niji-Yōneo opened 2020. Mixed frequency: 4–6 trains/hr per branch.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -829,7 +928,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Showanul / Kashimochi</span>
           </div>
-          <div class="line-facts">Airport link under Tsuruna Yaon connecting Asunahama International Airport to the west via Riimibaiken and Tahamuro. Southern spur offers IZX interchange at Showanul.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Airport link under Tsuruna Yaon connecting Asunahama International Airport to the west via Riimibaiken and Tahamuro. Southern spur offers IZX interchange at Showanul.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -854,7 +959,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Tanjānli</span>
           </div>
-          <div class="line-facts">One of the most heavily used lines, connecting Masuda Agarai, Jufurai, and Intsushitsa Island with north-eastern districts. Extension to Dankau currently under construction.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">One of the most heavily used lines, connecting Masuda Agarai, Jufurai, and Intsushitsa Island with north-eastern districts. Extension to Dankau currently under construction.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -879,7 +990,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Sakamuso</span>
           </div>
-          <div class="line-facts">Draws a semicircle along the western and southern edges of West Sainðaul. Shares track with Line 13 (Tsuruna) between SAIA Cargo Center and Bibaisone.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Draws a semicircle along the western and southern edges of West Sainðaul. Shares track with Line 13 (Tsuruna) between SAIA Cargo Center and Bibaisone.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -905,7 +1022,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Kamaishi Kaiyan Kōwen</span>
           </div>
-          <div class="line-facts">Almost-complete mega-loop around both city centres — longest line in the system. Southern completion through Kashimochi and Utsullani Islands estimated at 11.2B Etsi. Shares track with Line 18.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Almost-complete mega-loop around both city centres — longest line in the system. Southern completion through Kashimochi and Utsullani Islands estimated at 11.2B Etsi. Shares track with Line 18.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -931,7 +1054,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Mewakate Kippai / Kungaus Sangu</span>
           </div>
-          <div class="line-facts">West-east in north West Sainðaul, north-south on the eastern side. Two main patterns; rapid trains cover the full line in ~55 min. Shares track with Lines 16 and 18.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">West-east in north West Sainðaul, north-south on the eastern side. Two main patterns; rapid trains cover the full line in ~55 min. Shares track with Lines 16 and 18.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
           <div class="thru-badge">⇄ Thru: IR Gashi Line → Kirijima</div>
         </div>
       </div>
@@ -957,7 +1086,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Mewakate Kippai</span>
           </div>
-          <div class="line-facts">North-south through eastern Sainðaul. Partially uses former IR Dunkōn Line tracks. Shares terminus track with Line 17 between IDK Arena Station and Mewakate Kippai.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">North-south through eastern Sainðaul. Partially uses former IR Dunkōn Line tracks. Shares terminus track with Line 17 between IDK Arena Station and Mewakate Kippai.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -983,7 +1118,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Kadokamahiwa</span>
           </div>
-          <div class="line-facts">Newest line in the public network. Fully automated 4-car light subway serving the western business district. Opened 2019.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Newest line in the public network. Fully automated 4-car light subway serving the western business district. Opened 2019.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1020,7 +1161,13 @@
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Torino Jutakutsi</span>
           </div>
-          <div class="line-facts">Private express railway connecting Shiratsuki City to Herubori in under 35 minutes at up to 160 km/h. Limited-stop express pattern only.</div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Private express railway connecting Shiratsuki City to Herubori in under 35 minutes at up to 160 km/h. Limited-stop express pattern only.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
           <div class="private-badge">✦ Privately operated</div>
         </div>
       </div>
@@ -1288,6 +1435,22 @@
           :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
       });
     })();
+
+    // Expand/collapse description panels
+    document.querySelectorAll('.expand-btn').forEach(btn => {
+      const facts = btn.previousElementSibling;
+      // Only show button if text is actually overflowing
+      if (facts.scrollHeight <= facts.clientHeight + 4) {
+        btn.style.display = 'none';
+        return;
+      }
+      btn.addEventListener('click', () => {
+        const isOpen = facts.classList.toggle('expanded');
+        btn.classList.toggle('open', isOpen);
+        btn.querySelector('span').textContent = isOpen ? 'Show less' : 'Show more';
+        btn.setAttribute('aria-label', isOpen ? 'Show less' : 'Show more');
+      });
+    });
 
     // View toggle
     const gridView = document.getElementById('gridView');
