@@ -418,7 +418,93 @@
       .stats-bar,.controls,.lines-container,.section-divider{padding-left:var(--space-4);padding-right:var(--space-4);}
       .search-box{width:100%;}
     }
-  </style>
+  
+    /* ─── STATIONS COLLAPSIBLE PANEL ─────────────────────────── */
+    .stations-details {
+      border-top: 1px solid var(--border);
+      margin-top: var(--space-3);
+    }
+    .stations-summary {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) 0 var(--space-1);
+      cursor: pointer;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      list-style: none;
+      user-select: none;
+      transition: color var(--transition);
+    }
+    .stations-summary::-webkit-details-marker { display: none; }
+    .stations-summary:hover { color: var(--text-muted); }
+    .stations-summary .stn-chevron {
+      transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+    }
+    .stations-details[open] .stn-chevron { transform: rotate(180deg); }
+    .stations-details[open] .stations-summary { color: var(--text-muted); }
+    .stations-body { padding-bottom: var(--space-2); }
+    .stn-branch { margin-top: var(--space-2); }
+    .stn-branch-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      color: var(--text-faint);
+      margin-bottom: var(--space-1);
+      padding-left: 20px;
+    }
+    .stn-list {
+      list-style: none;
+      position: relative;
+      padding-left: 20px;
+    }
+    .stn-list::before {
+      content: '';
+      position: absolute;
+      left: 7px; top: 8px; bottom: 8px;
+      width: 2px;
+      background: var(--border);
+      border-radius: 1px;
+    }
+    .stn-item {
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-2);
+      padding: 2px 0;
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+    .stn-item::before {
+      content: '';
+      position: absolute;
+      left: -13px; top: 6px;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+    .stn-item.terminus { color: var(--text); font-weight: 700; }
+    .stn-item.terminus::before {
+      background: var(--line-color, #888);
+      width: 8px; height: 8px;
+      left: -14px; top: 5px;
+    }
+    .stn-name { flex: 1; }
+    .stn-count-chip {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-faint);
+      margin-left: auto;
+    }
+    /* ─────────────────────────────────────────────────────────── */
+</style>
 </head>
 <body>
   <nav>
@@ -547,6 +633,41 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#CC0000">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">27 stn</span>
+            </summary>
+            <div class="stations-body">
+              <div class="stn-branch">
+                <div class="stn-branch-label">Main line → Oitsura</div>
+                <ul class="stn-list">
+                  <li class="stn-item terminus"><span class="stn-name">Naezoto</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +21 stations TBD · · ·</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Oitsura</span></li>
+                </ul>
+              </div>
+              <div class="stn-branch">
+                <div class="stn-branch-label">Branch → Mokoba</div>
+                <ul class="stn-list">
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Mokoba</span></li>
+                </ul>
+              </div>
+              <div class="stn-branch">
+                <div class="stn-branch-label">Branch → Hintomaui</div>
+                <ul class="stn-list">
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Hintomaui</span></li>
+                </ul>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -579,6 +700,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#FE7F00">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">30 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Ikashumai Sports Center</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +26 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Enikezya Forum</span></li>
+              </ul>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -611,6 +748,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#009E4F">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">25 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Ansan Shakuiadae</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +21 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Iyogateri</span></li>
+              </ul>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -632,17 +785,53 @@
             <div class="line-meta-item"><div class="line-meta-value">1976</div><div class="line-meta-label">thru since</div></div>
           </div>
           <div class="line-termini">
-            <span class="terminus-name">Abawauri</span>
+            <span class="terminus-name">Ipporai-Senpyan</span>
             <span class="terminus-sep">→</span>
             <span class="terminus-name">Kawaei</span>
           </div>
           <div class="line-facts-wrap">
-            <div class="line-facts">Runs parallel to the Hibaru Line, touching the embassy district (Aguri) and old city (Kushigae). First upgraded line to offer rapid service (1998). Thru service onto Shinsabu Oitsura Line.</div>
+            <div class="line-facts">Runs parallel to the Hibaru Line, touching the embassy district (Aguri) and old city (Kushigae). First upgraded line to offer rapid service (1998). Thru service onto Shinsabu Oitsura Line (eastbound) and until Ipporai-Senpyan by sharing tracks with Line 6, since 2013.</div>
             <button class="expand-btn" aria-label="Show more">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#FFD912">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">15 stn</span>
+           </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Ipporai-Senpyan <span class="stn-xfer">一蒲崍船駢</span></span></li>
+                <li class="stn-item"><span class="stn-name">Ipporai-Owonideki <span class="stn-xfer">一蒲崍吹取</span></span></li>
+                <li class="stn-item"><span class="stn-name">Ipporai-Konegisa <span class="stn-xfer">一蒲崍干鮃</span></span></li>
+                <li class="stn-item"><span class="stn-name">Shiki-Hoze <span class="stn-xfer">北舗摧</span></span></li>
+                <li class="stn-item"><span class="stn-name">Kotoshiruna <span class="stn-xfer">細荒奈</span></span></li>
+                <li class="stn-item"><span class="stn-name">Buslyu Toshi <span class="stn-xfer">物流都市</span></span></li>
+                <li class="stn-item"><span class="stn-name">Kasakuri <span class="stn-xfer">鯛巻</span></span></li>
+                <li class="stn-item"><span class="stn-name">Nihkyonta <span class="stn-xfer">濱角</span></span></li>
+                <li class="stn-item"><span class="stn-name">Shimamera <span class="stn-xfer">渠瀬田</span></span></li>
+                <li class="stn-item"><span class="stn-name">Abawauri <span class="stn-xfer">燕宦</span></span></li>
+                <li class="stn-item"><span class="stn-name">Heinomoji <span class="stn-xfer">駕桃</span></span></li>
+                <li class="stn-item"><span class="stn-name">Ogiwata <span class="stn-xfer">槃芳</span></span></li>
+                <li class="stn-item"><span class="stn-name">Ekinðuka <span class="stn-xfer">虓પ્鵜</span></span></li>
+                <li class="stn-item"><span class="stn-name">Aguri 2-sa <span class="stn-xfer">阿久里二沙</span></span></li>
+                <li class="stn-item"><span class="stn-name">Anagusa Mukai <span class="stn-xfer">矢模武凱</span></span></li>
+                <li class="stn-item"><span class="stn-name">Kushidaru Amiya <span class="stn-xfer">柚艏-</span></span></li>
+                <li class="stn-item"><span class="stn-name">Tamainoki <span class="stn-xfer">谷伊坂</span></span></li>
+                <li class="stn-item"><span class="stn-name">Tamainoki Kokendake <span class="stn-xfer">谷伊坂古剣館</span></span></li>
+                <li class="stn-item"><span class="stn-name">Sumi-Kokendake <span class="stn-xfer">隠古剣館</span></span></li>
+                <li class="stn-item"><span class="stn-name">Sojo-Kokendake</span></li>
+                <li class="stn-item"><span class="stn-name">Nuskaitsa</span></li>
+                <li class="stn-item"><span class="stn-name">Juhtasamo</span></li>
+                <li class="stn-item"><span class="stn-name">Ristai-Nyūngu <span class="stn-xfer">立大入口</span></span></li>
+                <li class="stn-item"><span class="stn-name">Niji-Kawaei <span class="stn-xfer">西珂夬栄</span></span></li>
+                <li class="stn-item terminus"><span class="stn-name">Kawaei <span class="stn-xfer">珂夬栄</span></span></li>
+              </ul>
+            </div>
+          </details>
           <div class="thru-badge">⇄ Thru: Shinsabu Oitsura Line</div>
         </div>
       </div>
@@ -676,6 +865,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#9E6A51">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">13 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Jisahara</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +9 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Tsuragoi</span></li>
+              </ul>
+            </div>
+          </details>
           <div class="thru-badge">⇄ Thru: IR Shosen Line → Komokata</div>
         </div>
       </div>
@@ -709,6 +914,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#00A2D3">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">22 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Kishagoi</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +18 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Komayunden</span></li>
+              </ul>
+            </div>
+          </details>
           <div class="thru-badge">⇄ Thru: IR Tandan Kaihyō · Ibaches Main</div>
         </div>
       </div>
@@ -742,6 +963,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#3465A4">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">30 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Saibu-Panatsawa</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +26 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Nari-Gotsurindai</span></li>
+              </ul>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -774,6 +1011,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#00A0BC">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">29 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Pwakkobe</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +25 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Akettun Shendao</span></li>
+              </ul>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -806,6 +1059,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#C40062">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">13 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Teyomuka</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +9 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Shōryān Daishi</span></li>
+              </ul>
+            </div>
+          </details>
           <div class="thru-badge">⇄ Thru: Shinsabu Line → Hidano</div>
         </div>
       </div>
@@ -838,6 +1107,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#C46200">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">29 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Shakihori</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +25 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Uhāra-Motu</span></li>
+              </ul>
+            </div>
+          </details>
           <div class="thru-badge">⇄ Thru: Shikisabu Railway</div>
         </div>
       </div>
@@ -870,6 +1155,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#c5e1a5">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">22 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Itsayuki-Tonjō</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +18 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Jisahara</span></li>
+              </ul>
+            </div>
+          </details>
           <div class="thru-badge">⇄ Thru: IR Shosen Line → Katayoshi-Juwon</div>
         </div>
       </div>
@@ -903,6 +1204,34 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#86EBEB">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">13 stn</span>
+            </summary>
+            <div class="stations-body">
+              <div class="stn-branch">
+                <div class="stn-branch-label">Main line → Mewakate-Kippai</div>
+                <ul class="stn-list">
+                  <li class="stn-item terminus"><span class="stn-name">Kayatsori</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +7 stations TBD · · ·</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Mewakate-Kippai</span></li>
+                </ul>
+              </div>
+              <div class="stn-branch">
+                <div class="stn-branch-label">Branch → Niji-Yōneo</div>
+                <ul class="stn-list">
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +1 stations TBD · · ·</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Niji-Yōneo</span></li>
+                </ul>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -935,6 +1264,33 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#36873c">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">29 stn</span>
+            </summary>
+            <div class="stations-body">
+              <div class="stn-branch">
+                <div class="stn-branch-label">Main line → Showanul</div>
+                <ul class="stn-list">
+                  <li class="stn-item terminus"><span class="stn-name">SAIA Cargo Center</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +23 stations TBD · · ·</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Showanul</span></li>
+                </ul>
+              </div>
+              <div class="stn-branch">
+                <div class="stn-branch-label">Spur → Kashimochi</div>
+                <ul class="stn-list">
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Kashimochi</span></li>
+                </ul>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -966,6 +1322,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#72E400">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">20 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Migawarae</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +16 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Tanjānli</span></li>
+              </ul>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -997,6 +1369,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#db287a">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">24 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">SAIA Cargo Center</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +20 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Sakamuso</span></li>
+              </ul>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -1029,6 +1417,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#816cb1">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">52 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Tsukitonai</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +48 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Kamaishi Kaiyan Kōwen</span></li>
+              </ul>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -1061,6 +1465,34 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#f985bb">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">38 stn</span>
+            </summary>
+            <div class="stations-body">
+              <div class="stn-branch">
+                <div class="stn-branch-label">Main line → Mewakate Kippai</div>
+                <ul class="stn-list">
+                  <li class="stn-item terminus"><span class="stn-name">Tswankanami Airport</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +26 stations TBD · · ·</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Mewakate Kippai</span></li>
+                </ul>
+              </div>
+              <div class="stn-branch">
+                <div class="stn-branch-label">Branch → Kungaus Sangu</div>
+                <ul class="stn-list">
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +6 stations TBD · · ·</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Kungaus Sangu</span></li>
+                </ul>
+              </div>
+            </div>
+          </details>
           <div class="thru-badge">⇄ Thru: IR Gashi Line → Kirijima</div>
         </div>
       </div>
@@ -1093,6 +1525,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#999999">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">20 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Nari-Gotsurindai</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +16 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Mewakate Kippai</span></li>
+              </ul>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -1125,6 +1573,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#CD5C5C">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">13 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Takatsura</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +9 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Kadokamahiwa</span></li>
+              </ul>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -1168,6 +1632,22 @@
               <span>Show more</span>
             </button>
           </div>
+          <details class="stations-details" style="--line-color:#B22222">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">19 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Herubori</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +15 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Torino Jutakutsi</span></li>
+              </ul>
+            </div>
+          </details>
           <div class="private-badge">✦ Privately operated</div>
         </div>
       </div>
