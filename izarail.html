@@ -174,10 +174,14 @@
       background: var(--surface-2);
       color: var(--text-muted);
       text-decoration: none;
-      transition: border-color var(--transition), color var(--transition);
+      transition: border-color var(--transition), color var(--transition), background var(--transition);
     }
     .network-chip:hover { border-color: var(--text-muted); color: var(--text); }
+    .network-chip.linked:hover { border-color: var(--izr-green); color: var(--izr-green); background: rgba(34,197,94,0.06); }
     .network-chip .chip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .chip-arrow { opacity: 0.5; font-size: 10px; margin-left: 2px; }
+    a.network-chip .chip-arrow { opacity: 0; transition: opacity var(--transition), transform var(--transition); }
+    a.network-chip:hover .chip-arrow { opacity: 1; transform: translateX(2px); }
 
     /* ── SECTION DIVIDER ── */
     .section-divider {
@@ -317,6 +321,7 @@
       <a href="izx.html">IZX</a>
       <a href="metro.html">Metro</a>
       <a href="izarail.html" class="active">Izarail</a>
+      <a href="commuter.html">Commuter Rail</a>
       <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
@@ -350,20 +355,20 @@
 
   <!-- ══════════════════════════════════════════════
        SAINÐAUL — FEATURED INTRO
-  ═══════════════════════════════════════════════ -->
+  ══════════════════════════════════════════════ -->
   <div class="intro-section">
     <div class="intro-card">
       <div class="intro-card-header">
         <div class="city-badge">SÐ</div>
         <div class="intro-card-header-text">
           <h2>Sainðaul Capital Region</h2>
-          <div class="subtitle">首都圏廣域捷運</div>
+          <div class="subtitle">首都圏廣域捧運</div>
           <div class="kanji-row"><em>shutokwen-kwannwiki-shōun</em></div>
         </div>
       </div>
       <div class="intro-card-body">
         <p class="intro-text">
-          <strong>Izarail's Capital Wider Suburban Mass Transit</strong> (首都圏廣域捷運, <em>"shutokwen-kwannwiki-shōun"</em>)
+          <strong>Izarail's Capital Wider Suburban Mass Transit</strong> (首都圏廣域捧運, <em>"shutokwen-kwannwiki-shōun"</em>)
           is the network of local and regional public transport that moves millions of people in and out of Sainðaul every day,
           connecting all the main towns and settlements whose inhabitants flock to the capital.
           As of 2024 it is made up of <strong>xxx lines</strong>, covering a total extension of <strong>xx km</strong>.
@@ -388,8 +393,8 @@
         </div>
         <div class="network-chips">
           <span class="wip-notice">⚙ Network figures TBD</span>
-          <a href="metro.html" class="network-chip"><span class="chip-dot" style="background:#14b8a6"></span>Sainðaul Metro (19 lines)</a>
-          <span class="network-chip"><span class="chip-dot" style="background:#22c55e"></span>IR Commuter Lines</span>
+          <a href="metro.html" class="network-chip linked"><span class="chip-dot" style="background:#14b8a6"></span>Sainðaul Metro (19 lines)<span class="chip-arrow">→</span></a>
+          <a href="commuter.html" class="network-chip linked"><span class="chip-dot" style="background:#22c55e"></span>IR Commuter Lines<span class="chip-arrow">→</span></a>
           <span class="network-chip"><span class="chip-dot" style="background:#f97316"></span>Shikisabu Railway</span>
           <span class="network-chip"><span class="chip-dot" style="background:#a855f7"></span>IR Tandan Kaihyō Line</span>
           <span class="network-chip"><span class="chip-dot" style="background:#3b82f6"></span>Ibaches Main Line</span>
@@ -401,7 +406,7 @@
 
   <!-- ══════════════════════════════════════════════
        OTHER CITIES
-  ═══════════════════════════════════════════════ -->
+  ══════════════════════════════════════════════ -->
   <div class="section-divider">
     <div class="section-divider-label">Other major urban areas</div>
   </div>
