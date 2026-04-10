@@ -35,7 +35,7 @@
       --izx-red: #dc2626; --izx-gold: #d97706; --metro-teal: #0d9488;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;scroll-padding-top:4rem;}
+    html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;scroll-padding-top:5rem;}
     body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--text);background:var(--bg);line-height:1.6;}
     img,video,canvas{display:block;max-width:100%;height:auto;}
 
@@ -113,17 +113,14 @@
     .num-cell{font-family:var(--font-display);font-weight:700;font-size:var(--text-sm);color:var(--text);}
     .tbd-chip{font-size:10px;color:var(--text-faint);font-style:italic;}
 
-    /* EXPAND BUTTON in table */
-    .expand-btn{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:2px 7px;cursor:pointer;transition:color var(--transition),border-color var(--transition),background var(--transition);white-space:nowrap;margin-top:var(--space-2);}
-    .expand-btn:hover{color:var(--text);border-color:var(--text-muted);}
-    .expand-btn.open{color:var(--accent);border-color:var(--accent);background:var(--accent-glow);}
-    .expand-btn svg{transition:transform 300ms cubic-bezier(0.16,1,0.3,1);flex-shrink:0;}
-    .expand-btn.open svg{transform:rotate(180deg);}
+    /* JUMP BUTTON */
+    .jump-btn{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:2px 8px;cursor:pointer;transition:color var(--transition),border-color var(--transition),background var(--transition);white-space:nowrap;margin-top:var(--space-2);text-decoration:none;}
+    .jump-btn:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-glow);}
+    .jump-btn svg{flex-shrink:0;}
 
-    /* LINE ACCORDION */
-    .line-accordion{overflow:hidden;max-height:0;transition:max-height 420ms cubic-bezier(0.16,1,0.3,1);}
-    .line-accordion.open{max-height:9999px;}
-    .line-accordion-inner{border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;margin-top:var(--space-4);}
+    /* LINE DETAIL SECTION */
+    .line-detail-section{border-top:1px solid var(--border);padding:var(--space-12) var(--space-8);max-width:1200px;margin:0 auto;}
+    .line-detail-inner{border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;}
 
     /* ACCORDION HEADER */
     .acc-header{display:flex;align-items:center;gap:var(--space-4);padding:var(--space-6);border-bottom:1px solid var(--border);}
@@ -164,6 +161,10 @@
     .private-note h3{font-family:var(--font-display);font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-2);}
     .private-note p{font-size:var(--text-sm);color:var(--text-muted);line-height:1.7;}
 
+    /* BACK TO TABLE LINK */
+    .back-to-table{display:inline-flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);font-weight:600;color:var(--text-muted);text-decoration:none;margin-bottom:var(--space-6);transition:color var(--transition);}
+    .back-to-table:hover{color:var(--accent);}
+
     footer{border-top:1px solid var(--border);padding:var(--space-8);text-align:center;font-size:var(--text-sm);color:var(--text-muted);}
     footer a{color:var(--accent);text-decoration:none;}
     footer a:hover{text-decoration:underline;}
@@ -171,7 +172,7 @@
     @media(max-width:768px){
       nav{padding:var(--space-3) var(--space-4);}
       .nav-links{gap:var(--space-3);}
-      .breadcrumb,.page-header,.stats-row,.info-box,.tunnel-callout,section{padding-left:var(--space-4);padding-right:var(--space-4);}
+      .breadcrumb,.page-header,.stats-row,.info-box,.tunnel-callout,section,.line-detail-section{padding-left:var(--space-4);padding-right:var(--space-4);}
       .info-box,.tunnel-callout{width:calc(100% - var(--space-8));}
       .page-header h1{font-size:var(--text-xl);}
       .acc-stats{gap:var(--space-4);}
@@ -260,15 +261,16 @@
         </thead>
         <tbody>
 
-          <tr>
+          <tr id="row-lo">
             <td><span class="line-badge" style="background:#34589F;color:white;">LO</span></td>
             <td>
               <div class="line-name-cell">Loop Line</div>
               <div class="line-name-kanji">環状線</div>
-              <button class="expand-btn" data-target="acc-lo" aria-expanded="false" aria-controls="acc-lo">
+              <!-- JUMP BUTTON instead of inline expand -->
+              <a href="#detail-lo" class="jump-btn" aria-label="Jump to Loop Line details">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-                Details
-              </button>
+                Details ↓
+              </a>
             </td>
             <td class="route-cell">
               <div class="route-ends">Sainðaul Central ↔ Hayatogaru</div>
@@ -444,278 +446,284 @@
       </table>
     </div>
 
-    <!-- ═══ LOOP LINE ACCORDION ═══ -->
-    <div class="line-accordion" id="acc-lo" role="region" aria-label="Loop Line details">
-      <div class="line-accordion-inner">
-
-        <div class="acc-header">
-          <div class="acc-badge" style="background:#34589F;">LO</div>
-          <div>
-            <h3>Loop Line — 環状線 (Kwanjān-sen)</h3>
-            <p>Circular heavy rail · Sainðaul Central → Hayatogaru → Sainðaul Central</p>
-          </div>
-        </div>
-
-        <div class="acc-stats">
-          <div class="acc-stat"><div class="acc-stat-val" style="color:#34589F;">24.5 km</div><div class="acc-stat-lbl">Circuit length</div></div>
-          <div class="acc-stat"><div class="acc-stat-val" style="color:#34589F;">19</div><div class="acc-stat-lbl">Stations</div></div>
-          <div class="acc-stat"><div class="acc-stat-val" style="color:#34589F;">1937</div><div class="acc-stat-lbl">Official opening</div></div>
-          <div class="acc-stat"><div class="acc-stat-val" style="color:#34589F;">1.7M</div><div class="acc-stat-lbl">Daily riders</div></div>
-          <div class="acc-stat"><div class="acc-stat-val" style="color:#34589F;">5 min</div><div class="acc-stat-lbl">Typical headway</div></div>
-          <div class="acc-stat"><div class="acc-stat-val" style="color:#34589F;">90 sec</div><div class="acc-stat-lbl">Peak headway</div></div>
-        </div>
-
-        <div class="acc-desc">
-          <p>The Loop Line encircles the historic heart of Sainðaul. It did not come into existence as a single project — rather, it evolved from the gradual amalgamation of various railway segments connected over decades, with the official circular service launching in 1937. Standing out on maps in its distinctive <strong style="color:#34589F">Prussian blue</strong>, the line is a daily artery for 1.7 million riders and a hub of urban activity.</p>
-          <p>Some services terminate at <strong>Hayatogaru Station</strong>, which hosts the line's maintenance depot. During rush hours, headways compress to 90 seconds to accommodate peak demand on one of the busiest commuter loops in Uletha.</p>
-        </div>
-
-        <div class="stn-table-wrap">
-          <table class="stn-table" aria-label="Loop Line stations">
-            <thead>
-              <tr style="color:#34589F;">
-                <th>Code</th>
-                <th>Station</th>
-                <th>Izaki</th>
-                <th>Rail connections</th>
-                <th>Metro connections</th>
-                <th>District</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL01</td>
-                <td><div class="stn-name-en">Sainðaul Central</div><div class="stn-name-iz">作安崎中央</div></td>
-                <td class="stn-name-iz">作安崎中央</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-rail">Airport Express</li>
-                  <li class="conn-rail">Chikaoi Line</li>
-                  <li class="conn-rail">Enishaku Line</li>
-                  <li class="conn-rail">Sainniga Line</li>
-                  <li class="conn-rail">Bajikoe-Dōnnei Line</li>
-                  <li class="conn-rail">IZX</li>
-                </ul></td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-metro">Line 1</li>
-                  <li class="conn-metro">Line 8</li>
-                  <li class="conn-metro">Line 10</li>
-                  <li class="conn-metro">Line 17</li>
-                  <li class="conn-metro">Shindōnsai Link</li>
-                </ul></td>
-                <td class="stn-loc" rowspan="2">Juwon</td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL02</td>
-                <td><div class="stn-name-en">Binno</div><div class="stn-name-iz">苠喃</div></td>
-                <td class="stn-name-iz">苠喃</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-rail">Chikaoi Line</li>
-                  <li class="conn-rail">Enishaku Line</li>
-                  <li class="conn-rail">Bajikoe-Dōnnei Line</li>
-                </ul></td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-metro">Line 4</li>
-                  <li class="conn-metro">Line 17</li>
-                </ul></td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL03</td>
-                <td><div class="stn-name-en">Shiitehongi</div><div class="stn-name-iz">茛本名</div></td>
-                <td class="stn-name-iz">茛本名</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-rail">Enishaku Line</li>
-                  <li class="conn-rail">Limited Expresses</li>
-                </ul></td>
-                <td class="stn-conn"><ul><li class="conn-metro">Line 3</li></ul></td>
-                <td class="stn-loc">Shiki</td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL04</td>
-                <td><div class="stn-name-en">Jigasūngai Kōwen</div><div class="stn-name-iz">治ヶ僧涯公園</div></td>
-                <td class="stn-name-iz">治ヶ僧涯公園</td>
-                <td class="stn-conn">—</td>
-                <td class="stn-conn"><ul><li class="conn-metro">Line 18</li></ul></td>
-                <td class="stn-loc" rowspan="4">Jufurai</td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL05</td>
-                <td><div class="stn-name-en">Jufurai Kōwen Niji</div><div class="stn-name-iz">朱布来公園西</div></td>
-                <td class="stn-name-iz">朱布来公園西</td>
-                <td class="stn-conn">—</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-metro">Line 8</li>
-                  <li class="conn-metro">Line 16</li>
-                </ul></td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL06</td>
-                <td><div class="stn-name-en">Punoidan</div><div class="stn-name-iz">富硾壇</div></td>
-                <td class="stn-name-iz">富硾壇</td>
-                <td class="stn-conn">—</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-metro" style="font-size:9px;font-style:italic">at Tensari Omuhate:</li>
-                  <li class="conn-metro">Line 1</li>
-                  <li class="conn-metro">Line 16</li>
-                </ul></td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL07</td>
-                <td><div class="stn-name-en">Rupekoppe</div><div class="stn-name-iz">孱槻</div></td>
-                <td class="stn-name-iz">孱槻</td>
-                <td class="stn-conn">—</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-metro" style="font-size:9px;font-style:italic">at Tamanoke Tsunui:</li>
-                  <li class="conn-metro">Line 1</li>
-                </ul></td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL08</td>
-                <td><div class="stn-name-en">Isenebo</div><div class="stn-name-iz">床踔</div></td>
-                <td class="stn-name-iz">床踔</td>
-                <td class="stn-conn">—</td>
-                <td class="stn-conn"><ul><li class="conn-metro">Line 14</li></ul></td>
-                <td class="stn-loc" rowspan="4">Hayatogaru</td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL09</td>
-                <td><div class="stn-name-en">Igashikura <span style="font-size:10px;font-weight:400;">(Taishin Univ.)</span></div><div class="stn-name-iz">品霜（泰進大）</div></td>
-                <td class="stn-name-iz">品霜（泰進大）</td>
-                <td class="stn-conn"><ul><li class="conn-rail">Kidai Line</li></ul></td>
-                <td class="stn-conn">—</td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL10</td>
-                <td><div class="stn-name-en">Hayatogaru</div><div class="stn-name-iz">久松</div></td>
-                <td class="stn-name-iz">久松</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-rail">Chikaoi Line</li>
-                  <li class="conn-rail">Ansoku Line</li>
-                  <li class="conn-rail">Kidai Line</li>
-                  <li class="conn-rail">Sainniga Line</li>
-                </ul></td>
-                <td class="stn-conn">—</td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL11</td>
-                <td><div class="stn-name-en">Rakkashoni</div><div class="stn-name-iz">鳶腳</div></td>
-                <td class="stn-name-iz">鳶腳</td>
-                <td class="stn-conn"><ul><li class="conn-rail">Chikaoi Line</li></ul></td>
-                <td class="stn-conn"><ul><li class="conn-metro">Line 2</li></ul></td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL12</td>
-                <td><div class="stn-name-en">Sumi-Kokendake</div><div class="stn-name-iz">隠古剣館</div></td>
-                <td class="stn-name-iz">隠古剣館</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-rail">Chikaoi Line</li>
-                  <li class="conn-rail">Ansoku Line</li>
-                </ul></td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-metro" style="font-size:9px;font-style:italic">at Kushigae:</li>
-                  <li class="conn-metro">Line 4</li>
-                  <li class="conn-metro">Line 16</li>
-                </ul></td>
-                <td class="stn-loc" rowspan="4">Kokendake</td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL13</td>
-                <td><div class="stn-name-en">Oritoku</div><div class="stn-name-iz">壌外</div></td>
-                <td class="stn-name-iz">壌外</td>
-                <td class="stn-conn"><ul><li class="conn-rail">Chikaoi Line</li></ul></td>
-                <td class="stn-conn"><ul><li class="conn-metro">Line 10</li></ul></td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL14</td>
-                <td><div class="stn-name-en">Tomiganei</div><div class="stn-name-iz">庭ヶ汢</div></td>
-                <td class="stn-name-iz">庭ヶ汢</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-rail">Chikaoi Line</li>
-                  <li class="conn-rail">Sabuonno Line</li>
-                </ul></td>
-                <td class="stn-conn"><ul><li class="conn-metro">Line 9</li></ul></td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL15</td>
-                <td><div class="stn-name-en">Tagashiga</div><div class="stn-name-iz">浚藻</div></td>
-                <td class="stn-name-iz">浚藻</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-rail">Chikaoi Line</li>
-                  <li class="conn-rail">Sabuonno Line</li>
-                </ul></td>
-                <td class="stn-conn">—</td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL16</td>
-                <td><div class="stn-name-en">Oiseharu</div><div class="stn-name-iz">粕墾</div></td>
-                <td class="stn-name-iz">粕墾</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-rail">Chikaoi Line</li>
-                  <li class="conn-rail">Sabuonno Line</li>
-                  <li class="conn-rail" style="font-size:9px;font-style:italic">at Shin-Oiseharu:</li>
-                  <li class="conn-rail">Shinsabu Main Line</li>
-                </ul></td>
-                <td class="stn-conn"><ul><li class="conn-metro">Line 18</li></ul></td>
-                <td class="stn-loc" rowspan="4">Juwon</td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL17</td>
-                <td><div class="stn-name-en">Herubori</div><div class="stn-name-iz">杏登</div></td>
-                <td class="stn-name-iz">杏登</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-rail">Chikaoi Line</li>
-                  <li class="conn-rail">Sabuonno Line</li>
-                  <li class="conn-rail">Ansoku Line</li>
-                  <li class="conn-rail">Airport Express</li>
-                  <li class="conn-rail">Dōnkai Line</li>
-                  <li class="conn-rail">Shinsabu Main Line</li>
-                  <li class="conn-rail">IZX</li>
-                </ul></td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-metro">Line 3</li>
-                  <li class="conn-metro">Line 12</li>
-                </ul></td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL18</td>
-                <td><div class="stn-name-en">Ōbakura</div><div class="stn-name-iz">大砌</div></td>
-                <td class="stn-name-iz">大砌</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-rail">Chikaoi Line</li>
-                  <li class="conn-rail">Sabuonno Line</li>
-                </ul></td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-metro">Line 12</li>
-                  <li class="conn-metro">Line 14</li>
-                </ul></td>
-              </tr>
-              <tr>
-                <td class="stn-code" style="color:#34589F;">LL19</td>
-                <td><div class="stn-name-en">Aketsue</div><div class="stn-name-iz">薫都衛</div></td>
-                <td class="stn-name-iz">薫都衛</td>
-                <td class="stn-conn"><ul>
-                  <li class="conn-rail">Chikaoi Line</li>
-                  <li class="conn-rail">Sabuonno Line</li>
-                  <li class="conn-rail">Daikiri Line</li>
-                  <li class="conn-rail">Kidai Line</li>
-                  <li class="conn-rail">Enishaku Line</li>
-                  <li class="conn-rail">Bajikoe-Dōnnei Line</li>
-                </ul></td>
-                <td class="stn-conn"><ul><li class="conn-metro">Line 12</li></ul></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-      </div>
-    </div>
-    <!-- ═══ END LOOP LINE ACCORDION ═══ -->
-
     <div class="private-note">
       <h3>Private Railways</h3>
       <p>Several private operators complement the Izarail network in the Greater Sainðaul area. These lines integrate with the Izarail network at key interchange stations and accept the <strong>IZWay</strong> smart card.</p>
     </div>
 
   </section>
+
+  <!-- ═══ LOOP LINE DETAIL — fixed section at bottom ═══ -->
+  <div class="line-detail-section" id="detail-lo">
+
+    <a href="#row-lo" class="back-to-table">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+      Back to line overview
+    </a>
+
+    <div class="line-detail-inner">
+
+      <div class="acc-header">
+        <div class="acc-badge" style="background:#34589F;">LO</div>
+        <div>
+          <h3>Loop Line — 環状線 (Kwanjān-sen)</h3>
+          <p>Circular heavy rail · Sainðaul Central → Hayatogaru → Sainðaul Central</p>
+        </div>
+      </div>
+
+      <div class="acc-stats">
+        <div class="acc-stat"><div class="acc-stat-val" style="color:#34589F;">24.5 km</div><div class="acc-stat-lbl">Circuit length</div></div>
+        <div class="acc-stat"><div class="acc-stat-val" style="color:#34589F;">19</div><div class="acc-stat-lbl">Stations</div></div>
+        <div class="acc-stat"><div class="acc-stat-val" style="color:#34589F;">1937</div><div class="acc-stat-lbl">Official opening</div></div>
+        <div class="acc-stat"><div class="acc-stat-val" style="color:#34589F;">1.7M</div><div class="acc-stat-lbl">Daily riders</div></div>
+        <div class="acc-stat"><div class="acc-stat-val" style="color:#34589F;">5 min</div><div class="acc-stat-lbl">Typical headway</div></div>
+        <div class="acc-stat"><div class="acc-stat-val" style="color:#34589F;">90 sec</div><div class="acc-stat-lbl">Peak headway</div></div>
+      </div>
+
+      <div class="acc-desc">
+        <p>The Loop Line encircles the historic heart of Sainðaul. It did not come into existence as a single project — rather, it evolved from the gradual amalgamation of various railway segments connected over decades, with the official circular service launching in 1937. Standing out on maps in its distinctive <strong style="color:#34589F">Prussian blue</strong>, the line is a daily artery for 1.7 million riders and a hub of urban activity.</p>
+        <p>Some services terminate at <strong>Hayatogaru Station</strong>, which hosts the line's maintenance depot. During rush hours, headways compress to 90 seconds to accommodate peak demand on one of the busiest commuter loops in Uletha.</p>
+      </div>
+
+      <div class="stn-table-wrap">
+        <table class="stn-table" aria-label="Loop Line stations">
+          <thead>
+            <tr style="color:#34589F;">
+              <th>Code</th>
+              <th>Station</th>
+              <th>Izaki</th>
+              <th>Rail connections</th>
+              <th>Metro connections</th>
+              <th>District</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL01</td>
+              <td><div class="stn-name-en">Sainðaul Central</div><div class="stn-name-iz">作安崎中央</div></td>
+              <td class="stn-name-iz">作安崎中央</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-rail">Airport Express</li>
+                <li class="conn-rail">Chikaoi Line</li>
+                <li class="conn-rail">Enishaku Line</li>
+                <li class="conn-rail">Sainniga Line</li>
+                <li class="conn-rail">Bajikoe-Dōnnei Line</li>
+                <li class="conn-rail">IZX</li>
+              </ul></td>
+              <td class="stn-conn"><ul>
+                <li class="conn-metro">Line 1</li>
+                <li class="conn-metro">Line 8</li>
+                <li class="conn-metro">Line 10</li>
+                <li class="conn-metro">Line 17</li>
+                <li class="conn-metro">Shindōnsai Link</li>
+              </ul></td>
+              <td class="stn-loc" rowspan="2">Juwon</td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL02</td>
+              <td><div class="stn-name-en">Binno</div><div class="stn-name-iz">苠喃</div></td>
+              <td class="stn-name-iz">苠喃</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-rail">Chikaoi Line</li>
+                <li class="conn-rail">Enishaku Line</li>
+                <li class="conn-rail">Bajikoe-Dōnnei Line</li>
+              </ul></td>
+              <td class="stn-conn"><ul>
+                <li class="conn-metro">Line 4</li>
+                <li class="conn-metro">Line 17</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL03</td>
+              <td><div class="stn-name-en">Shiitehongi</div><div class="stn-name-iz">茛本名</div></td>
+              <td class="stn-name-iz">茛本名</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-rail">Enishaku Line</li>
+                <li class="conn-rail">Limited Expresses</li>
+              </ul></td>
+              <td class="stn-conn"><ul><li class="conn-metro">Line 3</li></ul></td>
+              <td class="stn-loc">Shiki</td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL04</td>
+              <td><div class="stn-name-en">Jigasūngai Kōwen</div><div class="stn-name-iz">治ヶ僧涯公園</div></td>
+              <td class="stn-name-iz">治ヶ僧涯公園</td>
+              <td class="stn-conn">—</td>
+              <td class="stn-conn"><ul><li class="conn-metro">Line 18</li></ul></td>
+              <td class="stn-loc" rowspan="4">Jufurai</td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL05</td>
+              <td><div class="stn-name-en">Jufurai Kōwen Niji</div><div class="stn-name-iz">朱布来公園西</div></td>
+              <td class="stn-name-iz">朱布来公園西</td>
+              <td class="stn-conn">—</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-metro">Line 8</li>
+                <li class="conn-metro">Line 16</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL06</td>
+              <td><div class="stn-name-en">Punoidan</div><div class="stn-name-iz">富硾壇</div></td>
+              <td class="stn-name-iz">富硾壇</td>
+              <td class="stn-conn">—</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-metro" style="font-size:9px;font-style:italic">at Tensari Omuhate:</li>
+                <li class="conn-metro">Line 1</li>
+                <li class="conn-metro">Line 16</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL07</td>
+              <td><div class="stn-name-en">Rupekoppe</div><div class="stn-name-iz">孱槻</div></td>
+              <td class="stn-name-iz">孱槻</td>
+              <td class="stn-conn">—</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-metro" style="font-size:9px;font-style:italic">at Tamanoke Tsunui:</li>
+                <li class="conn-metro">Line 1</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL08</td>
+              <td><div class="stn-name-en">Isenebo</div><div class="stn-name-iz">床踔</div></td>
+              <td class="stn-name-iz">床踔</td>
+              <td class="stn-conn">—</td>
+              <td class="stn-conn"><ul><li class="conn-metro">Line 14</li></ul></td>
+              <td class="stn-loc" rowspan="4">Hayatogaru</td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL09</td>
+              <td><div class="stn-name-en">Igashikura <span style="font-size:10px;font-weight:400;">(Taishin Univ.)</span></div><div class="stn-name-iz">品霜（泰進大）</div></td>
+              <td class="stn-name-iz">品霜（泰進大）</td>
+              <td class="stn-conn"><ul><li class="conn-rail">Kidai Line</li></ul></td>
+              <td class="stn-conn">—</td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL10</td>
+              <td><div class="stn-name-en">Hayatogaru</div><div class="stn-name-iz">久松</div></td>
+              <td class="stn-name-iz">久松</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-rail">Chikaoi Line</li>
+                <li class="conn-rail">Ansoku Line</li>
+                <li class="conn-rail">Kidai Line</li>
+                <li class="conn-rail">Sainniga Line</li>
+              </ul></td>
+              <td class="stn-conn">—</td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL11</td>
+              <td><div class="stn-name-en">Rakkashoni</div><div class="stn-name-iz">鳶腳</div></td>
+              <td class="stn-name-iz">鳶腳</td>
+              <td class="stn-conn"><ul><li class="conn-rail">Chikaoi Line</li></ul></td>
+              <td class="stn-conn"><ul><li class="conn-metro">Line 2</li></ul></td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL12</td>
+              <td><div class="stn-name-en">Sumi-Kokendake</div><div class="stn-name-iz">隠古剣館</div></td>
+              <td class="stn-name-iz">隠古剣館</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-rail">Chikaoi Line</li>
+                <li class="conn-rail">Ansoku Line</li>
+              </ul></td>
+              <td class="stn-conn"><ul>
+                <li class="conn-metro" style="font-size:9px;font-style:italic">at Kushigae:</li>
+                <li class="conn-metro">Line 4</li>
+                <li class="conn-metro">Line 16</li>
+              </ul></td>
+              <td class="stn-loc" rowspan="4">Kokendake</td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL13</td>
+              <td><div class="stn-name-en">Oritoku</div><div class="stn-name-iz">壌外</div></td>
+              <td class="stn-name-iz">壌外</td>
+              <td class="stn-conn"><ul><li class="conn-rail">Chikaoi Line</li></ul></td>
+              <td class="stn-conn"><ul><li class="conn-metro">Line 10</li></ul></td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL14</td>
+              <td><div class="stn-name-en">Tomiganei</div><div class="stn-name-iz">庭ヶ汢</div></td>
+              <td class="stn-name-iz">庭ヶ汢</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-rail">Chikaoi Line</li>
+                <li class="conn-rail">Sabuonno Line</li>
+              </ul></td>
+              <td class="stn-conn"><ul><li class="conn-metro">Line 9</li></ul></td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL15</td>
+              <td><div class="stn-name-en">Tagashiga</div><div class="stn-name-iz">浚藻</div></td>
+              <td class="stn-name-iz">浚藻</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-rail">Chikaoi Line</li>
+                <li class="conn-rail">Sabuonno Line</li>
+              </ul></td>
+              <td class="stn-conn">—</td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL16</td>
+              <td><div class="stn-name-en">Oiseharu</div><div class="stn-name-iz">粕墾</div></td>
+              <td class="stn-name-iz">粕墾</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-rail">Chikaoi Line</li>
+                <li class="conn-rail">Sabuonno Line</li>
+                <li class="conn-rail" style="font-size:9px;font-style:italic">at Shin-Oiseharu:</li>
+                <li class="conn-rail">Shinsabu Main Line</li>
+              </ul></td>
+              <td class="stn-conn"><ul><li class="conn-metro">Line 18</li></ul></td>
+              <td class="stn-loc" rowspan="4">Juwon</td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL17</td>
+              <td><div class="stn-name-en">Herubori</div><div class="stn-name-iz">杏登</div></td>
+              <td class="stn-name-iz">杏登</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-rail">Chikaoi Line</li>
+                <li class="conn-rail">Sabuonno Line</li>
+                <li class="conn-rail">Ansoku Line</li>
+                <li class="conn-rail">Airport Express</li>
+                <li class="conn-rail">Dōnkai Line</li>
+                <li class="conn-rail">Shinsabu Main Line</li>
+                <li class="conn-rail">IZX</li>
+              </ul></td>
+              <td class="stn-conn"><ul>
+                <li class="conn-metro">Line 3</li>
+                <li class="conn-metro">Line 12</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL18</td>
+              <td><div class="stn-name-en">Ōbakura</div><div class="stn-name-iz">大砌</div></td>
+              <td class="stn-name-iz">大砌</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-rail">Chikaoi Line</li>
+                <li class="conn-rail">Sabuonno Line</li>
+              </ul></td>
+              <td class="stn-conn"><ul>
+                <li class="conn-metro">Line 12</li>
+                <li class="conn-metro">Line 14</li>
+              </ul></td>
+            </tr>
+            <tr>
+              <td class="stn-code" style="color:#34589F;">LL19</td>
+              <td><div class="stn-name-en">Aketsue</div><div class="stn-name-iz">薫都衛</div></td>
+              <td class="stn-name-iz">薫都衛</td>
+              <td class="stn-conn"><ul>
+                <li class="conn-rail">Chikaoi Line</li>
+                <li class="conn-rail">Sabuonno Line</li>
+                <li class="conn-rail">Daikiri Line</li>
+                <li class="conn-rail">Kidai Line</li>
+                <li class="conn-rail">Enishaku Line</li>
+                <li class="conn-rail">Bajikoe-Dōnnei Line</li>
+              </ul></td>
+              <td class="stn-conn"><ul><li class="conn-metro">Line 12</li></ul></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+  <!-- ═══ END LOOP LINE DETAIL ═══ -->
 
   <footer>
     <p>Izaland Transit Portal · Built on <a href="https://opengeofiction.net" target="_blank" rel="noopener">OpenGeoFiction</a> data · Not affiliated with any real transport operator</p>
@@ -734,46 +742,6 @@
           :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
       });
     })();
-
-    /* ── Line accordions ── */
-    document.querySelectorAll('.expand-btn').forEach(btn => {
-      const targetId = btn.dataset.target;
-      const panel    = document.getElementById(targetId);
-      if (!panel) return;
-
-      btn.addEventListener('click', () => {
-        const isOpen = panel.classList.contains('open');
-
-        if (isOpen) {
-          // Collapse: fix current height, then animate to 0
-          panel.style.maxHeight = panel.scrollHeight + 'px';
-          requestAnimationFrame(() => {
-            panel.style.transition = 'max-height 380ms cubic-bezier(0.16,1,0.3,1)';
-            panel.style.maxHeight  = '0';
-          });
-          panel.classList.remove('open');
-          btn.classList.remove('open');
-          btn.setAttribute('aria-expanded', 'false');
-          btn.querySelector('span') && (btn.querySelector('span').textContent = 'Details');
-        } else {
-          // Expand: set max-height to scrollHeight then let CSS take over
-          panel.style.transition = 'max-height 420ms cubic-bezier(0.16,1,0.3,1)';
-          panel.style.maxHeight  = panel.scrollHeight + 'px';
-          panel.classList.add('open');
-          btn.classList.add('open');
-          btn.setAttribute('aria-expanded', 'true');
-          btn.querySelector('span') && (btn.querySelector('span').textContent = 'Close');
-
-          // After animation, remove inline max-height so content can grow (e.g. images)
-          panel.addEventListener('transitionend', () => {
-            if (panel.classList.contains('open')) panel.style.maxHeight = 'none';
-          }, { once: true });
-
-          // Smooth scroll so the panel is visible
-          setTimeout(() => btn.closest('tr').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
-        }
-      });
-    });
   </script>
 
 </body>
