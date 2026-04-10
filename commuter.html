@@ -42,6 +42,11 @@
     /* NAV */
     nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-8);background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
     .nav-logo{display:flex;align-items:center;gap:var(--space-3);text-decoration:none;color:var(--text);}
+    .nav-logo img{height:40px;width:auto;display:block;transition:opacity var(--transition);}
+    .nav-logo img.logo-dark{display:block;}
+    .nav-logo img.logo-light{display:none;}
+    [data-theme="light"] .nav-logo img.logo-dark{display:none;}
+    [data-theme="light"] .nav-logo img.logo-light{display:block;}
     .nav-logo-text{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;letter-spacing:-0.02em;}
     .nav-logo-sub{font-size:var(--text-xs);color:var(--text-muted);}
     .nav-links{display:flex;gap:var(--space-6);align-items:center;}
@@ -162,18 +167,20 @@
 
   <nav>
     <a href="index.html" class="nav-logo">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Izaland Transit">
-        <rect width="32" height="32" rx="8" fill="var(--accent)"/>
-        <rect x="6" y="14" width="20" height="3" rx="1.5" fill="white"/>
-        <rect x="6" y="9" width="14" height="3" rx="1.5" fill="white" opacity="0.7"/>
-        <rect x="6" y="19" width="17" height="3" rx="1.5" fill="white" opacity="0.5"/>
-        <circle cx="24" cy="22" r="3" fill="white"/>
-        <circle cx="24" cy="22" r="1.5" fill="var(--accent)"/>
-      </svg>
-      <div>
-        <div class="nav-logo-text">IZ Transit</div>
-        <div class="nav-logo-sub">Izaland · OpenGeoFiction</div>
-      </div>
+      <img
+        class="logo-dark"
+        src="frontend/Izarail Urban Networks dark.svg"
+        alt="Izarail Urban Networks"
+        height="40"
+        loading="eager"
+      >
+      <img
+        class="logo-light"
+        src="frontend/Izarail Urban Networks bright.svg"
+        alt="Izarail Urban Networks"
+        height="40"
+        loading="eager"
+      >
     </a>
     <div class="nav-links">
       <a href="index.html">Home</a>
