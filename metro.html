@@ -1,0 +1,2005 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sainðaul Metro — Izaland Transit Portal</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-body: 'Satoshi', 'Inter', sans-serif;
+      --font-display: 'Cabinet Grotesk', 'Satoshi', sans-serif;
+      --text-xs:   clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm:   clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg:   clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl:   clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl:  clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+      --space-4: 1rem; --space-6: 1.5rem; --space-8: 2rem;
+      --space-12: 3rem; --space-16: 4rem;
+      --radius-sm: 0.375rem; --radius-md: 0.5rem;
+      --radius-lg: 0.75rem; --radius-xl: 1rem;
+      --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    [data-theme="dark"] {
+      --bg: #0f1117; --surface: #161b27; --surface-2: #1c2235;
+      --border: #2a3147; --text: #e2e8f0; --text-muted: #94a3b8; --text-faint: #4a5568;
+      --accent: #3b82f6; --accent-hover: #2563eb; --accent-glow: rgba(59,130,246,0.15);
+      --izx-red: #ef4444; --izx-gold: #f59e0b; --metro-teal: #14b8a6;
+    }
+    [data-theme="light"] {
+      --bg: #f8fafc; --surface: #ffffff; --surface-2: #f1f5f9;
+      --border: #e2e8f0; --text: #1e293b; --text-muted: #64748b; --text-faint: #cbd5e1;
+      --accent: #2563eb; --accent-hover: #1d4ed8; --accent-glow: rgba(37,99,235,0.1);
+      --izx-red: #dc2626; --izx-gold: #d97706; --metro-teal: #0d9488;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;}
+    body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--text);background:var(--bg);line-height:1.6;}
+
+    /* NAV */
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-8);background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
+    .nav-logo{display:flex;align-items:center;gap:var(--space-3);text-decoration:none;color:var(--text);}
+    .nav-logo-text{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;letter-spacing:-0.02em;}
+    .nav-logo-sub{font-size:var(--text-xs);color:var(--text-muted);}
+    .nav-links{display:flex;gap:var(--space-6);align-items:center;}
+    .nav-links a{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;font-weight:500;transition:color var(--transition);}
+    .nav-links a:hover{color:var(--text);}
+    .nav-links a.active{color:var(--accent);}
+    .theme-btn{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:var(--radius-md);padding:var(--space-2);cursor:pointer;display:flex;transition:color var(--transition),border-color var(--transition);}
+    .theme-btn:hover{color:var(--text);border-color:var(--text-muted);}
+
+    /* PAGE HEADER */
+    .page-header {
+      padding: var(--space-12) var(--space-8) var(--space-8);
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--space-8);
+      align-items: start;
+    }
+    .page-label{font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--metro-teal);margin-bottom:var(--space-3);}
+    .page-title{font-family:var(--font-display);font-size:var(--text-2xl);font-weight:800;line-height:1.05;letter-spacing:-0.03em;margin-bottom:var(--space-4);}
+    .page-desc{font-size:var(--text-base);color:var(--text-muted);max-width:56ch;}
+
+    /* METRO LOGO BADGE */
+    .metro-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .metro-logo-circle {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--metro-teal);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 2rem; font-weight: 800;
+      color: white;
+      letter-spacing: -0.05em;
+      box-shadow: 0 0 32px rgba(20,184,166,0.3);
+    }
+    .metro-badge-label{font-size:var(--text-xs);color:var(--text-muted);font-weight:600;text-align:center;}
+
+    /* STATS BAR */
+    .stats-bar {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-8) var(--space-8);
+      display: flex;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .stat-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: var(--space-2) var(--space-4);
+      display: flex; align-items: center; gap: var(--space-2);
+      font-size: var(--text-sm);
+    }
+    .stat-pill-value { font-weight: 700; font-family: var(--font-display); }
+    .stat-pill-label { color: var(--text-muted); }
+
+    /* FILTERS */
+    .controls {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-8) var(--space-6);
+      display: flex;
+      gap: var(--space-3);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: var(--space-2) var(--space-4);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .filter-btn:hover { border-color: var(--text-muted); color: var(--text); }
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+    .search-box {
+      margin-left: auto;
+      padding: var(--space-2) var(--space-4);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      color: var(--text);
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color var(--transition);
+      width: 220px;
+    }
+    .search-box:focus { border-color: var(--accent); }
+    .search-box::placeholder { color: var(--text-faint); }
+
+    /* VIEW TOGGLE */
+    .view-toggle {
+      display: flex;
+      gap: var(--space-1);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-1);
+    }
+    .view-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-sm); transition: all var(--transition);
+      font-size: var(--text-sm); font-family: var(--font-body); font-weight: 500;
+    }
+    .view-btn.active { background: var(--surface-2); color: var(--text); }
+
+    /* LINES GRID */
+    .lines-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-8) var(--space-16);
+    }
+
+    /* CARD VIEW */
+    .lines-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
+      gap: var(--space-4);
+    }
+
+    .line-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .line-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .line-card-header {
+      padding: var(--space-4) var(--space-5);
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .line-card-header::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+    }
+    .line-code-badge {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+      letter-spacing: 0.02em;
+    }
+    .line-card-title-wrap { flex: 1; min-width: 0; }
+    .line-card-number { font-size: var(--text-xs); color: var(--text-muted); font-weight: 600; }
+    .line-card-name {
+      font-family: var(--font-display);
+      font-size: var(--text-base);
+      font-weight: 700;
+      line-height: 1.2;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .line-card-year {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 2px var(--space-2);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .line-card-body { padding: var(--space-4) var(--space-5); }
+    .line-meta-row {
+      display: flex;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+    .line-meta-item { flex: 1; }
+    .line-meta-value {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-weight: 800;
+      line-height: 1;
+    }
+    .line-meta-label {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .line-termini {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      background: var(--surface-2);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-3);
+      margin-bottom: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .terminus-name { color: var(--text); font-weight: 600; }
+    .terminus-sep { color: var(--text-faint); }
+
+    /* EXPANDABLE FACTS */
+    .line-facts-wrap {
+      border-top: 1px solid var(--border);
+      padding-top: var(--space-3);
+    }
+    .line-facts {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      line-height: 1.5;
+      overflow: hidden;
+      max-height: 2.8em; /* ~2 lines */
+      transition: max-height 380ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .line-facts.expanded {
+      max-height: 20em;
+    }
+    .expand-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: var(--space-2);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-faint);
+      font-family: var(--font-body);
+      padding: 0;
+      transition: color var(--transition);
+    }
+    .expand-btn:hover { color: var(--text-muted); }
+    .expand-btn svg {
+      transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+    }
+    .expand-btn.open svg { transform: rotate(180deg); }
+
+    .thru-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px var(--space-2);
+      background: rgba(245,158,11,0.12);
+      color: var(--izx-gold);
+      border-radius: 9999px;
+      border: 1px solid rgba(245,158,11,0.2);
+      margin-top: var(--space-2);
+    }
+    .private-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px var(--space-2);
+      background: rgba(239,68,68,0.12);
+      color: var(--izx-red);
+      border-radius: 9999px;
+      border: 1px solid rgba(239,68,68,0.2);
+      margin-top: var(--space-2);
+    }
+
+    /* TABLE VIEW */
+    .lines-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+    }
+    .lines-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+    .lines-table thead th {
+      background: var(--surface);
+      padding: var(--space-3) var(--space-4);
+      text-align: left;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .lines-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    .lines-table tbody tr:last-child { border-bottom: none; }
+    .lines-table tbody tr:hover { background: var(--surface-2); }
+    .lines-table td {
+      padding: var(--space-3) var(--space-4);
+      vertical-align: middle;
+    }
+    .table-code {
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 36px; height: 28px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-size: var(--text-xs);
+      font-weight: 800;
+      color: white;
+    }
+    .table-line-name {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .table-termini { color: var(--text-muted); font-size: var(--text-xs); white-space: nowrap; }
+    .table-num { font-family: var(--font-display); font-weight: 700; }
+
+    /* HIDDEN */
+    .hidden { display: none !important; }
+
+    /* SECTION DIVIDER */
+    .section-divider {
+      max-width: 1200px;
+      margin: 0 auto var(--space-4);
+      padding: 0 var(--space-8);
+    }
+    .section-divider-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-faint);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .section-divider-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:var(--space-8);text-align:center;font-size:var(--text-sm);color:var(--text-muted);margin-top:var(--space-8);}
+    footer a{color:var(--accent);text-decoration:none;}
+    footer a:hover{text-decoration:underline;}
+
+    /* RESPONSIVE */
+    @media(max-width:768px){
+      nav{padding:var(--space-3) var(--space-4);}
+      .nav-links{gap:var(--space-3);}
+      .page-header{grid-template-columns:1fr;padding:var(--space-8) var(--space-4) var(--space-6);}
+      .metro-badge{display:none;}
+      .stats-bar,.controls,.lines-container,.section-divider{padding-left:var(--space-4);padding-right:var(--space-4);}
+      .search-box{width:100%;}
+    }
+  
+    /* ─── STATIONS COLLAPSIBLE PANEL ─────────────────────────── */
+    .stations-details {
+      border-top: 1px solid var(--border);
+      margin-top: var(--space-3);
+    }
+    .stations-summary {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) 0 var(--space-1);
+      cursor: pointer;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      list-style: none;
+      user-select: none;
+      transition: color var(--transition);
+    }
+    .stations-summary::-webkit-details-marker { display: none; }
+    .stations-summary:hover { color: var(--text-muted); }
+    .stations-summary .stn-chevron {
+      transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+    }
+    .stations-details[open] .stn-chevron { transform: rotate(180deg); }
+    .stations-details[open] .stations-summary { color: var(--text-muted); }
+    .stations-body { padding-bottom: var(--space-2); }
+    .stn-branch { margin-top: var(--space-2); }
+    .stn-branch-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      color: var(--text-faint);
+      margin-bottom: var(--space-1);
+      padding-left: 20px;
+    }
+    .stn-list {
+      list-style: none;
+      position: relative;
+      padding-left: 20px;
+    }
+    .stn-list::before {
+      content: '';
+      position: absolute;
+      left: 7px; top: 8px; bottom: 8px;
+      width: 2px;
+      background: var(--border);
+      border-radius: 1px;
+    }
+    .stn-item {
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-2);
+      padding: 2px 0;
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+    .stn-item::before {
+      content: '';
+      position: absolute;
+      left: -13px; top: 6px;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+    .stn-item.terminus { color: var(--text); font-weight: 700; }
+    .stn-item.terminus::before {
+      background: var(--line-color, #888);
+      width: 8px; height: 8px;
+      left: -14px; top: 5px;
+    }
+    .stn-name { flex: 1; }
+    .stn-count-chip {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-faint);
+      margin-left: auto;
+    }
+    /* ─────────────────────────────────────────────────────────── */
+</style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img class="logo-dark"  src="frontend/Izarail Urban Networks dark.svg"   alt="Izarail Urban Networks" height="40" loading="eager">
+      <img class="logo-light" src="frontend/Izarail Urban Networks bright.svg" alt="Izarail Urban Networks" height="40" loading="eager">
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="izx.html">IZX</a>
+      <a href="metro.html" class="active">Metro</a>
+      <a href="izarail.html">Izarail</a>
+      <a href="commuter.html">Commuter Rail</a>
+      <a href="#map">Map</a>
+      <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="page-label">Sainðaul Metropolitan Transit</div>
+      <h1 class="page-title">Sainðaul Metro</h1>
+      <p class="page-desc">The underground backbone of the Izaland capital. 19 lines spanning the two sides of the Tandan Strait — from the historic Hibaru Line of 1919 to the newest automated corridors of the modern era.</p>
+    </div>
+    <div class="metro-badge">
+      <div class="metro-logo-circle">SM</div>
+      <div class="metro-badge-label">Sainðaul Metro<br>Established 1919</div>
+    </div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-pill">
+      <span class="stat-pill-value" style="color:var(--metro-teal)">19</span>
+      <span class="stat-pill-label">metro lines</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-value" style="color:var(--accent)">673.93</span>
+      <span class="stat-pill-label">km of network</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-value" style="color:var(--izx-gold)">1919</span>
+      <span class="stat-pill-label">year opened</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-value" style="color:var(--izx-red)">3</span>
+      <span class="stat-pill-label">lines cross Tandan Strait</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-value">Kishagoi</span>
+      <span class="stat-pill-label">undersea tunnel</span>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <button class="filter-btn active" data-filter="all">All lines</button>
+    <button class="filter-btn" data-filter="public">Public</button>
+    <button class="filter-btn" data-filter="private">Private</button>
+    <button class="filter-btn" data-filter="thru">Thru service</button>
+    <button class="filter-btn" data-filter="automated">Automated</button>
+    <div class="view-toggle">
+      <button class="view-btn active" data-view="grid">⊞ Grid</button>
+      <button class="view-btn" data-view="table">≡ Table</button>
+    </div>
+    <input class="search-box" type="search" placeholder="Search lines, stations…" id="searchInput">
+  </div>
+
+  <!-- LINES — PUBLIC -->
+  <div class="section-divider" id="divider-public">
+    <div class="section-divider-label">Sainðaul Metro — Public Lines</div>
+  </div>
+
+  <div class="lines-container">
+    <!-- GRID VIEW -->
+    <div class="lines-grid" id="gridView">
+
+      <!-- Line 2: HB Hibaru -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="hibaru hb 2 naezoto mokoba hintomaui oitsura">
+        <div class="line-card-header" style="--lc:#CC0000">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#CC0000;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#CC0000">HB</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 2</div>
+            <div class="line-card-name">Hibaru Line</div>
+          </div>
+          <div class="line-card-year">est. 1919</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item">
+              <div class="line-meta-value">36.02</div>
+              <div class="line-meta-label">km</div>
+            </div>
+            <div class="line-meta-item">
+              <div class="line-meta-value">27</div>
+              <div class="line-meta-label">stations</div>
+            </div>
+            <div class="line-meta-item">
+              <div class="line-meta-value">2</div>
+              <div class="line-meta-label">branches</div>
+            </div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Naezoto</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Mokoba</span>
+            <span class="terminus-sep">/</span>
+            <span class="terminus-name">Hintomaui</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">The first subway line built in Izaland — and one of the first in Eastern Uletha. Runs west-east through the old city core, serving the central station area, the government district of Amiya, and the Eikuku-ji Temple precinct. Splits eastward into two branches.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#CC0000">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">27 stn</span>
+            </summary>
+            <div class="stations-body">
+              <div class="stn-branch">
+                <div class="stn-branch-label">Main line → Oitsura</div>
+                <ul class="stn-list">
+                  <li class="stn-item terminus"><span class="stn-name">Naezoto</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +21 stations TBD · · ·</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Oitsura</span></li>
+                </ul>
+              </div>
+              <div class="stn-branch">
+                <div class="stn-branch-label">Branch → Mokoba</div>
+                <ul class="stn-list">
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Mokoba</span></li>
+                </ul>
+              </div>
+              <div class="stn-branch">
+                <div class="stn-branch-label">Branch → Hintomaui</div>
+                <ul class="stn-list">
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Hintomaui</span></li>
+                </ul>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Line 1: AD Agarai-Dōnpuku -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="agarai donpuku ad 1 ikashumai enikezya yakata">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FE7F00;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#FE7F00">AD</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 1</div>
+            <div class="line-card-name">Agarai-Dōnpuku Line</div>
+          </div>
+          <div class="line-card-year">est. 1924</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">51.66</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">30</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Express</div><div class="line-meta-label">service</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Ikashumai Sports Center</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Enikezya Forum</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">The second-oldest line of the system, upgraded multiple times. Offers express and rapid services. Extension from Ikashumai Sports Center to Yakata targeted for 2024.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#FE7F00">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">30 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Ikashumai Sports Center</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +26 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Enikezya Forum</span></li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Line 3: SH Shakihori -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="shakihori sh 3 ansan shakuiadae iyogateri bibawara komayunden rapid">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#009E4F;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#009E4F">SH</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 3</div>
+            <div class="line-card-name">Shakihori Line</div>
+          </div>
+          <div class="line-card-year">est. 1932</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">42.96</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">25</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Rapid</div><div class="line-meta-label">N. section</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Ansan Shakuiadae</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Iyogateri</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Connects the central districts north-south (Shiitehongi–Herubori). Rapid service north of Komayunden; all-stop south. Extension from Bibawara opened 2019.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#009E4F">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">25 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Ansan Shakuiadae</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +21 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Iyogateri</span></li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Line 4: KO Kokendake -->
+      <div class="line-card" data-type="public" data-tags="public thru" data-search="kokendake ko 4 abawauri kawaei oitsura ipporai embassy aguri kushigae rapid">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FFD912;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#FFD912; color:#1e293b">KO</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 4</div>
+            <div class="line-card-name">Kokendake Line</div>
+          </div>
+          <div class="line-card-year">est. 1937</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">18.45</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">15</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">1976</div><div class="line-meta-label">thru since</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Ipporai-Senpyan</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Kawaei</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Runs parallel to the Hibaru Line, touching the embassy district (Aguri) and old city (Kushigae). First upgraded line to offer rapid service (1998). Thru service onto Shinsabu Oitsura Line (eastbound) and until Ipporai-Senpyan by sharing tracks with Line 6, since 2013.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#FFD912">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">15 stn</span>
+           </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Ipporai-Senpyan <span class="stn-xfer">一蒲崍船駢</span></span></li>
+                <li class="stn-item"><span class="stn-name">Ipporai-Owonideki <span class="stn-xfer">一蒲崍吹取</span></span></li>
+                <li class="stn-item"><span class="stn-name">Ipporai-Konegisa <span class="stn-xfer">一蒲崍干鮃</span></span></li>
+                <li class="stn-item"><span class="stn-name">Shiki-Hoze <span class="stn-xfer">北舗摧</span></span></li>
+                <li class="stn-item"><span class="stn-name">Kotoshiruna <span class="stn-xfer">細荒奈</span></span></li>
+                <li class="stn-item"><span class="stn-name">Buslyu Toshi <span class="stn-xfer">物流都市</span></span></li>
+                <li class="stn-item"><span class="stn-name">Kasakuri <span class="stn-xfer">鯛巻</span></span></li>
+                <li class="stn-item"><span class="stn-name">Nihkyonta <span class="stn-xfer">濱角</span></span></li>
+                <li class="stn-item"><span class="stn-name">Shimamera <span class="stn-xfer">渠瀬田</span></span></li>
+                <li class="stn-item"><span class="stn-name">Abawauri <span class="stn-xfer">燕宦</span></span></li>
+                <li class="stn-item"><span class="stn-name">Heinomoji <span class="stn-xfer">駕桃</span></span></li>
+                <li class="stn-item"><span class="stn-name">Ogiwata <span class="stn-xfer">槃芳</span></span></li>
+                <li class="stn-item"><span class="stn-name">Ekinðuka <span class="stn-xfer">虓પ્鵜</span></span></li>
+                <li class="stn-item"><span class="stn-name">Aguri 2-sa <span class="stn-xfer">阿久里二沙</span></span></li>
+                <li class="stn-item"><span class="stn-name">Anagusa Mukai <span class="stn-xfer">矢模武凱</span></span></li>
+                <li class="stn-item"><span class="stn-name">Kushidaru Amiya <span class="stn-xfer">柚艏-</span></span></li>
+                <li class="stn-item"><span class="stn-name">Tamainoki <span class="stn-xfer">谷伊坂</span></span></li>
+                <li class="stn-item"><span class="stn-name">Tamainoki Kokendake <span class="stn-xfer">谷伊坂古剣館</span></span></li>
+                <li class="stn-item"><span class="stn-name">Sumi-Kokendake <span class="stn-xfer">隠古剣館</span></span></li>
+                <li class="stn-item"><span class="stn-name">Sojo-Kokendake</span></li>
+                <li class="stn-item"><span class="stn-name">Nuskaitsa</span></li>
+                <li class="stn-item"><span class="stn-name">Juhtasamo</span></li>
+                <li class="stn-item"><span class="stn-name">Ristai-Nyūngu <span class="stn-xfer">立大入口</span></span></li>
+                <li class="stn-item"><span class="stn-name">Niji-Kawaei <span class="stn-xfer">西珂夬栄</span></span></li>
+                <li class="stn-item terminus"><span class="stn-name">Kawaei <span class="stn-xfer">珂夬栄</span></span></li>
+              </ul>
+            </div>
+          </details>
+          <div class="thru-badge">⇄ Thru: Shinsabu Oitsura Line</div>
+        </div>
+      </div>
+
+      <!-- Line 5: KE Kirifunu Eigandan -->
+      <div class="line-card" data-type="public" data-tags="public thru" data-search="kirifunu eigandan ke 5 jisahara tsuragoi komokata shosen 180kmh fast">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#9E6A51;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#9E6A51">KE</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 5</div>
+            <div class="line-card-name">Kirifunu Eigandan Line</div>
+          </div>
+          <div class="line-card-year">est. 1941</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">16.05</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">13</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">180</div><div class="line-meta-label">km/h max</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Jisahara</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Tsuragoi</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Reversed "L" shape through central Bajikoe. Since 2013, rapid thru trains reach Komokata at up to 180 km/h on the IR Shosen Line — one of the fastest subway services in the world.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#9E6A51">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">13 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Jisahara</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +9 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Tsuragoi</span></li>
+              </ul>
+            </div>
+          </details>
+          <div class="thru-badge">⇄ Thru: IR Shosen Line → Komokata</div>
+        </div>
+      </div>
+
+      <!-- Line 8: HM Hamaas -->
+      <div class="line-card" data-type="public" data-tags="public thru" data-search="hamaas hm 8 kishagoi komayunden islands tandan strait thru">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#00A2D3;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#00A2D3">HM</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 8</div>
+            <div class="line-card-name">Hamaas Line</div>
+          </div>
+          <div class="line-card-year">est. 1958</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">23.95</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">22</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">V</div><div class="line-meta-label">shape</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Kishagoi</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Komayunden</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">"Line of the islands" — V-shaped, linking north-west eastern Sainðaul to the north-east via central locations. Thru services onto IR Tandan Kaihyō Line and Ibaches Main Line.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#00A2D3">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">22 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Kishagoi</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +18 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Komayunden</span></li>
+              </ul>
+            </div>
+          </details>
+          <div class="thru-badge">⇄ Thru: IR Tandan Kaihyō · Ibaches Main</div>
+        </div>
+      </div>
+
+      <!-- Line 6: IP Ipporai -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="ipporai ip 6 saibu panatsawa nari gotsurindai tandan strait 1967 undersea tunnel norihoi">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#3465A4;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#3465A4">IP</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 6</div>
+            <div class="line-card-name">Ipporai Line</div>
+          </div>
+          <div class="line-card-year">est. 1967</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">47.30</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">30</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">1973</div><div class="line-meta-label">strait crossed</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Saibu-Panatsawa</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Nari-Gotsurindai</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">The first subway line to cross the Tandan Strait (undersea tunnel, 1973). Dramatically lightened congestion on IR lines. Extended 2008 and 2018. Possible future extension to Iberotsuna under study.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#3465A4">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">30 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Saibu-Panatsawa</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +26 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Nari-Gotsurindai</span></li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Line 7: BJ Bajikoe -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="bajikoe bj 7 pwakkobe akettun shendao komokata riimibaiken eigandan shutazai chikawari">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#00A0BC;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#00A0BC">BJ</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 7</div>
+            <div class="line-card-name">Bajikoe Line</div>
+          </div>
+          <div class="line-card-year">est. 1972</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">36.47</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">29</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">"5"</div><div class="line-meta-label">shape</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Pwakkobe</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Akettun Shendao</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Number "5" shaped line linking the Riimibaiken port area to the western CBD under Eigandan Lan and Shutazai-ku. Branch project towards Chikawari pending funding.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#00A0BC">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">29 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Pwakkobe</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +25 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Akettun Shendao</span></li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Line 9: BX Bordeaux -->
+      <div class="line-card" data-type="public" data-tags="public thru automated" data-search="bordeaux bx 9 teyomuka shoryan daishi automated 6 cars shinsabu tsukasai">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#C40062;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#C40062">BX</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 9</div>
+            <div class="line-card-name">Bordeaux Line</div>
+          </div>
+          <div class="line-card-year">est. 1986</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">14.00</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">13</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Auto</div><div class="line-meta-label">driverless</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Teyomuka</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Shōryān Daishi</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">First lower-capacity automated line. 6-car fully driverless trains. Possible extension to Tsukasai (Agarai-Dōnpuku interchange) under study.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#C40062">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">13 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Teyomuka</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +9 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Shōryān Daishi</span></li>
+              </ul>
+            </div>
+          </details>
+          <div class="thru-badge">⇄ Thru: Shinsabu Line → Hidano</div>
+        </div>
+      </div>
+
+      <!-- Line 10: SO Shakiose -->
+      <div class="line-card" data-type="public" data-tags="public thru" data-search="shakiose so 10 shakihori uhara motu shikisabu rillantsoye">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#C46200;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#C46200">SO</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 10</div>
+            <div class="line-card-name">Shakiose Line</div>
+          </div>
+          <div class="line-card-year">est. 1969</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">32.80</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">29</div><div class="line-meta-label">stations</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Shakihori</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Uhāra-Motu</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Runs parallel to the Shakihori (green) line between Niji-Shakihori and Rillantsoye. Thru service onto Shikisabu Railway.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#C46200">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">29 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Shakihori</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +25 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Uhāra-Motu</span></li>
+              </ul>
+            </div>
+          </details>
+          <div class="thru-badge">⇄ Thru: Shikisabu Railway</div>
+        </div>
+      </div>
+
+      <!-- Line 11: OD Owonideki -->
+      <div class="line-card" data-type="public" data-tags="public thru" data-search="owonideki od 11 itsayuki tonjo jisahara north south boulevard shosen">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#c5e1a5;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#c5e1a5; color:#1e293b">OD</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 11</div>
+            <div class="line-card-name">Owonideki Line</div>
+          </div>
+          <div class="line-card-year">est. 2012</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">23.32</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">22</div><div class="line-meta-label">stations</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Itsayuki-Tonjō</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Jisahara</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">North-south line mostly following Owonideki Boulevard in the western city. Thru service onto IR Shosen Line to Katayoshi-Juwon.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#c5e1a5">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">22 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Itsayuki-Tonjō</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +18 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Jisahara</span></li>
+              </ul>
+            </div>
+          </details>
+          <div class="thru-badge">⇄ Thru: IR Shosen Line → Katayoshi-Juwon</div>
+        </div>
+      </div>
+
+      <!-- Line 12: IS Intsushitsa -->
+      <div class="line-card" data-type="public" data-tags="public automated" data-search="intsushitsa is 12 kayatsori mewakate kippai niji yoneo koyabi island automated branch tanjanli">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#86EBEB;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#86EBEB; color:#1e293b">IS</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 12</div>
+            <div class="line-card-name">Intsushitsa Line</div>
+          </div>
+          <div class="line-card-year">est. 1995</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">14.23</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">13</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Auto</div><div class="line-meta-label">driverless</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Kayatsori</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Mewakate-Kippai / Niji-Yōneo</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Fully automated middle-capacity line connecting eastern center with Koyabi Island. 8.6 km branch to Niji-Yōneo opened 2020. Mixed frequency: 4–6 trains/hr per branch.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#86EBEB">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">13 stn</span>
+            </summary>
+            <div class="stations-body">
+              <div class="stn-branch">
+                <div class="stn-branch-label">Main line → Mewakate-Kippai</div>
+                <ul class="stn-list">
+                  <li class="stn-item terminus"><span class="stn-name">Kayatsori</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +7 stations TBD · · ·</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Mewakate-Kippai</span></li>
+                </ul>
+              </div>
+              <div class="stn-branch">
+                <div class="stn-branch-label">Branch → Niji-Yōneo</div>
+                <ul class="stn-list">
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +1 stations TBD · · ·</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Niji-Yōneo</span></li>
+                </ul>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Line 13: TN Tsuruna -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="tsuruna tn 13 saia cargo center showanul kashimochi airport riimibaiken tahamuro">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#36873c;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#36873c">TN</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 13</div>
+            <div class="line-card-name">Tsuruna Line</div>
+          </div>
+          <div class="line-card-year">est. 2003</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">39.40</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">29</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Spur</div><div class="line-meta-label">branch</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">SAIA Cargo Center</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Showanul / Kashimochi</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Airport link under Tsuruna Yaon connecting Asunahama International Airport to the west via Riimibaiken and Tahamuro. Southern spur offers IZX interchange at Showanul.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#36873c">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">29 stn</span>
+            </summary>
+            <div class="stations-body">
+              <div class="stn-branch">
+                <div class="stn-branch-label">Main line → Showanul</div>
+                <ul class="stn-list">
+                  <li class="stn-item terminus"><span class="stn-name">SAIA Cargo Center</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +23 stations TBD · · ·</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Showanul</span></li>
+                </ul>
+              </div>
+              <div class="stn-branch">
+                <div class="stn-branch-label">Spur → Kashimochi</div>
+                <ul class="stn-list">
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Kashimochi</span></li>
+                </ul>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Line 14: NO Nanpuku Otsumi -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="nanpuku otsumi no 14 migawarae tanjanli masuda agarai jufurai intsushitsa dankau">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#72E400;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#72E400; color:#1e293b">NO</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 14</div>
+            <div class="line-card-name">Nanpuku Otsumi Line</div>
+          </div>
+          <div class="line-card-year">est. 2004</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">22.57</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">20</div><div class="line-meta-label">stations</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Migawarae</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Tanjānli</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">One of the most heavily used lines, connecting Masuda Agarai, Jufurai, and Intsushitsa Island with north-eastern districts. Extension to Dankau currently under construction.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#72E400">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">20 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Migawarae</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +16 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Tanjānli</span></li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Line 15: UN Urenosomi -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="urenosomi un 15 saia cargo center sakamuso bibaisone semicircle west south">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#db287a;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#db287a">UN</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 15</div>
+            <div class="line-card-name">Urenosomi Line</div>
+          </div>
+          <div class="line-card-year">est. 2010</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">34.31</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">24</div><div class="line-meta-label">stations</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">SAIA Cargo Center</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Sakamuso</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Draws a semicircle along the western and southern edges of West Sainðaul. Shares track with Line 13 (Tsuruna) between SAIA Cargo Center and Bibaisone.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#db287a">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">24 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">SAIA Cargo Center</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +20 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Sakamuso</span></li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Line 16: KW Kyokwan -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="kyokwan kw 16 tsukitonai kamaishi kaiyan kowen loop koneei bajikoe 71km">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#816cb1;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#816cb1">KW</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 16</div>
+            <div class="line-card-name">Kyokwan Line</div>
+          </div>
+          <div class="line-card-year">est. 2013</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">71.50</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">52</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Mega</div><div class="line-meta-label">loop</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Tsukitonai</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Kamaishi Kaiyan Kōwen</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Almost-complete mega-loop around both city centres — longest line in the system. Southern completion through Kashimochi and Utsullani Islands estimated at 11.2B Etsi. Shares track with Line 18.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#816cb1">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">52 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Tsukitonai</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +48 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Kamaishi Kaiyan Kōwen</span></li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Line 17: ZK Zakumi -->
+      <div class="line-card" data-type="public" data-tags="public thru" data-search="zakumi zk 17 tswankanami airport mewakate kippai kungaus sangu shikumun gashi line rapid 55min">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#f985bb;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#f985bb; color:#1e293b">ZK</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 17</div>
+            <div class="line-card-name">Zakumi Line</div>
+          </div>
+          <div class="line-card-year">est. 2013</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">51.83</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">38</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">55′</div><div class="line-meta-label">rapid end-to-end</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Tswankanami Airport</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Mewakate Kippai / Kungaus Sangu</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">West-east in north West Sainðaul, north-south on the eastern side. Two main patterns; rapid trains cover the full line in ~55 min. Shares track with Lines 16 and 18.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#f985bb">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">38 stn</span>
+            </summary>
+            <div class="stations-body">
+              <div class="stn-branch">
+                <div class="stn-branch-label">Main line → Mewakate Kippai</div>
+                <ul class="stn-list">
+                  <li class="stn-item terminus"><span class="stn-name">Tswankanami Airport</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +26 stations TBD · · ·</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Mewakate Kippai</span></li>
+                </ul>
+              </div>
+              <div class="stn-branch">
+                <div class="stn-branch-label">Branch → Kungaus Sangu</div>
+                <ul class="stn-list">
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                  <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +6 stations TBD · · ·</span></li>
+                  <li class="stn-item terminus"><span class="stn-name">Kungaus Sangu</span></li>
+                </ul>
+              </div>
+            </div>
+          </details>
+          <div class="thru-badge">⇄ Thru: IR Gashi Line → Kirijima</div>
+        </div>
+      </div>
+
+      <!-- Line 18: JF Jufurai -->
+      <div class="line-card" data-type="public" data-tags="public" data-search="jufurai jf 18 nari gotsurindai mewakate kippai former dunkOn ir">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#999999;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#999999">JF</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 18</div>
+            <div class="line-card-name">Jufurai Line</div>
+          </div>
+          <div class="line-card-year">est. 1998</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">27.51</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">20</div><div class="line-meta-label">stations</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Nari-Gotsurindai</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Mewakate Kippai</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">North-south through eastern Sainðaul. Partially uses former IR Dunkōn Line tracks. Shares terminus track with Line 17 between IDK Arena Station and Mewakate Kippai.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#999999">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">20 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Nari-Gotsurindai</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +16 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Mewakate Kippai</span></li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Line HO: Hoze-Oyehatton -->
+      <div class="line-card" data-type="public" data-tags="public automated" data-search="hoze oyehatton ho takatsura kadokamahiwa automated light 4 car western business district">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#CD5C5C;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#CD5C5C">HO</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line —</div>
+            <div class="line-card-name">Hoze-Oyehatton Line</div>
+          </div>
+          <div class="line-card-year">est. 2019</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">13.64</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">13</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">Auto</div><div class="line-meta-label">driverless</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Takatsura</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Kadokamahiwa</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Newest line in the public network. Fully automated 4-car light subway serving the western business district. Opened 2019.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#CD5C5C">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">13 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Takatsura</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +9 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Kadokamahiwa</span></li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+    </div><!-- end lines-grid public -->
+
+    <!-- PRIVATE SECTION DIVIDER -->
+    <div style="margin: var(--space-12) 0 var(--space-6);">
+      <div class="section-divider-label" style="font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-faint);display:flex;align-items:center;gap:var(--space-3);" id="divider-private">
+        Private Metro-like Systems
+        <span style="flex:1;height:1px;background:var(--border);display:block;"></span>
+      </div>
+    </div>
+
+    <div class="lines-grid" id="gridViewPrivate">
+      <!-- SX Shubaru Express -->
+      <div class="line-card" data-type="private" data-tags="private" data-search="shubaru express sx herubori torino jutakutsi shiratsuki 160kmh 35min">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#B22222;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#B22222">SX</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Private</div>
+            <div class="line-card-name">Shubaru Express</div>
+          </div>
+          <div class="line-card-year">est. 2016</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item"><div class="line-meta-value">53.89</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">19</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">160</div><div class="line-meta-label">km/h max</div></div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">Herubori</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">Torino Jutakutsi</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Private express railway connecting Shiratsuki City to Herubori in under 35 minutes at up to 160 km/h. Limited-stop express pattern only.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#B22222">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">19 stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">Herubori</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +15 stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Torino Jutakutsi</span></li>
+              </ul>
+            </div>
+          </details>
+          <div class="private-badge">✦ Privately operated</div>
+        </div>
+      </div>
+    </div><!-- end private grid -->
+
+    <!-- TABLE VIEW (hidden by default) -->
+    <div id="tableView" class="hidden">
+      <div class="lines-table-wrap">
+        <table class="lines-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>#</th>
+              <th>Line Name</th>
+              <th>Opened</th>
+              <th>km</th>
+              <th>Stations</th>
+              <th>Terminus A</th>
+              <th>Terminus B</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr data-type="public" data-search="hibaru hb 2 naezoto mokoba hintomaui">
+              <td><span class="table-code" style="background:#CC0000">HB</span></td>
+              <td class="table-num">2</td>
+              <td class="table-line-name">Hibaru Line</td>
+              <td>1919</td>
+              <td class="table-num">36.02</td>
+              <td class="table-num">27</td>
+              <td class="table-termini">Naezoto</td>
+              <td class="table-termini">Mokoba / Hintomaui</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="agarai donpuku ad 1 ikashumai enikezya">
+              <td><span class="table-code" style="background:#FE7F00">AD</span></td>
+              <td class="table-num">1</td>
+              <td class="table-line-name">Agarai-Dōnpuku Line</td>
+              <td>1924</td>
+              <td class="table-num">51.66</td>
+              <td class="table-num">30</td>
+              <td class="table-termini">Ikashumai Sports Center</td>
+              <td class="table-termini">Enikezya Forum</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="shakihori sh 3 ansan iyogateri">
+              <td><span class="table-code" style="background:#009E4F">SH</span></td>
+              <td class="table-num">3</td>
+              <td class="table-line-name">Shakihori Line</td>
+              <td>1932</td>
+              <td class="table-num">42.96</td>
+              <td class="table-num">25</td>
+              <td class="table-termini">Ansan Shakuiadae</td>
+              <td class="table-termini">Iyogateri</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="kokendake ko 4 abawauri kawaei">
+              <td><span class="table-code" style="background:#FFD912;color:#1e293b">KO</span></td>
+              <td class="table-num">4</td>
+              <td class="table-line-name">Kokendake Line</td>
+              <td>1937</td>
+              <td class="table-num">18.45</td>
+              <td class="table-num">15</td>
+              <td class="table-termini">Abawauri</td>
+              <td class="table-termini">Kawaei</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="kirifunu eigandan ke 5 jisahara tsuragoi">
+              <td><span class="table-code" style="background:#9E6A51">KE</span></td>
+              <td class="table-num">5</td>
+              <td class="table-line-name">Kirifunu Eigandan Line</td>
+              <td>1941</td>
+              <td class="table-num">16.05</td>
+              <td class="table-num">13</td>
+              <td class="table-termini">Jisahara</td>
+              <td class="table-termini">Tsuragoi</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="ipporai ip 6 saibu panatsawa nari gotsurindai">
+              <td><span class="table-code" style="background:#3465A4">IP</span></td>
+              <td class="table-num">6</td>
+              <td class="table-line-name">Ipporai Line</td>
+              <td>1967</td>
+              <td class="table-num">47.30</td>
+              <td class="table-num">30</td>
+              <td class="table-termini">Saibu-Panatsawa</td>
+              <td class="table-termini">Nari-Gotsurindai</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="bajikoe bj 7 pwakkobe akettun shendao">
+              <td><span class="table-code" style="background:#00A0BC">BJ</span></td>
+              <td class="table-num">7</td>
+              <td class="table-line-name">Bajikoe Line</td>
+              <td>1972</td>
+              <td class="table-num">36.47</td>
+              <td class="table-num">29</td>
+              <td class="table-termini">Pwakkobe</td>
+              <td class="table-termini">Akettun Shendao</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="hamaas hm 8 kishagoi komayunden">
+              <td><span class="table-code" style="background:#00A2D3">HM</span></td>
+              <td class="table-num">8</td>
+              <td class="table-line-name">Hamaas Line</td>
+              <td>1958</td>
+              <td class="table-num">23.95</td>
+              <td class="table-num">22</td>
+              <td class="table-termini">Kishagoi</td>
+              <td class="table-termini">Komayunden</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="bordeaux bx 9 teyomuka shoryan daishi">
+              <td><span class="table-code" style="background:#C40062">BX</span></td>
+              <td class="table-num">9</td>
+              <td class="table-line-name">Bordeaux Line</td>
+              <td>1986</td>
+              <td class="table-num">14.00</td>
+              <td class="table-num">13</td>
+              <td class="table-termini">Teyomuka</td>
+              <td class="table-termini">Shōryān Daishi</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="shakiose so 10 shakihori uhara motu">
+              <td><span class="table-code" style="background:#C46200">SO</span></td>
+              <td class="table-num">10</td>
+              <td class="table-line-name">Shakiose Line</td>
+              <td>1969</td>
+              <td class="table-num">32.80</td>
+              <td class="table-num">29</td>
+              <td class="table-termini">Shakihori</td>
+              <td class="table-termini">Uhāra-Motu</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="owonideki od 11 itsayuki tonjo jisahara">
+              <td><span class="table-code" style="background:#c5e1a5;color:#1e293b">OD</span></td>
+              <td class="table-num">11</td>
+              <td class="table-line-name">Owonideki Line</td>
+              <td>2012</td>
+              <td class="table-num">23.32</td>
+              <td class="table-num">22</td>
+              <td class="table-termini">Itsayuki-Tonjō</td>
+              <td class="table-termini">Jisahara</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="intsushitsa is 12 kayatsori mewakate kippai">
+              <td><span class="table-code" style="background:#86EBEB;color:#1e293b">IS</span></td>
+              <td class="table-num">12</td>
+              <td class="table-line-name">Intsushitsa Line</td>
+              <td>1995</td>
+              <td class="table-num">14.23</td>
+              <td class="table-num">13</td>
+              <td class="table-termini">Kayatsori</td>
+              <td class="table-termini">Mewakate-Kippai / Niji-Yōneo</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="tsuruna tn 13 saia cargo showanul kashimochi">
+              <td><span class="table-code" style="background:#36873c">TN</span></td>
+              <td class="table-num">13</td>
+              <td class="table-line-name">Tsuruna Line</td>
+              <td>2003</td>
+              <td class="table-num">39.40</td>
+              <td class="table-num">29</td>
+              <td class="table-termini">SAIA Cargo Center</td>
+              <td class="table-termini">Showanul / Kashimochi</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="nanpuku otsumi no 14 migawarae tanjanli">
+              <td><span class="table-code" style="background:#72E400;color:#1e293b">NO</span></td>
+              <td class="table-num">14</td>
+              <td class="table-line-name">Nanpuku Otsumi Line</td>
+              <td>2004</td>
+              <td class="table-num">22.57</td>
+              <td class="table-num">20</td>
+              <td class="table-termini">Migawarae</td>
+              <td class="table-termini">Tanjānli</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="urenosomi un 15 saia cargo sakamuso">
+              <td><span class="table-code" style="background:#db287a">UN</span></td>
+              <td class="table-num">15</td>
+              <td class="table-line-name">Urenosomi Line</td>
+              <td>2010</td>
+              <td class="table-num">34.31</td>
+              <td class="table-num">24</td>
+              <td class="table-termini">SAIA Cargo Center</td>
+              <td class="table-termini">Sakamuso</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="kyokwan kw 16 tsukitonai kamaishi loop">
+              <td><span class="table-code" style="background:#816cb1">KW</span></td>
+              <td class="table-num">16</td>
+              <td class="table-line-name">Kyokwan Line</td>
+              <td>2013</td>
+              <td class="table-num">71.50</td>
+              <td class="table-num">52</td>
+              <td class="table-termini">Tsukitonai</td>
+              <td class="table-termini">Kamaishi Kaiyan Kōwen</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="zakumi zk 17 tswankanami airport mewakate">
+              <td><span class="table-code" style="background:#f985bb;color:#1e293b">ZK</span></td>
+              <td class="table-num">17</td>
+              <td class="table-line-name">Zakumi Line</td>
+              <td>2013</td>
+              <td class="table-num">51.83</td>
+              <td class="table-num">38</td>
+              <td class="table-termini">Tswankanami Airport</td>
+              <td class="table-termini">Mewakate Kippai / Kungaus Sangu</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="jufurai jf 18 nari gotsurindai mewakate">
+              <td><span class="table-code" style="background:#999999">JF</span></td>
+              <td class="table-num">18</td>
+              <td class="table-line-name">Jufurai Line</td>
+              <td>1998</td>
+              <td class="table-num">27.51</td>
+              <td class="table-num">20</td>
+              <td class="table-termini">Nari-Gotsurindai</td>
+              <td class="table-termini">Mewakate Kippai</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="public" data-search="hoze oyehatton ho takatsura kadokamahiwa">
+              <td><span class="table-code" style="background:#CD5C5C">HO</span></td>
+              <td class="table-num">—</td>
+              <td class="table-line-name">Hoze-Oyehatton Line</td>
+              <td>2019</td>
+              <td class="table-num">13.64</td>
+              <td class="table-num">13</td>
+              <td class="table-termini">Takatsura</td>
+              <td class="table-termini">Kadokamahiwa</td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Public</span></td>
+            </tr>
+            <tr data-type="private" data-search="shubaru express sx herubori torino jutakutsi">
+              <td><span class="table-code" style="background:#B22222">SX</span></td>
+              <td class="table-num">—</td>
+              <td class="table-line-name">Shubaru Express</td>
+              <td>2016</td>
+              <td class="table-num">53.89</td>
+              <td class="table-num">19</td>
+              <td class="table-termini">Herubori</td>
+              <td class="table-termini">Torino Jutakutsi</td>
+              <td><span style="color:var(--izx-red);font-size:var(--text-xs);font-weight:600;">Private</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /lines-container -->
+
+  <footer>
+    <p>Izaland Transit Portal · Built on <a href="https://opengeofiction.net" target="_blank" rel="noopener">OpenGeoFiction</a> data · Not affiliated with any real transport operator</p>
+  </footer>
+
+  <script>
+    // Theme toggle
+    (function(){
+      const t=document.querySelector('[data-theme-toggle]'),r=document.documentElement;
+      let d=r.getAttribute('data-theme')||'dark';
+      t&&t.addEventListener('click',()=>{
+        d=d==='dark'?'light':'dark';
+        r.setAttribute('data-theme',d);
+        t.innerHTML=d==='dark'
+          ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+          :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+      });
+    })();
+
+    // Expand/collapse description panels
+    document.querySelectorAll('.expand-btn').forEach(btn => {
+      const facts = btn.previousElementSibling;
+      // Only show button if text is actually overflowing
+      if (facts.scrollHeight <= facts.clientHeight + 4) {
+        btn.style.display = 'none';
+        return;
+      }
+      btn.addEventListener('click', () => {
+        const isOpen = facts.classList.toggle('expanded');
+        btn.classList.toggle('open', isOpen);
+        btn.querySelector('span').textContent = isOpen ? 'Show less' : 'Show more';
+        btn.setAttribute('aria-label', isOpen ? 'Show less' : 'Show more');
+      });
+    });
+
+    // View toggle
+    const gridView = document.getElementById('gridView');
+    const gridViewPrivate = document.getElementById('gridViewPrivate');
+    const tableView = document.getElementById('tableView');
+    const dividerPrivate = document.getElementById('divider-private').parentElement;
+
+    document.querySelectorAll('.view-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (btn.dataset.view === 'grid') {
+          gridView.classList.remove('hidden');
+          gridViewPrivate.classList.remove('hidden');
+          tableView.classList.add('hidden');
+          dividerPrivate.classList.remove('hidden');
+        } else {
+          gridView.classList.add('hidden');
+          gridViewPrivate.classList.add('hidden');
+          tableView.classList.remove('hidden');
+          dividerPrivate.classList.add('hidden');
+        }
+        applyFilters();
+      });
+    });
+
+    // Filter + search
+    let activeFilter = 'all';
+    let searchQuery = '';
+
+    function applyFilters() {
+      const isGrid = !gridView.classList.contains('hidden');
+      if (isGrid) {
+        const allCards = document.querySelectorAll('.line-card');
+        allCards.forEach(card => {
+          const type = card.dataset.type;
+          const tags = card.dataset.tags || '';
+          const search = (card.dataset.search || '') + ' ' + (card.querySelector('.line-card-name')?.textContent || '');
+          let show = true;
+          if (activeFilter !== 'all') {
+            if (activeFilter === 'public') show = type === 'public';
+            else if (activeFilter === 'private') show = type === 'private';
+            else show = tags.includes(activeFilter);
+          }
+          if (searchQuery && !search.toLowerCase().includes(searchQuery.toLowerCase())) show = false;
+          card.style.display = show ? '' : 'none';
+        });
+      } else {
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach(row => {
+          const type = row.dataset.type;
+          const search = (row.dataset.search || '') + ' ' + (row.querySelector('.table-line-name')?.textContent || '');
+          let show = true;
+          if (activeFilter !== 'all') {
+            if (activeFilter === 'public') show = type === 'public';
+            else if (activeFilter === 'private') show = type === 'private';
+            else show = true;
+          }
+          if (searchQuery && !search.toLowerCase().includes(searchQuery.toLowerCase())) show = false;
+          row.style.display = show ? '' : 'none';
+        });
+      }
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        applyFilters();
+      });
+    });
+
+    document.getElementById('searchInput').addEventListener('input', e => {
+      searchQuery = e.target.value;
+      applyFilters();
+    });
+  </script>
+</body>
+</html>
