@@ -102,8 +102,17 @@
       .li-sw{width:100%;height:4px;}
       .li-ref{width:auto;}
     }
+    /* stazioni */
+    .st-dot{border-radius:50%;box-sizing:border-box;transition:width .15s,height .15s;}
+    .st-dot.st-sm{width:6px;height:6px;border:1.5px solid #888;}
+    .st-dot.st-md{width:9px;height:9px;border:2px solid #888;}
+    .st-dot.st-lg{width:12px;height:12px;border:2.5px solid #888;}
+    .lt-bold{font-weight:700!important;}
+    [data-theme="dark"]  .st-dot{background:#161b27;border-color:#94a3b8!important;}
+    [data-theme="light"] .st-dot{background:#ffffff;border-color:#475569!important;}
   </style>
 </head>
+
 <body>
   <nav>
     <a href="index.html" class="nav-logo">
@@ -158,6 +167,7 @@
         <div class="base-btns">
           <button class="base-btn on" data-layer="standard">Standard</button>
           <button class="base-btn"    data-layer="topo">Topo</button>
+          <button class="base-btn"    data-layer="blank">Blank</button>
         </div>
       </div>
     </div>
@@ -166,180 +176,35 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
   const RM = {
-  "242546": {
-    "group": "Metro",
-    "name": "Line 8",
-    "ref": "8",
-    "colour": "#00A2D3"
-  },
-  "242547": {
-    "group": "Metro",
-    "name": "🅼 Line 4 (local service for Kawaei 珂夬栄方面各駅停車)",
-    "ref": "4",
-    "colour": "#FFD912"
-  },
-  "242548": {
-    "group": "Metro",
-    "name": "🅼 Line 9 (for Shōryan Daishi)",
-    "ref": "9",
-    "colour": "#C40062"
-  },
-  "242549": {
-    "group": "Metro",
-    "name": "🅼 Line 1 (local for Enikezya Forum)",
-    "ref": "1",
-    "colour": "#FE7F00"
-  },
-  "242565": {
-    "group": "Metro",
-    "name": "🅼 Line 2 (for Mokoba)",
-    "ref": "2",
-    "colour": "#FF0000"
-  },
-  "242566": {
-    "group": "Metro",
-    "name": "🅼 Line 3 (local to Iyogateri)",
-    "ref": "3",
-    "colour": "#009E4F"
-  },
-  "242567": {
-    "group": "Metro",
-    "name": "🅼 Line 14",
-    "ref": "14",
-    "colour": "#72E400"
-  },
-  "242569": {
-    "group": "Metro",
-    "name": "🅼 Line 10 to Shakihori",
-    "ref": "10",
-    "colour": "#C46200"
-  },
-  "242570": {
-    "group": "Metro",
-    "name": "🅼 Line 16",
-    "ref": "16",
-    "colour": "#816cb1"
-  },
-  "242571": {
-    "group": "Metro",
-    "name": "🅼 Line 12 (for Mewakate-Kippai)",
-    "ref": "12",
-    "colour": "#86ebeb"
-  },
-  "242573": {
-    "group": "Metro",
-    "name": "🅼 Line 17 (for Tswakanami Airport)",
-    "ref": "17",
-    "colour": "#f985bb"
-  },
-  "242576": {
-    "group": "Metro",
-    "name": "🅼 Line 7",
-    "ref": "7",
-    "colour": "#00a0bc"
-  },
-  "242577": {
-    "group": "Metro",
-    "name": "🅼 Line 5 (local service for Jisahara)",
-    "ref": "5",
-    "colour": "#9e6a51"
-  },
-  "242578": {
-    "group": "Metro",
-    "name": "🅼 Line 6 (for Saibu Panatsawa)",
-    "ref": "6",
-    "colour": "#3465a4"
-  },
-  "242579": {
-    "group": "Metro",
-    "name": "🅼 Line 11",
-    "ref": "11",
-    "colour": "#c5e1a5"
-  },
-  "242580": {
-    "group": "Metro",
-    "name": "🅼 Line 15",
-    "ref": "15",
-    "colour": "#db287a"
-  },
-  "242593": {
-    "group": "Metro",
-    "name": "🅼 Line 13",
-    "ref": "13",
-    "colour": "#36873c"
-  },
-  "292343": {
-    "group": "Metro",
-    "name": "🅼 Line 18 (for ??)",
-    "ref": "",
-    "colour": "#999999"
-  },
-  "242568": {
-    "group": "Other systems",
-    "name": "Portflyer",
-    "ref": "PF",
-    "colour": "#b9a5bd"
-  },
-  "242572": {
-    "group": "Other systems",
-    "name": "Linhai Monorail",
-    "ref": "LH",
-    "colour": "#bcbf62"
-  },
-  "242613": {
-    "group": "Other systems",
-    "name": "Portliner",
-    "ref": "PL",
-    "colour": "#e2bfa7"
-  },
-  "283140": {
-    "group": "Other systems",
-    "name": "Kayan Railway Sakamo Line 嘉鞍高速鉄道Sakamo線",
-    "ref": "KY03",
-    "colour": "#990000"
-  },
-  "283141": {
-    "group": "Other systems",
-    "name": "Kayan Railway Main Line 嘉鞍高速鉄道本線",
-    "ref": "KY02",
-    "colour": "#993300"
-  },
-  "303201": {
-    "group": "Other systems",
-    "name": "🅻 Hoze-Oyehatton Line (for Kadokamahiwa)",
-    "ref": "OH",
-    "colour": "#CD5C5C"
-  },
-  "272674": {
-    "group": "Thru services",
-    "name": "🆂 Kwōkei Line (suburban service, for Yamagoka) 荒京線 (近郊電車, 倉湖加方面)",
-    "ref": "CKW",
-    "colour": "#99FFFF"
-  },
-  "303222": {
-    "group": "Thru services",
-    "name": "Shinsabu Hidano Line Thru Service",
-    "ref": "",
-    "colour": "#BC8F8F"
-  },
-  "303223": {
-    "group": "Thru services",
-    "name": "Shinsabu Oitsura Line Thru Service",
-    "ref": "",
-    "colour": "#FFFACD"
-  },
-  "303227": {
-    "group": "Thru services",
-    "name": "Shikisabu dyenches thru service",
-    "ref": "",
-    "colour": "#D2B48C"
-  },
-  "303270": {
-    "group": "Thru services",
-    "name": "Line 5 Shosen Line Thru service",
-    "ref": "",
-    "colour": "#D2B48C"
-  }
+  "242546": { "group": "Metro", "name": "Line 8", "ref": "8", "colour": "#00A2D3" },
+  "242547": { "group": "Metro", "name": "🅼 Line 4 (local service for Kawaei 珂夬栄方面各駅停車)", "ref": "4", "colour": "#FFD912" },
+  "242548": { "group": "Metro", "name": "🅼 Line 9 (for Shōryan Daishi)", "ref": "9", "colour": "#C40062" },
+  "242549": { "group": "Metro", "name": "🅼 Line 1 (local for Enikezya Forum)", "ref": "1", "colour": "#FE7F00" },
+  "242565": { "group": "Metro", "name": "🅼 Line 2 (for Mokoba)", "ref": "2", "colour": "#FF0000" },
+  "242566": { "group": "Metro", "name": "🅼 Line 3 (local to Iyogateri)", "ref": "3", "colour": "#009E4F" },
+  "242567": { "group": "Metro", "name": "🅼 Line 14", "ref": "14", "colour": "#72E400" },
+  "242569": { "group": "Metro", "name": "🅼 Line 10 to Shakihori", "ref": "10", "colour": "#C46200" },
+  "242570": { "group": "Metro", "name": "🅼 Line 16", "ref": "16", "colour": "#816cb1" },
+  "242571": { "group": "Metro", "name": "🅼 Line 12 (for Mewakate-Kippai)", "ref": "12", "colour": "#86ebeb" },
+  "242573": { "group": "Metro", "name": "🅼 Line 17 (for Tswakanami Airport)", "ref": "17", "colour": "#f985bb" },
+  "242576": { "group": "Metro", "name": "🅼 Line 7", "ref": "7", "colour": "#00a0bc" },
+  "242577": { "group": "Metro", "name": "🅼 Line 5 (local service for Jisahara)", "ref": "5", "colour": "#9e6a51" },
+  "242578": { "group": "Metro", "name": "🅼 Line 6 (for Saibu Panatsawa)", "ref": "6", "colour": "#3465a4" },
+  "242579": { "group": "Metro", "name": "🅼 Line 11", "ref": "11", "colour": "#c5e1a5" },
+  "242580": { "group": "Metro", "name": "🅼 Line 15", "ref": "15", "colour": "#db287a" },
+  "242593": { "group": "Metro", "name": "🅼 Line 13", "ref": "13", "colour": "#36873c" },
+  "292343": { "group": "Metro", "name": "🅼 Line 18 (for ??)", "ref": "", "colour": "#999999" },
+  "242568": { "group": "Other systems", "name": "Portflyer", "ref": "PF", "colour": "#b9a5bd" },
+  "242572": { "group": "Other systems", "name": "Linhai Monorail", "ref": "LH", "colour": "#bcbf62" },
+  "242613": { "group": "Other systems", "name": "Portliner", "ref": "PL", "colour": "#e2bfa7" },
+  "283140": { "group": "Other systems", "name": "Kayan Railway Sakamo Line 嘉鞍高速鉄道Sakamo線", "ref": "KY03", "colour": "#990000" },
+  "283141": { "group": "Other systems", "name": "Kayan Railway Main Line 嘉鞍高速鉄道本線", "ref": "KY02", "colour": "#993300" },
+  "303201": { "group": "Other systems", "name": "🅻 Hoze-Oyehatton Line (for Kadokamahiwa)", "ref": "OH", "colour": "#CD5C5C" },
+  "272674": { "group": "Thru services", "name": "🆂 Kwōkei Line (suburban service, for Yamagoka) 荒京線 (近郊電車, 倉湖加方面)", "ref": "CKW", "colour": "#99FFFF" },
+  "303222": { "group": "Thru services", "name": "Shinsabu Hidano Line Thru Service", "ref": "", "colour": "#BC8F8F" },
+  "303223": { "group": "Thru services", "name": "Shinsabu Oitsura Line Thru Service", "ref": "", "colour": "#FFFACD" },
+  "303227": { "group": "Thru services", "name": "Shikisabu dyenches thru service", "ref": "", "colour": "#D2B48C" },
+  "303270": { "group": "Thru services", "name": "Line 5 Shosen Line Thru service", "ref": "", "colour": "#D2B48C" }
 };
   const GROUPS = {
     'Metro':         [242567,242593,242571,242579,242569,242548,242546,242576,242578,242577,242547,242566,242565,242549,242343,242573,242570,242580,292343],
@@ -354,6 +219,12 @@
     t.addEventListener('click',()=>{
       d=d==='dark'?'light':'dark';
       h.setAttribute('data-theme',d);
+      const blankBtn=document.querySelector('.base-btn[data-layer="blank"]');
+      if(blankBtn&&blankBtn.classList.contains('on')){
+        map.removeLayer(tiles.blank);
+        tiles.blank=makeBlank();
+        tiles.blank.addTo(map);
+      }
       t.innerHTML=d==='dark'
         ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
         :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
@@ -373,11 +244,27 @@
   document.addEventListener('click',()=>document.querySelectorAll('.nav-dd.open').forEach(o=>o.classList.remove('open')));
 
   const map=L.map('map',{center:[36.0118,128.8961],zoom:12,maxZoom:19});
+
+  const blankCanvas=L.GridLayer.extend({
+    createTile:function(){ const t=document.createElement('canvas'); t.width=256; t.height=256; return t; }
+  });
+  function makeBlank(){
+    const dark=document.documentElement.getAttribute('data-theme')==='dark';
+    const cv=new blankCanvas({maxZoom:19,attribution:''});
+    cv.on('tileload',function(e){
+      const ctx=e.tile.getContext('2d');
+      ctx.fillStyle=dark?'#0f1117':'#f8fafc';
+      ctx.fillRect(0,0,256,256);
+    });
+    return cv;
+  }
+
   const tiles={
     standard:L.tileLayer('https://tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png',
       {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
     topo:L.tileLayer('https://tile.opengeofiction.net/ogf-topo/{z}/{x}/{y}.png',
-      {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'})
+      {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
+    blank:makeBlank()
   };
   tiles.standard.addTo(map);
   document.querySelectorAll('.base-btn').forEach(b=>{
@@ -411,7 +298,7 @@
         const opts={color:col,weight:m.group==='Metro'?4:3,opacity:thru?.65:.9,smoothFactor:1.5};
         if(thru)opts.dashArray='7 4';
         L.polyline(w.geometry.map(p=>[p.lat,p.lon]),opts)
-          .bindTooltip(clean(m.name||id)+(m.ref?' \u00b7 '+m.ref:''),{sticky:true,className:'lt'})
+          .bindTooltip(clean(m.name||id)+(m.ref?' · '+m.ref:''),{sticky:true,className:'lt'})
           .addTo(grp);
       }
     });
@@ -438,17 +325,80 @@
     });
   }
 
+  // ── STAZIONI ─────────────────────────────────────────────────
+  const stLayer = L.layerGroup().addTo(map);
+  const ST_BBOX = '35.85,128.70,36.18,129.10';
+
+  async function loadStations() {
+    const q = '[out:json][timeout:30];node["railway"~"station|stop"]('+ST_BBOX+');out body;';
+    const r = await fetch(OV, {
+      method:'POST',
+      body:'data='+encodeURIComponent(q),
+      headers:{'Content-Type':'application/x-www-form-urlencoded'}
+    });
+    const data = await r.json();
+    data.elements.forEach(renderStation);
+  }
+
+  function renderStation(node) {
+    const name = node.tags?.name || node.tags?.['name:en'] || '';
+    const isMain = node.tags?.railway === 'station';
+    const icon = L.divIcon({
+      className:'',
+      html:'<div class="st-dot st-sm"></div>',
+      iconSize:[10,10],
+      iconAnchor:[5,5]
+    });
+    const m = L.marker([node.lat,node.lon],{icon,title:name,zIndexOffset:isMain?200:100});
+    if (name) m.bindTooltip(name,{sticky:true,className:'lt'});
+    m.addTo(stLayer);
+    m._stName = name;
+    m._stMain = isMain;
+    m._labelBound = false;
+  }
+
+  function updateStations() {
+    const z = map.getZoom();
+    stLayer.eachLayer(m => {
+      const el = m.getElement(); if(!el) return;
+      const dot = el.querySelector('.st-dot'); if(!dot) return;
+      if (z < 12) { el.style.display='none'; return; }
+      el.style.display='';
+      dot.className = z >= 16 ? 'st-dot st-lg' : z >= 14 ? 'st-dot st-md' : 'st-dot st-sm';
+      const wantPerm = z >= 14 && !!m._stName;
+      if (wantPerm && !m._labelBound) {
+        m.unbindTooltip();
+        m.bindTooltip(m._stName,{
+          permanent:true,
+          direction:'right',
+          offset:[8,0],
+          className:z>=16?'lt lt-bold':'lt'
+        }).openTooltip();
+        m._labelBound = true;
+      } else if (!wantPerm && m._labelBound) {
+        m.unbindTooltip();
+        m._labelBound = false;
+        if (m._stName) m.bindTooltip(m._stName,{sticky:true,className:'lt'});
+      }
+    });
+  }
+  map.on('zoomend', updateStations);
+
   async function main(){
     const ld=document.getElementById('ld'),lt=document.getElementById('ld-txt');
     let done=0;
     const entries=Object.entries(GROUPS);
-    await Promise.all(entries.map(async([g,ids])=>{
-      lt.textContent='Loading '+g+'\u2026';
-      (await fetch_rels(ids.join(','))).forEach(renderRel);
-      lt.textContent='Loaded '+(++done)+'/'+entries.length+'\u2026';
-    }));
+    await Promise.all([
+      ...entries.map(async([g,ids])=>{
+        lt.textContent='Loading '+g+'…';
+        (await fetch_rels(ids.join(','))).forEach(renderRel);
+        lt.textContent='Loaded '+(++done)+'/'+entries.length+'…';
+      }),
+      loadStations()
+    ]);
     ld.classList.add('done');setTimeout(()=>ld.remove(),600);
     buildLegend();
+    updateStations();
     status(Object.keys(layers).length+' transit lines loaded');
   }
   main();
