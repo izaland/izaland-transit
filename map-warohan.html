@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transit Map — Warohan</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    :root{
+      --font-body:'Satoshi','Inter',sans-serif;
+      --font-display:'Cabinet Grotesk','Satoshi',sans-serif;
+      --text-xs:clamp(0.75rem,0.7rem + 0.25vw,0.875rem);
+      --text-sm:clamp(0.875rem,0.8rem + 0.35vw,1rem);
+      --text-base:clamp(1rem,0.95rem + 0.25vw,1.125rem);
+      --sp1:.25rem;--sp2:.5rem;--sp3:.75rem;--sp4:1rem;--sp6:1.5rem;--sp8:2rem;
+      --r-sm:.375rem;--r-md:.5rem;--r-lg:.75rem;--r-full:9999px;
+      --tx:180ms cubic-bezier(0.16,1,0.3,1);
+    }
+    [data-theme="dark"]{
+      --bg:#0f1117;--sf:#161b27;--sf2:#1c2235;
+      --bd:#2a3147;--tx-c:#e2e8f0;--tx-m:#94a3b8;--tx-f:#4a5568;
+      --ac:#3b82f6;
+    }
+    [data-theme="light"]{
+      --bg:#f8fafc;--sf:#ffffff;--sf2:#f1f5f9;
+      --bd:#e2e8f0;--tx-c:#1e293b;--tx-m:#64748b;--tx-f:#cbd5e1;
+      --ac:#2563eb;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{-webkit-font-smoothing:antialiased;}
+    body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--tx-c);background:var(--bg);display:flex;flex-direction:column;}
+    img{display:block;max-width:100%;height:auto;}
+    /* NAV */
+    nav{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:var(--sp4) var(--sp8);background:var(--bg);border-bottom:1px solid var(--bd);backdrop-filter:blur(12px);}
+    .nav-logo{display:flex;align-items:center;gap:var(--sp3);text-decoration:none;color:var(--tx-c);}
+    .nav-logo img{height:40px;width:auto;}
+    .logo-dark{display:block!important;}
+    .logo-light{display:none!important;}
+    [data-theme="light"] .logo-dark{display:none!important;}
+    [data-theme="light"] .logo-light{display:block!important;}
+    .nav-links{display:flex;gap:var(--sp6);align-items:center;}
+    .nav-links>a{font-size:var(--text-sm);color:var(--tx-m);text-decoration:none;font-weight:500;transition:color var(--tx);}
+    .nav-links>a:hover,.nav-links>a.active{color:var(--tx-c);}
+    .nav-links>a.active{color:var(--ac);}
+    .theme-btn{background:none;border:1px solid var(--bd);color:var(--tx-m);border-radius:var(--r-md);padding:var(--sp2);cursor:pointer;display:flex;transition:color var(--tx),border-color var(--tx);}
+    .theme-btn:hover{color:var(--tx-c);border-color:var(--tx-m);}
+    .nav-dd{position:relative;}
+    .nav-dd>button{background:none;border:none;font-size:var(--text-sm);color:var(--tx-m);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0;transition:color var(--tx);}
+    .nav-dd>button:hover,.nav-dd.active>button{color:var(--tx-c);}
+    .nav-dd.active>button{color:var(--ac);}
+    .nav-dd>button svg{transition:transform var(--tx);}
+    .nav-dd.open>button svg{transform:rotate(180deg);}
+    .dd{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-4px);min-width:160px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-lg);padding:var(--sp2);box-shadow:0 8px 24px oklch(0 0 0/.18);opacity:0;pointer-events:none;transition:opacity var(--tx),transform var(--tx);}
+    .nav-dd.open .dd{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+    .dd a{display:block;padding:var(--sp2) var(--sp3);font-size:var(--text-sm);color:var(--tx-m);text-decoration:none;border-radius:var(--r-md);font-weight:500;transition:background var(--tx),color var(--tx);white-space:nowrap;}
+    .dd a:hover{background:var(--sf2);color:var(--tx-c);}
+    .dd a.active{color:var(--ac);}
+    .dd-lbl{display:block;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-f);padding:var(--sp2) var(--sp3) var(--sp1);}
+    /* nested map dropdown */
+    .nav-item--sub{position:relative;}
+    .nav-item--sub>button{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;padding:var(--sp2) var(--sp3);font-size:var(--text-sm);color:var(--tx-m);font-weight:500;cursor:pointer;border-radius:var(--r-md);transition:background var(--tx),color var(--tx);gap:var(--sp2);}
+    .nav-item--sub>button:hover{background:var(--sf2);color:var(--tx-c);}
+    .nav-item--sub.open>button{color:var(--tx-c);}
+    .nav-item--sub>button svg{transition:transform var(--tx);flex-shrink:0;}
+    .nav-item--sub.open>button svg{transform:rotate(180deg);}
+    .dropdown--sub{position:absolute;top:0;left:calc(100% + 6px);min-width:160px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-lg);padding:var(--sp2);box-shadow:0 8px 24px oklch(0 0 0/.18);opacity:0;pointer-events:none;transition:opacity var(--tx),transform var(--tx);transform:translateX(-4px);}
+    .nav-item--sub.open .dropdown--sub{opacity:1;pointer-events:auto;transform:translateX(0);}
+    /* MAP */
+    .map-wrap{flex:1;display:flex;min-height:0;position:relative;}
+    #map{flex:1;min-height:600px;}
+    /* SIDEBAR */
+    .sb{width:272px;flex-shrink:0;background:var(--sf);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;z-index:500;}
+    .sb-head{padding:var(--sp4) var(--sp4) var(--sp3);border-bottom:1px solid var(--bd);}
+    .sb-title{font-family:var(--font-display);font-size:var(--text-base);font-weight:800;margin-bottom:2px;}
+    .sb-sub{font-size:var(--text-xs);color:var(--tx-m);}
+    .sb-body{overflow-y:auto;flex:1;padding:var(--sp2);}
+    .lg{margin-bottom:var(--sp3);}
+    .lg-title{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-f);padding:var(--sp2) var(--sp2) var(--sp1);}
+    .li{display:flex;align-items:center;gap:var(--sp3);padding:5px var(--sp2);border-radius:var(--r-md);cursor:pointer;transition:background var(--tx);user-select:none;}
+    .li:hover{background:var(--sf2);}
+    .li-sw{width:26px;height:5px;border-radius:3px;flex-shrink:0;transition:opacity var(--tx);}
+    .li-name{font-size:var(--text-xs);color:var(--tx-m);flex:1;line-height:1.3;}
+    .li-ref{font-size:var(--text-xs);font-weight:700;color:var(--tx-f);width:26px;text-align:right;flex-shrink:0;}
+    .li.off .li-sw{opacity:.2;}
+    .li.off .li-name,.li.off .li-ref{opacity:.35;}
+    .base-sel{padding:var(--sp3);border-top:1px solid var(--bd);}
+    .base-sel-t{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-f);margin-bottom:var(--sp2);}
+    .base-btns{display:flex;gap:var(--sp2);}
+    .base-btn{flex:1;padding:var(--sp2);font-size:var(--text-xs);font-weight:600;border:1px solid var(--bd);border-radius:var(--r-md);background:var(--sf2);color:var(--tx-m);cursor:pointer;transition:background var(--tx),color var(--tx),border-color var(--tx);}
+    .base-btn.on{background:var(--ac);color:white;border-color:var(--ac);}
+    /* LOADING */
+    #ld{position:absolute;inset:0;z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);gap:var(--sp3);transition:opacity .5s;}
+    #ld.done{opacity:0;pointer-events:none;}
+    .spin{width:36px;height:36px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .ld-txt{font-size:var(--text-sm);color:var(--tx-m);}
+    #sbar{position:absolute;bottom:var(--sp4);left:50%;transform:translateX(-50%);z-index:600;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-full);padding:var(--sp2) var(--sp4);font-size:var(--text-xs);color:var(--tx-m);pointer-events:none;transition:opacity .4s;white-space:nowrap;box-shadow:0 4px 16px oklch(0 0 0/.25);}
+    #sbar.h{opacity:0;}
+    .lt{background:var(--sf)!important;border:1px solid var(--bd)!important;color:var(--tx-c)!important;font-family:var(--font-body)!important;font-size:11px!important;border-radius:var(--r-sm)!important;padding:3px 8px!important;}
+    @media(max-width:768px){
+      nav{padding:var(--sp3) var(--sp4);}
+      .nav-links{gap:var(--sp3);}
+      .map-wrap{flex-direction:column-reverse;}
+      .sb{width:100%;max-height:185px;border-left:none;border-top:1px solid var(--bd);}
+      .sb-head{padding:var(--sp3) var(--sp3) var(--sp2);}
+      .sb-body{display:flex;overflow-x:auto;overflow-y:hidden;padding:var(--sp2) var(--sp3);gap:4px;}
+      .lg{display:contents;}
+      .lg-title{display:none;}
+      .li{flex-direction:column;align-items:flex-start;gap:2px;padding:var(--sp2);min-width:60px;max-width:70px;}
+      .li-sw{width:100%;height:4px;}
+      .li-ref{width:auto;}
+    }
+    /* stazioni */
+    .st-dot{border-radius:50%;box-sizing:border-box;transition:width .15s,height .15s;}
+    .st-dot.st-sm{width:6px;height:6px;border:1.5px solid #888;}
+    .st-dot.st-md{width:9px;height:9px;border:2px solid #888;}
+    .st-dot.st-lg{width:12px;height:12px;border:2.5px solid #888;}
+    .lt-bold{font-weight:700!important;}
+    [data-theme="dark"]  .st-dot{background:#161b27;border-color:#94a3b8!important;}
+    [data-theme="light"] .st-dot{background:#ffffff;border-color:#475569!important;}
+  </style>
+</head>
+
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img class="logo-dark"  src="frontend/Izarail Urban Networks dark.svg"   alt="Izarail Urban Networks" height="40" loading="eager">
+      <img class="logo-light" src="frontend/Izarail Urban Networks bright.svg" alt="Izarail Urban Networks" height="40" loading="eager">
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <div class="nav-dd active">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Railways</button>
+        <div class="dd">
+          <a href="izarail.html">Izarail</a>
+          <a href="metro.html">Metro</a>
+          <a href="izx.html">IZX</a>
+          <a href="commuter.html">Commuter Rail</a>
+          <a href="other-rail.html">Other Rail</a>
+          <div class="nav-item--sub">
+            <button>Map <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="dropdown--sub">
+              <span class="dd-lbl">City maps</span>
+              <a href="map.html">Sai&#x00F0;aul</a>
+              <a href="map-warohan.html" class="active">Warohan</a>
+              <a href="map-panaireki.html">Panaireki</a>
+              <a href="map-sannupuri.html">Sannupuri</a>
+              <a href="map-kichatsura.html">Kichatsura</a>
+              <a href="map-riyatoma.html">Riyatoma</a>
+              <a href="map-makkenoke.html">Makkenoke</a>
+              <a href="map-daishin.html">Daishin</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-dd">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Aviation</button>
+        <div class="dd">
+          <a href="airports.html">Airports</a>
+          <a href="airlines.html">Airlines</a>
+        </div>
+      </div>
+      <div class="nav-dd">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Other</button>
+        <div class="dd"><span class="dd-lbl">Coming soon</span></div>
+      </div>
+      <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="map-wrap">
+    <div id="map"></div>
+    <div id="ld">
+      <div class="spin"></div>
+      <div class="ld-txt" id="ld-txt">Loading transit data…</div>
+    </div>
+    <div id="sbar" class="h"></div>
+    <div class="sb">
+      <div class="sb-head">
+        <div class="sb-title">Transit Lines</div>
+        <div class="sb-sub">Warohan metropolitan area</div>
+      </div>
+      <div class="sb-body" id="legend"></div>
+      <div class="base-sel">
+        <div class="base-sel-t">Base map</div>
+        <div class="base-btns">
+          <button class="base-btn on" data-layer="standard">Standard</button>
+          <button class="base-btn"    data-layer="topo">Topo</button>
+          <button class="base-btn"    data-layer="blank">Blank</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+  // ── RELATION METADATA ─────────────────────────────────────────
+  // Colours are placeholders — update once actual line colours are
+  // visible on the OGF relation pages.
+  const RM = {
+    "387726": { "group": "Metro", "name": "Line 1", "ref": "1", "colour": "#E60012" },
+    "387728": { "group": "Metro", "name": "Line 2", "ref": "2", "colour": "#007BC3" },
+    "387727": { "group": "Metro", "name": "Line 3", "ref": "3", "colour": "#00A63C" },
+    "387734": { "group": "Metro", "name": "Line 4", "ref": "4", "colour": "#F5A200" },
+    "387733": { "group": "Metro", "name": "Line 5", "ref": "5", "colour": "#9B59B6" },
+    "387732": { "group": "Metro", "name": "Line 6", "ref": "6", "colour": "#00B5CC" },
+    "387731": { "group": "Metro", "name": "Line 7", "ref": "7", "colour": "#E91E8C" }
+  };
+
+  const GROUPS = {
+    'Metro': [387726, 387728, 387727, 387734, 387733, 387732, 387731]
+  };
+
+  // ── THEME TOGGLE ──────────────────────────────────────────────
+  (function(){
+    const t=document.querySelector('[data-theme-toggle]'),h=document.documentElement;
+    let d=h.getAttribute('data-theme')||'dark';
+    if(!t)return;
+    t.addEventListener('click',()=>{
+      d=d==='dark'?'light':'dark';
+      h.setAttribute('data-theme',d);
+      const blankBtn=document.querySelector('.base-btn[data-layer="blank"]');
+      if(blankBtn&&blankBtn.classList.contains('on')){
+        map.removeLayer(tiles.blank);
+        tiles.blank=makeBlank();
+        tiles.blank.addTo(map);
+      }
+      t.innerHTML=d==='dark'
+        ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+        :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+    });
+  })();
+
+  // ── NAV DROPDOWNS ─────────────────────────────────────────────
+  document.querySelectorAll('.nav-dd').forEach(d=>{
+    const btn=d.querySelector(':scope>button');
+    if(!btn)return;
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const open=d.classList.contains('open');
+      document.querySelectorAll('.nav-dd.open').forEach(o=>o.classList.remove('open'));
+      document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
+      if(!open)d.classList.add('open');
+    });
+  });
+  document.querySelectorAll('.nav-item--sub').forEach(sub=>{
+    const btn=sub.querySelector(':scope>button');
+    if(!btn)return;
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const open=sub.classList.contains('open');
+      document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
+      if(!open)sub.classList.add('open');
+    });
+  });
+  document.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-dd.open').forEach(o=>o.classList.remove('open'));
+    document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
+  });
+
+  // ── MAP INIT ──────────────────────────────────────────────────
+  // Centre on Warohan — update lat/lon once you verify on OGF
+  const map=L.map('map',{center:[34.20,131.50],zoom:12,maxZoom:19});
+
+  const blankCanvas=L.GridLayer.extend({
+    createTile:function(){ const t=document.createElement('canvas'); t.width=256; t.height=256; return t; }
+  });
+  function makeBlank(){
+    const dark=document.documentElement.getAttribute('data-theme')==='dark';
+    const cv=new blankCanvas({maxZoom:19,attribution:''});
+    cv.on('tileload',function(e){
+      const ctx=e.tile.getContext('2d');
+      ctx.fillStyle=dark?'#0f1117':'#f8fafc';
+      ctx.fillRect(0,0,256,256);
+    });
+    return cv;
+  }
+
+  const tiles={
+    standard:L.tileLayer('https://tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png',
+      {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
+    topo:L.tileLayer('https://tile.opengeofiction.net/ogf-topo/{z}/{x}/{y}.png',
+      {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
+    blank:makeBlank()
+  };
+  tiles.standard.addTo(map);
+  document.querySelectorAll('.base-btn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.base-btn').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      const w=b.dataset.layer;
+      Object.entries(tiles).forEach(([k,l])=>{if(k===w)l.addTo(map);else map.removeLayer(l);});
+    });
+  });
+
+  function clean(s){return s.replace(/[\uD800-\uDFFF]{2}/g,'').replace(/^[\u24C2-\u24FF\u2460-\u27BF\s]+/,'').trim();}
+
+  const sbar=document.getElementById('sbar');
+  function status(msg,ms=3000){sbar.textContent=msg;sbar.classList.remove('h');clearTimeout(sbar._t);sbar._t=setTimeout(()=>sbar.classList.add('h'),ms);}
+
+  const OV='https://overpass.opengeofiction.net/api/interpreter';
+  async function fetch_rels(ids){
+    const r=await fetch(OV,{method:'POST',body:'data='+encodeURIComponent('[out:json];relation(id:'+ids+');out geom;'),headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+    return (await r.json()).elements;
+  }
+
+  const layers={},vis={};
+  function renderRel(el){
+    const id=String(el.id),m=RM[id]||{};
+    const col=m.colour||el.tags?.colour||'#888';
+    const grp=L.layerGroup();
+    (el.members||[]).forEach(w=>{
+      if(w.type==='way'&&w.geometry?.length>1){
+        L.polyline(w.geometry.map(p=>[p.lat,p.lon]),{color:col,weight:4,opacity:.9,smoothFactor:1.5})
+          .bindTooltip(clean(m.name||id)+(m.ref?' · '+m.ref:''),{sticky:true,className:'lt'})
+          .addTo(grp);
+      }
+    });
+    grp.addTo(map);layers[id]=grp;vis[id]=true;
+
+    // Auto-fit map to loaded data on first relation
+    if(Object.keys(layers).length===1){
+      const allLatLng=[];
+      grp.eachLayer(l=>{ if(l.getLatLngs) allLatLng.push(...l.getLatLngs()); });
+      if(allLatLng.length) map.fitBounds(L.latLngBounds(allLatLng),{padding:[40,40]});
+    }
+  }
+
+  function buildLegend(){
+    const el=document.getElementById('legend');el.innerHTML='';
+    ['Metro'].forEach(g=>{
+      const w=document.createElement('div');w.className='lg';
+      w.innerHTML='<div class="lg-title">'+g+'</div>';
+      GROUPS[g].forEach(rid=>{
+        const m=RM[String(rid)]||{},c=m.colour||'#888',n=clean(m.name||String(rid));
+        const item=document.createElement('div');item.className='li';item.dataset.rid=rid;
+        item.innerHTML='<span class="li-sw" style="background:'+c+'"></span><span class="li-name">'+n+'</span><span class="li-ref">'+(m.ref||'')+'</span>';
+        item.addEventListener('click',()=>{
+          const id=String(rid);
+          if(vis[id]){map.removeLayer(layers[id]);vis[id]=false;item.classList.add('off');}
+          else{layers[id]?.addTo(map);vis[id]=true;item.classList.remove('off');}
+        });
+        w.appendChild(item);
+      });
+      el.appendChild(w);
+    });
+  }
+
+  // ── STATIONS ──────────────────────────────────────────────────
+  // Bounding box — will be auto-derived from loaded lines on first render;
+  // this fallback covers a ~50 km area around the placeholder centre.
+  const stLayer=L.layerGroup().addTo(map);
+  let ST_BBOX='33.90,131.20,34.50,131.80';
+
+  async function loadStations(){
+    const q='[out:json][timeout:30];node["railway"~"station|stop"]('+ST_BBOX+');out body;';
+    const r=await fetch(OV,{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+    const data=await r.json();
+    data.elements.forEach(renderStation);
+  }
+
+  function renderStation(node){
+    const name=node.tags?.name||node.tags?.['name:en']||'';
+    const isMain=node.tags?.railway==='station';
+    const icon=L.divIcon({className:'',html:'<div class="st-dot st-sm"></div>',iconSize:[10,10],iconAnchor:[5,5]});
+    const m=L.marker([node.lat,node.lon],{icon,title:name,zIndexOffset:isMain?200:100});
+    if(name)m.bindTooltip(name,{sticky:true,className:'lt'});
+    m.addTo(stLayer);
+    m._stName=name;m._stMain=isMain;m._labelBound=false;
+  }
+
+  function updateStations(){
+    const z=map.getZoom();
+    stLayer.eachLayer(m=>{
+      const el=m.getElement();if(!el)return;
+      const dot=el.querySelector('.st-dot');if(!dot)return;
+      if(z<12){el.style.display='none';return;}
+      el.style.display='';
+      dot.className=z>=16?'st-dot st-lg':z>=14?'st-dot st-md':'st-dot st-sm';
+      const wantPerm=z>=14&&!!m._stName;
+      if(wantPerm&&!m._labelBound){
+        m.unbindTooltip();
+        m.bindTooltip(m._stName,{permanent:true,direction:'right',offset:[8,0],className:z>=16?'lt lt-bold':'lt'}).openTooltip();
+        m._labelBound=true;
+      }else if(!wantPerm&&m._labelBound){
+        m.unbindTooltip();m._labelBound=false;
+        if(m._stName)m.bindTooltip(m._stName,{sticky:true,className:'lt'});
+      }
+    });
+  }
+  map.on('zoomend',updateStations);
+
+  // Update station bbox once all lines are loaded
+  function updateBboxFromLayers(){
+    const pts=[];
+    Object.values(layers).forEach(grp=>{
+      grp.eachLayer(l=>{if(l.getLatLngs)pts.push(...l.getLatLngs());});
+    });
+    if(!pts.length)return;
+    const b=L.latLngBounds(pts);
+    const pad=0.15;
+    ST_BBOX=[b.getSouth()-pad,b.getWest()-pad,b.getNorth()+pad,b.getEast()+pad].join(',');
+  }
+
+  // ── MAIN ──────────────────────────────────────────────────────
+  async function main(){
+    const ld=document.getElementById('ld'),lt=document.getElementById('ld-txt');
+    let done=0;
+    const entries=Object.entries(GROUPS);
+    await Promise.all(
+      entries.map(async([g,ids])=>{
+        lt.textContent='Loading '+g+'…';
+        (await fetch_rels(ids.join(','))).forEach(renderRel);
+        lt.textContent='Loaded '+(++done)+'/'+entries.length+'…';
+      })
+    );
+    updateBboxFromLayers();
+    await loadStations();
+    ld.classList.add('done');setTimeout(()=>ld.remove(),600);
+    buildLegend();
+    updateStations();
+    status(Object.keys(layers).length+' transit lines loaded');
+  }
+  main();
+  </script>
+</body>
+</html>
