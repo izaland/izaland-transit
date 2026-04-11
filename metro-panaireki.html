@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panaireki Metro — Izaland Transit Portal</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-body: 'Satoshi', 'Inter', sans-serif;
+      --font-display: 'Cabinet Grotesk', 'Satoshi', sans-serif;
+      --text-xs:   clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm:   clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg:   clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl:   clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl:  clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+      --space-4: 1rem; --space-6: 1.5rem; --space-8: 2rem;
+      --space-12: 3rem; --space-16: 4rem;
+      --radius-sm: 0.375rem; --radius-md: 0.5rem;
+      --radius-lg: 0.75rem; --radius-xl: 1rem;
+      --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    [data-theme="dark"] {
+      --bg: #0f1117; --surface: #161b27; --surface-2: #1c2235;
+      --border: #2a3147; --text: #e2e8f0; --text-muted: #94a3b8; --text-faint: #4a5568;
+      --accent: #3b82f6; --accent-hover: #2563eb; --accent-glow: rgba(59,130,246,0.15);
+      --izx-red: #ef4444; --izx-gold: #f59e0b; --metro-teal: #14b8a6;
+    }
+    [data-theme="light"] {
+      --bg: #f8fafc; --surface: #ffffff; --surface-2: #f1f5f9;
+      --border: #e2e8f0; --text: #1e293b; --text-muted: #64748b; --text-faint: #cbd5e1;
+      --accent: #2563eb; --accent-hover: #1d4ed8; --accent-glow: rgba(37,99,235,0.1);
+      --izx-red: #dc2626; --izx-gold: #d97706; --metro-teal: #0d9488;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;}
+    body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--text);background:var(--bg);line-height:1.6;}
+
+    /* NAV */
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-8);background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
+    .nav-logo{display:flex;align-items:center;gap:var(--space-3);text-decoration:none;color:var(--text);}
+    .logo-light{display:none;}
+    [data-theme="light"] .logo-dark{display:none;}
+    [data-theme="light"] .logo-light{display:block;}
+    .nav-links{display:flex;gap:var(--space-6);align-items:center;}
+    .nav-links>a{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;font-weight:500;transition:color var(--transition);}
+    .nav-links a:hover{color:var(--text);}
+    .nav-links a.active{color:var(--accent);}
+    .theme-btn{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:var(--radius-md);padding:var(--space-2);cursor:pointer;display:flex;transition:color var(--transition),border-color var(--transition);}
+    .theme-btn:hover{color:var(--text);border-color:var(--text-muted);}
+    /* DROPDOWN */
+    .nav-item{position:relative;}
+    .nav-item>button{background:none;border:none;font-size:var(--text-sm);color:var(--text-muted);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0;transition:color var(--transition);}
+    .nav-item>button:hover{color:var(--text);}
+    .nav-item.active>button{color:var(--accent);}
+    .nav-item>button svg{transition:transform var(--transition);}
+    .nav-item.open>button svg{transform:rotate(180deg);}
+    .dropdown{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-4px);min-width:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-2);box-shadow:0 8px 24px oklch(0 0 0 / 0.18);opacity:0;pointer-events:none;transition:opacity var(--transition),transform var(--transition);}
+    .nav-item.open .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+    .dropdown a{display:block;padding:var(--space-2) var(--space-3);font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;border-radius:var(--radius-md);font-weight:500;transition:background var(--transition),color var(--transition);white-space:nowrap;}
+    .dropdown a:hover{background:var(--surface-2);color:var(--text);}
+    .dropdown a.active{color:var(--accent);}
+    .dropdown-label{display:block;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);padding:var(--space-2) var(--space-3) var(--space-1);}
+
+    /* PAGE HEADER */
+    .page-header {
+      padding: var(--space-12) var(--space-8) var(--space-8);
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--space-8);
+      align-items: start;
+    }
+    .page-label{font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--metro-teal);margin-bottom:var(--space-3);}
+    .page-title{font-family:var(--font-display);font-size:var(--text-2xl);font-weight:800;line-height:1.05;letter-spacing:-0.03em;margin-bottom:var(--space-4);}
+    .page-desc{font-size:var(--text-base);color:var(--text-muted);max-width:56ch;}
+
+    /* METRO LOGO BADGE */
+    .metro-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .metro-logo-circle {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: #e53e3e;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.5rem; font-weight: 800;
+      color: white;
+      letter-spacing: -0.05em;
+      box-shadow: 0 0 32px rgba(229,62,62,0.35);
+    }
+    .metro-badge-label{font-size:var(--text-xs);color:var(--text-muted);font-weight:600;text-align:center;}
+
+    /* STATS BAR */
+    .stats-bar {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-8) var(--space-8);
+      display: flex;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .stat-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: var(--space-2) var(--space-4);
+      display: flex; align-items: center; gap: var(--space-2);
+      font-size: var(--text-sm);
+    }
+    .stat-pill-value { font-weight: 700; font-family: var(--font-display); }
+    .stat-pill-label { color: var(--text-muted); }
+
+    /* FILTERS */
+    .controls {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-8) var(--space-6);
+      display: flex;
+      gap: var(--space-3);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: var(--space-2) var(--space-4);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .filter-btn:hover { border-color: var(--text-muted); color: var(--text); }
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+    .search-box {
+      margin-left: auto;
+      padding: var(--space-2) var(--space-4);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      color: var(--text);
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color var(--transition);
+      width: 220px;
+    }
+    .search-box:focus { border-color: var(--accent); }
+    .search-box::placeholder { color: var(--text-faint); }
+
+    /* VIEW TOGGLE */
+    .view-toggle {
+      display: flex;
+      gap: var(--space-1);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-1);
+    }
+    .view-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-sm); transition: all var(--transition);
+      font-size: var(--text-sm); font-family: var(--font-body); font-weight: 500;
+    }
+    .view-btn.active { background: var(--surface-2); color: var(--text); }
+
+    /* LINES GRID */
+    .lines-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-8) var(--space-16);
+    }
+    .lines-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
+      gap: var(--space-4);
+    }
+    .line-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .line-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .line-card-header {
+      padding: var(--space-4) var(--space-5);
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .line-code-badge {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+      letter-spacing: 0.02em;
+    }
+    .line-card-title-wrap { flex: 1; min-width: 0; }
+    .line-card-number { font-size: var(--text-xs); color: var(--text-muted); font-weight: 600; }
+    .line-card-name {
+      font-family: var(--font-display);
+      font-size: var(--text-base);
+      font-weight: 700;
+      line-height: 1.2;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .line-card-year {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 2px var(--space-2);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .line-card-body { padding: var(--space-4) var(--space-5); }
+    .line-meta-row {
+      display: flex;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+    .line-meta-item { flex: 1; }
+    .line-meta-value {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-weight: 800;
+      line-height: 1;
+    }
+    .line-meta-label {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .line-termini {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      background: var(--surface-2);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-3);
+      margin-bottom: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .terminus-name { color: var(--text); font-weight: 600; }
+    .terminus-sep { color: var(--text-faint); }
+
+    /* EXPANDABLE FACTS */
+    .line-facts-wrap {
+      border-top: 1px solid var(--border);
+      padding-top: var(--space-3);
+    }
+    .line-facts {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      line-height: 1.5;
+      overflow: hidden;
+      max-height: 2.8em;
+      transition: max-height 380ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .line-facts.expanded { max-height: 20em; }
+    .expand-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: var(--space-2);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-faint);
+      font-family: var(--font-body);
+      padding: 0;
+      transition: color var(--transition);
+    }
+    .expand-btn:hover { color: var(--text-muted); }
+    .expand-btn svg { transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1); flex-shrink: 0; }
+    .expand-btn.open svg { transform: rotate(180deg); }
+
+    .special-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px var(--space-2);
+      background: rgba(59,130,246,0.12);
+      color: var(--accent);
+      border-radius: 9999px;
+      border: 1px solid rgba(59,130,246,0.2);
+      margin-top: var(--space-2);
+    }
+
+    /* TABLE VIEW */
+    .lines-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+    }
+    .lines-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+    .lines-table thead th {
+      background: var(--surface);
+      padding: var(--space-3) var(--space-4);
+      text-align: left;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .lines-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    .lines-table tbody tr:last-child { border-bottom: none; }
+    .lines-table tbody tr:hover { background: var(--surface-2); }
+    .lines-table td {
+      padding: var(--space-3) var(--space-4);
+      vertical-align: middle;
+    }
+    .table-code {
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 36px; height: 28px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-size: var(--text-xs);
+      font-weight: 800;
+      color: white;
+    }
+    .table-line-name { font-weight: 600; white-space: nowrap; }
+    .table-termini { color: var(--text-muted); font-size: var(--text-xs); white-space: nowrap; }
+    .table-num { font-family: var(--font-display); font-weight: 700; }
+
+    /* HIDDEN */
+    .hidden { display: none !important; }
+
+    /* SECTION DIVIDER */
+    .section-divider {
+      max-width: 1200px;
+      margin: 0 auto var(--space-4);
+      padding: 0 var(--space-8);
+    }
+    .section-divider-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-faint);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .section-divider-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:var(--space-8);text-align:center;font-size:var(--text-sm);color:var(--text-muted);margin-top:var(--space-8);}
+    footer a{color:var(--accent);text-decoration:none;}
+    footer a:hover{text-decoration:underline;}
+
+    /* RESPONSIVE */
+    @media(max-width:768px){
+      nav{padding:var(--space-3) var(--space-4);}
+      .nav-links{gap:var(--space-3);}
+      .page-header{grid-template-columns:1fr;padding:var(--space-8) var(--space-4) var(--space-6);}
+      .metro-badge{display:none;}
+      .stats-bar,.controls,.lines-container,.section-divider{padding-left:var(--space-4);padding-right:var(--space-4);}
+      .search-box{width:100%;}
+    }
+
+    /* STATIONS COLLAPSIBLE PANEL */
+    .stations-details { border-top: 1px solid var(--border); margin-top: var(--space-3); }
+    .stations-summary {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-2) 0 var(--space-1);
+      cursor: pointer; font-size: var(--text-xs); font-weight: 700;
+      color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em;
+      list-style: none; user-select: none; transition: color var(--transition);
+    }
+    .stations-summary::-webkit-details-marker { display: none; }
+    .stations-summary:hover { color: var(--text-muted); }
+    .stations-summary .stn-chevron { transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1); flex-shrink: 0; }
+    .stations-details[open] .stn-chevron { transform: rotate(180deg); }
+    .stations-details[open] .stations-summary { color: var(--text-muted); }
+    .stations-body { padding-bottom: var(--space-2); }
+    .stn-branch { margin-top: var(--space-2); }
+    .stn-branch-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.10em; color: var(--text-faint);
+      margin-bottom: var(--space-1); padding-left: 20px;
+    }
+    .stn-list { list-style: none; position: relative; padding-left: 20px; }
+    .stn-list::before {
+      content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px;
+      width: 2px; background: var(--border); border-radius: 1px;
+    }
+    .stn-item {
+      position: relative; display: flex; align-items: baseline;
+      gap: var(--space-2); padding: 2px 0; font-size: var(--text-xs);
+      color: var(--text-muted); line-height: 1.45;
+    }
+    .stn-item::before {
+      content: ''; position: absolute; left: -13px; top: 6px;
+      width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0;
+    }
+    .stn-item.terminus { color: var(--text); font-weight: 700; }
+    .stn-item.terminus::before {
+      background: var(--line-color, #888); width: 8px; height: 8px; left: -14px; top: 5px;
+    }
+    .stn-name { flex: 1; }
+    .stn-count-chip { font-size: 10px; font-weight: 600; color: var(--text-faint); margin-left: auto; }
+
+    /* OSM relation chip */
+    .osm-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600;
+      padding: 2px var(--space-2);
+      background: rgba(148,163,184,0.1);
+      color: var(--text-faint);
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      margin-top: var(--space-2);
+      transition: color var(--transition), border-color var(--transition);
+    }
+    .osm-chip:hover { color: var(--text-muted); border-color: var(--text-faint); }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img class="logo-dark"  src="frontend/Izarail Urban Networks dark.svg"   alt="Izarail Urban Networks" height="40" loading="eager">
+      <img class="logo-light" src="frontend/Izarail Urban Networks bright.svg" alt="Izarail Urban Networks" height="40" loading="eager">
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+
+      <div class="nav-item active">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Railways</button>
+        <div class="dropdown">
+          <a href="izarail.html">Izarail</a>
+          <span class="dropdown-label">Metro</span>
+          <a href="metro.html">Sainðaul Metro</a>
+          <a href="metro-panaireki.html" class="active">Panaireki Metro</a>
+          <a href="izx.html">IZX</a>
+          <a href="commuter.html">Commuter Rail</a>
+          <a href="other-rail.html">Other Rail</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Aviation</button>
+        <div class="dropdown">
+          <a href="airports.html">Airports</a>
+          <a href="airlines.html">Airlines</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Other</button>
+        <div class="dropdown">
+          <span class="dropdown-label">Coming soon</span>
+        </div>
+      </div>
+
+      <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="page-label">Panaireki Metropolitan Transit</div>
+      <h1 class="page-title">Panaireki Metro</h1>
+      <p class="page-desc">The rapid transit backbone of Izaland's second-largest metropolitan area. 6 heavy metro lines, 1 light metro line, an automated people mover and a monorail — spanning 221.33 km across the Panaireki conurbation.</p>
+    </div>
+    <div class="metro-badge">
+      <div class="metro-logo-circle">PM</div>
+      <div class="metro-badge-label">Panaireki Metro<br>OGF network</div>
+    </div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-pill">
+      <span class="stat-pill-value" style="color:#FF0000">6</span>
+      <span class="stat-pill-label">metro lines</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-value" style="color:var(--accent)">221.33</span>
+      <span class="stat-pill-label">km of network</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-value" style="color:#E59163">1</span>
+      <span class="stat-pill-label">light metro / people mover</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-value" style="color:#32CD32">1</span>
+      <span class="stat-pill-label">monorail</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-value" style="color:var(--izx-gold)">9</span>
+      <span class="stat-pill-label">services total</span>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <button class="filter-btn active" data-filter="all">All lines</button>
+    <button class="filter-btn" data-filter="metro">Metro</button>
+    <button class="filter-btn" data-filter="special">People Mover / Monorail</button>
+    <div class="view-toggle">
+      <button class="view-btn active" data-view="grid">⊞ Grid</button>
+      <button class="view-btn" data-view="table">≡ Table</button>
+    </div>
+    <input class="search-box" type="search" placeholder="Search lines, stations…" id="searchInput">
+  </div>
+
+  <!-- METRO LINES -->
+  <div class="section-divider">
+    <div class="section-divider-label">Panaireki Metro — Lines</div>
+  </div>
+
+  <div class="lines-container">
+    <div class="lines-grid" id="gridView">
+
+      <!-- LINE 1 — Red -->
+      <div class="line-card" data-type="metro" data-tags="metro" data-search="line 1 red panaireki metro 273767">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FF0000;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#FF0000">L1</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 1</div>
+            <div class="line-card-name">Line 1</div>
+          </div>
+          <div class="line-card-year">36.56 km</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item">
+              <div class="line-meta-value">36.56</div>
+              <div class="line-meta-label">km</div>
+            </div>
+            <div class="line-meta-item">
+              <div class="line-meta-value" style="color:#FF0000">●</div>
+              <div class="line-meta-label">Red</div>
+            </div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">TBD</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">TBD</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">The first and longest metro line of the Panaireki network. Serves the main urban corridor of the city.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#FF0000">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">TBD stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+              </ul>
+            </div>
+          </details>
+          <a class="osm-chip" href="https://opengeofiction.net/relation/273767" target="_blank" rel="noopener">OGF rel. 273767 ↗</a>
+        </div>
+      </div>
+
+      <!-- LINE 2 — Yellow -->
+      <div class="line-card" data-type="metro" data-tags="metro" data-search="line 2 yellow panaireki metro 275587">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FFCC00;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#FFCC00;color:#1e293b">L2</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 2</div>
+            <div class="line-card-name">Line 2</div>
+          </div>
+          <div class="line-card-year">49.01 km</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item">
+              <div class="line-meta-value">49.01</div>
+              <div class="line-meta-label">km</div>
+            </div>
+            <div class="line-meta-item">
+              <div class="line-meta-value" style="color:#FFCC00">●</div>
+              <div class="line-meta-label">Yellow</div>
+            </div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">TBD</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">TBD</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">The longest line in the Panaireki Metro network at 49.01 km, crossing a wide arc of the metropolitan area.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#FFCC00">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">TBD stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+              </ul>
+            </div>
+          </details>
+          <a class="osm-chip" href="https://opengeofiction.net/relation/275587" target="_blank" rel="noopener">OGF rel. 275587 ↗</a>
+        </div>
+      </div>
+
+      <!-- LINE 3 — Pink -->
+      <div class="line-card" data-type="metro" data-tags="metro" data-search="line 3 pink panaireki metro 273766">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FF99CC;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#FF99CC;color:#1e293b">L3</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 3</div>
+            <div class="line-card-name">Line 3</div>
+          </div>
+          <div class="line-card-year">20.27 km</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item">
+              <div class="line-meta-value">20.27</div>
+              <div class="line-meta-label">km</div>
+            </div>
+            <div class="line-meta-item">
+              <div class="line-meta-value" style="color:#FF99CC">●</div>
+              <div class="line-meta-label">Pink</div>
+            </div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">TBD</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">TBD</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">A shorter urban line serving central and inner districts of Panaireki.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#FF99CC">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">TBD stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+              </ul>
+            </div>
+          </details>
+          <a class="osm-chip" href="https://opengeofiction.net/relation/273766" target="_blank" rel="noopener">OGF rel. 273766 ↗</a>
+        </div>
+      </div>
+
+      <!-- LINE 4 — Light Blue -->
+      <div class="line-card" data-type="metro" data-tags="metro" data-search="line 4 light blue panaireki metro 273756">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#99CCFF;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#99CCFF;color:#1e293b">L4</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 4</div>
+            <div class="line-card-name">Line 4</div>
+          </div>
+          <div class="line-card-year">31.19 km</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item">
+              <div class="line-meta-value">31.19</div>
+              <div class="line-meta-label">km</div>
+            </div>
+            <div class="line-meta-item">
+              <div class="line-meta-value" style="color:#99CCFF">●</div>
+              <div class="line-meta-label">Light Blue</div>
+            </div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">TBD</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">TBD</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Connects suburban areas to the city core with 31.19 km of infrastructure.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#99CCFF">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">TBD stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+              </ul>
+            </div>
+          </details>
+          <a class="osm-chip" href="https://opengeofiction.net/relation/273756" target="_blank" rel="noopener">OGF rel. 273756 ↗</a>
+        </div>
+      </div>
+
+      <!-- LINE 5 — Teal -->
+      <div class="line-card" data-type="metro" data-tags="metro" data-search="line 5 teal panaireki metro 273764">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#009999;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#009999">L5</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 5</div>
+            <div class="line-card-name">Line 5</div>
+          </div>
+          <div class="line-card-year">29.50 km</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item">
+              <div class="line-meta-value">29.50</div>
+              <div class="line-meta-label">km</div>
+            </div>
+            <div class="line-meta-item">
+              <div class="line-meta-value" style="color:#009999">●</div>
+              <div class="line-meta-label">Teal</div>
+            </div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">TBD</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">TBD</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">A teal-coloured cross-city line forming part of the central metro grid.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#009999">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">TBD stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+              </ul>
+            </div>
+          </details>
+          <a class="osm-chip" href="https://opengeofiction.net/relation/273764" target="_blank" rel="noopener">OGF rel. 273764 ↗</a>
+        </div>
+      </div>
+
+      <!-- LINE 6 — Dark Blue -->
+      <div class="line-card" data-type="metro" data-tags="metro" data-search="line 6 dark blue navy panaireki metro 273763">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#0033CC;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#0033CC">L6</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 6</div>
+            <div class="line-card-name">Line 6</div>
+          </div>
+          <div class="line-card-year">25.43 km</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item">
+              <div class="line-meta-value">25.43</div>
+              <div class="line-meta-label">km</div>
+            </div>
+            <div class="line-meta-item">
+              <div class="line-meta-value" style="color:#0033CC">●</div>
+              <div class="line-meta-label">Dark Blue</div>
+            </div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">TBD</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">TBD</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Dark blue urban metro line running through key commercial and residential districts.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#0033CC">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">TBD stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+              </ul>
+            </div>
+          </details>
+          <a class="osm-chip" href="https://opengeofiction.net/relation/273763" target="_blank" rel="noopener">OGF rel. 273763 ↗</a>
+        </div>
+      </div>
+
+      <!-- LINE 8 — Orange -->
+      <div class="line-card" data-type="metro" data-tags="metro" data-search="line 8 orange panaireki metro 386982">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#E59163;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#E59163">L8</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Line 8</div>
+            <div class="line-card-name">Line 8</div>
+          </div>
+          <div class="line-card-year">17.62 km</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item">
+              <div class="line-meta-value">17.62</div>
+              <div class="line-meta-label">km</div>
+            </div>
+            <div class="line-meta-item">
+              <div class="line-meta-value" style="color:#E59163">●</div>
+              <div class="line-meta-label">Orange</div>
+            </div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">TBD</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">TBD</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">A more recent addition to the metro network, extending coverage to underserved areas.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#E59163">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">TBD stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+              </ul>
+            </div>
+          </details>
+          <a class="osm-chip" href="https://opengeofiction.net/relation/386982" target="_blank" rel="noopener">OGF rel. 386982 ↗</a>
+        </div>
+      </div>
+
+    </div><!-- end metro lines grid -->
+
+    <!-- SPECIAL SERVICES DIVIDER -->
+    <div style="margin: var(--space-12) 0 var(--space-6);">
+      <div class="section-divider-label" style="font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-faint);display:flex;align-items:center;gap:var(--space-3);" id="divider-special">
+        Special Transit Services
+        <span style="flex:1;height:1px;background:var(--border);display:block;"></span>
+      </div>
+    </div>
+
+    <div class="lines-grid" id="gridViewSpecial">
+
+      <!-- CITY SHUTTLE (people mover) -->
+      <div class="line-card" data-type="special" data-tags="special" data-search="city shuttle CS people mover panaireki 273762">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#E59163;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#E59163">CS</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">People Mover</div>
+            <div class="line-card-name">Panaireki City Shuttle</div>
+          </div>
+          <div class="line-card-year">9.84 km</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item">
+              <div class="line-meta-value">9.84</div>
+              <div class="line-meta-label">km</div>
+            </div>
+            <div class="line-meta-item">
+              <div class="line-meta-value">Auto</div>
+              <div class="line-meta-label">driverless</div>
+            </div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">TBD</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">TBD</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Automated people mover linking key nodes within central Panaireki. Shares the orange colour family with Line 8.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#E59163">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">TBD stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+              </ul>
+            </div>
+          </details>
+          <a class="osm-chip" href="https://opengeofiction.net/relation/273762" target="_blank" rel="noopener">OGF rel. 273762 ↗</a>
+          <div class="special-badge">⬡ Automated People Mover</div>
+        </div>
+      </div>
+
+      <!-- SHWAMUL MONORAIL -->
+      <div class="line-card" data-type="special" data-tags="special" data-search="shwamul monorail panaireki 540515 lime">
+        <div class="line-card-header">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#32CD32;border-radius:4px 0 0 4px;"></div>
+          <div class="line-code-badge" style="background:#32CD32;color:#1e293b">MR</div>
+          <div class="line-card-title-wrap">
+            <div class="line-card-number">Monorail</div>
+            <div class="line-card-name">Panaireki Shwamul Monorail</div>
+          </div>
+          <div class="line-card-year">12.80 km</div>
+        </div>
+        <div class="line-card-body">
+          <div class="line-meta-row">
+            <div class="line-meta-item">
+              <div class="line-meta-value">12.80</div>
+              <div class="line-meta-label">km</div>
+            </div>
+            <div class="line-meta-item">
+              <div class="line-meta-value" style="color:#32CD32">●</div>
+              <div class="line-meta-label">Lime</div>
+            </div>
+          </div>
+          <div class="line-termini">
+            <span class="terminus-name">TBD</span>
+            <span class="terminus-sep">→</span>
+            <span class="terminus-name">TBD</span>
+          </div>
+          <div class="line-facts-wrap">
+            <div class="line-facts">Elevated monorail serving the Shwamul district of Panaireki, providing a distinctive lime-green line on the city's transit map.</div>
+            <button class="expand-btn" aria-label="Show more">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>Show more</span>
+            </button>
+          </div>
+          <details class="stations-details" style="--line-color:#32CD32">
+            <summary class="stations-summary">
+              <svg class="stn-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              Stations
+              <span class="stn-count-chip">TBD stn</span>
+            </summary>
+            <div class="stations-body">
+              <ul class="stn-list">
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · stations TBD · · ·</span></li>
+                <li class="stn-item terminus"><span class="stn-name">TBD</span></li>
+              </ul>
+            </div>
+          </details>
+          <a class="osm-chip" href="https://opengeofiction.net/relation/540515" target="_blank" rel="noopener">OGF rel. 540515 ↗</a>
+          <div class="special-badge">🚝 Elevated Monorail</div>
+        </div>
+      </div>
+
+    </div><!-- end special services grid -->
+
+    <!-- TABLE VIEW (hidden by default) -->
+    <div id="tableView" class="hidden">
+      <div class="lines-table-wrap">
+        <table class="lines-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>#</th>
+              <th>Line Name</th>
+              <th>km</th>
+              <th>Colour</th>
+              <th>OGF Relation</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr data-type="metro" data-search="line 1 red 273767">
+              <td><span class="table-code" style="background:#FF0000">L1</span></td>
+              <td class="table-num">1</td>
+              <td class="table-line-name">Line 1</td>
+              <td class="table-num">36.56</td>
+              <td><span style="color:#FF0000;font-weight:700;">● Red</span></td>
+              <td><a href="https://opengeofiction.net/relation/273767" target="_blank" rel="noopener" style="color:var(--accent);font-size:var(--text-xs);">273767 ↗</a></td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Metro</span></td>
+            </tr>
+            <tr data-type="metro" data-search="line 2 yellow 275587">
+              <td><span class="table-code" style="background:#FFCC00;color:#1e293b">L2</span></td>
+              <td class="table-num">2</td>
+              <td class="table-line-name">Line 2</td>
+              <td class="table-num">49.01</td>
+              <td><span style="color:#FFCC00;font-weight:700;">● Yellow</span></td>
+              <td><a href="https://opengeofiction.net/relation/275587" target="_blank" rel="noopener" style="color:var(--accent);font-size:var(--text-xs);">275587 ↗</a></td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Metro</span></td>
+            </tr>
+            <tr data-type="metro" data-search="line 3 pink 273766">
+              <td><span class="table-code" style="background:#FF99CC;color:#1e293b">L3</span></td>
+              <td class="table-num">3</td>
+              <td class="table-line-name">Line 3</td>
+              <td class="table-num">20.27</td>
+              <td><span style="color:#FF99CC;font-weight:700;">● Pink</span></td>
+              <td><a href="https://opengeofiction.net/relation/273766" target="_blank" rel="noopener" style="color:var(--accent);font-size:var(--text-xs);">273766 ↗</a></td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Metro</span></td>
+            </tr>
+            <tr data-type="metro" data-search="line 4 light blue 273756">
+              <td><span class="table-code" style="background:#99CCFF;color:#1e293b">L4</span></td>
+              <td class="table-num">4</td>
+              <td class="table-line-name">Line 4</td>
+              <td class="table-num">31.19</td>
+              <td><span style="color:#99CCFF;font-weight:700;">● Light Blue</span></td>
+              <td><a href="https://opengeofiction.net/relation/273756" target="_blank" rel="noopener" style="color:var(--accent);font-size:var(--text-xs);">273756 ↗</a></td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Metro</span></td>
+            </tr>
+            <tr data-type="metro" data-search="line 5 teal 273764">
+              <td><span class="table-code" style="background:#009999">L5</span></td>
+              <td class="table-num">5</td>
+              <td class="table-line-name">Line 5</td>
+              <td class="table-num">29.50</td>
+              <td><span style="color:#009999;font-weight:700;">● Teal</span></td>
+              <td><a href="https://opengeofiction.net/relation/273764" target="_blank" rel="noopener" style="color:var(--accent);font-size:var(--text-xs);">273764 ↗</a></td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Metro</span></td>
+            </tr>
+            <tr data-type="metro" data-search="line 6 dark blue navy 273763">
+              <td><span class="table-code" style="background:#0033CC">L6</span></td>
+              <td class="table-num">6</td>
+              <td class="table-line-name">Line 6</td>
+              <td class="table-num">25.43</td>
+              <td><span style="color:#0033CC;font-weight:700;">● Dark Blue</span></td>
+              <td><a href="https://opengeofiction.net/relation/273763" target="_blank" rel="noopener" style="color:var(--accent);font-size:var(--text-xs);">273763 ↗</a></td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Metro</span></td>
+            </tr>
+            <tr data-type="metro" data-search="line 8 orange 386982">
+              <td><span class="table-code" style="background:#E59163">L8</span></td>
+              <td class="table-num">8</td>
+              <td class="table-line-name">Line 8</td>
+              <td class="table-num">17.62</td>
+              <td><span style="color:#E59163;font-weight:700;">● Orange</span></td>
+              <td><a href="https://opengeofiction.net/relation/386982" target="_blank" rel="noopener" style="color:var(--accent);font-size:var(--text-xs);">386982 ↗</a></td>
+              <td><span style="color:var(--metro-teal);font-size:var(--text-xs);font-weight:600;">Metro</span></td>
+            </tr>
+            <tr data-type="special" data-search="city shuttle CS people mover 273762">
+              <td><span class="table-code" style="background:#E59163">CS</span></td>
+              <td class="table-num">—</td>
+              <td class="table-line-name">Panaireki City Shuttle</td>
+              <td class="table-num">9.84</td>
+              <td><span style="color:#E59163;font-weight:700;">● Orange</span></td>
+              <td><a href="https://opengeofiction.net/relation/273762" target="_blank" rel="noopener" style="color:var(--accent);font-size:var(--text-xs);">273762 ↗</a></td>
+              <td><span style="color:var(--accent);font-size:var(--text-xs);font-weight:600;">People Mover</span></td>
+            </tr>
+            <tr data-type="special" data-search="shwamul monorail lime 540515">
+              <td><span class="table-code" style="background:#32CD32;color:#1e293b">MR</span></td>
+              <td class="table-num">—</td>
+              <td class="table-line-name">Panaireki Shwamul Monorail</td>
+              <td class="table-num">12.80</td>
+              <td><span style="color:#32CD32;font-weight:700;">● Lime</span></td>
+              <td><a href="https://opengeofiction.net/relation/540515" target="_blank" rel="noopener" style="color:var(--accent);font-size:var(--text-xs);">540515 ↗</a></td>
+              <td><span style="color:var(--accent);font-size:var(--text-xs);font-weight:600;">Monorail</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /lines-container -->
+
+  <footer>
+    <p>Izaland Transit Portal · Built on <a href="https://opengeofiction.net" target="_blank" rel="noopener">OpenGeoFiction</a> data · Not affiliated with any real transport operator</p>
+  </footer>
+
+  <script>
+    // Theme toggle
+    (function(){
+      const t=document.querySelector('[data-theme-toggle]'),r=document.documentElement;
+      let d=r.getAttribute('data-theme')||'dark';
+      t&&t.addEventListener('click',()=>{
+        d=d==='dark'?'light':'dark';
+        r.setAttribute('data-theme',d);
+        t.innerHTML=d==='dark'
+          ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+          :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+      });
+    })();
+
+    // Expand/collapse
+    document.querySelectorAll('.expand-btn').forEach(btn => {
+      const facts = btn.previousElementSibling;
+      if (facts.scrollHeight <= facts.clientHeight + 4) { btn.style.display = 'none'; return; }
+      btn.addEventListener('click', () => {
+        const isOpen = facts.classList.toggle('expanded');
+        btn.classList.toggle('open', isOpen);
+        btn.querySelector('span').textContent = isOpen ? 'Show less' : 'Show more';
+      });
+    });
+
+    // View toggle
+    const gridView = document.getElementById('gridView');
+    const gridViewSpecial = document.getElementById('gridViewSpecial');
+    const tableView = document.getElementById('tableView');
+    const dividerSpecial = document.getElementById('divider-special').parentElement;
+
+    document.querySelectorAll('.view-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (btn.dataset.view === 'grid') {
+          gridView.classList.remove('hidden');
+          gridViewSpecial.classList.remove('hidden');
+          tableView.classList.add('hidden');
+          dividerSpecial.classList.remove('hidden');
+        } else {
+          gridView.classList.add('hidden');
+          gridViewSpecial.classList.add('hidden');
+          tableView.classList.remove('hidden');
+          dividerSpecial.classList.add('hidden');
+        }
+        applyFilters();
+      });
+    });
+
+    // Filter + search
+    let activeFilter = 'all';
+    let searchQuery = '';
+
+    function applyFilters() {
+      const isGrid = !gridView.classList.contains('hidden');
+      if (isGrid) {
+        document.querySelectorAll('.line-card').forEach(card => {
+          const type = card.dataset.type;
+          const tags = card.dataset.tags || '';
+          const search = (card.dataset.search || '') + ' ' + (card.querySelector('.line-card-name')?.textContent || '');
+          let show = true;
+          if (activeFilter !== 'all') {
+            if (activeFilter === 'metro') show = type === 'metro';
+            else if (activeFilter === 'special') show = type === 'special';
+            else show = tags.includes(activeFilter);
+          }
+          if (searchQuery && !search.toLowerCase().includes(searchQuery.toLowerCase())) show = false;
+          card.style.display = show ? '' : 'none';
+        });
+      } else {
+        document.querySelectorAll('#tableBody tr').forEach(row => {
+          const type = row.dataset.type;
+          const search = (row.dataset.search || '') + ' ' + (row.querySelector('.table-line-name')?.textContent || '');
+          let show = true;
+          if (activeFilter !== 'all') {
+            if (activeFilter === 'metro') show = type === 'metro';
+            else if (activeFilter === 'special') show = type === 'special';
+            else show = true;
+          }
+          if (searchQuery && !search.toLowerCase().includes(searchQuery.toLowerCase())) show = false;
+          row.style.display = show ? '' : 'none';
+        });
+      }
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        applyFilters();
+      });
+    });
+
+    document.getElementById('searchInput').addEventListener('input', e => {
+      searchQuery = e.target.value;
+      applyFilters();
+    });
+
+    // Nav dropdowns
+    document.querySelectorAll('.nav-item').forEach(item => {
+      const btn = item.querySelector(':scope > button');
+      if (!btn) return;
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.nav-item.open').forEach(o => o.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+      });
+    });
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item.open').forEach(o => o.classList.remove('open'));
+    });
+  </script>
+
+</body>
+</html>
