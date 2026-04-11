@@ -57,6 +57,15 @@
     .dd a:hover{background:var(--sf2);color:var(--tx-c);}
     .dd a.active{color:var(--ac);}
     .dd-lbl{display:block;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-f);padding:var(--sp2) var(--sp3) var(--sp1);}
+    /* NESTED DROPDOWN (Map) */
+    .nav-item--sub{position:relative;}
+    .nav-item--sub>button{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;padding:var(--sp2) var(--sp3);font-size:var(--text-sm);color:var(--tx-m);font-weight:500;cursor:pointer;border-radius:var(--r-md);transition:background var(--tx),color var(--tx);gap:var(--sp2);}
+    .nav-item--sub>button:hover{background:var(--sf2);color:var(--tx-c);}
+    .nav-item--sub.open>button{color:var(--tx-c);}
+    .nav-item--sub>button svg{transition:transform var(--tx);flex-shrink:0;}
+    .nav-item--sub.open>button svg{transform:rotate(180deg);}
+    .dropdown--sub{position:absolute;top:0;left:calc(100% + 6px);min-width:160px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-lg);padding:var(--sp2);box-shadow:0 8px 24px oklch(0 0 0/.18);opacity:0;pointer-events:none;transition:opacity var(--tx),transform var(--tx);transform:translateX(-4px);}
+    .nav-item--sub.open .dropdown--sub{opacity:1;pointer-events:auto;transform:translateX(0);}
     /* MAP */
     .map-wrap{flex:1;display:flex;min-height:0;position:relative;}
     #map{flex:1;min-height:600px;}
@@ -129,7 +138,20 @@
           <a href="izx.html">IZX</a>
           <a href="commuter.html">Commuter Rail</a>
           <a href="other-rail.html">Other Rail</a>
-          <a href="map.html" class="active">Map</a>
+          <div class="nav-item--sub">
+            <button>Map <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="dropdown--sub">
+              <span class="dd-lbl">City maps</span>
+              <a href="map.html" class="active">Sai&#x00F0;aul</a>
+              <a href="map-warohan.html">Warohan</a>
+              <a href="map-panaireki.html">Panaireki</a>
+              <a href="map-sannupuri.html">Sannupuri</a>
+              <a href="map-kichatsura.html">Kichatsura</a>
+              <a href="map-riyatoma.html">Riyatoma</a>
+              <a href="map-makkenoke.html">Makkenoke</a>
+              <a href="map-daishin.html">Daishin</a>
+            </div>
+          </div>
         </div>
       </div>
       <div class="nav-dd">
@@ -159,7 +181,7 @@
     <div class="sb">
       <div class="sb-head">
         <div class="sb-title">Transit Lines</div>
-        <div class="sb-sub">Saïnðaul metropolitan area</div>
+        <div class="sb-sub">Saï nðaul metropolitan area</div>
       </div>
       <div class="sb-body" id="legend"></div>
       <div class="base-sel">
@@ -177,30 +199,30 @@
   <script>
   const RM = {
   "242546": { "group": "Metro", "name": "Line 8", "ref": "8", "colour": "#00A2D3" },
-  "242547": { "group": "Metro", "name": "🅼 Line 4 (local service for Kawaei 珂夬栄方面各駅停車)", "ref": "4", "colour": "#FFD912" },
-  "242548": { "group": "Metro", "name": "🅼 Line 9 (for Shōryan Daishi)", "ref": "9", "colour": "#C40062" },
-  "242549": { "group": "Metro", "name": "🅼 Line 1 (local for Enikezya Forum)", "ref": "1", "colour": "#FE7F00" },
-  "242565": { "group": "Metro", "name": "🅼 Line 2 (for Mokoba)", "ref": "2", "colour": "#FF0000" },
-  "242566": { "group": "Metro", "name": "🅼 Line 3 (local to Iyogateri)", "ref": "3", "colour": "#009E4F" },
-  "242567": { "group": "Metro", "name": "🅼 Line 14", "ref": "14", "colour": "#72E400" },
-  "242569": { "group": "Metro", "name": "🅼 Line 10 to Shakihori", "ref": "10", "colour": "#C46200" },
-  "242570": { "group": "Metro", "name": "🅼 Line 16", "ref": "16", "colour": "#816cb1" },
-  "242571": { "group": "Metro", "name": "🅼 Line 12 (for Mewakate-Kippai)", "ref": "12", "colour": "#86ebeb" },
-  "242573": { "group": "Metro", "name": "🅼 Line 17 (for Tswakanami Airport)", "ref": "17", "colour": "#f985bb" },
-  "242576": { "group": "Metro", "name": "🅼 Line 7", "ref": "7", "colour": "#00a0bc" },
-  "242577": { "group": "Metro", "name": "🅼 Line 5 (local service for Jisahara)", "ref": "5", "colour": "#9e6a51" },
-  "242578": { "group": "Metro", "name": "🅼 Line 6 (for Saibu Panatsawa)", "ref": "6", "colour": "#3465a4" },
-  "242579": { "group": "Metro", "name": "🅼 Line 11", "ref": "11", "colour": "#c5e1a5" },
-  "242580": { "group": "Metro", "name": "🅼 Line 15", "ref": "15", "colour": "#db287a" },
-  "242593": { "group": "Metro", "name": "🅼 Line 13", "ref": "13", "colour": "#36873c" },
-  "292343": { "group": "Metro", "name": "🅼 Line 18 (for ??)", "ref": "", "colour": "#999999" },
+  "242547": { "group": "Metro", "name": "🄼 Line 4 (local service for Kawaei 珂夼栄方面各駅停車)", "ref": "4", "colour": "#FFD912" },
+  "242548": { "group": "Metro", "name": "🄼 Line 9 (for Shōryan Daishi)", "ref": "9", "colour": "#C40062" },
+  "242549": { "group": "Metro", "name": "🄼 Line 1 (local for Enikezya Forum)", "ref": "1", "colour": "#FE7F00" },
+  "242565": { "group": "Metro", "name": "🄼 Line 2 (for Mokoba)", "ref": "2", "colour": "#FF0000" },
+  "242566": { "group": "Metro", "name": "🄼 Line 3 (local to Iyogateri)", "ref": "3", "colour": "#009E4F" },
+  "242567": { "group": "Metro", "name": "🄼 Line 14", "ref": "14", "colour": "#72E400" },
+  "242569": { "group": "Metro", "name": "🄼 Line 10 to Shakihori", "ref": "10", "colour": "#C46200" },
+  "242570": { "group": "Metro", "name": "🄼 Line 16", "ref": "16", "colour": "#816cb1" },
+  "242571": { "group": "Metro", "name": "🄼 Line 12 (for Mewakate-Kippai)", "ref": "12", "colour": "#86ebeb" },
+  "242573": { "group": "Metro", "name": "🄼 Line 17 (for Tswakanami Airport)", "ref": "17", "colour": "#f985bb" },
+  "242576": { "group": "Metro", "name": "🄼 Line 7", "ref": "7", "colour": "#00a0bc" },
+  "242577": { "group": "Metro", "name": "🄼 Line 5 (local service for Jisahara)", "ref": "5", "colour": "#9e6a51" },
+  "242578": { "group": "Metro", "name": "🄼 Line 6 (for Saibu Panatsawa)", "ref": "6", "colour": "#3465a4" },
+  "242579": { "group": "Metro", "name": "🄼 Line 11", "ref": "11", "colour": "#c5e1a5" },
+  "242580": { "group": "Metro", "name": "🄼 Line 15", "ref": "15", "colour": "#db287a" },
+  "242593": { "group": "Metro", "name": "🄼 Line 13", "ref": "13", "colour": "#36873c" },
+  "292343": { "group": "Metro", "name": "🄼 Line 18 (for ??)", "ref": "", "colour": "#999999" },
   "242568": { "group": "Other systems", "name": "Portflyer", "ref": "PF", "colour": "#b9a5bd" },
   "242572": { "group": "Other systems", "name": "Linhai Monorail", "ref": "LH", "colour": "#bcbf62" },
   "242613": { "group": "Other systems", "name": "Portliner", "ref": "PL", "colour": "#e2bfa7" },
   "283140": { "group": "Other systems", "name": "Kayan Railway Sakamo Line 嘉鞍高速鉄道Sakamo線", "ref": "KY03", "colour": "#990000" },
   "283141": { "group": "Other systems", "name": "Kayan Railway Main Line 嘉鞍高速鉄道本線", "ref": "KY02", "colour": "#993300" },
-  "303201": { "group": "Other systems", "name": "🅻 Hoze-Oyehatton Line (for Kadokamahiwa)", "ref": "OH", "colour": "#CD5C5C" },
-  "272674": { "group": "Thru services", "name": "🆂 Kwōkei Line (suburban service, for Yamagoka) 荒京線 (近郊電車, 倉湖加方面)", "ref": "CKW", "colour": "#99FFFF" },
+  "303201": { "group": "Other systems", "name": "🄻 Hoze-Oyehatton Line (for Kadokamahiwa)", "ref": "OH", "colour": "#CD5C5C" },
+  "272674": { "group": "Thru services", "name": "🅂 Kwōkei Line (suburban service, for Yamagoka) 荒京線 (近郊電車, 倉湖加方面)", "ref": "CKW", "colour": "#99FFFF" },
   "303222": { "group": "Thru services", "name": "Shinsabu Hidano Line Thru Service", "ref": "", "colour": "#BC8F8F" },
   "303223": { "group": "Thru services", "name": "Shinsabu Oitsura Line Thru Service", "ref": "", "colour": "#FFFACD" },
   "303227": { "group": "Thru services", "name": "Shikisabu dyenches thru service", "ref": "", "colour": "#D2B48C" },
@@ -238,10 +260,24 @@
       e.stopPropagation();
       const open=d.classList.contains('open');
       document.querySelectorAll('.nav-dd.open').forEach(o=>o.classList.remove('open'));
+      document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
       if(!open)d.classList.add('open');
     });
   });
-  document.addEventListener('click',()=>document.querySelectorAll('.nav-dd.open').forEach(o=>o.classList.remove('open')));
+  document.querySelectorAll('.nav-item--sub').forEach(sub=>{
+    const btn=sub.querySelector(':scope>button');
+    if(!btn)return;
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const open=sub.classList.contains('open');
+      document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
+      if(!open)sub.classList.add('open');
+    });
+  });
+  document.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-dd.open').forEach(o=>o.classList.remove('open'));
+    document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
+  });
 
   const map=L.map('map',{center:[36.0118,128.8961],zoom:12,maxZoom:19});
 
@@ -325,7 +361,7 @@
     });
   }
 
-  // ── STAZIONI ─────────────────────────────────────────────────
+  // ── STAZIONI ───────────────────────────────────────────────────
   const stLayer = L.layerGroup().addTo(map);
   const ST_BBOX = '35.85,128.70,36.18,129.10';
 
