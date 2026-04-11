@@ -31,12 +31,10 @@
     html{-webkit-font-smoothing:antialiased;}
     body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--tx-c);background:var(--bg);display:flex;flex-direction:column;}
     img{display:block;max-width:100%;height:auto;}
-    /* NAV */
     nav{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:var(--sp4) var(--sp8);background:var(--bg);border-bottom:1px solid var(--bd);backdrop-filter:blur(12px);}
     .nav-logo{display:flex;align-items:center;gap:var(--sp3);text-decoration:none;color:var(--tx-c);}
     .nav-logo img{height:40px;width:auto;}
-    .logo-dark{display:block!important;}
-    .logo-light{display:none!important;}
+    .logo-dark{display:block!important;} .logo-light{display:none!important;}
     [data-theme="light"] .logo-dark{display:none!important;}
     [data-theme="light"] .logo-light{display:block!important;}
     .nav-links{display:flex;gap:var(--sp6);align-items:center;}
@@ -57,7 +55,6 @@
     .dd a:hover{background:var(--sf2);color:var(--tx-c);}
     .dd a.active{color:var(--ac);}
     .dd-lbl{display:block;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-f);padding:var(--sp2) var(--sp3) var(--sp1);}
-    /* nested map dropdown */
     .nav-item--sub{position:relative;}
     .nav-item--sub>button{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;padding:var(--sp2) var(--sp3);font-size:var(--text-sm);color:var(--tx-m);font-weight:500;cursor:pointer;border-radius:var(--r-md);transition:background var(--tx),color var(--tx);gap:var(--sp2);}
     .nav-item--sub>button:hover{background:var(--sf2);color:var(--tx-c);}
@@ -66,10 +63,8 @@
     .nav-item--sub.open>button svg{transform:rotate(180deg);}
     .dropdown--sub{position:absolute;top:0;left:calc(100% + 6px);min-width:160px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-lg);padding:var(--sp2);box-shadow:0 8px 24px oklch(0 0 0/.18);opacity:0;pointer-events:none;transition:opacity var(--tx),transform var(--tx);transform:translateX(-4px);}
     .nav-item--sub.open .dropdown--sub{opacity:1;pointer-events:auto;transform:translateX(0);}
-    /* MAP */
     .map-wrap{flex:1;display:flex;min-height:0;position:relative;}
     #map{flex:1;min-height:600px;}
-    /* SIDEBAR */
     .sb{width:272px;flex-shrink:0;background:var(--sf);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;z-index:500;}
     .sb-head{padding:var(--sp4) var(--sp4) var(--sp3);border-bottom:1px solid var(--bd);}
     .sb-title{font-family:var(--font-display);font-size:var(--text-base);font-weight:800;margin-bottom:2px;}
@@ -89,7 +84,6 @@
     .base-btns{display:flex;gap:var(--sp2);}
     .base-btn{flex:1;padding:var(--sp2);font-size:var(--text-xs);font-weight:600;border:1px solid var(--bd);border-radius:var(--r-md);background:var(--sf2);color:var(--tx-m);cursor:pointer;transition:background var(--tx),color var(--tx),border-color var(--tx);}
     .base-btn.on{background:var(--ac);color:white;border-color:var(--ac);}
-    /* LOADING */
     #ld{position:absolute;inset:0;z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);gap:var(--sp3);transition:opacity .5s;}
     #ld.done{opacity:0;pointer-events:none;}
     .spin{width:36px;height:36px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite;}
@@ -99,19 +93,15 @@
     #sbar.h{opacity:0;}
     .lt{background:var(--sf)!important;border:1px solid var(--bd)!important;color:var(--tx-c)!important;font-family:var(--font-body)!important;font-size:11px!important;border-radius:var(--r-sm)!important;padding:3px 8px!important;}
     @media(max-width:768px){
-      nav{padding:var(--sp3) var(--sp4);}
-      .nav-links{gap:var(--sp3);}
+      nav{padding:var(--sp3) var(--sp4);} .nav-links{gap:var(--sp3);}
       .map-wrap{flex-direction:column-reverse;}
       .sb{width:100%;max-height:185px;border-left:none;border-top:1px solid var(--bd);}
       .sb-head{padding:var(--sp3) var(--sp3) var(--sp2);}
       .sb-body{display:flex;overflow-x:auto;overflow-y:hidden;padding:var(--sp2) var(--sp3);gap:4px;}
-      .lg{display:contents;}
-      .lg-title{display:none;}
+      .lg{display:contents;} .lg-title{display:none;}
       .li{flex-direction:column;align-items:flex-start;gap:2px;padding:var(--sp2);min-width:60px;max-width:70px;}
-      .li-sw{width:100%;height:4px;}
-      .li-ref{width:auto;}
+      .li-sw{width:100%;height:4px;} .li-ref{width:auto;}
     }
-    /* stazioni */
     .st-dot{border-radius:50%;box-sizing:border-box;transition:width .15s,height .15s;}
     .st-dot.st-sm{width:6px;height:6px;border:1.5px solid #888;}
     .st-dot.st-md{width:9px;height:9px;border:2px solid #888;}
@@ -121,7 +111,6 @@
     [data-theme="light"] .st-dot{background:#ffffff;border-color:#475569!important;}
   </style>
 </head>
-
 <body>
   <nav>
     <a href="index.html" class="nav-logo">
@@ -197,25 +186,23 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-  // ── RELATION METADATA ─────────────────────────────────────────
   const RM = {
-    "273767": { "group": "Metro",   "name": "Line 1",                    "ref": "1",  "colour": "#FF0000" },
-    "275587": { "group": "Metro",   "name": "Line 2",                    "ref": "2",  "colour": "#FFCC00" },
-    "273766": { "group": "Metro",   "name": "Line 3",                    "ref": "3",  "colour": "#FF99CC" },
-    "273756": { "group": "Metro",   "name": "Line 4",                    "ref": "4",  "colour": "#99CCFF" },
-    "273764": { "group": "Metro",   "name": "Line 5",                    "ref": "5",  "colour": "#009999" },
-    "273763": { "group": "Metro",   "name": "Line 6",                    "ref": "6",  "colour": "#0033CC" },
-    "386982": { "group": "Metro",   "name": "Line 8",                    "ref": "8",  "colour": "#E59163" },
-    "273762": { "group": "Special", "name": "City Shuttle",              "ref": "CS", "colour": "#E59163" },
-    "540515": { "group": "Special", "name": "Shwamul Monorail",          "ref": "MR", "colour": "#32CD32" }
+    "273767": { group:"Metro",   name:"Line 1",               ref:"1",  colour:"#FF0000" },
+    "275587": { group:"Metro",   name:"Line 2",               ref:"2",  colour:"#FFCC00" },
+    "273766": { group:"Metro",   name:"Line 3",               ref:"3",  colour:"#FF99CC" },
+    "273756": { group:"Metro",   name:"Line 4",               ref:"4",  colour:"#99CCFF" },
+    "273764": { group:"Metro",   name:"Line 5",               ref:"5",  colour:"#009999" },
+    "273763": { group:"Metro",   name:"Line 6",               ref:"6",  colour:"#0033CC" },
+    "386982": { group:"Metro",   name:"Line 8",               ref:"8",  colour:"#E59163" },
+    "273762": { group:"Special", name:"City Shuttle",         ref:"CS", colour:"#E59163" },
+    "540515": { group:"Special", name:"Shwamul Monorail",     ref:"MR", colour:"#32CD32" }
   };
-
   const GROUPS = {
-    'Metro':   [273767, 275587, 273766, 273756, 273764, 273763, 386982],
-    'Special': [273762, 540515]
+    Metro:   [273767,275587,273766,273756,273764,273763,386982],
+    Special: [273762,540515]
   };
 
-  // ── THEME TOGGLE ──────────────────────────────────────────────
+  // ─ theme toggle
   (function(){
     const t=document.querySelector('[data-theme-toggle]'),h=document.documentElement;
     let d=h.getAttribute('data-theme')||'dark';
@@ -223,68 +210,57 @@
     t.addEventListener('click',()=>{
       d=d==='dark'?'light':'dark';
       h.setAttribute('data-theme',d);
-      const blankBtn=document.querySelector('.base-btn[data-layer="blank"]');
-      if(blankBtn&&blankBtn.classList.contains('on')){
-        map.removeLayer(tiles.blank);
-        tiles.blank=makeBlank();
-        tiles.blank.addTo(map);
-      }
+      const bb=document.querySelector('.base-btn[data-layer="blank"]');
+      if(bb&&bb.classList.contains('on')){ map.removeLayer(tiles.blank); tiles.blank=makeBlank(); tiles.blank.addTo(map); }
       t.innerHTML=d==='dark'
         ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
         :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
     });
   })();
 
-  // ── NAV DROPDOWNS ─────────────────────────────────────────────
+  // ─ nav dropdowns
   document.querySelectorAll('.nav-dd').forEach(d=>{
-    const btn=d.querySelector(':scope>button');
-    if(!btn)return;
-    btn.addEventListener('click',e=>{
+    const b=d.querySelector(':scope>button'); if(!b)return;
+    b.addEventListener('click',e=>{
       e.stopPropagation();
-      const open=d.classList.contains('open');
-      document.querySelectorAll('.nav-dd.open').forEach(o=>o.classList.remove('open'));
-      document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
-      if(!open)d.classList.add('open');
+      const o=d.classList.contains('open');
+      document.querySelectorAll('.nav-dd.open,.nav-item--sub.open').forEach(x=>x.classList.remove('open'));
+      if(!o)d.classList.add('open');
     });
   });
-  document.querySelectorAll('.nav-item--sub').forEach(sub=>{
-    const btn=sub.querySelector(':scope>button');
-    if(!btn)return;
-    btn.addEventListener('click',e=>{
+  document.querySelectorAll('.nav-item--sub').forEach(s=>{
+    const b=s.querySelector(':scope>button'); if(!b)return;
+    b.addEventListener('click',e=>{
       e.stopPropagation();
-      const open=sub.classList.contains('open');
-      document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
-      if(!open)sub.classList.add('open');
+      const o=s.classList.contains('open');
+      document.querySelectorAll('.nav-item--sub.open').forEach(x=>x.classList.remove('open'));
+      if(!o)s.classList.add('open');
     });
   });
   document.addEventListener('click',()=>{
-    document.querySelectorAll('.nav-dd.open').forEach(o=>o.classList.remove('open'));
-    document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
+    document.querySelectorAll('.nav-dd.open,.nav-item--sub.open').forEach(x=>x.classList.remove('open'));
   });
 
-  // ── MAP INIT ──────────────────────────────────────────────────
+  // ─ map init
   const map=L.map('map',{center:[44.50,119.50],zoom:12,maxZoom:19});
 
   const blankCanvas=L.GridLayer.extend({
-    createTile:function(){ const t=document.createElement('canvas'); t.width=256; t.height=256; return t; }
+    createTile(){ const t=document.createElement('canvas'); t.width=256; t.height=256; return t; }
   });
   function makeBlank(){
     const dark=document.documentElement.getAttribute('data-theme')==='dark';
     const cv=new blankCanvas({maxZoom:19,attribution:''});
-    cv.on('tileload',function(e){
+    cv.on('tileload',e=>{
       const ctx=e.tile.getContext('2d');
       ctx.fillStyle=dark?'#0f1117':'#f8fafc';
       ctx.fillRect(0,0,256,256);
     });
     return cv;
   }
-
   const tiles={
-    standard:L.tileLayer('https://tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png',
-      {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
-    topo:L.tileLayer('https://tile.opengeofiction.net/ogf-topo/{z}/{x}/{y}.png',
-      {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
-    blank:makeBlank()
+    standard:L.tileLayer('https://tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
+    topo:    L.tileLayer('https://tile.opengeofiction.net/ogf-topo/{z}/{x}/{y}.png', {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
+    blank:   makeBlank()
   };
   tiles.standard.addTo(map);
   document.querySelectorAll('.base-btn').forEach(b=>{
@@ -292,18 +268,20 @@
       document.querySelectorAll('.base-btn').forEach(x=>x.classList.remove('on'));
       b.classList.add('on');
       const w=b.dataset.layer;
-      Object.entries(tiles).forEach(([k,l])=>{if(k===w)l.addTo(map);else map.removeLayer(l);});
+      Object.entries(tiles).forEach(([k,l])=>{ if(k===w)l.addTo(map); else map.removeLayer(l); });
     });
   });
 
-  function clean(s){return s.replace(/[\uD800-\uDFFF]{2}/g,'').replace(/^[\u24C2-\u24FF\u2460-\u27BF\s]+/,'').trim();}
+  function clean(s){ return s.replace(/[\uD800-\uDFFF]{2}/g,'').replace(/^[\u24C2-\u24FF\u2460-\u27BF\s]+/,'').trim(); }
 
   const sbar=document.getElementById('sbar');
-  function status(msg,ms=3000){sbar.textContent=msg;sbar.classList.remove('h');clearTimeout(sbar._t);sbar._t=setTimeout(()=>sbar.classList.add('h'),ms);}
+  function status(msg,ms=3000){ sbar.textContent=msg; sbar.classList.remove('h'); clearTimeout(sbar._t); sbar._t=setTimeout(()=>sbar.classList.add('h'),ms); }
 
   const OV='https://overpass.opengeofiction.net/api/interpreter';
-  async function fetch_rels(ids){
-    const r=await fetch(OV,{method:'POST',body:'data='+encodeURIComponent('[out:json];relation(id:'+ids+');out geom;'),headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+  async function fetchRels(ids){
+    const r=await fetch(OV,{method:'POST',
+      body:'data='+encodeURIComponent('[out:json];relation(id:'+ids+');out geom;'),
+      headers:{'Content-Type':'application/x-www-form-urlencoded'}});
     return (await r.json()).elements;
   }
 
@@ -320,29 +298,27 @@
           .addTo(grp);
       }
     });
-    grp.addTo(map);layers[id]=grp;vis[id]=true;
-
-    // Auto-fit on first loaded relation
+    grp.addTo(map); layers[id]=grp; vis[id]=true;
     if(!firstFit){
-      const allLatLng=[];
-      grp.eachLayer(l=>{ if(l.getLatLngs) allLatLng.push(...l.getLatLngs()); });
-      if(allLatLng.length){ map.fitBounds(L.latLngBounds(allLatLng),{padding:[40,40]}); firstFit=true; }
+      const pts=[];
+      grp.eachLayer(l=>{ if(l.getLatLngs) pts.push(...l.getLatLngs()); });
+      if(pts.length){ map.fitBounds(L.latLngBounds(pts),{padding:[40,40]}); firstFit=true; }
     }
   }
 
   function buildLegend(){
-    const el=document.getElementById('legend');el.innerHTML='';
+    const el=document.getElementById('legend'); el.innerHTML='';
     Object.keys(GROUPS).forEach(g=>{
-      const w=document.createElement('div');w.className='lg';
+      const w=document.createElement('div'); w.className='lg';
       w.innerHTML='<div class="lg-title">'+g+'</div>';
       GROUPS[g].forEach(rid=>{
         const m=RM[String(rid)]||{},c=m.colour||'#888',n=clean(m.name||String(rid));
-        const item=document.createElement('div');item.className='li';item.dataset.rid=rid;
+        const item=document.createElement('div'); item.className='li'; item.dataset.rid=rid;
         item.innerHTML='<span class="li-sw" style="background:'+c+'"></span><span class="li-name">'+n+'</span><span class="li-ref">'+(m.ref||'')+'</span>';
         item.addEventListener('click',()=>{
           const id=String(rid);
-          if(vis[id]){map.removeLayer(layers[id]);vis[id]=false;item.classList.add('off');}
-          else{layers[id]?.addTo(map);vis[id]=true;item.classList.remove('off');}
+          if(vis[id]){ map.removeLayer(layers[id]); vis[id]=false; item.classList.add('off'); }
+          else{ layers[id]?.addTo(map); vis[id]=true; item.classList.remove('off'); }
         });
         w.appendChild(item);
       });
@@ -350,77 +326,100 @@
     });
   }
 
-  // ── STATIONS ──────────────────────────────────────────────────
+  // ───────────────────────────────────────────────────────────────
+  // STATIONS — on-demand by viewport, only at zoom >= 12
+  // No bulk bbox query on load. Stations are fetched per visible
+  // viewport area and deduplicated by node ID.
+  // ───────────────────────────────────────────────────────────────
   const stLayer=L.layerGroup().addTo(map);
-  let ST_BBOX='44.20,119.20,44.80,119.80';
+  const seenNodes=new Set();
+  let stFetching=false;
+  let stPending=false;
 
-  async function loadStations(){
-    const q='[out:json][timeout:30];node["railway"~"station|stop"]('+ST_BBOX+');out body;';
-    const r=await fetch(OV,{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'}});
-    const data=await r.json();
-    data.elements.forEach(renderStation);
+  async function fetchStationsViewport(){
+    if(map.getZoom()<12){ hideAllStations(); return; }
+    if(stFetching){ stPending=true; return; }
+    stFetching=true;
+    try{
+      const b=map.getBounds().pad(0.05);
+      const bbox=[b.getSouth(),b.getWest(),b.getNorth(),b.getEast()].map(v=>v.toFixed(5)).join(',');
+      const q='[out:json][timeout:20];node["railway"~"^(station|stop)$"]('+bbox+');out body;';
+      const r=await fetch(OV,{method:'POST',
+        body:'data='+encodeURIComponent(q),
+        headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+      const data=await r.json();
+      (data.elements||[]).forEach(node=>{
+        if(seenNodes.has(node.id))return;
+        seenNodes.add(node.id);
+        renderStation(node);
+      });
+      updateStationDisplay();
+    }catch(e){ console.warn('Station fetch error',e); }
+    stFetching=false;
+    if(stPending){ stPending=false; fetchStationsViewport(); }
+  }
+
+  function hideAllStations(){
+    stLayer.eachLayer(m=>{ const el=m.getElement(); if(el)el.style.display='none'; });
   }
 
   function renderStation(node){
     const name=node.tags?.name||node.tags?.['name:en']||'';
     const isMain=node.tags?.railway==='station';
     const icon=L.divIcon({className:'',html:'<div class="st-dot st-sm"></div>',iconSize:[10,10],iconAnchor:[5,5]});
-    const m=L.marker([node.lat,node.lon],{icon,title:name,zIndexOffset:isMain?200:100});
-    if(name)m.bindTooltip(name,{sticky:true,className:'lt'});
-    m.addTo(stLayer);
-    m._stName=name;m._stMain=isMain;m._labelBound=false;
+    const mk=L.marker([node.lat,node.lon],{icon,title:name,zIndexOffset:isMain?200:100});
+    if(name) mk.bindTooltip(name,{sticky:true,className:'lt'});
+    mk.addTo(stLayer);
+    mk._stName=name; mk._stMain=isMain; mk._labelBound=false;
   }
 
-  function updateStations(){
+  function updateStationDisplay(){
     const z=map.getZoom();
-    stLayer.eachLayer(m=>{
-      const el=m.getElement();if(!el)return;
-      const dot=el.querySelector('.st-dot');if(!dot)return;
-      if(z<12){el.style.display='none';return;}
+    stLayer.eachLayer(mk=>{
+      const el=mk.getElement(); if(!el)return;
+      const dot=el.querySelector('.st-dot'); if(!dot)return;
+      if(z<12){ el.style.display='none'; return; }
       el.style.display='';
       dot.className=z>=16?'st-dot st-lg':z>=14?'st-dot st-md':'st-dot st-sm';
-      const wantPerm=z>=14&&!!m._stName;
-      if(wantPerm&&!m._labelBound){
-        m.unbindTooltip();
-        m.bindTooltip(m._stName,{permanent:true,direction:'right',offset:[8,0],className:z>=16?'lt lt-bold':'lt'}).openTooltip();
-        m._labelBound=true;
-      }else if(!wantPerm&&m._labelBound){
-        m.unbindTooltip();m._labelBound=false;
-        if(m._stName)m.bindTooltip(m._stName,{sticky:true,className:'lt'});
+      const wantPerm=z>=14&&!!mk._stName;
+      if(wantPerm&&!mk._labelBound){
+        mk.unbindTooltip();
+        mk.bindTooltip(mk._stName,{permanent:true,direction:'right',offset:[8,0],className:z>=16?'lt lt-bold':'lt'}).openTooltip();
+        mk._labelBound=true;
+      } else if(!wantPerm&&mk._labelBound){
+        mk.unbindTooltip(); mk._labelBound=false;
+        if(mk._stName) mk.bindTooltip(mk._stName,{sticky:true,className:'lt'});
       }
     });
   }
-  map.on('zoomend',updateStations);
 
-  function updateBboxFromLayers(){
-    const pts=[];
-    Object.values(layers).forEach(grp=>{
-      grp.eachLayer(l=>{if(l.getLatLngs)pts.push(...l.getLatLngs());});
-    });
-    if(!pts.length)return;
-    const b=L.latLngBounds(pts);
-    const pad=0.15;
-    ST_BBOX=[b.getSouth()-pad,b.getWest()-pad,b.getNorth()+pad,b.getEast()+pad].join(',');
+  // Debounce so rapid pan/zoom doesn't fire many requests
+  let stTimer=null;
+  function scheduleStations(){
+    clearTimeout(stTimer);
+    stTimer=setTimeout(fetchStationsViewport,400);
   }
+  map.on('moveend zoomend',scheduleStations);
 
-  // ── MAIN ──────────────────────────────────────────────────────
+  // ─ main
   async function main(){
     const ld=document.getElementById('ld'),lt=document.getElementById('ld-txt');
     let done=0;
     const entries=Object.entries(GROUPS);
     await Promise.all(
       entries.map(async([g,ids])=>{
-        lt.textContent='Loading '+g+'\u2026';
-        (await fetch_rels(ids.join(','))).forEach(renderRel);
-        lt.textContent='Loaded '+(++done)+'/'+entries.length+'\u2026';
+        lt.textContent='Loading '+g+'…';
+        (await fetchRels(ids.join(','))).forEach(renderRel);
+        lt.textContent='Loaded '+(++done)+'/'+entries.length+'…';
       })
     );
-    updateBboxFromLayers();
-    await loadStations();
-    ld.classList.add('done');setTimeout(()=>ld.remove(),600);
+    // Done — dismiss loader
+    ld.classList.add('done');
+    setTimeout(()=>ld.remove(),600);
     buildLegend();
-    updateStations();
     status(Object.keys(layers).length+' transit lines loaded');
+    // Trigger first station load for current viewport
+    scheduleStations();
   }
   main();
   </script>
