@@ -3,8 +3,7 @@ name: Build transit JSON
 on:
   push:
     paths:
-      - 'data/stations.xml'
-      - 'data/lines.xml'
+      - 'data/xml/**'
   workflow_dispatch:
 
 jobs:
