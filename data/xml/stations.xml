@@ -1,0 +1,2866 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="Overpass API 0.7.59.120 (mmd) 1fceaad">
+<note>The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.</note>
+<meta osm_base="2026-04-12T14:01:14Z" areas="2026-04-12T14:01:14Z"/>
+
+  <node id="122813475" lat="36.1241086" lon="129.0105463">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Shakihori 石登"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393139" lat="36.0041725" lon="128.7563337">
+    <tag k="colour" v="#36873c"/>
+    <tag k="name" v="Otsumi-Nawadae 南兆先"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393486" lat="36.0214354" lon="128.7476127">
+    <tag k="colour" v="#36873c"/>
+    <tag k="name" v="Gundari Kōwen 裙橋公園"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393742" lat="35.9957892" lon="128.8321178">
+    <tag k="colour" v="#9e6a51"/>
+    <tag k="name" v="Tsuragoi 汐蒲"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393743" lat="35.9860353" lon="128.7759909">
+    <tag k="colour" v="#00a0bc"/>
+    <tag k="name" v="Bawangitan"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393744" lat="35.9818371" lon="128.7273898">
+    <tag k="colour" v="#00a0bc"/>
+    <tag k="name" v="Ezaesomu 皃築"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393745" lat="35.9817040" lon="128.7414085">
+    <tag k="colour" v="#00a0bc"/>
+    <tag k="name" v="Riihisano 2sa 尾本2沙"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393747" lat="35.9818779" lon="128.7505157">
+    <tag k="colour" v="#00a0bc"/>
+    <tag k="name" v="Riihisano 尾本"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393748" lat="36.0245787" lon="128.7765350">
+    <tag k="name" v="Choyarui"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393750" lat="35.9981190" lon="128.7831676">
+    <tag k="colour" v="#9e6a51"/>
+    <tag k="name" v="Sakanemoto 沛岬斗"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393751" lat="35.9905568" lon="128.7977075">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Ushiuruma"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393752" lat="35.9879118" lon="128.8225952">
+    <tag k="colour" v="#00a0bc"/>
+    <tag k="name" v="Himatoshi 妃満氾"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393753" lat="35.9938037" lon="128.8118176">
+    <tag k="colour" v="#00a0bc"/>
+    <tag k="name" v="Konegisa Eigandan 干鮃永玵段"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393770" lat="35.9661894" lon="128.7934718">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Urenosomi Senpyan"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393771" lat="35.9883885" lon="128.7855719">
+    <tag k="colour" v="#00a0bc"/>
+    <tag k="name" v="Eigandan Senpyan 永玵段船駢"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393772" lat="36.0114602" lon="128.7788892">
+    <tag k="colour" v="#FFD912"/>
+    <tag k="name" v="Ipporai-Senpyan 一蒲崍船駢 (Stock Exchange - 證券去來所前)"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393784" lat="35.9848379" lon="128.7656061">
+    <tag k="colour" v="#36873c"/>
+    <tag k="name" v="Tsuruna Eigandan 守那永玵段"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="123393785" lat="35.9943451" lon="128.7610846">
+    <tag k="colour" v="#36873c"/>
+    <tag k="name" v="Karisaji"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064327" lat="36.0590053" lon="128.9898338">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Higikura 矢九田"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064328" lat="36.1458108" lon="129.0021667">
+    <tag k="name" v="Surikato"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064329" lat="36.1391727" lon="129.0093788">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Bibawara"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064331" lat="36.1521663" lon="129.0207735">
+    <tag k="name" v="Kayahori Bunki"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064332" lat="36.1426458" lon="129.0185064">
+    <tag k="name" v="Punomowen 㷀園"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064333" lat="36.1345308" lon="129.0169175">
+    <tag k="name" v="Awada"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064334" lat="36.0507518" lon="128.9757518">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Shiitehongi 茛本名"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064335" lat="36.0643656" lon="128.9817577">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Kasaraki 次羽"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064336" lat="36.0736985" lon="128.9819258">
+    <tag k="name" v="Makurigawa 炭畦"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064337" lat="36.0813119" lon="128.9901219">
+    <tag k="name" v="Riyakugo 追句胡"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064338" lat="36.1158741" lon="129.0061764">
+    <tag k="name" v="Otsumi-Shakihori 南石登"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064339" lat="36.1062262" lon="129.0022583">
+    <tag k="name" v="Amitoya 安砂"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064340" lat="36.0978821" lon="129.0003158">
+    <tag k="name" v="Dendokuri 殿土巻"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064341" lat="36.0877604" lon="128.9987365">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="name" v="Oizato 粕穫"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064342" lat="36.0772409" lon="128.9999595">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="name" v="Yahamori 弥葩竹"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064343" lat="36.0698639" lon="129.0005694">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="name" v="Ekashugi 月手伎"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064344" lat="36.0602860" lon="129.0012122">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Jufurai Kōwen Niji 朱布来公園西"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124064345" lat="36.0542864" lon="128.9995267">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="name" v="Ibu-Jufurai 中朱布来"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124066071" lat="36.0856414" lon="129.0889818">
+    <tag k="colour" v="#FE7F00"/>
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Asaji Torimoshi 安佐寺狛篠"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="124066072" lat="36.0742959" lon="129.0912393">
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Aisendawa 愛仙堺"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="124066073" lat="36.0646199" lon="129.0850268">
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Kikachuri 筌中李"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="124066074" lat="36.0580821" lon="129.0777516">
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Namitoki 咲葵"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="124066075" lat="36.0483947" lon="129.0672442">
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Chikurai 宮鵜伊"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="124066076" lat="36.0410744" lon="129.0589848">
+    <tag k="colour" v="mediumblue"/>
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Igashikūra (Taishindai) 品霜（泰進大）"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="124066077" lat="36.0333002" lon="129.0507774">
+    <tag k="colour" v="mediumblue"/>
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Hayatogaru 久松"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="124066078" lat="36.0263271" lon="129.0422857">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Rakkashoni 鳶腳"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124066079" lat="36.0195884" lon="129.0344622">
+    <tag k="colour" v="#FFD912"/>
+    <tag k="name" v="Sumi-Kokendake 隠古剣館"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124066080" lat="36.0133767" lon="129.0261794">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Oritoku 壌外"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124066081" lat="36.0086704" lon="129.0175638">
+    <tag k="colour" v="#C40062"/>
+    <tag k="name" v="Tomiganei 庭ヶ汢"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124066082" lat="36.0088907" lon="129.0097010">
+    <tag k="colour" v="mediumblue"/>
+    <tag k="name" v="Tagashiga 浚藻"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124066083" lat="36.0104022" lon="128.9995719">
+    <tag k="colour" v="mediumblue"/>
+    <tag k="name" v="Oiseharu 粕墾"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124066084" lat="36.0105864" lon="128.9881596">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Herubori 杏登"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124066085" lat="36.0072109" lon="128.9771076">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Ōbakura 大砌"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124066086" lat="36.0102544" lon="128.9671019">
+    <tag k="colour" v="mediumblue"/>
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Aketsue 薫都衛"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="124066185" lat="36.0984037" lon="129.0559890">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Migawarae"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124066186" lat="36.1007643" lon="129.0425210">
+    <tag k="name" v="Jurimotoya"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124066187" lat="36.1038625" lon="129.0319347">
+    <tag k="name" v="Uriwako"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124066188" lat="36.1082314" lon="129.0218870">
+    <tag k="name" v="Gohamuki Kuuraki-mun"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124066189" lat="36.1157694" lon="129.0145197">
+    <tag k="name" v="Inamori"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124072530" lat="36.0484040" lon="129.1151947">
+    <tag k="name" v="Ippanigoen"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124072531" lat="36.0458576" lon="129.1049388">
+    <tag k="name" v="Makintoshi 馬貴પ氾"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124072532" lat="36.0431794" lon="129.0934101">
+    <tag k="name" v="Wayushima"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124072533" lat="36.0406647" lon="129.0828554">
+    <tag k="name" v="Domatsui 土頭居"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124072534" lat="36.0380671" lon="129.0719313">
+    <tag k="name" v="Nari-Hajafuki 東波社枇"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124072535" lat="36.0356641" lon="129.0612902">
+    <tag k="name" v="Hajafuki 波社枇"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124072537" lat="36.0353236" lon="129.0232684">
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Fushinose 翔峴"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="124072538" lat="36.0331733" lon="129.0367193">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Kairumuka"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="124295239" lat="36.0467009" lon="129.0111124">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Upajiya 袁棲"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124295240" lat="36.0435392" lon="129.0278980">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Shotsumaichi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124295241" lat="36.0447094" lon="129.0398392">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Ominotori Shikusa 天狛四彫"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124295242" lat="36.0519671" lon="129.0485773">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Isenebo 床踔"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124295243" lat="36.0591962" lon="129.0556642">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Kadewara"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124295244" lat="36.0687854" lon="129.0578075">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Shichirupas 四池流発"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124295245" lat="36.0773526" lon="129.0558507">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Tsarawari"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124295246" lat="36.0874366" lon="129.0543185">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Otsunuke 2sa"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124295454" lat="35.9836477" lon="129.0759178">
+    <tag k="name" v="Niji-Osenude 西防斉"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124295455" lat="35.9851426" lon="129.0640627">
+    <tag k="name" v="Bukunomatsu 粐頭"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124295456" lat="35.9902444" lon="129.0535709">
+    <tag k="name" v="Kōmeitsān 公明倉"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124295457" lat="35.9945865" lon="129.0430960">
+    <tag k="name" v="Yakishino 少史見"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="124295466" lat="36.0009629" lon="129.0345348">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Sasakuma"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="126493368" lat="35.9394759" lon="128.9467686">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Kamaishi Kaiyan Kōwen"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="126493369" lat="35.9451939" lon="128.9558177">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Kaimashi-kō"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="126497709" lat="35.9846121" lon="129.0863497">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Osenude 防斉"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="126497710" lat="35.9886101" lon="129.0828515">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Kanui Airport T1"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="126666460" lat="35.9989134" lon="129.0495776">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Tendoshiri"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="126666462" lat="35.9959552" lon="129.0590340">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Shiki-Kōmeitsān 北公明倉"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="126666463" lat="35.9910177" lon="129.0658426">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Torihashi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="126666464" lat="35.9883652" lon="129.0724747">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Kanui 2-sa"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="126666498" lat="35.9921501" lon="129.1134775">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Shin-Tsukaso 新鷸蘇"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="126666499" lat="36.0067276" lon="129.1079424">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Kawaei 珂夬栄"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="126754740" lat="36.0319966" lon="128.7752218">
+    <tag k="name" v="Zawahan Nojima"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="126754741" lat="36.0406699" lon="128.7725371">
+    <tag k="name" v="Eikunna 栄勳那"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="126754742" lat="36.0485714" lon="128.7641893">
+    <tag k="name" v="Tsurunarikki 鵺陸起"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="127914806" lat="36.0234798" lon="128.8539429">
+    <tag k="name" v="Sainðaul Niji 作安崎西"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="127914807" lat="36.0228200" lon="128.8558355">
+    <tag k="colour" v="#e2bfa7"/>
+    <tag k="name" v="Kasakuri 鯛巻"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="128525299" lat="36.0244478" lon="128.9703305">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Egunsen Shokumüs'wen"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="128525370" lat="36.0172776" lon="128.9729367">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Tikkamoto"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="128525371" lat="36.0191268" lon="128.9815942">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="官川 Kansāri"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="128607532" lat="36.2244192" lon="129.0815727">
+    <tag k="name" v="Ibaruno 齒琉能"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="128607533" lat="36.2020388" lon="129.0066917">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Moriyose"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="128669527" lat="36.0188255" lon="128.9909786">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Eigan-ji 栄鳫寺"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="128669528" lat="36.0240018" lon="128.9802802">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Masuda Agarai 馬砅任尭"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="129227659" lat="36.0724040" lon="128.9078802">
+    <tag k="colour" v="#3465a4"/>
+    <tag k="name" v="Kiranne"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="129227893" lat="36.0289548" lon="128.9285227">
+    <tag k="colour" v="#0099CC"/>
+    <tag k="name" v="Abawauri 燕宦"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="129227936" lat="36.0437109" lon="128.9580325">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Makkeriya 平追"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="129227937" lat="36.0400646" lon="128.9471612">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Tobeskauri 鴨沼"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="129227938" lat="36.0193907" lon="128.9431167">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="name" v="Nimunoðai 秩済"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="129227939" lat="36.0317114" lon="128.9366552">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Heinomoji 駕桃"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="129227940" lat="36.0240806" lon="128.9407274">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="name" v="Awasada 邊褒"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="129227941" lat="36.0363274" lon="128.9339106">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="name" v="Tajamōri 宰毛利"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="129227942" lat="36.0411431" lon="128.9268497">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="name" v="Ishitsuma 実維"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="129227943" lat="36.0433086" lon="128.9171668">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="name" v="Gawinosechi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="129227944" lat="36.0470843" lon="128.9035937">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="name" v="Tsumasui 都馬水"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="129227945" lat="36.0788249" lon="128.9184026">
+    <tag k="name" v="Shiki-Kiranne"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="129254587" lat="36.0251377" lon="128.9286509">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Niji-Kumasui 西枝水"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="135115998" lat="36.0881131" lon="129.0755209">
+    <tag k="name" v="Pakkishoi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="135115999" lat="36.0750981" lon="129.0292026">
+    <tag k="colour" v="#FE7F00"/>
+    <tag k="name" v="Oebatsun Resort"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="135204247" lat="36.2129015" lon="129.0274754">
+    <tag k="name" v="Holsotsawa 羊森"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="135204248" lat="36.2288897" lon="129.0962087">
+    <tag k="name" v="Tattamoto 蚫対"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="135394631" lat="35.9721348" lon="129.1210895">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Mokoba 母槻"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="135874133" lat="36.0199686" lon="128.9287639">
+    <tag k="colour" v="#C40062"/>
+    <tag k="name" v="Teyomuka"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="135876986" lat="36.0485222" lon="128.9948185">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Jufurai 朱布来"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136005577" lat="35.9693594" lon="128.8164900">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Ageni Tsaron"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136114106" lat="36.0006307" lon="128.7940160">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Kirifunu Kukubān 礒判國防"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136114107" lat="35.9986660" lon="128.8024169">
+    <tag k="colour" v="#9e6a51"/>
+    <tag k="name" v="Jaihonmu 3sa 際笨武3沙"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136114709" lat="36.0185336" lon="128.8464512">
+    <tag k="colour" v="#FFD912"/>
+    <tag k="name" v="Buslyu Toshi"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136114710" lat="36.0147037" lon="128.8330392">
+    <tag k="colour" v="#FFD912"/>
+    <tag k="name" v="Kotoshiruna 細荒奈"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136114711" lat="36.0154151" lon="128.8157729">
+    <tag k="colour" v="#CD5C5C"/>
+    <tag k="name" v="Shiki-Hoze 北舗摧"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136114713" lat="36.0153310" lon="128.8057644">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Ipporai - Konegisa 一蒲崍干鮃"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136114715" lat="36.0067584" lon="128.7644631">
+    <tag k="colour" v="#3465a4"/>
+    <tag k="name" v="Ipporai - Shindari 一蒲崍新艏"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136187238" lat="35.9516143" lon="128.7984600">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Shutazai 守多彩"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136187239" lat="35.9723319" lon="128.7914126">
+    <tag k="name" v="Senpyan - Murakami 船駢門良釜"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136187240" lat="35.9800066" lon="128.7888277">
+    <tag k="name" v="Shiittaru Senpyan"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136187241" lat="35.9823364" lon="128.7995870">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Shiittaru - Owonideki"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136187242" lat="36.0663381" lon="128.8129444">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Amajakashi"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136187243" lat="36.0566918" lon="128.7987741">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Chetonuku"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136187244" lat="36.0491486" lon="128.8068342">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Sagaisana 2 sa"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136187245" lat="36.0414663" lon="128.8035613">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Takatsura"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136187246" lat="36.0369600" lon="128.7901155">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Rismyonjen"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136187247" lat="36.0291692" lon="128.7882004">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Owonideki Zawahan"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="136187248" lat="36.0237094" lon="128.7890775">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Bubaijaka"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="144964622" lat="36.0033863" lon="128.8057883">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Kirifunu Sejiha"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="145311893" lat="35.9996233" lon="128.9625018">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Nashikoma 刖冬"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="145681683" lat="36.0266010" lon="128.9795627">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Masuda Hibaru 馬砅任尭"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="145943685" lat="36.0460488" lon="128.9356179">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Minkanawa"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="145985092" lat="36.0655367" lon="128.9728441">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Tsenduma"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="145985093" lat="36.0743068" lon="128.9716260">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Shin-Makurigawa"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="145985094" lat="36.0871867" lon="128.9778570">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Garotsu Lake"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="145985095" lat="36.1127190" lon="128.9951739">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Rillantsoye"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="145985096" lat="36.1214889" lon="128.9996179">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Niji-Shakihori"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="145985097" lat="36.1309264" lon="129.0016142">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Gawaraze"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="145991529" lat="36.0540224" lon="128.9847519">
+    <tag k="colour" v="mediumblue"/>
+    <tag k="name" v="Jigasūngai Kōwen 治ヶ僧涯公園"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146642920" lat="36.0340512" lon="128.9765705">
+    <tag k="colour" v="#72E400"/>
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Rosemane 酢丘"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="146642921" lat="36.0303100" lon="128.9800635">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="name" v="Takagimori 浚名竹"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146644144" lat="36.0533026" lon="128.9420170">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Korishima - Kōwen Shikirihi 飯渠-公園北域"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146645342" lat="36.0560108" lon="128.9161220">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Assemikori"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146645343" lat="36.0571524" lon="128.9292515">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Chiyakuda"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146645344" lat="36.0503376" lon="128.9476168">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Zaajokinsha 蔵汝金舎"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146813998" lat="36.0089799" lon="128.7916085">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Ipporai - Enhadan (Kunagushi) 一蒲崍縁閻 (九那柚)"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146814219" lat="35.9788943" lon="128.8009242">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Ðwaishon Tekkapi"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146814220" lat="35.9661547" lon="128.8036587">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Bajikoe Canal Kōwen 桐塚ડપધ્公園"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146814982" lat="35.9967156" lon="128.7424331">
+    <tag k="colour" v="#3465a4"/>
+    <tag k="name" v="Yemendawi 維綿富"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146814983" lat="35.9902075" lon="128.7360353">
+    <tag k="colour" v="#3465a4"/>
+    <tag k="name" v="Ðunarishi 享 虚"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146814984" lat="35.9755073" lon="128.7213774">
+    <tag k="colour" v="#3465a4"/>
+    <tag k="name" v="Sofuhaja 泴波社"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146814986" lat="35.9671560" lon="128.7264790">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Takarimoto"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146814987" lat="35.9671130" lon="128.7403116">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Eonogi Kōwen Niji"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146814988" lat="35.9667736" lon="128.7531883">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Eonogi Kōwen"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146814989" lat="35.9666338" lon="128.7643381">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Makkaustai"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146814990" lat="35.9666481" lon="128.7742064">
+    <tag k="colour" v="#36873c"/>
+    <tag k="name" v="Urenosomi-Tsuruna"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146815002" lat="36.0238333" lon="128.6745470">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Wamagiyasu"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146815003" lat="36.0135381" lon="128.6752871">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Shiki-Huppakoi"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146815004" lat="36.0042809" lon="128.6779822">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Huppakoi"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146815005" lat="35.9942806" lon="128.6865636">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Tansodai 綻宋臺"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146815006" lat="35.9852791" lon="128.6959588">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Saikade Onuki 賽湊午陥"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146815007" lat="35.9780531" lon="128.7031124">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Kaikakuda"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146815008" lat="35.9690664" lon="128.7138721">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Niji-Urenosomi"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146815991" lat="35.9293974" lon="128.7198523">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Minokashira"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146816261" lat="35.9031990" lon="128.7101675">
+    <tag k="name" v="Yanimoto"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146816262" lat="35.9542145" lon="128.7202319">
+    <tag k="name" v="Sakashidawi"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="146908926" lat="36.0857309" lon="129.0757084">
+    <tag k="colour" v="#FE7F00"/>
+    <tag k="name" v="Shin-Pakkishoi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="147382474" lat="35.9674640" lon="128.8293415">
+    <tag k="colour" v="#00a0bc"/>
+    <tag k="name" v="Kashiwaka"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="147457618" lat="36.0761136" lon="128.8318204">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Itsayuki Tonjo"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="147466398" lat="36.0554589" lon="128.7754736">
+    <tag k="colour" v="#e0ba33"/>
+    <tag k="name" v="Shinsaotoga"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="147984625" lat="36.0261586" lon="128.7679409">
+    <tag k="name" v="Ashihara Jaiken"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="147984626" lat="36.0144486" lon="128.7612288">
+    <tag k="name" v="Nari-Nawadae 東兆先"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="147984628" lat="35.9949955" lon="128.7691258">
+    <tag k="colour" v="#9e6a51"/>
+    <tag k="name" v="Akagae Nosori (Yōdai adae) 蛞外見祖里〈葉廼前〉"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="147984629" lat="35.9863294" lon="128.8156254">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Shiittaru Konegisa"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="147984631" lat="35.9864229" lon="128.7982778">
+    <tag k="name" v="Ikasurun - Owonideki"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="148019491" lat="36.0456899" lon="128.7588758">
+    <tag k="name" v="Niji-Tsuruna 西鵺"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="148136042" lat="36.0126807" lon="128.8540741">
+    <tag k="colour" v="#e2bfa7"/>
+    <tag k="name" v="Trade Center 𖬁𐐢𖬬ᥫ𖬒𖬰𐐢 𖬖ɭᐢ𖬁ᣗ"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="148136043" lat="36.0018938" lon="128.8517203">
+    <tag k="colour" v="#e2bfa7"/>
+    <tag k="name" v="Sumuedosu"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="148136044" lat="35.9904096" lon="128.8407629">
+    <tag k="colour" v="#e2bfa7"/>
+    <tag k="name" v="Anchikada - Kwahakukwan"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="148333494" lat="36.0781838" lon="128.9655938">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Garotsuho Nanmun"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="148333495" lat="36.0651430" lon="128.9340443">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Nekunno Juwon 牒ᐢ見中央"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="148428068" lat="36.0099261" lon="128.9615975">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="name" v="Tahnakusa"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="167670124" lat="35.9327057" lon="128.8017276">
+    <tag k="name" v="Showanul"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="167670212" lat="35.9612553" lon="128.8274391">
+    <tag k="colour" v="#00a0bc"/>
+    <tag k="name" v="Togamiro"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="167670213" lat="35.9523072" lon="128.8226823">
+    <tag k="name" v="Erifuka 操菴"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="167670214" lat="35.9430433" lon="128.8145413">
+    <tag k="name" v="Kamabata 寺石"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="167670215" lat="35.9119875" lon="128.7933286">
+    <tag k="colour" v="#36873c"/>
+    <tag k="name" v="Kojushire"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="167670216" lat="35.9227648" lon="128.7974550">
+    <tag k="name" v="Chaihamosu"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="168265320" lat="35.9838743" lon="129.0637499">
+    <tag k="name" v="Shin-Bukunomatsu 新粐頭"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="168306087" lat="36.0148287" lon="128.9783639">
+    <tag k="name" v="Ihkanuda Mattawi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="169341120" lat="36.0626577" lon="129.1108760">
+    <tag k="name" v="Yushinaware"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="169508180" lat="36.0311193" lon="128.8118330">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Dodonuka 登戸陥"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="169508181" lat="36.0580173" lon="128.9012765">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Kishagoi - Exhibitown 喜舎拘-૮ૅડાયારૃાઠ૮ેપ્"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="169508191" lat="36.0591811" lon="128.8758386">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Kingaus Sangu"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="169508221" lat="36.0573349" lon="128.8591427">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Samopuke"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="169508242" lat="36.0435658" lon="128.8204916">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Nokkwada"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="169508252" lat="36.0491729" lon="128.8321916">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Ruhseikon 硫昆"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="169508255" lat="36.0540420" lon="128.8442718">
+    <tag k="colour" v="#e2bfa7"/>
+    <tag k="name" v="Wannae"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="169590621" lat="36.0603854" lon="128.9665418">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Kanpayu Kahten"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="169590630" lat="36.0565006" lon="128.9516191">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Kiikudai-adae 熈育大前"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="170602613" lat="36.0274292" lon="128.8300663">
+    <tag k="name" v="Toemonjaru"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176295573" lat="35.9968284" lon="128.9527505">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Chestō Toshi"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="176346749" lat="35.9930183" lon="128.9419627">
+    <tag k="colour" v="#bcbf62"/>
+    <tag k="name" v="Tsutomaku Ferry"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176371841" lat="36.0185330" lon="128.9523735">
+    <tag k="colour" v="#bcbf62"/>
+    <tag k="name" v="Okoromachi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176517123" lat="36.0074699" lon="128.9993003">
+    <tag k="name" v="Shin-Oiseharu 新粕墾"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176574645" lat="36.0019605" lon="129.0131711">
+    <tag k="name" v="Tsaikikori"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176666299" lat="36.0172016" lon="129.0349348">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Kushigae 旧市街"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176667797" lat="36.0096286" lon="129.0374104">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Kushigae Otsumi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176667824" lat="36.0247081" lon="129.0321503">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Omenika Jinatsu 弁丹佳治芝"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176667833" lat="36.0262713" lon="129.0098664">
+    <tag k="colour" v="#FFD912"/>
+    <tag k="name" v="Tamainoki 谷伊坂"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176667834" lat="36.0233592" lon="129.0203471">
+    <tag k="colour" v="#FFD912"/>
+    <tag k="name" v="Tamainoki Kokendake 谷伊坂古剣館"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176668162" lat="36.0135479" lon="129.0004274">
+    <tag k="colour" v="#C40062"/>
+    <tag k="name" v="Oiseharu (Metro)"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176669802" lat="36.0288317" lon="128.9974951">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Kushidaru Amiya 柚艏-"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176670159" lat="36.0338694" lon="128.9898540">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Anagusa Mukai 矢模武凱"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="176782927" lat="35.9321243" lon="128.7610890">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Shiki-Jisahara"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176789173" lat="35.9380993" lon="128.7897749">
+    <tag k="colour" v="#36873c"/>
+    <tag k="name" v="Futteskaiba"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176789178" lat="35.9280405" lon="128.7868313">
+    <tag k="colour" v="#36873c"/>
+    <tag k="name" v="Niji-Showanul"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="176874425" lat="35.9809918" lon="128.8326329">
+    <tag k="colour" v="#db287a"/>
+    <tag k="name" v="Sakamuso 沛坤"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="177044014" lat="36.0000520" lon="128.9457321">
+    <tag k="colour" v="#bcbf62"/>
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Shiki-Tsutomaku"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="177044015" lat="36.0264915" lon="128.9554344">
+    <tag k="colour" v="#bcbf62"/>
+    <tag k="name" v="Kanbata 巻岩"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="180237681" lat="36.0120202" lon="128.7525249">
+    <tag k="colour" v="#36873c"/>
+    <tag k="name" v="Nawadae 兆先"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="180237682" lat="36.0025562" lon="128.7135529">
+    <tag k="colour" v="#00a0bc"/>
+    <tag k="name" v="Wikkaman 昱賀満"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183244989" lat="36.0761630" lon="128.9552310">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Yakata 双泉"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183244990" lat="36.0756203" lon="128.9412084">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Shiki-Nekunno 北牒ᐢ見"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183340984" lat="36.0405649" lon="128.9820828">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Aguri 2-sa 阿久里二沙"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370154" lat="36.1045367" lon="128.9939758">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Shakihori Sports Park"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370155" lat="36.0944224" lon="128.9850470">
+    <tag k="colour" v="#00A2D3"/>
+    <tag k="name" v="Komayunden - Dōnmus Kōwen 冬允殿-動物公園"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370156" lat="36.0389217" lon="128.9728799">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Ekinðuka 虓પ્鵜"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370157" lat="36.0015092" lon="128.9842821">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Amachi Kanlikoika 貽知官梨柳"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370158" lat="35.9723409" lon="129.0397435">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Iyogateri"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370159" lat="35.9819947" lon="129.0002583">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Patoshintsa 岩爪"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370160" lat="35.9946652" lon="129.0203242">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Shin-Tsaikikori"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370161" lat="35.9944436" lon="129.0070731">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Intsushitsa Kuyakujo"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370162" lat="35.9941335" lon="128.9912617">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Yunpotsai Soisuma"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370163" lat="35.9555887" lon="128.9645130">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Yahara"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370164" lat="35.9631798" lon="128.9689348">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Pogubiinsan Motu"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370165" lat="35.9725150" lon="129.0020547">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Powanuki"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370166" lat="35.9670522" lon="129.0089996">
+    <tag k="colour" v="#72E400"/>
+    <tag k="name" v="Tanjānli"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370173" lat="35.9771068" lon="129.0120966">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Nworisahta"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370181" lat="35.9833947" lon="129.0240074">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Ðaihate"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370182" lat="35.9914785" lon="129.0251921">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Matorigashesha"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370183" lat="36.0557900" lon="129.0183355">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Tensari Omuhate"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370188" lat="35.9379222" lon="129.0306988">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Mewakate Kippai"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370190" lat="35.9396765" lon="129.0071826">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Mewakate - Yōneo Motu"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370191" lat="35.9480246" lon="128.9879890">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Koyabisan 古谷比山"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370192" lat="35.9562671" lon="128.9863279">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Araonazako"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370193" lat="35.9706754" lon="128.9868753">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Niji-Intsushitsa"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370194" lat="35.9919778" lon="128.9825992">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Kadenmu Nyungu"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183370195" lat="36.0000284" lon="128.9764571">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Sainðaul National University 安作崎國立大學"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183419739" lat="36.0381373" lon="129.0048382">
+    <tag k="colour" v="#FE7F00"/>
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Tsumiji 都巳治"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="183726927" lat="36.0051624" lon="129.0976416">
+    <tag k="colour" v="#FFD912"/>
+    <tag k="name" v="Niji-Kawaei 西珂夬栄"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183726928" lat="36.0056338" lon="129.0790058">
+    <tag k="colour" v="#FFD912"/>
+    <tag k="name" v="Ristai-Nyūngu 立大入口"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183726951" lat="36.0111002" lon="129.0669277">
+    <tag k="colour" v="#FFD912"/>
+    <tag k="name" v="Juhtasamo"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183726960" lat="36.0155948" lon="129.0574818">
+    <tag k="colour" v="#FFD912"/>
+    <tag k="name" v="Nuskaitsa"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183726961" lat="36.0172026" lon="129.0431348">
+    <tag k="colour" v="#FFD912"/>
+    <tag k="name" v="Sojo-Kokendake"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183739921" lat="36.0162915" lon="129.0152883">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Mawaketsuki"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183739922" lat="36.0194787" lon="129.0039565">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Sōshitoya Otsumi-Kokendake"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="183877644" lat="36.1161787" lon="129.1661298">
+    <tag k="colour" v="#FE7F00"/>
+    <tag k="name" v="Watarui"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="184135020" lat="35.9387191" lon="128.9625643">
+    <tag k="name" v="Ivukiland Resort"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="184652211" lat="36.0063397" lon="128.9576651">
+    <tag k="name" v="Asumiya Nawakai"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="184979830" lat="36.0917400" lon="128.9293708">
+    <tag k="name" v="Ottanjoe"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="184979831" lat="36.0843996" lon="128.9252482">
+    <tag k="name" v="Semukudai 世牧臺"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="186940230" lat="36.0274492" lon="129.0200269">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Kukuris Opera 國立歌劇院"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="186940383" lat="36.0301837" lon="129.0091113">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Nagida Totsu 䲺橋"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="186953828" lat="35.9692653" lon="129.0310841">
+    <tag k="name" v="Kanlikoika Asamu"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="186953829" lat="35.9688369" lon="129.0207320">
+    <tag k="name" v="Tanjānli Chukkō 丹庄里築港"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="186955500" lat="35.9878423" lon="129.1152538">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Takejori Shimin Kōwen 館恵市民公園"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="186955501" lat="35.9828669" lon="129.1162325">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Yamaiki Town 倉琳ઠ૮ેપ્"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="186955502" lat="35.9779999" lon="129.1161788">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Shiki-Mokoba 北母槻"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="186957092" lat="35.9854833" lon="129.1242763">
+    <tag k="name" v="Mikori Yashihate"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="186957093" lat="35.9934008" lon="129.0978066">
+    <tag k="name" v="Sakaisoma 沛築"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="187047014" lat="35.9799381" lon="128.9859358">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="IDK Arena IDK૮દૅઃપ"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="188446969" lat="35.9124734" lon="128.8105495">
+    <tag k="colour" v="#36873c"/>
+    <tag k="name" v="Kajaringa Park &amp; Ride"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="188661339" lat="36.1114466" lon="129.0776148">
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Raikihoshi 挾浮"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="188661340" lat="36.1000844" lon="129.0840967">
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Inpas 院発"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="188737186" lat="36.1028783" lon="129.1329388">
+    <tag k="colour" v="#FE7F00"/>
+    <tag k="name" v="Otsumi-Furukobe 南福絽杷"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="188737233" lat="36.0987748" lon="129.1211914">
+    <tag k="colour" v="#FE7F00"/>
+    <tag k="name" v="Furukobe 福絽杷"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="188737257" lat="36.0932151" lon="129.1076895">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Hintomaui 価園斐"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="188737266" lat="36.0895992" lon="129.0995691">
+    <tag k="colour" v="#FE7F00"/>
+    <tag k="name" v="Minotase Kōwen 蓑村公園"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="188746696" lat="36.1074627" lon="129.1500936">
+    <tag k="colour" v="#FE7F00"/>
+    <tag k="name" v="Watarui Azenami 芳聖刈咲"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="188774665" lat="36.1340835" lon="129.0731538">
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Shakihori Kinahu Daigaku"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="188774666" lat="36.1208236" lon="129.0739339">
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Hokadaka"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="193198620" lat="36.1721600" lon="129.0247829">
+    <tag k="name" v="Irumanpi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="193206190" lat="36.1966669" lon="129.0168211">
+    <tag k="name" v="Moriyose Isamata"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="193224048" lat="36.1720538" lon="128.9595228">
+    <tag k="name" v="Urabato 鵜石"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="193224049" lat="36.1615170" lon="128.9956473">
+    <tag k="name" v="Shiki-Shakihori"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="193579020" lat="36.0586661" lon="128.8583968">
+    <tag k="colour" v="#e2bfa7"/>
+    <tag k="name" v="Samopuke (Portliner)"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="193581001" lat="36.0641050" lon="128.8766534">
+    <tag k="colour" v="#e2bfa7"/>
+    <tag k="name" v="Kingaus Sangu Shikimun"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="193804078" lat="36.0348955" lon="128.7682709">
+    <tag k="name" v="Yutesoha Koiroi"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="193807101" lat="36.0439594" lon="128.7933220">
+    <tag k="name" v="Astaris Marina"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="193807102" lat="36.0405354" lon="128.7852996">
+    <tag k="name" v="Astaris Place"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="193996385" lat="36.0183860" lon="128.7357223">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Arekuma 枝渫"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194000010" lat="36.0363461" lon="128.8423960">
+    <tag k="colour" v="#e2bfa7"/>
+    <tag k="name" v="Urunasāki"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194000746" lat="36.0270227" lon="128.7676579">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Ashihara Zumajihan"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194000762" lat="36.0278810" lon="128.7764983">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Shiki Choyarui"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194000793" lat="36.0283620" lon="128.8000077">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Dankore Museum of Modern Art (DMMA)"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194000794" lat="36.0287021" lon="128.8123745">
+    <tag k="colour" v="#CD5C5C"/>
+    <tag k="name" v="Shin-Dodonuka"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194000829" lat="36.0327517" lon="128.8284550">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Iskehashu Honjo"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194000877" lat="36.0507585" lon="128.8689547">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Miyanore"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194000878" lat="36.0433514" lon="128.8548605">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Tagukin Kōwen"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194028133" lat="35.9935958" lon="128.6470966">
+    <tag k="name" v="Hangōtswoni"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194028355" lat="35.9844528" lon="128.6593794">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Bibantōri"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194168723" lat="35.9788589" lon="128.8171513">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Konegisa Shujaminka"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194212210" lat="35.9624639" lon="128.6733885">
+    <tag k="colour" v="#3465a4"/>
+    <tag k="name" v="Kōtō Satahappi"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194212211" lat="35.9720262" lon="128.6668458">
+    <tag k="name" v="Nittsuma"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194212578" lat="35.9816389" lon="128.6729512">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Tsemuyori"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="194212579" lat="35.9807310" lon="128.6860058">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Nari-Tsemuyori"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="196658311" lat="35.9441714" lon="128.7942297">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Shobeikana Rihasai"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="196658312" lat="35.9408181" lon="128.7519419">
+    <tag k="colour" v="#00a0bc"/>
+    <tag k="name" v="Pwakkobe"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="196658314" lat="35.9453631" lon="128.7852242">
+    <tag k="colour" v="#36873c"/>
+    <tag k="name" v="Tsuruna-Mistukane"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="196658315" lat="35.9754060" lon="128.7703307">
+    <tag k="colour" v="#36873c"/>
+    <tag k="name" v="Shiittaru-Tsuruna"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="196658316" lat="35.9544813" lon="128.7806056">
+    <tag k="colour" v="#36873c"/>
+    <tag k="name" v="Sanbonzayo 三本木"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="196658319" lat="35.9587953" lon="128.7540644">
+    <tag k="colour" v="#CD5C5C"/>
+    <tag k="name" v="Kadokamahiwa"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="196658320" lat="35.9486815" lon="128.7533828">
+    <tag k="colour" v="#9e6a51"/>
+    <tag k="name" v="Tsuikei Daigaku"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="196743258" lat="35.9624141" lon="128.7161631">
+    <tag k="name" v="Niji-Takarimoto"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="197260040" lat="36.0026757" lon="128.6087939">
+    <tag k="name" v="Tswankanami Abuto"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="197260332" lat="36.0041338" lon="128.6230358">
+    <tag k="name" v="Tswankanami 芽咲市"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="198159780" lat="35.9893688" lon="128.7522164">
+    <tag k="colour" v="#9e6a51"/>
+    <tag k="name" v="Pentorawi Kirifunu"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="199180225" lat="35.9561686" lon="128.9352831">
+    <tag k="name" v="Upperitsoki"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="199180226" lat="35.9600869" lon="128.9405015">
+    <tag k="name" v="Sainðaul Chukkō"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="199180227" lat="35.9647214" lon="128.9469998">
+    <tag k="name" v="Gaekō Juwon"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="199180228" lat="35.9635477" lon="128.9589393">
+    <tag k="name" v="Waikō Bandai 外港番台"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="199181964" lat="35.9508226" lon="128.9266173">
+    <tag k="name" v="Shiki-Utsullani"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="199181965" lat="35.9468215" lon="128.9201433">
+    <tag k="name" v="Utsullani-Juwon"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="201033000" lat="35.9869503" lon="129.0406830">
+    <tag k="colour" v="#C40062"/>
+    <tag k="name" v="Matori Nanmun"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="201033001" lat="35.9871685" lon="129.0308342">
+    <tag k="colour" v="#C40062"/>
+    <tag k="name" v="Wasehai-Nuhajori"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="201033004" lat="35.9846333" lon="129.0483614">
+    <tag k="colour" v="#C40062"/>
+    <tag k="name" v="Shōryan Daishi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="201033005" lat="35.9846813" lon="129.0363846">
+    <tag k="name" v="Mintōjai"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="201033273" lat="35.9848094" lon="129.0265255">
+    <tag k="name" v="Nari-Ðaihate"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="201140441" lat="36.0023920" lon="129.0979961">
+    <tag k="name" v="Osenude Keiðaī Daigaku 防斉市經濟大學"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="201176459" lat="35.9787249" lon="129.0425828">
+    <tag k="name" v="Kokuma Itseki 弧九麻郭"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="201351276" lat="36.0528522" lon="129.1276173">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Oitsura 粕鵲"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="201351277" lat="36.0466922" lon="129.1355439">
+    <tag k="name" v="Otsumi-Oitsura 南粕鵲"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="201351278" lat="36.0367439" lon="129.1360342">
+    <tag k="name" v="Arasatolo"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="202909005" lat="35.9991904" lon="129.1107283">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Tayakure 貞師"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="202909262" lat="36.0166143" lon="129.1038247">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Shiki-Kawaei 北珂夬栄"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="202909263" lat="36.0237994" lon="129.1003928">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Akaimori 蛞生竹"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="202909265" lat="36.0297562" lon="129.0977251">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Ōdahui Kōwen"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="202909275" lat="36.0294965" lon="129.0819373">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Sumatake-Nehkehama"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="202909276" lat="36.0267897" lon="129.0703483">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Otsumi-Hajafuki"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="202909278" lat="36.0238921" lon="129.0578230">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Sumatake-Kyōmasa"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="204332946" lat="35.9444451" lon="128.7190192">
+    <tag k="name" v="Wayugachi"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="204334671" lat="35.9415880" lon="128.7374122">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Ekaruni"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="207757222" lat="35.9893272" lon="129.1035336">
+    <tag k="name" v="Nari-Osenude 東防斉"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="209841155" lat="35.9567513" lon="128.9743295">
+    <tag k="name" v="Tsukade 3-sa"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="209884897" lat="35.9614439" lon="128.9775069">
+    <tag k="name" v="Shiki-Tsukade"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="209884898" lat="35.9550350" lon="128.9931668">
+    <tag k="name" v="Niji-Kamanori"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="209884899" lat="35.9596132" lon="129.0031458">
+    <tag k="name" v="Otsumi-Kamanori"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="214014848" lat="35.9740635" lon="129.0274786">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Kanlikoika Yukashire"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="214843616" lat="36.0707473" lon="128.8217501">
+    <tag k="colour" v="#c5e1a5"/>
+    <tag k="name" v="Onpakki Village"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="216127444" lat="35.9414117" lon="128.7241175">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Wayugachi-Nagahoji"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="216294161" lat="35.9572721" lon="128.6920210">
+    <tag k="name" v="Shiirehongo"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="216448747" lat="35.9892630" lon="128.5993912">
+    <tag k="name" v="Hikkojauri"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="218522496" lat="35.9209693" lon="128.7193470">
+    <tag k="colour" v="#816cb1"/>
+    <tag k="name" v="Shiki-Yanimoto"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="219979571" lat="36.0770299" lon="128.9910899">
+    <tag k="name" v="Karajitsa 次矯"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="219979572" lat="36.0691625" lon="128.9878156">
+    <tag k="name" v="Ibaches Makurigawa 齒鐵炭畦"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="219979573" lat="36.0592855" lon="128.9910049">
+    <tag k="name" v="Shin-Higikura 新矢九田"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="225843843" lat="36.1410217" lon="129.1743299">
+    <tag k="colour" v="#FE7F00"/>
+    <tag k="name" v="Shin-Watarui"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="225873987" lat="36.1654848" lon="129.1041774">
+    <tag k="name" v="Rippama"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="225873988" lat="36.1637310" lon="129.0787989">
+    <tag k="name" v="Dankau 檀洪"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="225874014" lat="36.1182700" lon="129.0499529">
+    <tag k="name" v="Sayasama 餝宗"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="225874015" lat="36.1156481" lon="129.0368760">
+    <tag k="name" v="Otsumi-Kīttokaru 南謝松"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="225874016" lat="36.1232077" lon="129.0293537">
+    <tag k="name" v="Saikametotsu 斎肩橋"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229536854" lat="36.0346610" lon="128.9896683">
+    <tag k="name" v="Anagusa Mukai (Ibaches) 矢模武凱(齒鐵)"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229641679" lat="36.0026678" lon="129.0182520">
+    <tag k="colour" v="#C40062"/>
+    <tag k="name" v="Tsurunara"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229641680" lat="36.0096243" lon="128.9468268">
+    <tag k="colour" v="#bcbf62"/>
+    <tag k="name" v="Yauraki 葯洛"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229654732" lat="36.0329310" lon="128.9563480">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Ogiwata 槃芳"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229654733" lat="36.0626491" lon="129.0306909">
+    <tag k="name" v="Tamanoke-Tsunui"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229655862" lat="35.9801730" lon="129.0869167">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Osenude-Kyatoba"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229655863" lat="35.9745952" lon="129.0873044">
+    <tag k="colour" v="#C46200"/>
+    <tag k="name" v="Uhāra-Motu"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229656493" lat="36.0356106" lon="128.9652816">
+    <tag k="colour" v="mediumblue"/>
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1435"/>
+    <tag k="name" v="Binno 苠喃"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229656494" lat="36.0198786" lon="128.9662210">
+    <tag k="colour" v="mediumblue"/>
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1435"/>
+    <tag k="name" v="Sainðaul Central 作安崎中央"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="229667525" lat="36.0292420" lon="128.8501941">
+    <tag k="colour" v="#e2bfa7"/>
+    <tag k="name" v="Ayasaki Kōwen"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229672837" lat="36.1030461" lon="128.9124617">
+    <tag k="colour" v="#3465a4"/>
+    <tag k="name" v="Nari-Gotsurindai"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229672838" lat="36.0965879" lon="128.9189028">
+    <tag k="colour" v="#3465a4"/>
+    <tag k="name" v="Norihoi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229672839" lat="36.0857508" lon="128.9156402">
+    <tag k="colour" v="#3465a4"/>
+    <tag k="name" v="Semukudai Kōwen 世牧臺公園"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229672840" lat="36.0671712" lon="128.9171588">
+    <tag k="colour" v="#3465a4"/>
+    <tag k="name" v="Kumasui Niho"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="229672841" lat="36.0509656" lon="128.9203771">
+    <tag k="colour" v="#3465a4"/>
+    <tag k="name" v="Tassenon"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="230326420" lat="35.9404712" lon="128.5253990">
+    <tag k="name" v="Ponkazuki"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="230326422" lat="35.9416078" lon="128.5681509">
+    <tag k="name" v="Kaguhan"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="230326423" lat="35.9463822" lon="128.5371940">
+    <tag k="name" v="Kobate Onsen"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="230326424" lat="35.9360751" lon="128.5984092">
+    <tag k="name" v="Samaishiro"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="230326425" lat="35.9485770" lon="128.6134035">
+    <tag k="name" v="Munsan-ji"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="230326426" lat="35.9582810" lon="128.6419258">
+    <tag k="name" v="Yankakoibo"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="230326427" lat="35.9621417" lon="128.6525582">
+    <tag k="name" v="Daihantsumi"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="230326428" lat="35.9682093" lon="128.6641220">
+    <tag k="name" v="Nittsuma Takimaso"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="230326432" lat="35.9109849" lon="128.7165162">
+    <tag k="name" v="Poyojupen-ko Kōwen"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="232110019" lat="36.2247846" lon="129.0831036">
+    <tag k="name" v="Ibaches - Ibaruno"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="232186875" lat="36.1915603" lon="129.0775809">
+    <tag k="name" v="Chidai Seimun 齒大正門"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="232186876" lat="36.1918430" lon="129.0825775">
+    <tag k="electrified" v="contact_line"/>
+    <tag k="gauge" v="1434"/>
+    <tag k="name" v="Ibaruno Daigaku 齒琉能大學"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="232186877" lat="36.2127943" lon="129.0824608">
+    <tag k="electrified" v="contact_line"/>
+    <tag k="name" v="Ibaruno Dodose 齒琉能土々施"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+    <tag k="voltage" v="3000"/>
+  </node>
+  <node id="248681057" lat="36.0063754" lon="128.5109110">
+    <tag k="name" v="Isanoke 安坂"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="248681058" lat="35.9876701" lon="128.5270234">
+    <tag k="name" v="Teatama 下谷"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="248681059" lat="35.9818650" lon="128.5405312">
+    <tag k="name" v="Katasayo 泉木"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="248681060" lat="35.9846565" lon="128.5765354">
+    <tag k="name" v="Raitan Daigaku"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="248681061" lat="35.9929402" lon="128.5152481">
+    <tag k="name" v="Seikashi 西鹿市"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="250139350" lat="36.1692838" lon="128.9989669">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Gamonate"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="250139352" lat="36.1581530" lon="129.0042584">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Innotawa"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="250139353" lat="36.1499658" lon="129.0107852">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Nari-Surikato"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="250346476" lat="36.1948601" lon="129.0061559">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Moriyose Nanmun"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="250818546" lat="36.2092363" lon="129.0763920">
+    <tag k="name" v="Kaibaji 界馬寺"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="250818581" lat="36.1680004" lon="129.0711023">
+    <tag k="name" v="Ibaches Dankau 齒鐵檀洪"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="250818684" lat="36.1592112" lon="129.0705072">
+    <tag k="name" v="Shin-Dankau 新檀洪"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="250818700" lat="36.1802504" lon="129.0818777">
+    <tag k="name" v="Nukisakidai"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="250840616" lat="36.1532782" lon="129.0765293">
+    <tag k="name" v="Parisote"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="250841910" lat="36.1615210" lon="129.0516182">
+    <tag k="name" v="Moisashi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="251115566" lat="35.9839966" lon="128.6533207">
+    <tag k="colour" v="#f985bb"/>
+    <tag k="name" v="Tswankanami Airport"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="251329540" lat="35.9317323" lon="128.7003008">
+    <tag k="name" v="Yonobai 与盧梅"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="251329542" lat="35.9154031" lon="128.6912733">
+    <tag k="name" v="Keitukuji 景徳寺"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="251329543" lat="35.9063365" lon="128.6922791">
+    <tag k="name" v="Kihonaga 鰭沼"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="251381038" lat="35.9224429" lon="128.6972096">
+    <tag k="name" v="Soimanteke"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="252622899" lat="35.9468731" lon="128.9703903">
+    <tag k="name" v="Old Uletha 古代宇礼洲"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="252623048" lat="35.9377182" lon="128.9646705">
+    <tag k="name" v="Central Station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="252892783" lat="35.9411192" lon="128.9737245">
+    <tag k="name" v="Adrenalipolis"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="253086047" lat="35.9348004" lon="128.9724620">
+    <tag k="name" v="Legendopolis"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="253086251" lat="35.9434503" lon="128.9617920">
+    <tag k="name" v="TropikLand"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="253531480" lat="35.9500447" lon="128.9644372">
+    <tag k="name" v="Ivukipark"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="253532518" lat="35.9372572" lon="128.9781272">
+    <tag k="name" v="Animax Realms"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="259910602" lat="36.1448415" lon="129.1895541">
+    <tag k="name" v="Watarui Fukushi Daigaku 芳聖福祉大學"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="259910603" lat="36.1351981" lon="129.1869230">
+    <tag k="name" v="Bonkado Byōwin 千日病院"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="259910604" lat="36.1268286" lon="129.1830169">
+    <tag k="name" v="Aserimowa Jutakugai 刈箕住宅街"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="259910605" lat="36.1184174" lon="129.1798899">
+    <tag k="name" v="Tankyānji 誕響寺"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="259910633" lat="36.1164943" lon="129.1675693">
+    <tag k="name" v="Watarui Otsuminiswae"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="262111215" lat="36.0598798" lon="129.0312125">
+    <tag k="colour" v="mediumblue"/>
+    <tag k="name" v="Rupekoppe 孱槻"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="262111278" lat="36.0568227" lon="129.0193176">
+    <tag k="colour" v="mediumblue"/>
+    <tag k="name" v="Punoidan 富硾壇"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="262194820" lat="35.9469805" lon="129.0246805">
+    <tag k="name" v="Kubodanki"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="262194821" lat="35.9536310" lon="129.0092435">
+    <tag k="name" v="Shiki-Kubodanki"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="262195160" lat="36.0019575" lon="128.9976610">
+    <tag k="name" v="Ominotori Hasenoki"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="262196840" lat="36.0301909" lon="129.0046080">
+    <tag k="name" v="Tsūnguhai 樋吾箆"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="262364032" lat="35.9503994" lon="128.7695661">
+    <tag k="colour" v="#00a0bc"/>
+    <tag k="name" v="Kadokamahiwa Otsumi"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="262364033" lat="35.9587670" lon="128.8148111">
+    <tag k="colour" v="#00a0bc"/>
+    <tag k="name" v="Konegisa Shavunsan"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="268226483" lat="36.0752133" lon="129.1016888">
+    <tag k="name" v="Nari-Aisendawa"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="269425237" lat="36.0356510" lon="128.8068365">
+    <tag k="colour" v="#CD5C5C"/>
+    <tag k="name" v="Shinkas Jittantori 新褐垽丹狛"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="269425238" lat="36.0092800" lon="128.8144339">
+    <tag k="colour" v="#CD5C5C"/>
+    <tag k="name" v="Enhadan Hoze 縁閻舗摧"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="269425239" lat="36.0028494" lon="128.8129329">
+    <tag k="colour" v="#CD5C5C"/>
+    <tag k="name" v="Jaihokiri Center"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="269425240" lat="35.9852853" lon="128.8115713">
+    <tag k="colour" v="#CD5C5C"/>
+    <tag k="name" v="Shiittaru Pamiroi"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="269425241" lat="35.9728475" lon="128.7836579">
+    <tag k="colour" v="#CD5C5C"/>
+    <tag k="name" v="Oyehatton Tsuiruki"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="269425242" lat="35.9610173" lon="128.7660805">
+    <tag k="colour" v="#CD5C5C"/>
+    <tag k="name" v="Kadokamahiwa Jutaku"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="273572265" lat="36.0297913" lon="128.6094898">
+    <tag k="name" v="Uiradi Hakuwen"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="273572350" lat="36.0268525" lon="128.5989544">
+    <tag k="name" v="Nokkestara"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="274155028" lat="36.0142310" lon="128.7900618">
+    <tag k="colour" v="#FFD912"/>
+    <tag k="name" v="Ipporai - Owonideki 一蒲崍吹取"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="283704142" lat="36.1010392" lon="128.9358892">
+    <tag k="name" v="Niji-Rekuni 西長澤"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="283940565" lat="36.0488930" lon="129.1462806">
+    <tag k="name" v="Kaidaru 艏開"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="284156335" lat="36.0744036" lon="129.1633251">
+    <tag k="name" v="Suma 須万"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="284336273" lat="36.0672612" lon="128.9017198">
+    <tag k="name" v="Tsenzhijān Shiki 國際展示場北"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="284336274" lat="36.0615597" lon="128.9010366">
+    <tag k="name" v="Kukujai Tsenzhijān 國際展示場"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="291318583" lat="35.9727021" lon="128.8649857">
+    <tag k="colour" v="#0099CC"/>
+    <tag k="name" v="Taradawaki"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="291759399" lat="36.0191729" lon="129.0026331">
+    <tag k="name" v="Gwannowin-Adae 元老院前"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="292408408" lat="36.2477852" lon="129.1006181">
+    <tag k="name" v="Nōntsuma 濃都満"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="292408409" lat="36.2349306" lon="129.0982601">
+    <tag k="name" v="Shinkeidai 真景台"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="292488855" lat="36.1297316" lon="129.0515555">
+    <tag k="name" v="Katanase Tea 泉那施下"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="292597869" lat="35.8959913" lon="128.6432527">
+    <tag k="colour" v="#3465a4"/>
+    <tag k="name" v="Ruisekoi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="294364786" lat="36.0845471" lon="129.1730766">
+    <tag k="name" v="Suma Taisha 須万大社"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="296042086" lat="35.9788592" lon="128.8336440">
+    <tag k="name" v="Shin-Sakamuso 新沛坤"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="304294338" lat="35.8941789" lon="128.5660791">
+    <tag k="name" v="Hailenuki 半陥"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="304294339" lat="35.8785769" lon="128.5921419">
+    <tag k="name" v="Shimeno 渠見"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="304405932" lat="35.9955513" lon="128.8226572">
+    <tag k="colour" v="#9e6a51"/>
+    <tag k="name" v="Mundōzan 門道山"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="315166405" lat="36.0629132" lon="129.0309333">
+    <tag k="name" v="Tamanoke-Tsunui"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="315166406" lat="36.0647383" lon="129.0262940">
+    <tag k="name" v="Otsumi-Fuwovushi 南鳥翔"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="315166409" lat="36.0658693" lon="129.0199774">
+    <tag k="name" v="Charafuga 白庵"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="315166410" lat="36.0672749" lon="129.0136963">
+    <tag k="name" v="Jufurai Kōwen Shikiniswae 朱布来公園北口"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="315166411" lat="36.0690964" lon="129.0067435">
+    <tag k="name" v="Amahi Yaon"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="316981224" lat="36.0132566" lon="128.6048064">
+    <tag k="name" v="Intsubasa"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="316981416" lat="36.0217736" lon="128.5699466">
+    <tag k="name" v="Shakuiseji 湖井"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="321304867" lat="36.0456139" lon="129.1250563">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Sunbui 栒芙依"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="321304869" lat="36.0357892" lon="129.1178036">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Kanasamaki 崔蒔"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="321304870" lat="36.0343073" lon="129.1050643">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Otsumi-Makintoshi Meidai-adae 南馬ᐢ貴氾・明大前"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="321305089" lat="36.0316425" lon="129.0905997">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Ārikkohanu Yunobu 鶴神由見夫"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="321305792" lat="36.0882855" lon="129.1137970">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Obikasunde 吾比加嵶"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="321305793" lat="36.0750509" lon="129.1211893">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Tsutsuro Uguttaya 笙呂茨貞"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="321305795" lat="36.0647155" lon="129.1267869">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Oitsura Daikōwen 粕鵲大公園"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="322484711" lat="36.2563942" lon="129.0788646">
+    <tag k="name" v="Koromuki 軺鵡奇"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="322484712" lat="36.2344166" lon="129.0814114">
+    <tag k="name" v="Hailehira 半桶"/>
+    <tag k="operator" v="Izarail"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="322484713" lat="36.2137847" lon="129.0429897">
+    <tag k="name" v="Eihon 栄本"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="322699571" lat="36.2119695" lon="129.0072974">
+    <tag k="colour" v="#009E4F"/>
+    <tag k="name" v="Chastano 椋見"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="324188925" lat="36.0768329" lon="128.9366217">
+    <tag k="name" v="Nekunno 牒ᐢ見"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="325484915" lat="36.0619080" lon="129.1485269">
+    <tag k="name" v="Miwase 水刈"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="327318463" lat="35.9221446" lon="128.6521129">
+    <tag k="colour" v="#3465a4"/>
+    <tag k="name" v="Pankyō-Nari 岅嶠東"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="328602737" lat="35.9487169" lon="128.6809892">
+    <tag k="name" v="Rehajun Byō 弤純廟"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="329463990" lat="35.8694142" lon="128.5822451">
+    <tag k="name" v="Koragi 児羅名"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="338349128" lat="35.9953591" lon="128.8096327">
+    <tag k="name" v="Saibu Koneei 西部干永"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="342508941" lat="35.9018943" lon="128.9852016">
+    <tag k="name" v="Niji-Yōneo"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="342508942" lat="35.9031230" lon="128.9994884">
+    <tag k="name" v="Yōneo Juwon"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="342508943" lat="35.9136660" lon="129.0083427">
+    <tag k="name" v="Uhtashiruul 妻和崎"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="345089885" lat="36.0081925" lon="129.1041712">
+    <tag k="name" v="Kawaei Stadium"/>
+    <tag k="operator" v="SX Rail"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="345173018" lat="36.0273918" lon="128.9982574">
+    <tag k="name" v="Agarai Tomasue 阿賀来庥須衛"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="345173019" lat="36.0284011" lon="129.0097239">
+    <tag k="name" v="Nagida Kunbai 䲺訓梅"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="363016410" lat="36.0841286" lon="129.0362169">
+    <tag k="colour" v="#FE7F00"/>
+    <tag k="name" v="Nandamoigon Sumatai 凬浪社"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="367484551" lat="35.9842702" lon="128.8387129">
+    <tag k="name" v="Hataðuma 琦維"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="368583211" lat="36.0475969" lon="128.8997451">
+    <tag k="colour" v="#C40062"/>
+    <tag k="name" v="Shin-Tsumasui 新都馬水"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="368583212" lat="36.0379708" lon="128.8959130">
+    <tag k="colour" v="#C40062"/>
+    <tag k="name" v="Station TBD 未定驛"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="368583213" lat="36.0140174" lon="128.8999272">
+    <tag k="colour" v="#0099CC"/>
+    <tag k="name" v="Hadantoyo 琦砂"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="368583225" lat="36.0036411" lon="128.9283378">
+    <tag k="name" v="Yuparaul 枕崎"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="368583226" lat="36.0289577" lon="128.8982577">
+    <tag k="colour" v="#FFD912"/>
+    <tag k="name" v="Nihkyonta 濱角"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="368583227" lat="36.0247784" lon="128.9124068">
+    <tag k="colour" v="#0099CC"/>
+    <tag k="name" v="Shimamera 渠瀬田"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="368583228" lat="36.0154162" lon="128.9188659">
+    <tag k="name" v="Takkurahama 琢玖羅島"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="368583229" lat="36.0133799" lon="128.9309495">
+    <tag k="name" v="Horahama 稲島"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="368584877" lat="36.0067257" lon="128.9100290">
+    <tag k="name" v="Former East Side Terminal Station 舊東部ઠૅદ્ઇાપઃધ્"/>
+    <tag k="railway" v="station"/>
+    <tag k="station" v="historical"/>
+  </node>
+  <node id="368744262" lat="36.0356712" lon="128.9124676">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Alkuitsa 潮屺"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="368744264" lat="36.0234178" lon="128.9207863">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Shinnibuhama 新中島"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="368744266" lat="36.0273292" lon="128.9115827">
+    <tag k="colour" v="#FF0000"/>
+    <tag k="name" v="Shimamera Shikiniswae 渠瀬田北口"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="368744267" lat="36.0227638" lon="128.9179647">
+    <tag k="name" v="Ripeigu 李平具"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="368744269" lat="36.0157828" lon="128.9210900">
+    <tag k="colour" v="#C40062"/>
+    <tag k="name" v="Takkurahama 琢玖羅島"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="369511437" lat="36.0289654" lon="128.8943333">
+    <tag k="colour" v="#C40062"/>
+    <tag k="name" v="Nihkyonta Mirai 濱角未來"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="369511438" lat="36.0134968" lon="128.9104534">
+    <tag k="colour" v="#C40062"/>
+    <tag k="name" v="Yeisonzuta 八砅"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="369511451" lat="36.0065841" lon="128.9113512">
+    <tag k="name" v="Sahnaden 舩取"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="369511452" lat="36.0013843" lon="128.9166551">
+    <tag k="name" v="Station TBD 未定驛"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="378079140" lat="35.9969863" lon="129.0882407">
+    <tag k="name" v="Kanui Airport T2"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="378136780" lat="36.1255352" lon="129.0232592">
+    <tag k="name" v="Nari-Tonomuri 東殿弖"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="381535620" lat="35.9246199" lon="128.8100851">
+    <tag k="name" v="Showanul Bunkwa Plaza 書瓦崎文化PLAZA"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="386824826" lat="36.1581653" lon="129.0366553">
+    <tag k="name" v="Suhakos"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="387403463" lat="36.0161448" lon="128.6597674">
+    <tag k="name" v="TBD"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="387403464" lat="36.0087188" lon="128.6683966">
+    <tag k="name" v="TBD"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="387406231" lat="35.9958361" lon="128.4978354">
+    <tag k="name" v="Niji-Seika 西西鹿"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="389540202" lat="36.0918699" lon="128.9778131">
+    <tag k="name" v="Desert 砂漠"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="389540203" lat="36.0938454" lon="128.9823061">
+    <tag k="name" v="Zooama ટૃ૾ઃ૮ઇ"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="389644125" lat="36.0972126" lon="128.9776168">
+    <tag k="name" v="Dōnmusswen Shikiniswae 動物園北口"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="389778437" lat="36.0019924" lon="128.4817506">
+    <tag k="name" v="Tsurigaryu"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="389778438" lat="35.9933406" lon="128.4929946">
+    <tag k="name" v="Neihekosāri"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="389778439" lat="35.9878038" lon="128.5002938">
+    <tag k="name" v="Riibe"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="389778440" lat="35.9796391" lon="128.5223256">
+    <tag k="name" v="Yuraho"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="389778473" lat="35.9840255" lon="128.5105091">
+    <tag k="name" v="Saibu-Seika"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="389778474" lat="35.9723856" lon="128.5396613">
+    <tag k="name" v="Akurasan-niswae 阿玖羅口"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="389778475" lat="35.9663913" lon="128.5570506">
+    <tag k="name" v="Noukeri Sumatai"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="389778476" lat="35.9637849" lon="128.5744937">
+    <tag k="name" v="Hakkagutsu"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="389778477" lat="35.9705468" lon="128.6012754">
+    <tag k="name" v="Hindakau Taun"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="389778478" lat="35.9585066" lon="128.6255883">
+    <tag k="name" v="Shōnnagai"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="393976319" lat="36.2141425" lon="129.0546117">
+    <tag k="name" v="Eihon Orika Center 栄本૮૾દાડૅપ્​ઠૅદ્"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="399128016" lat="35.9761714" lon="128.7387491">
+    <tag k="name" v="Kishouden 吉報殿"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="402705341" lat="35.9865728" lon="128.8164037">
+    <tag k="name" v="Niji-Himatoshi 西妃満氾"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="402709780" lat="36.0197883" lon="128.8443649">
+    <tag k="name" v="Zoihuka Shinnata"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="402709782" lat="36.0182400" lon="128.8302978">
+    <tag k="name" v="Nari-Asamiki 東鯡浹"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="402709789" lat="36.0123134" lon="128.8255555">
+    <tag k="name" v="Riibaronata 麴町"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="402709790" lat="36.0030713" lon="128.8198674">
+    <tag k="name" v="Sometsuka 俎瀬鷸"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="402710243" lat="35.9695911" lon="128.8152751">
+    <tag k="name" v="Hankeda"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="402794568" lat="35.9507114" lon="128.8044475">
+    <tag k="name" v="Shiki-Kamabata 北寺石"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="402795419" lat="35.9592090" lon="128.8092051">
+    <tag k="name" v="TBD"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="402876949" lat="35.9095477" lon="128.8041514">
+    <tag k="name" v="TBD"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="402876950" lat="35.9201102" lon="128.8038050">
+    <tag k="name" v="TBD"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="407375935" lat="35.9902259" lon="129.1171763">
+    <tag k="name" v="Shin-Tsukaso IC 新鷸蘇IC"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="409739998" lat="36.1428737" lon="129.0598997">
+    <tag k="name" v="Samakisamo 蒔山"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="411797108" lat="35.8838726" lon="128.6471138">
+    <tag k="name" v="Ruisekoi"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="411797110" lat="35.9095352" lon="128.6421705">
+    <tag k="name" v="Nari-Mitsukuno 東未抖綱"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="412171851" lat="36.0160807" lon="128.6459003">
+    <tag k="name" v="Keiredatotsu"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+  <node id="412171852" lat="36.0106286" lon="128.6362684">
+    <tag k="name" v="Ryunatsuki 欅原"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="railway" v="station"/>
+  </node>
+
+</osm>
