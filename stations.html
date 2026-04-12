@@ -184,7 +184,7 @@
       <div id="map" style="position:absolute;inset:0;"></div>
       <div id="ld">
         <div class="spin"></div>
-        <div class="ld-txt" id="ld-txt">Loading station data&hellip;</div>
+        <div class="ld-txt" id="ld-txt">Loading&hellip;</div>
         <div class="ld-sub" id="ld-sub"></div>
       </div>
       <div id="sbar" class="h"></div>
@@ -246,40 +246,29 @@
   const sbar=document.getElementById('sbar');
   function status(msg,ms=3000){ sbar.textContent=msg; sbar.classList.remove('h'); clearTimeout(sbar._t); sbar._t=setTimeout(()=>sbar.classList.add('h'),ms); }
 
-  // keyed by station id string
   const stations={};
-  // keyed by relId string
   let lineRegistry={};
+  // lineGeom: relId -> array of segments, each segment = [[lat,lon],...]
+  let lineGeom={};
 
-  // ─ layers (polylines below markers)
+  // ─ layers
   const polylineLayer=L.layerGroup().addTo(map);
   const markerLayer=L.layerGroup().addTo(map);
   let selectedId=null;
 
-  // ─ build line polylines by connecting stations sorted by seq
   function renderPolylines(){
     polylineLayer.clearLayers();
-
-    // group stations by relId
-    const byLine={};
-    Object.values(stations).forEach(st=>{
-      st.lines.forEach(l=>{
-        if(!byLine[l.relId]) byLine[l.relId]=[];
-        byLine[l.relId].push({seq:l.seq,lat:st.lat,lon:st.lon});
-      });
-    });
-
-    Object.entries(byLine).forEach(([relId,pts])=>{
+    Object.entries(lineGeom).forEach(([relId, segments])=>{
       const meta=lineRegistry[relId];
       if(!meta||meta.type==='disabled') return;
       const colour=meta.colour||'#888';
-      // sort by seq
-      pts.sort((a,b)=>a.seq-b.seq);
-      const latlngs=pts.map(p=>[p.lat,p.lon]);
-      if(latlngs.length<2) return;
-      const pl=L.polyline(latlngs,{color:colour,weight:4,opacity:.82,smoothFactor:1.2});
-      pl.bindTooltip(meta.name||relId,{sticky:true,className:'lt'});
-      pl.addTo(polylineLayer);
+      const name=meta.name||relId;
+      segments.forEach(seg=>{
+        if(seg.length<2) return;
+        const pl=L.polyline(seg,{color:colour,weight:4,opacity:.85,smoothFactor:1.2});
+        pl.bindTooltip(name,{sticky:true,className:'lt'});
+        pl.addTo(polylineLayer);
+      });
     });
   }
 
@@ -305,7 +294,7 @@
     });
   }
 
-  // ─ sidebar filters
+  // ─ sidebar
   let filterLine=null, searchQ='';
 
   function buildFilters(){
@@ -314,10 +303,8 @@
     all.className='filter-btn'+(filterLine?'':' on'); all.textContent='All';
     all.onclick=()=>{filterLine=null;buildFilters();buildList();};
     el.appendChild(all);
-
     const usedLineIds=new Set();
     Object.values(stations).forEach(st=>st.lines.forEach(l=>usedLineIds.add(l.relId)));
-
     Object.entries(lineRegistry).forEach(([id,m])=>{
       if(!usedLineIds.has(id)) return;
       if(m.type==='disabled') return;
@@ -353,16 +340,14 @@
       const item=document.createElement('div');
       item.className='st-item'+(String(st.id)===selectedId?' active':'');
       item.dataset.id=st.id;
-      const lineNames=st.lines.map(l=>{
-        const m=lineRegistry[l.relId]; return m?m.short:l.relId;
-      });
+      const lineNames=st.lines.map(l=>{ const m=lineRegistry[l.relId]; return m?m.short:l.relId; });
       item.innerHTML=`<span class="st-num">${i+1}</span><span class="st-dot-sb" style="background:var(--sf,#161b27);border-color:${col}"></span><span class="st-info"><span class="st-name">${st.name||'(unnamed)'}</span><span class="st-lines">${lineNames.join(', ')}</span></span><span class="st-type">${st.type||''}</span>`;
       item.addEventListener('click',()=>selectStation(String(st.id)));
       list.appendChild(item);
     });
   }
 
-  // ─ detail panel
+  // ─ detail
   function selectStation(sid){
     selectedId=sid;
     const st=stations[sid]; if(!st)return;
@@ -411,29 +396,33 @@
 
   async function main(){
     const ld=document.getElementById('ld'),ldTxt=document.getElementById('ld-txt'),ldSub=document.getElementById('ld-sub');
-    ldTxt.textContent='Loading station database\u2026';
-    ldSub.textContent='Fetching data/stations.json';
+    ldTxt.textContent='Loading data\u2026';
+    ldSub.textContent='Fetching stations and line geometry';
     try{
-      const resp=await fetch('data/stations.json');
-      if(!resp.ok) throw new Error('HTTP '+resp.status);
-      const data=await resp.json();
+      // fetch both files in parallel
+      const [stResp, lnResp] = await Promise.all([
+        fetch('data/stations.json'),
+        fetch('data/lines.json')
+      ]);
+      if(!stResp.ok) throw new Error('stations.json: HTTP '+stResp.status);
+      if(!lnResp.ok) throw new Error('lines.json: HTTP '+lnResp.status);
 
-      lineRegistry=data.lines||{};
+      const [stData, lnData] = await Promise.all([stResp.json(), lnResp.json()]);
 
-      const raw=data.stations||[];
+      lineRegistry = stData.lines || {};
+      lineGeom = lnData.lines || {};
+
+      const raw = stData.stations || [];
       raw.forEach(st=>{
-        stations[String(st.id)]={
-          id:st.id,
-          name:st.name||'',
-          lat:st.lat,
-          lon:st.lon,
-          type:st.type||'station',
-          tags:st.tags||{},
-          lines:(st.lines||[]).map(l=>({
-            relId:String(l.relId),
-            seq:l.seq
-          })),
-          marker:null
+        stations[String(st.id)] = {
+          id: st.id,
+          name: st.name || '',
+          lat: st.lat,
+          lon: st.lon,
+          type: st.type || 'station',
+          tags: st.tags || {},
+          lines: (st.lines || []).map(l=>({ relId: String(l.relId), seq: l.seq })),
+          marker: null
         };
       });
 
@@ -448,9 +437,9 @@
       if(pts.length) map.fitBounds(L.latLngBounds(pts),{padding:[40,40]});
 
       status('Loaded '+raw.length+' stations');
-    }catch(e){
+    } catch(e){
       console.error(e);
-      ldTxt.textContent='Failed to load station data';
+      ldTxt.textContent='Failed to load data';
       ldSub.textContent=String(e);
       return;
     }
