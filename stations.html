@@ -44,7 +44,7 @@
     .theme-btn:hover{color:var(--tx-c);border-color:var(--tx-m);}
     .nav-dd{position:relative;}
     .nav-dd>button{background:none;border:none;font-size:var(--text-sm);color:var(--tx-m);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0;transition:color var(--tx);}
-    .nav-dd>button:hover{color:var(--tx-c);} .nav-dd.active>button{color:var(--ac);}
+    .nav-dd>button:hover{color:var(--tx-c);}
     .nav-dd>button svg{transition:transform var(--tx);}
     .nav-dd.open>button svg{transform:rotate(180deg);}
     .dd{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-4px);min-width:160px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-lg);padding:var(--sp2);box-shadow:0 8px 24px oklch(0 0 0/.18);opacity:0;pointer-events:none;transition:opacity var(--tx),transform var(--tx);}
@@ -70,21 +70,30 @@
     .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--tx-f);pointer-events:none;}
     #search{width:100%;padding:8px 10px 8px 34px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r-md);color:var(--tx-c);font-family:var(--font-body);font-size:var(--text-xs);outline:none;transition:border-color var(--tx);}
     #search:focus{border-color:var(--ac);} #search::placeholder{color:var(--tx-f);}
-
     /* ── FILTER GROUPS ── */
-    .sb-filters{overflow-y:auto;border-bottom:1px solid var(--bd);max-height:220px;}
+    .sb-filters{overflow-y:auto;border-bottom:1px solid var(--bd);max-height:240px;}
     .filter-group{padding:var(--sp2) var(--sp4) var(--sp3);}
     .filter-group+.filter-group{border-top:1px solid var(--bd);}
-    .filter-group-label{
-      font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-      color:var(--tx-f);margin-bottom:var(--sp2);display:flex;align-items:center;gap:6px;
-    }
+    .filter-group-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-f);margin-bottom:var(--sp2);display:flex;align-items:center;gap:6px;}
     .filter-group-label::after{content:'';flex:1;height:1px;background:var(--bd);}
     .filter-chips{display:flex;flex-wrap:wrap;gap:var(--sp1);}
-    .filter-btn{padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--bd);border-radius:var(--r-full);background:none;color:var(--tx-f);cursor:pointer;transition:all var(--tx);white-space:nowrap;}
-    .filter-btn.on{background:var(--ac);color:white;border-color:var(--ac);}
+    /* line toggle buttons: ON = coloured fill, OFF = dimmed */
+    .filter-btn{
+      padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+      border:1px solid var(--bd);border-radius:var(--r-full);background:none;
+      color:var(--tx-f);cursor:pointer;transition:all var(--tx);white-space:nowrap;
+    }
+    .filter-btn.on{ color:white; }
+    .filter-btn.off{ opacity:.35; }
+    /* All / None special buttons */
+    .ctrl-btn{
+      padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+      border:1px solid var(--bd);border-radius:var(--r-full);background:none;
+      color:var(--tx-m);cursor:pointer;transition:all var(--tx);white-space:nowrap;
+    }
+    .ctrl-btn:hover{background:var(--sf2);color:var(--tx-c);border-color:var(--tx-m);}
+    .ctrl-btn.active{background:var(--ac);color:white;border-color:var(--ac);}
     /* ─────────────────── */
-
     .sb-count{padding:var(--sp2) var(--sp4);font-size:var(--text-xs);color:var(--tx-f);border-bottom:1px solid var(--bd);}
     .sb-list{overflow-y:auto;flex:1;}
     .st-item{display:flex;align-items:center;gap:var(--sp3);padding:10px var(--sp4);cursor:pointer;border-bottom:1px solid var(--bd);transition:background var(--tx);}
@@ -123,7 +132,7 @@
     @media(max-width:768px){
       nav{padding:var(--sp3) var(--sp4);} .nav-links{gap:var(--sp3);}
       .app{flex-direction:column;}
-      .sb{width:100%;max-height:240px;border-right:none;border-bottom:1px solid var(--bd);}
+      .sb{width:100%;max-height:260px;border-right:none;border-bottom:1px solid var(--bd);}
       .detail{left:var(--sp3);bottom:var(--sp4);width:calc(100vw - 2 * var(--sp3));}
     }
   </style>
@@ -228,7 +237,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-  // ─ theme toggle
+  // ─ theme
   (function(){
     const t=document.querySelector('[data-theme-toggle]'),h=document.documentElement;
     let d=h.getAttribute('data-theme')||'dark'; if(!t)return;
@@ -262,31 +271,87 @@
   let lineRegistry={};
   let lineGeom={};
 
-  // ─ layers
-  const polylineLayer=L.layerGroup().addTo(map);
-  const markerLayer=L.layerGroup().addTo(map);
-  let selectedId=null;
+  // ──────────────────────────────────────────
+  // VISIBILITY STATE
+  // visibleLines = Set of relIds currently shown on map.
+  // null = "all visible" (initial state, avoid building a huge Set upfront)
+  let visibleLines = null; // null means ALL
+  let allLineIds = [];     // populated after data loads
+
+  function isVisible(relId){ return visibleLines === null || visibleLines.has(relId); }
+  function isAllVisible(){ return visibleLines === null || visibleLines.size === allLineIds.length; }
+  function isNoneVisible(){ return visibleLines !== null && visibleLines.size === 0; }
+
+  function setAll(){
+    visibleLines = null;
+    applyVisibility();
+    buildFilters();
+    buildList();
+  }
+  function setNone(){
+    visibleLines = new Set();
+    applyVisibility();
+    buildFilters();
+    buildList();
+  }
+  function toggleLine(relId){
+    // Switch from "all" mode to explicit set first
+    if(visibleLines === null) visibleLines = new Set(allLineIds);
+    if(visibleLines.has(relId)) visibleLines.delete(relId);
+    else visibleLines.add(relId);
+    // If all are back on, reset to null (all mode)
+    if(visibleLines.size === allLineIds.length) visibleLines = null;
+    applyVisibility();
+    buildFilters();
+    buildList();
+  }
+  // ──────────────────────────────────────────
+
+  // ─ per-line polyline + marker storage
+  const linePolylines = {};  // relId -> [L.Polyline, ...]
+  const markerLayer = L.layerGroup().addTo(map);
+  let selectedId = null;
 
   function renderPolylines(){
-    polylineLayer.clearLayers();
+    // Build per-line polyline groups
     Object.entries(lineGeom).forEach(([relId, segments])=>{
-      const meta=lineRegistry[relId];
-      if(!meta||meta.type==='disabled') return;
-      const colour=meta.colour||'#888';
-      const name=meta.name||relId;
+      const meta = lineRegistry[relId];
+      if(!meta || meta.type==='disabled') return;
+      const colour = meta.colour || '#888';
+      const name   = meta.name   || relId;
+      const pls = [];
       segments.forEach(seg=>{
         if(seg.length<2) return;
-        const pl=L.polyline(seg,{color:colour,weight:4,opacity:.85,smoothFactor:1.2});
+        const pl = L.polyline(seg,{color:colour,weight:4,opacity:.85,smoothFactor:1.2});
         pl.bindTooltip(name,{sticky:true,className:'lt'});
-        pl.addTo(polylineLayer);
+        pl.addTo(map);
+        pls.push(pl);
       });
+      linePolylines[relId] = pls;
+    });
+  }
+
+  function applyVisibility(){
+    // Polylines
+    Object.entries(linePolylines).forEach(([relId, pls])=>{
+      const on = isVisible(relId);
+      pls.forEach(pl=>{ if(on) map.addLayer(pl); else map.removeLayer(pl); });
+    });
+    // Markers: show station only if at least one of its lines is visible
+    Object.values(stations).forEach(st=>{
+      if(!st.marker) return;
+      const show = st.lines.some(l => isVisible(l.relId));
+      if(show) markerLayer.addLayer(st.marker);
+      else     markerLayer.removeLayer(st.marker);
     });
   }
 
   function primaryColour(st){
     if(!st.lines||!st.lines.length) return '#888';
-    const meta=lineRegistry[st.lines[0].relId];
-    return meta?meta.colour:'#888';
+    // prefer first visible line colour
+    const vis = st.lines.find(l=>isVisible(l.relId));
+    const meta = lineRegistry[(vis||st.lines[0]).relId];
+    return meta ? meta.colour : '#888';
   }
   function makeIcon(col,selected=false){
     const sz=selected?14:10, bw=selected?3:2, sh=selected?'box-shadow:0 0 0 3px rgba(255,255,255,.22);':'';
@@ -296,71 +361,72 @@
   function renderMarkers(){
     markerLayer.clearLayers();
     Object.values(stations).forEach(st=>{
-      const col=primaryColour(st);
-      const mk=L.marker([st.lat,st.lon],{icon:makeIcon(col),title:st.name,zIndexOffset:100});
+      const col = primaryColour(st);
+      const mk  = L.marker([st.lat,st.lon],{icon:makeIcon(col),title:st.name,zIndexOffset:100});
       if(st.name) mk.bindTooltip(st.name,{sticky:true,className:'lt'});
       mk.on('click',()=>selectStation(String(st.id)));
-      mk.addTo(markerLayer);
-      st.marker=mk;
+      st.marker = mk;
+      markerLayer.addLayer(mk);
     });
   }
 
   // ─ sidebar
-  let filterLine=null, searchQ='';
+  let searchQ = '';
 
-  // Group definitions: order matters, label shown, types that belong here
   const TYPE_GROUPS = [
-    { key: 'all',        label: null,           types: null },
-    { key: 'train',      label: '🚆 Train',      types: ['train','railway'] },
-    { key: 'subway',     label: '🚇 Metro',      types: ['subway'] },
-    { key: 'light_rail', label: '🚊 Light Rail', types: ['light_rail','tram'] },
-    { key: 'monorail',   label: '🚝 Monorail',   types: ['monorail'] },
-    { key: 'other',      label: '🔹 Other',      types: [] }, // catch-all
+    { key:'train',      label:'🚆 Train',      types:['train','railway'] },
+    { key:'subway',     label:'🚇 Metro',      types:['subway'] },
+    { key:'light_rail', label:'🚊 Light Rail', types:['light_rail','tram'] },
+    { key:'monorail',   label:'🚝 Monorail',   types:['monorail'] },
+    { key:'other',      label:'🔹 Other',      types:[] },
   ];
-  const KNOWN_TYPES = new Set(['train','railway','subway','light_rail','tram','monorail','disabled']);
 
   function typeGroup(t){
     if(!t||t==='disabled') return null;
-    for(const g of TYPE_GROUPS){
-      if(!g.types) continue;
-      if(g.types.includes(t)) return g.key;
-    }
+    for(const g of TYPE_GROUPS){ if(g.types.includes(t)) return g.key; }
     return 'other';
   }
 
   function buildFilters(){
-    const el=document.getElementById('filters'); el.innerHTML='';
+    const el = document.getElementById('filters');
+    el.innerHTML = '';
 
-    const usedLineIds=new Set();
+    const usedLineIds = new Set();
     Object.values(stations).forEach(st=>st.lines.forEach(l=>usedLineIds.add(l.relId)));
 
-    // Bucket lines by group
     const buckets = {};
     TYPE_GROUPS.forEach(g=>buckets[g.key]=[]);
-
     Object.entries(lineRegistry).forEach(([id,m])=>{
-      if(!usedLineIds.has(id)) return;
-      if(m.type==='disabled') return;
-      const gk = typeGroup(m.type) || 'other';
+      if(!usedLineIds.has(id)||m.type==='disabled') return;
+      const gk = typeGroup(m.type)||'other';
       buckets[gk].push({id,m});
     });
 
-    // "All" group (no label)
-    const allGroup = document.createElement('div');
-    allGroup.className = 'filter-group';
-    const chips0 = document.createElement('div');
-    chips0.className = 'filter-chips';
-    const allBtn = document.createElement('button');
-    allBtn.className = 'filter-btn' + (filterLine ? '' : ' on');
-    allBtn.textContent = 'All';
-    allBtn.onclick = () => { filterLine=null; buildFilters(); buildList(); };
-    chips0.appendChild(allBtn);
-    allGroup.appendChild(chips0);
-    el.appendChild(allGroup);
+    // ─ "All" / "None" control row
+    const ctrlGroup = document.createElement('div');
+    ctrlGroup.className = 'filter-group';
+    const ctrlChips = document.createElement('div');
+    ctrlChips.className = 'filter-chips';
 
-    // One group per type category
+    const allBtn = document.createElement('button');
+    allBtn.className = 'ctrl-btn' + (isAllVisible() ? ' active' : '');
+    allBtn.textContent = 'All';
+    allBtn.title = 'Show all lines';
+    allBtn.onclick = () => setAll();
+
+    const noneBtn = document.createElement('button');
+    noneBtn.className = 'ctrl-btn' + (isNoneVisible() ? ' active' : '');
+    noneBtn.textContent = 'None';
+    noneBtn.title = 'Hide all lines';
+    noneBtn.onclick = () => setNone();
+
+    ctrlChips.appendChild(allBtn);
+    ctrlChips.appendChild(noneBtn);
+    ctrlGroup.appendChild(ctrlChips);
+    el.appendChild(ctrlGroup);
+
+    // ─ one section per type group
     TYPE_GROUPS.forEach(g=>{
-      if(!g.label) return; // skip 'all'
       const lines = buckets[g.key];
       if(!lines.length) return;
 
@@ -376,15 +442,20 @@
       chips.className = 'filter-chips';
 
       lines.forEach(({id,m})=>{
-        const b = document.createElement('button');
-        b.className = 'filter-btn' + (filterLine===id ? ' on' : '');
+        const on = isVisible(id);
+        const b  = document.createElement('button');
+        b.className = 'filter-btn ' + (on ? 'on' : 'off');
         b.textContent = m.short || id;
         b.title = m.name || id;
-        if(filterLine !== id){
+        // coloured border always; fill only when ON
+        b.style.borderColor = m.colour + '88';
+        if(on){
+          b.style.background = m.colour;
+          b.style.color = '#fff';
+        } else {
           b.style.color = m.colour;
-          b.style.borderColor = m.colour + '66';
         }
-        b.onclick = () => { filterLine=id; buildFilters(); buildList(); };
+        b.onclick = () => toggleLine(id);
         chips.appendChild(b);
       });
 
@@ -394,69 +465,63 @@
   }
 
   function buildList(){
-    const list=document.getElementById('list'),cnt=document.getElementById('count');
-    list.innerHTML='';
-    let vis=Object.values(stations).filter(st=>{
-      if(filterLine&&!st.lines.some(l=>l.relId===filterLine))return false;
-      if(searchQ&&!st.name.toLowerCase().includes(searchQ))return false;
+    const list = document.getElementById('list');
+    const cnt  = document.getElementById('count');
+    list.innerHTML = '';
+
+    // In list: show stations that have at least one visible line AND match search
+    let vis = Object.values(stations).filter(st=>{
+      const hasVisible = st.lines.some(l=>isVisible(l.relId));
+      if(!hasVisible) return false;
+      if(searchQ && !st.name.toLowerCase().includes(searchQ)) return false;
       return true;
     });
-    if(filterLine){
-      vis.sort((a,b)=>{
-        const sa=a.lines.find(l=>l.relId===filterLine)?.seq??9999;
-        const sb2=b.lines.find(l=>l.relId===filterLine)?.seq??9999;
-        return sa-sb2;
-      });
-    } else {
-      vis.sort((a,b)=>a.name.localeCompare(b.name));
-    }
-    cnt.textContent=vis.length+' station'+(vis.length!==1?'s':'')+' shown';
+    vis.sort((a,b)=>a.name.localeCompare(b.name));
+    cnt.textContent = vis.length + ' station' + (vis.length!==1?'s':'') + ' shown';
+
     vis.forEach((st,i)=>{
-      const col=primaryColour(st);
-      const item=document.createElement('div');
-      item.className='st-item'+(String(st.id)===selectedId?' active':'');
-      item.dataset.id=st.id;
-      const lineNames=st.lines.map(l=>{ const m=lineRegistry[l.relId]; return m?m.short:l.relId; });
-      item.innerHTML=`<span class="st-num">${i+1}</span><span class="st-dot-sb" style="background:var(--sf,#161b27);border-color:${col}"></span><span class="st-info"><span class="st-name">${st.name||'(unnamed)'}</span><span class="st-lines">${lineNames.join(', ')}</span></span><span class="st-type">${st.type||''}</span>`;
+      const col  = primaryColour(st);
+      const item = document.createElement('div');
+      item.className = 'st-item' + (String(st.id)===selectedId ? ' active' : '');
+      item.dataset.id = st.id;
+      const lineNames = st.lines.map(l=>{ const m=lineRegistry[l.relId]; return m?m.short:l.relId; });
+      item.innerHTML = `<span class="st-num">${i+1}</span><span class="st-dot-sb" style="background:var(--sf,#161b27);border-color:${col}"></span><span class="st-info"><span class="st-name">${st.name||'(unnamed)'}</span><span class="st-lines">${lineNames.join(', ')}</span></span><span class="st-type">${st.type||''}</span>`;
       item.addEventListener('click',()=>selectStation(String(st.id)));
       list.appendChild(item);
     });
   }
 
-  // ─ detail
+  // ─ detail panel
   function selectStation(sid){
-    selectedId=sid;
-    const st=stations[sid]; if(!st)return;
-    Object.values(stations).forEach(s=>{ if(s.marker)s.marker.setIcon(makeIcon(primaryColour(s),String(s.id)===sid)); });
-    document.querySelectorAll('.st-item').forEach(el=>el.classList.toggle('active',el.dataset.id===sid));
-    map.flyTo([st.lat,st.lon],Math.max(map.getZoom(),14),{duration:.8});
-    document.getElementById('d-name').textContent=st.name||'(unnamed)';
-    document.getElementById('d-id').textContent='OGF node #'+st.id;
-    document.getElementById('d-coords').textContent=st.lat.toFixed(6)+', '+st.lon.toFixed(6);
-    document.getElementById('d-ogf').href='https://opengeofiction.net/node/'+st.id;
-    const linesEl=document.getElementById('d-lines'); linesEl.innerHTML='';
-    if(st.lines&&st.lines.length){
-      st.lines.forEach(l=>{
-        const meta=lineRegistry[l.relId];
-        const col=meta?meta.colour:'#888';
-        const name=meta?meta.name:('Line '+l.relId);
-        const d=document.createElement('div'); d.className='detail-line';
-        d.innerHTML=`<span class="detail-line-dot" style="background:${col}"></span><span>${name}</span>`;
-        linesEl.appendChild(d);
-      });
-    } else {
-      linesEl.innerHTML='<span style="color:var(--tx-f);font-size:10px">No line data</span>';
-    }
-    const tagEntries=Object.entries(st.tags||{}).filter(([k])=>k!=='name');
-    const tagsEl=document.getElementById('d-tags'),tw=document.getElementById('d-tags-wrap');
+    selectedId = sid;
+    const st = stations[sid]; if(!st) return;
+    Object.values(stations).forEach(s=>{ if(s.marker) s.marker.setIcon(makeIcon(primaryColour(s), String(s.id)===sid)); });
+    document.querySelectorAll('.st-item').forEach(el=>el.classList.toggle('active', el.dataset.id===sid));
+    map.flyTo([st.lat,st.lon], Math.max(map.getZoom(),14), {duration:.8});
+    document.getElementById('d-name').textContent  = st.name||'(unnamed)';
+    document.getElementById('d-id').textContent    = 'OGF node #'+st.id;
+    document.getElementById('d-coords').textContent= st.lat.toFixed(6)+', '+st.lon.toFixed(6);
+    document.getElementById('d-ogf').href           = 'https://opengeofiction.net/node/'+st.id;
+    const linesEl = document.getElementById('d-lines'); linesEl.innerHTML='';
+    (st.lines||[]).forEach(l=>{
+      const meta = lineRegistry[l.relId];
+      const col  = meta ? meta.colour : '#888';
+      const name = meta ? meta.name   : 'Line '+l.relId;
+      const d = document.createElement('div'); d.className='detail-line';
+      d.innerHTML=`<span class="detail-line-dot" style="background:${col}"></span><span>${name}</span>`;
+      linesEl.appendChild(d);
+    });
+    if(!linesEl.children.length) linesEl.innerHTML='<span style="color:var(--tx-f);font-size:10px">No line data</span>';
+    const tagEntries = Object.entries(st.tags||{}).filter(([k])=>k!=='name');
+    const tagsEl = document.getElementById('d-tags'), tw = document.getElementById('d-tags-wrap');
     if(tagEntries.length){ tagsEl.innerHTML=tagEntries.map(([k,v])=>`<span class="dtag">${k}=${v}</span>`).join(''); tw.style.display=''; }
     else tw.style.display='none';
     document.getElementById('detail').classList.add('show');
   }
   document.getElementById('detail-close').addEventListener('click',()=>{
     document.getElementById('detail').classList.remove('show');
-    selectedId=null;
-    Object.values(stations).forEach(s=>{ if(s.marker)s.marker.setIcon(makeIcon(primaryColour(s),false)); });
+    selectedId = null;
+    Object.values(stations).forEach(s=>{ if(s.marker) s.marker.setIcon(makeIcon(primaryColour(s),false)); });
     document.querySelectorAll('.st-item').forEach(el=>el.classList.remove('active'));
   });
 
@@ -464,44 +529,39 @@
 
   function updateBadge(){
     const el=document.getElementById('line-badge');
-    const nSt=Object.keys(stations).length;
-    const nLn=Object.keys(lineRegistry).length;
-    el.style.background='#334155'; el.style.borderColor='#475569'; el.style.color='#e2e8f0';
-    el.textContent=nSt+' stations \u00b7 '+nLn+' line'+(nLn!==1?'s':'');
+    const nSt=Object.keys(stations).length, nLn=Object.keys(lineRegistry).length;
+    el.style.cssText='background:#334155;border-color:#475569;color:#e2e8f0;';
+    el.textContent=nSt+' stations · '+nLn+' line'+(nLn!==1?'s':'');
   }
 
   async function main(){
     const ld=document.getElementById('ld'),ldTxt=document.getElementById('ld-txt'),ldSub=document.getElementById('ld-sub');
-    ldTxt.textContent='Loading data\u2026';
+    ldTxt.textContent='Loading data…';
     ldSub.textContent='Fetching stations and line geometry';
     try{
-      const [stResp, lnResp] = await Promise.all([
-        fetch('data/stations.json'),
-        fetch('data/lines.json')
-      ]);
+      const [stResp,lnResp]=await Promise.all([fetch('data/stations.json'),fetch('data/lines.json')]);
       if(!stResp.ok) throw new Error('stations.json: HTTP '+stResp.status);
       if(!lnResp.ok) throw new Error('lines.json: HTTP '+lnResp.status);
-
-      const [stData, lnData] = await Promise.all([stResp.json(), lnResp.json()]);
+      const [stData,lnData]=await Promise.all([stResp.json(),lnResp.json()]);
 
       lineRegistry = stData.lines || {};
-      lineGeom = lnData.lines || {};
+      lineGeom     = lnData.lines || {};
 
-      const raw = stData.stations || [];
-      raw.forEach(st=>{
-        stations[String(st.id)] = {
-          id: st.id,
-          name: st.name || '',
-          lat: st.lat,
-          lon: st.lon,
-          type: st.type || 'station',
-          tags: st.tags || {},
-          lines: (st.lines || []).map(l=>({ relId: String(l.relId), seq: l.seq })),
-          marker: null
+      // build allLineIds list (non-disabled, used by at least one station)
+      const usedIds = new Set();
+      (stData.stations||[]).forEach(st=>(st.lines||[]).forEach(l=>usedIds.add(String(l.relId))));
+      allLineIds = Object.keys(lineRegistry).filter(id=>lineRegistry[id].type!=='disabled'&&usedIds.has(id));
+
+      (stData.stations||[]).forEach(st=>{
+        stations[String(st.id)]={
+          id:st.id, name:st.name||'', lat:st.lat, lon:st.lon,
+          type:st.type||'station', tags:st.tags||{},
+          lines:(st.lines||[]).map(l=>({relId:String(l.relId),seq:l.seq})),
+          marker:null
         };
       });
 
-      ldSub.textContent='Rendering\u2026';
+      ldSub.textContent='Rendering…';
       renderPolylines();
       renderMarkers();
       updateBadge();
@@ -510,8 +570,7 @@
 
       const pts=Object.values(stations).map(s=>[s.lat,s.lon]);
       if(pts.length) map.fitBounds(L.latLngBounds(pts),{padding:[40,40]});
-
-      status('Loaded '+raw.length+' stations');
+      status('Loaded '+(stData.stations||[]).length+' stations');
     } catch(e){
       console.error(e);
       ldTxt.textContent='Failed to load data';
