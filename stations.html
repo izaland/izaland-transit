@@ -70,9 +70,21 @@
     .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--tx-f);pointer-events:none;}
     #search{width:100%;padding:8px 10px 8px 34px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r-md);color:var(--tx-c);font-family:var(--font-body);font-size:var(--text-xs);outline:none;transition:border-color var(--tx);}
     #search:focus{border-color:var(--ac);} #search::placeholder{color:var(--tx-f);}
-    .sb-filters{display:flex;gap:var(--sp2);padding:var(--sp2) var(--sp4);border-bottom:1px solid var(--bd);flex-wrap:wrap;}
+
+    /* ── FILTER GROUPS ── */
+    .sb-filters{overflow-y:auto;border-bottom:1px solid var(--bd);max-height:220px;}
+    .filter-group{padding:var(--sp2) var(--sp4) var(--sp3);}
+    .filter-group+.filter-group{border-top:1px solid var(--bd);}
+    .filter-group-label{
+      font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--tx-f);margin-bottom:var(--sp2);display:flex;align-items:center;gap:6px;
+    }
+    .filter-group-label::after{content:'';flex:1;height:1px;background:var(--bd);}
+    .filter-chips{display:flex;flex-wrap:wrap;gap:var(--sp1);}
     .filter-btn{padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--bd);border-radius:var(--r-full);background:none;color:var(--tx-f);cursor:pointer;transition:all var(--tx);white-space:nowrap;}
     .filter-btn.on{background:var(--ac);color:white;border-color:var(--ac);}
+    /* ─────────────────── */
+
     .sb-count{padding:var(--sp2) var(--sp4);font-size:var(--text-xs);color:var(--tx-f);border-bottom:1px solid var(--bd);}
     .sb-list{overflow-y:auto;flex:1;}
     .st-item{display:flex;align-items:center;gap:var(--sp3);padding:10px var(--sp4);cursor:pointer;border-bottom:1px solid var(--bd);transition:background var(--tx);}
@@ -248,7 +260,6 @@
 
   const stations={};
   let lineRegistry={};
-  // lineGeom: relId -> array of segments, each segment = [[lat,lon],...]
   let lineGeom={};
 
   // ─ layers
@@ -297,23 +308,88 @@
   // ─ sidebar
   let filterLine=null, searchQ='';
 
+  // Group definitions: order matters, label shown, types that belong here
+  const TYPE_GROUPS = [
+    { key: 'all',        label: null,           types: null },
+    { key: 'train',      label: '🚆 Train',      types: ['train','railway'] },
+    { key: 'subway',     label: '🚇 Metro',      types: ['subway'] },
+    { key: 'light_rail', label: '🚊 Light Rail', types: ['light_rail','tram'] },
+    { key: 'monorail',   label: '🚝 Monorail',   types: ['monorail'] },
+    { key: 'other',      label: '🔹 Other',      types: [] }, // catch-all
+  ];
+  const KNOWN_TYPES = new Set(['train','railway','subway','light_rail','tram','monorail','disabled']);
+
+  function typeGroup(t){
+    if(!t||t==='disabled') return null;
+    for(const g of TYPE_GROUPS){
+      if(!g.types) continue;
+      if(g.types.includes(t)) return g.key;
+    }
+    return 'other';
+  }
+
   function buildFilters(){
     const el=document.getElementById('filters'); el.innerHTML='';
-    const all=document.createElement('button');
-    all.className='filter-btn'+(filterLine?'':' on'); all.textContent='All';
-    all.onclick=()=>{filterLine=null;buildFilters();buildList();};
-    el.appendChild(all);
+
     const usedLineIds=new Set();
     Object.values(stations).forEach(st=>st.lines.forEach(l=>usedLineIds.add(l.relId)));
+
+    // Bucket lines by group
+    const buckets = {};
+    TYPE_GROUPS.forEach(g=>buckets[g.key]=[]);
+
     Object.entries(lineRegistry).forEach(([id,m])=>{
       if(!usedLineIds.has(id)) return;
       if(m.type==='disabled') return;
-      const b=document.createElement('button');
-      b.className='filter-btn'+(filterLine===id?' on':'');
-      b.textContent=m.short||id;
-      b.style.cssText=filterLine===id?'':`color:${m.colour};border-color:${m.colour}55;`;
-      b.onclick=()=>{filterLine=id;buildFilters();buildList();};
-      el.appendChild(b);
+      const gk = typeGroup(m.type) || 'other';
+      buckets[gk].push({id,m});
+    });
+
+    // "All" group (no label)
+    const allGroup = document.createElement('div');
+    allGroup.className = 'filter-group';
+    const chips0 = document.createElement('div');
+    chips0.className = 'filter-chips';
+    const allBtn = document.createElement('button');
+    allBtn.className = 'filter-btn' + (filterLine ? '' : ' on');
+    allBtn.textContent = 'All';
+    allBtn.onclick = () => { filterLine=null; buildFilters(); buildList(); };
+    chips0.appendChild(allBtn);
+    allGroup.appendChild(chips0);
+    el.appendChild(allGroup);
+
+    // One group per type category
+    TYPE_GROUPS.forEach(g=>{
+      if(!g.label) return; // skip 'all'
+      const lines = buckets[g.key];
+      if(!lines.length) return;
+
+      const group = document.createElement('div');
+      group.className = 'filter-group';
+
+      const lbl = document.createElement('div');
+      lbl.className = 'filter-group-label';
+      lbl.textContent = g.label;
+      group.appendChild(lbl);
+
+      const chips = document.createElement('div');
+      chips.className = 'filter-chips';
+
+      lines.forEach(({id,m})=>{
+        const b = document.createElement('button');
+        b.className = 'filter-btn' + (filterLine===id ? ' on' : '');
+        b.textContent = m.short || id;
+        b.title = m.name || id;
+        if(filterLine !== id){
+          b.style.color = m.colour;
+          b.style.borderColor = m.colour + '66';
+        }
+        b.onclick = () => { filterLine=id; buildFilters(); buildList(); };
+        chips.appendChild(b);
+      });
+
+      group.appendChild(chips);
+      el.appendChild(group);
     });
   }
 
@@ -399,7 +475,6 @@
     ldTxt.textContent='Loading data\u2026';
     ldSub.textContent='Fetching stations and line geometry';
     try{
-      // fetch both files in parallel
       const [stResp, lnResp] = await Promise.all([
         fetch('data/stations.json'),
         fetch('data/lines.json')
