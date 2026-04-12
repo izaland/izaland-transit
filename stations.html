@@ -184,7 +184,7 @@
       <div id="map" style="position:absolute;inset:0;"></div>
       <div id="ld">
         <div class="spin"></div>
-        <div class="ld-txt" id="ld-txt">Loading line data&hellip;</div>
+        <div class="ld-txt" id="ld-txt">Loading station data&hellip;</div>
         <div class="ld-sub" id="ld-sub"></div>
       </div>
       <div id="sbar" class="h"></div>
@@ -216,10 +216,6 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-  const LINE_REGISTRY = {
-    "302747": { name:"Nijikut\u014d Main Line \u897f\u6d77\u672c\u7dda", short:"Nijikut\u014d ML", colour:"#555", operator:"Izarail", type:"train" }
-  };
-
   // ─ theme toggle
   (function(){
     const t=document.querySelector('[data-theme-toggle]'),h=document.documentElement;
@@ -244,88 +240,31 @@
   document.addEventListener('click',()=>document.querySelectorAll('.nav-dd.open,.nav-item--sub.open').forEach(x=>x.classList.remove('open')));
 
   // ─ map
-  const map=L.map('map',{center:[37,130],zoom:7,maxZoom:19});
+  const map=L.map('map',{center:[36.02,128.97],zoom:12,maxZoom:19});
   L.tileLayer('https://tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}).addTo(map);
 
   const sbar=document.getElementById('sbar');
   function status(msg,ms=3000){ sbar.textContent=msg; sbar.classList.remove('h'); clearTimeout(sbar._t); sbar._t=setTimeout(()=>sbar.classList.add('h'),ms); }
 
+  // keyed by station id string
   const stations={};
-  const lineData={};
-
-  const OV='https://overpass.opengeofiction.net/api/interpreter';
-  async function ovPost(q){
-    const r=await fetch(OV,{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'}});
-    return (await r.json()).elements;
-  }
-  function clean(s){ return (s||'').replace(/[\uD800-\uDFFF]{2}/g,'').trim(); }
-
-  async function loadRelation(relId){
-    const meta=LINE_REGISTRY[String(relId)]||{name:'Line '+relId,short:'Line '+relId,colour:'#888',operator:'',type:'train'};
-    const colour=meta.colour;
-
-    // ── PASS 1: relation geometry + member list
-    const pass1=await ovPost('[out:json][timeout:60];relation('+relId+');out geom;');
-
-    const polylines=[];
-    // nodeMembers: [{ref, role, lat, lon}] — lat/lon present from geom
-    const nodeMembers=[];
-
-    pass1.forEach(el=>{
-      if(el.type!=='relation')return;
-      (el.members||[]).forEach(m=>{
-        if(m.type==='way'&&m.geometry?.length>1){
-          const pl=L.polyline(m.geometry.map(p=>[p.lat,p.lon]),{color:colour,weight:4,opacity:.85,smoothFactor:1.5}).addTo(map);
-          pl.bindTooltip(clean(meta.name),{sticky:true,className:'lt'});
-          polylines.push(pl);
-        }
-        if(m.type==='node'&&m.lat!=null){
-          nodeMembers.push({ref:m.ref,role:m.role||'',lat:m.lat,lon:m.lon});
-        }
-      });
-    });
-
-    lineData[relId]={meta,polylines};
-
-    if(!nodeMembers.length) return 0;
-
-    // ── PASS 2: fetch full tags for all member nodes
-    const nodeIds=nodeMembers.map(n=>n.ref).join(',');
-    const pass2=await ovPost('[out:json][timeout:30];node(id:'+nodeIds+');out body;');
-
-    // index by id
-    const tagMap={};
-    pass2.forEach(n=>{ if(n.type==='node') tagMap[n.id]=n.tags||{}; });
-
-    let stationCount=0;
-    nodeMembers.forEach((nm,idx)=>{
-      const t=tagMap[nm.ref]||{};
-      const rw=t.railway||'';
-      const isStation=rw==='station'||rw==='halt'||rw==='stop'||rw==='tram_stop'||nm.role==='stop'||nm.role==='station'||nm.role==='stop_exit_only'||nm.role==='stop_entry_only';
-      if(!isStation)return;
-      const name=clean(t.name||t['name:en']||t['name:ja']||'');
-      const sid=String(nm.ref);
-      if(!stations[sid]){
-        stations[sid]={id:nm.ref,name,lat:nm.lat,lon:nm.lon,type:nm.role||rw,tags:t,lines:[],marker:null,seq:{}};
-      } else if(!stations[sid].name && name){
-        stations[sid].name=name;
-        stations[sid].tags=t;
-      }
-      stations[sid].lines.push({relId:String(relId),relName:meta.name,short:meta.short,colour,role:nm.role});
-      stations[sid].seq[String(relId)]=idx;
-      stationCount++;
-    });
-    return stationCount;
-  }
+  // keyed by relId string
+  let lineRegistry={};
 
   // ─ markers
   const markerLayer=L.layerGroup().addTo(map);
   let selectedId=null;
-  function primaryColour(st){ return st.lines.length?st.lines[0].colour:'#888'; }
+
+  function primaryColour(st){
+    if(!st.lines||!st.lines.length) return '#888';
+    const meta=lineRegistry[st.lines[0].relId];
+    return meta?meta.colour:'#888';
+  }
   function makeIcon(col,selected=false){
     const sz=selected?14:10, bw=selected?3:2, sh=selected?'box-shadow:0 0 0 3px rgba(255,255,255,.22);':'';
     return L.divIcon({className:'',html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:var(--sf,#161b27);border:${bw}px solid ${col};box-sizing:border-box;${sh}"></div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
   }
+
   function renderMarkers(){
     markerLayer.clearLayers();
     Object.values(stations).forEach(st=>{
@@ -338,23 +277,32 @@
     });
   }
 
-  // ─ sidebar
+  // ─ sidebar filters
   let filterLine=null, searchQ='';
+
   function buildFilters(){
     const el=document.getElementById('filters'); el.innerHTML='';
     const all=document.createElement('button');
     all.className='filter-btn'+(filterLine?'':' on'); all.textContent='All';
     all.onclick=()=>{filterLine=null;buildFilters();buildList();};
     el.appendChild(all);
-    Object.entries(LINE_REGISTRY).forEach(([id,m])=>{
+
+    // only show lines that have at least one station
+    const usedLineIds=new Set();
+    Object.values(stations).forEach(st=>st.lines.forEach(l=>usedLineIds.add(l.relId)));
+
+    Object.entries(lineRegistry).forEach(([id,m])=>{
+      if(!usedLineIds.has(id)) return;
+      if(m.type==='disabled') return;
       const b=document.createElement('button');
       b.className='filter-btn'+(filterLine===id?' on':'');
-      b.textContent=m.short;
+      b.textContent=m.short||id;
       b.style.cssText=filterLine===id?'':`color:${m.colour};border-color:${m.colour}55;`;
       b.onclick=()=>{filterLine=id;buildFilters();buildList();};
       el.appendChild(b);
     });
   }
+
   function buildList(){
     const list=document.getElementById('list'),cnt=document.getElementById('count');
     list.innerHTML='';
@@ -363,21 +311,31 @@
       if(searchQ&&!st.name.toLowerCase().includes(searchQ))return false;
       return true;
     });
-    if(filterLine) vis.sort((a,b)=>(a.seq[filterLine]??9999)-(b.seq[filterLine]??9999));
-    else vis.sort((a,b)=>a.name.localeCompare(b.name));
+    if(filterLine){
+      vis.sort((a,b)=>{
+        const sa=a.lines.find(l=>l.relId===filterLine)?.seq??9999;
+        const sb2=b.lines.find(l=>l.relId===filterLine)?.seq??9999;
+        return sa-sb2;
+      });
+    } else {
+      vis.sort((a,b)=>a.name.localeCompare(b.name));
+    }
     cnt.textContent=vis.length+' station'+(vis.length!==1?'s':'')+' shown';
     vis.forEach((st,i)=>{
       const col=primaryColour(st);
       const item=document.createElement('div');
       item.className='st-item'+(String(st.id)===selectedId?' active':'');
       item.dataset.id=st.id;
-      item.innerHTML=`<span class="st-num">${i+1}</span><span class="st-dot-sb" style="background:var(--sf,#161b27);border-color:${col}"></span><span class="st-info"><span class="st-name">${st.name||'(unnamed)'}</span><span class="st-lines">${st.lines.map(l=>l.short).join(', ')}</span></span><span class="st-type">${st.type||''}</span>`;
+      const lineNames=st.lines.map(l=>{
+        const m=lineRegistry[l.relId]; return m?m.short:l.relId;
+      });
+      item.innerHTML=`<span class="st-num">${i+1}</span><span class="st-dot-sb" style="background:var(--sf,#161b27);border-color:${col}"></span><span class="st-info"><span class="st-name">${st.name||'(unnamed)'}</span><span class="st-lines">${lineNames.join(', ')}</span></span><span class="st-type">${st.type||''}</span>`;
       item.addEventListener('click',()=>selectStation(String(st.id)));
       list.appendChild(item);
     });
   }
 
-  // ─ detail
+  // ─ detail panel
   function selectStation(sid){
     selectedId=sid;
     const st=stations[sid]; if(!st)return;
@@ -389,12 +347,18 @@
     document.getElementById('d-coords').textContent=st.lat.toFixed(6)+', '+st.lon.toFixed(6);
     document.getElementById('d-ogf').href='https://opengeofiction.net/node/'+st.id;
     const linesEl=document.getElementById('d-lines'); linesEl.innerHTML='';
-    (st.lines.length?st.lines:[]).forEach(l=>{
-      const d=document.createElement('div'); d.className='detail-line';
-      d.innerHTML=`<span class="detail-line-dot" style="background:${l.colour}"></span><span>${l.relName}</span>`;
-      linesEl.appendChild(d);
-    });
-    if(!st.lines.length) linesEl.innerHTML='<span style="color:var(--tx-f);font-size:10px">No line data</span>';
+    if(st.lines&&st.lines.length){
+      st.lines.forEach(l=>{
+        const meta=lineRegistry[l.relId];
+        const col=meta?meta.colour:'#888';
+        const name=meta?meta.name:('Line '+l.relId);
+        const d=document.createElement('div'); d.className='detail-line';
+        d.innerHTML=`<span class="detail-line-dot" style="background:${col}"></span><span>${name}</span>`;
+        linesEl.appendChild(d);
+      });
+    } else {
+      linesEl.innerHTML='<span style="color:var(--tx-f);font-size:10px">No line data</span>';
+    }
     const tagEntries=Object.entries(st.tags||{}).filter(([k])=>k!=='name');
     const tagsEl=document.getElementById('d-tags'),tw=document.getElementById('d-tags-wrap');
     if(tagEntries.length){ tagsEl.innerHTML=tagEntries.map(([k,v])=>`<span class="dtag">${k}=${v}</span>`).join(''); tw.style.display=''; }
@@ -412,35 +376,59 @@
 
   function updateBadge(){
     const el=document.getElementById('line-badge');
-    const lines=Object.values(LINE_REGISTRY); if(!lines.length)return;
+    const nSt=Object.keys(stations).length;
+    const nLn=Object.keys(lineRegistry).length;
     el.style.background='#334155'; el.style.borderColor='#475569'; el.style.color='#e2e8f0';
-    el.textContent=Object.keys(stations).length+' stations \u00b7 '+lines.length+' line'+(lines.length!==1?'s':'');
+    el.textContent=nSt+' stations \u00b7 '+nLn+' line'+(nLn!==1?'s':'');
   }
 
   async function main(){
     const ld=document.getElementById('ld'),ldTxt=document.getElementById('ld-txt'),ldSub=document.getElementById('ld-sub');
-    const relIds=Object.keys(LINE_REGISTRY);
-    let done=0;
-    for(const relId of relIds){
-      const meta=LINE_REGISTRY[relId];
-      ldTxt.textContent='Loading '+meta.short+'\u2026';
-      ldSub.textContent='Step 1/2: line geometry';
-      try{
-        ldSub.textContent='Step 1/2: line geometry…';
-        // loadRelation handles both passes internally
-        ldSub.textContent='Step 2/2: station names…';
-        const n=await loadRelation(relId);
-        status('Loaded '+meta.short+' ('+n+' stations)');
-      }catch(e){ console.error('Failed',relId,e); status('Failed: '+meta.short); }
-      done++;
+    ldTxt.textContent='Loading station database\u2026';
+    ldSub.textContent='Fetching data/stations.json';
+    try{
+      const resp=await fetch('data/stations.json');
+      if(!resp.ok) throw new Error('HTTP '+resp.status);
+      const data=await resp.json();
+
+      // populate lineRegistry
+      lineRegistry=data.lines||{};
+
+      // populate stations map
+      const raw=data.stations||[];
+      raw.forEach(st=>{
+        stations[String(st.id)]={
+          id:st.id,
+          name:st.name||'',
+          lat:st.lat,
+          lon:st.lon,
+          type:st.type||'station',
+          tags:st.tags||{},
+          lines:(st.lines||[]).map(l=>({
+            relId:String(l.relId),
+            seq:l.seq
+          })),
+          marker:null
+        };
+      });
+
+      ldSub.textContent='Rendering '+raw.length+' stations\u2026';
+      renderMarkers();
+      updateBadge();
+      buildFilters();
+      buildList();
+
+      // fit map to all station bounds
+      const pts=Object.values(stations).map(s=>[s.lat,s.lon]);
+      if(pts.length) map.fitBounds(L.latLngBounds(pts),{padding:[40,40]});
+
+      status('Loaded '+raw.length+' stations');
+    }catch(e){
+      console.error(e);
+      ldTxt.textContent='Failed to load station data';
+      ldSub.textContent=String(e);
+      return;
     }
-    renderMarkers();
-    updateBadge();
-    buildFilters();
-    buildList();
-    const allPts=[];
-    Object.values(lineData).forEach(d=>d.polylines.forEach(pl=>allPts.push(...pl.getLatLngs())));
-    if(allPts.length) map.fitBounds(L.latLngBounds(allPts),{padding:[40,40]});
     ld.classList.add('done');
     setTimeout(()=>ld.remove(),600);
   }
