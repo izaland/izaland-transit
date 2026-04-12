@@ -251,9 +251,37 @@
   // keyed by relId string
   let lineRegistry={};
 
-  // ─ markers
+  // ─ layers (polylines below markers)
+  const polylineLayer=L.layerGroup().addTo(map);
   const markerLayer=L.layerGroup().addTo(map);
   let selectedId=null;
+
+  // ─ build line polylines by connecting stations sorted by seq
+  function renderPolylines(){
+    polylineLayer.clearLayers();
+
+    // group stations by relId
+    const byLine={};
+    Object.values(stations).forEach(st=>{
+      st.lines.forEach(l=>{
+        if(!byLine[l.relId]) byLine[l.relId]=[];
+        byLine[l.relId].push({seq:l.seq,lat:st.lat,lon:st.lon});
+      });
+    });
+
+    Object.entries(byLine).forEach(([relId,pts])=>{
+      const meta=lineRegistry[relId];
+      if(!meta||meta.type==='disabled') return;
+      const colour=meta.colour||'#888';
+      // sort by seq
+      pts.sort((a,b)=>a.seq-b.seq);
+      const latlngs=pts.map(p=>[p.lat,p.lon]);
+      if(latlngs.length<2) return;
+      const pl=L.polyline(latlngs,{color:colour,weight:4,opacity:.82,smoothFactor:1.2});
+      pl.bindTooltip(meta.name||relId,{sticky:true,className:'lt'});
+      pl.addTo(polylineLayer);
+    });
+  }
 
   function primaryColour(st){
     if(!st.lines||!st.lines.length) return '#888';
@@ -287,7 +315,6 @@
     all.onclick=()=>{filterLine=null;buildFilters();buildList();};
     el.appendChild(all);
 
-    // only show lines that have at least one station
     const usedLineIds=new Set();
     Object.values(stations).forEach(st=>st.lines.forEach(l=>usedLineIds.add(l.relId)));
 
@@ -391,10 +418,8 @@
       if(!resp.ok) throw new Error('HTTP '+resp.status);
       const data=await resp.json();
 
-      // populate lineRegistry
       lineRegistry=data.lines||{};
 
-      // populate stations map
       const raw=data.stations||[];
       raw.forEach(st=>{
         stations[String(st.id)]={
@@ -412,13 +437,13 @@
         };
       });
 
-      ldSub.textContent='Rendering '+raw.length+' stations\u2026';
+      ldSub.textContent='Rendering\u2026';
+      renderPolylines();
       renderMarkers();
       updateBadge();
       buildFilters();
       buildList();
 
-      // fit map to all station bounds
       const pts=Object.values(stations).map(s=>[s.lat,s.lon]);
       if(pts.length) map.fitBounds(L.latLngBounds(pts),{padding:[40,40]});
 
