@@ -31,8 +31,6 @@
     html{-webkit-font-smoothing:antialiased;}
     body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--tx-c);background:var(--bg);display:flex;flex-direction:column;}
     img{display:block;max-width:100%;height:auto;}
-
-    /* NAV */
     nav{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:var(--sp4) var(--sp8);background:var(--bg);border-bottom:1px solid var(--bd);backdrop-filter:blur(12px);}
     .nav-logo{display:flex;align-items:center;gap:var(--sp3);text-decoration:none;color:var(--tx-c);}
     .nav-logo img{height:40px;width:auto;}
@@ -41,21 +39,18 @@
     [data-theme="light"] .logo-light{display:block!important;}
     .nav-links{display:flex;gap:var(--sp6);align-items:center;}
     .nav-links>a{font-size:var(--text-sm);color:var(--tx-m);text-decoration:none;font-weight:500;transition:color var(--tx);}
-    .nav-links>a:hover{color:var(--tx-c);}
-    .nav-links>a.active{color:var(--ac);}
+    .nav-links>a:hover{color:var(--tx-c);} .nav-links>a.active{color:var(--ac);}
     .theme-btn{background:none;border:1px solid var(--bd);color:var(--tx-m);border-radius:var(--r-md);padding:var(--sp2);cursor:pointer;display:flex;transition:color var(--tx),border-color var(--tx);}
     .theme-btn:hover{color:var(--tx-c);border-color:var(--tx-m);}
     .nav-dd{position:relative;}
     .nav-dd>button{background:none;border:none;font-size:var(--text-sm);color:var(--tx-m);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0;transition:color var(--tx);}
-    .nav-dd>button:hover,.nav-dd.active>button{color:var(--tx-c);}
-    .nav-dd.active>button{color:var(--ac);}
+    .nav-dd>button:hover{color:var(--tx-c);} .nav-dd.active>button{color:var(--ac);}
     .nav-dd>button svg{transition:transform var(--tx);}
     .nav-dd.open>button svg{transform:rotate(180deg);}
     .dd{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-4px);min-width:160px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-lg);padding:var(--sp2);box-shadow:0 8px 24px oklch(0 0 0/.18);opacity:0;pointer-events:none;transition:opacity var(--tx),transform var(--tx);}
     .nav-dd.open .dd{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
     .dd a{display:block;padding:var(--sp2) var(--sp3);font-size:var(--text-sm);color:var(--tx-m);text-decoration:none;border-radius:var(--r-md);font-weight:500;transition:background var(--tx),color var(--tx);white-space:nowrap;}
-    .dd a:hover{background:var(--sf2);color:var(--tx-c);}
-    .dd a.active{color:var(--ac);}
+    .dd a:hover{background:var(--sf2);color:var(--tx-c);} .dd a.active{color:var(--ac);}
     .dd-lbl{display:block;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-f);padding:var(--sp2) var(--sp3) var(--sp1);}
     .nav-item--sub{position:relative;}
     .nav-item--sub>button{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;padding:var(--sp2) var(--sp3);font-size:var(--text-sm);color:var(--tx-m);font-weight:500;cursor:pointer;border-radius:var(--r-md);transition:background var(--tx),color var(--tx);gap:var(--sp2);}
@@ -65,11 +60,7 @@
     .nav-item--sub.open>button svg{transform:rotate(180deg);}
     .dropdown--sub{position:absolute;top:0;left:calc(100% + 6px);min-width:160px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-lg);padding:var(--sp2);box-shadow:0 8px 24px oklch(0 0 0/.18);opacity:0;pointer-events:none;transition:opacity var(--tx),transform var(--tx);transform:translateX(-4px);}
     .nav-item--sub.open .dropdown--sub{opacity:1;pointer-events:auto;transform:translateX(0);}
-
-    /* LAYOUT */
     .app{flex:1;display:flex;min-height:0;}
-
-    /* SIDEBAR */
     .sb{width:320px;flex-shrink:0;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;z-index:500;}
     .sb-head{padding:var(--sp4);border-bottom:1px solid var(--bd);}
     .sb-title{font-family:var(--font-display);font-size:var(--text-base);font-weight:800;margin-bottom:var(--sp1);}
@@ -78,25 +69,21 @@
     .search-wrap{position:relative;}
     .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--tx-f);pointer-events:none;}
     #search{width:100%;padding:8px 10px 8px 34px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r-md);color:var(--tx-c);font-family:var(--font-body);font-size:var(--text-xs);outline:none;transition:border-color var(--tx);}
-    #search:focus{border-color:var(--ac);}
-    #search::placeholder{color:var(--tx-f);}
+    #search:focus{border-color:var(--ac);} #search::placeholder{color:var(--tx-f);}
     .sb-filters{display:flex;gap:var(--sp2);padding:var(--sp2) var(--sp4);border-bottom:1px solid var(--bd);flex-wrap:wrap;}
     .filter-btn{padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--bd);border-radius:var(--r-full);background:none;color:var(--tx-f);cursor:pointer;transition:all var(--tx);white-space:nowrap;}
     .filter-btn.on{background:var(--ac);color:white;border-color:var(--ac);}
     .sb-count{padding:var(--sp2) var(--sp4);font-size:var(--text-xs);color:var(--tx-f);border-bottom:1px solid var(--bd);}
     .sb-list{overflow-y:auto;flex:1;}
     .st-item{display:flex;align-items:center;gap:var(--sp3);padding:10px var(--sp4);cursor:pointer;border-bottom:1px solid var(--bd);transition:background var(--tx);}
-    .st-item:hover{background:var(--sf2);}
-    .st-item.active{background:var(--sf3);}
+    .st-item:hover{background:var(--sf2);} .st-item.active{background:var(--sf3);}
     .st-num{font-size:var(--text-xs);font-weight:700;color:var(--tx-f);width:28px;flex-shrink:0;text-align:right;}
     .st-dot-sb{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid;}
     .st-info{flex:1;min-width:0;}
     .st-name{font-size:var(--text-xs);font-weight:600;color:var(--tx-c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .st-lines{font-size:10px;color:var(--tx-m);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .st-type{font-size:10px;color:var(--tx-f);flex-shrink:0;}
-
-    /* DETAIL PANEL */
-    .detail{position:absolute;bottom:var(--sp4);left:calc(320px + var(--sp4));z-index:600;width:280px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-xl);padding:var(--sp4);box-shadow:0 8px 32px oklch(0 0 0/.28);transform:translateY(8px);opacity:0;pointer-events:none;transition:opacity var(--tx),transform var(--tx);}
+    .detail{position:absolute;bottom:var(--sp4);left:calc(var(--sp4));z-index:600;width:280px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-xl);padding:var(--sp4);box-shadow:0 8px 32px oklch(0 0 0/.28);transform:translateY(8px);opacity:0;pointer-events:none;transition:opacity var(--tx),transform var(--tx);}
     .detail.show{opacity:1;transform:translateY(0);pointer-events:auto;}
     .detail-close{position:absolute;top:var(--sp3);right:var(--sp3);background:none;border:none;color:var(--tx-f);cursor:pointer;padding:2px;border-radius:var(--r-sm);transition:color var(--tx);}
     .detail-close:hover{color:var(--tx-c);}
@@ -112,23 +99,15 @@
     .detail-ogf:hover{color:var(--ac2);}
     .detail-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:var(--sp2);}
     .dtag{font-size:10px;padding:2px 6px;border-radius:var(--r-sm);background:var(--sf2);color:var(--tx-m);border:1px solid var(--bd);}
-
-    /* MAP */
     #map{flex:1;min-height:0;}
-
-    /* LOADING */
     #ld{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);gap:var(--sp3);transition:opacity .5s;}
     #ld.done{opacity:0;pointer-events:none;}
     .spin{width:36px;height:36px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg);}}
-    .ld-txt{font-size:var(--text-sm);color:var(--tx-m);}
-    .ld-sub{font-size:var(--text-xs);color:var(--tx-f);}
-
+    .ld-txt{font-size:var(--text-sm);color:var(--tx-m);} .ld-sub{font-size:var(--text-xs);color:var(--tx-f);}
     #sbar{position:absolute;bottom:var(--sp4);right:var(--sp4);z-index:600;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-full);padding:var(--sp2) var(--sp4);font-size:var(--text-xs);color:var(--tx-m);pointer-events:none;transition:opacity .4s;white-space:nowrap;box-shadow:0 4px 16px oklch(0 0 0/.25);}
     #sbar.h{opacity:0;}
-
     .lt{background:var(--sf)!important;border:1px solid var(--bd)!important;color:var(--tx-c)!important;font-family:var(--font-body)!important;font-size:11px!important;border-radius:var(--r-sm)!important;padding:3px 8px!important;}
-
     @media(max-width:768px){
       nav{padding:var(--sp3) var(--sp4);} .nav-links{gap:var(--sp3);}
       .app{flex-direction:column;}
@@ -171,10 +150,7 @@
       </div>
       <div class="nav-dd">
         <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Aviation</button>
-        <div class="dd">
-          <a href="airports.html">Airports</a>
-          <a href="airlines.html">Airlines</a>
-        </div>
+        <div class="dd"><a href="airports.html">Airports</a><a href="airlines.html">Airlines</a></div>
       </div>
       <a href="stations.html" class="active">Stations</a>
       <div class="nav-dd">
@@ -204,8 +180,8 @@
       <div class="sb-list" id="list"></div>
     </div>
 
-    <div style="flex:1;position:relative;">
-      <div id="map"></div>
+    <div style="flex:1;position:relative;min-width:0;">
+      <div id="map" style="position:absolute;inset:0;"></div>
       <div id="ld">
         <div class="spin"></div>
         <div class="ld-txt" id="ld-txt">Loading line data&hellip;</div>
@@ -240,364 +216,234 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-  // ── LINE REGISTRY — extend as you add more lines ──────────────
   const LINE_REGISTRY = {
-    "302747": { name: "Nijikut\u014d Main Line \u897f\u6d77\u672c\u7dda", short: "Nijikut\u014d ML", colour: "#222", operator: "Izarail", type: "train" }
+    "302747": { name:"Nijikut\u014d Main Line \u897f\u6d77\u672c\u7dda", short:"Nijikut\u014d ML", colour:"#555", operator:"Izarail", type:"train" }
   };
 
-  // ── THEME TOGGLE ──────────────────────────────────────────────
+  // ─ theme toggle
   (function(){
     const t=document.querySelector('[data-theme-toggle]'),h=document.documentElement;
-    let d=h.getAttribute('data-theme')||'dark';
-    if(!t)return;
+    let d=h.getAttribute('data-theme')||'dark'; if(!t)return;
     t.addEventListener('click',()=>{
-      d=d==='dark'?'light':'dark';
-      h.setAttribute('data-theme',d);
+      d=d==='dark'?'light':'dark'; h.setAttribute('data-theme',d);
       t.innerHTML=d==='dark'
         ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
         :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
     });
   })();
 
-  // ── NAV DROPDOWNS ─────────────────────────────────────────────
+  // ─ nav dropdowns
   document.querySelectorAll('.nav-dd').forEach(dd=>{
     const b=dd.querySelector(':scope>button'); if(!b)return;
-    b.addEventListener('click',e=>{
-      e.stopPropagation();
-      const o=dd.classList.contains('open');
-      document.querySelectorAll('.nav-dd.open,.nav-item--sub.open').forEach(x=>x.classList.remove('open'));
-      if(!o)dd.classList.add('open');
-    });
+    b.addEventListener('click',e=>{ e.stopPropagation(); const o=dd.classList.contains('open'); document.querySelectorAll('.nav-dd.open,.nav-item--sub.open').forEach(x=>x.classList.remove('open')); if(!o)dd.classList.add('open'); });
   });
   document.querySelectorAll('.nav-item--sub').forEach(s=>{
     const b=s.querySelector(':scope>button'); if(!b)return;
-    b.addEventListener('click',e=>{
-      e.stopPropagation();
-      const o=s.classList.contains('open');
-      document.querySelectorAll('.nav-item--sub.open').forEach(x=>x.classList.remove('open'));
-      if(!o)s.classList.add('open');
-    });
+    b.addEventListener('click',e=>{ e.stopPropagation(); const o=s.classList.contains('open'); document.querySelectorAll('.nav-item--sub.open').forEach(x=>x.classList.remove('open')); if(!o)s.classList.add('open'); });
   });
   document.addEventListener('click',()=>document.querySelectorAll('.nav-dd.open,.nav-item--sub.open').forEach(x=>x.classList.remove('open')));
 
-  // ── MAP INIT ──────────────────────────────────────────────────
-  const map = L.map('map', { center:[37,130], zoom:7, maxZoom:19 });
-  L.tileLayer('https://tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png',
-    {maxZoom:19, attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}).addTo(map);
+  // ─ map
+  const map=L.map('map',{center:[37,130],zoom:7,maxZoom:19});
+  L.tileLayer('https://tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}).addTo(map);
 
-  const sbar = document.getElementById('sbar');
+  const sbar=document.getElementById('sbar');
   function status(msg,ms=3000){ sbar.textContent=msg; sbar.classList.remove('h'); clearTimeout(sbar._t); sbar._t=setTimeout(()=>sbar.classList.add('h'),ms); }
 
-  // ── DATA STORE ────────────────────────────────────────────────
-  // stations[id] = { id, name, lat, lon, type, tags, lines:[{relId,relName,colour,role}], marker }
-  const stations = {};
-  // lines[relId] = { meta, polylines:[] }
-  const lineData = {};
+  const stations={};
+  const lineData={};
 
-  // ── OVERPASS ──────────────────────────────────────────────────
-  const OV = 'https://overpass.opengeofiction.net/api/interpreter';
-  async function ovPost(query){
-    const r = await fetch(OV, {
-      method:'POST',
-      body:'data='+encodeURIComponent(query),
-      headers:{'Content-Type':'application/x-www-form-urlencoded'}
-    });
+  const OV='https://overpass.opengeofiction.net/api/interpreter';
+  async function ovPost(q){
+    const r=await fetch(OV,{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'}});
     return (await r.json()).elements;
   }
-
   function clean(s){ return (s||'').replace(/[\uD800-\uDFFF]{2}/g,'').trim(); }
 
-  // ── LOAD A RELATION ───────────────────────────────────────────
   async function loadRelation(relId){
-    const meta = LINE_REGISTRY[String(relId)] || { name: 'Line '+relId, short: 'Line '+relId, colour:'#888', operator:'', type:'train' };
-    const colour = meta.colour;
+    const meta=LINE_REGISTRY[String(relId)]||{name:'Line '+relId,short:'Line '+relId,colour:'#888',operator:'',type:'train'};
+    const colour=meta.colour;
 
-    const elements = await ovPost(
-      '[out:json][timeout:60];relation('+relId+');out geom;'
-    );
+    // ── PASS 1: relation geometry + member list
+    const pass1=await ovPost('[out:json][timeout:60];relation('+relId+');out geom;');
 
-    const polylines = [];
-    const relStations = []; // {id,name,lat,lon,role,tags}
+    const polylines=[];
+    // nodeMembers: [{ref, role, lat, lon}] — lat/lon present from geom
+    const nodeMembers=[];
 
-    elements.forEach(el=>{
-      if(el.type !== 'relation') return;
+    pass1.forEach(el=>{
+      if(el.type!=='relation')return;
       (el.members||[]).forEach(m=>{
-        // ways → draw line geometry
-        if(m.type==='way' && m.geometry?.length>1){
-          const pl = L.polyline(
-            m.geometry.map(p=>[p.lat,p.lon]),
-            {color:colour, weight:4, opacity:.85, smoothFactor:1.5}
-          ).addTo(map);
+        if(m.type==='way'&&m.geometry?.length>1){
+          const pl=L.polyline(m.geometry.map(p=>[p.lat,p.lon]),{color:colour,weight:4,opacity:.85,smoothFactor:1.5}).addTo(map);
           pl.bindTooltip(clean(meta.name),{sticky:true,className:'lt'});
           polylines.push(pl);
         }
-        // nodes → stations/stops
-        if(m.type==='node' && m.lat != null){
-          const t = m.tags||{};
-          const rw = t.railway||'';
-          if(rw==='station'||rw==='halt'||rw==='stop'||rw==='tram_stop'||m.role==='stop'||m.role==='station'){
-            relStations.push({
-              id: m.ref,
-              name: clean(t.name||t['name:en']||''),
-              lat: m.lat,
-              lon: m.lon,
-              role: m.role||rw,
-              tags: t
-            });
-          }
+        if(m.type==='node'&&m.lat!=null){
+          nodeMembers.push({ref:m.ref,role:m.role||'',lat:m.lat,lon:m.lon});
         }
       });
     });
 
-    lineData[relId] = { meta, polylines };
+    lineData[relId]={meta,polylines};
 
-    // merge into stations store
-    relStations.forEach((s,idx)=>{
-      const sid = String(s.id);
+    if(!nodeMembers.length) return 0;
+
+    // ── PASS 2: fetch full tags for all member nodes
+    const nodeIds=nodeMembers.map(n=>n.ref).join(',');
+    const pass2=await ovPost('[out:json][timeout:30];node(id:'+nodeIds+');out body;');
+
+    // index by id
+    const tagMap={};
+    pass2.forEach(n=>{ if(n.type==='node') tagMap[n.id]=n.tags||{}; });
+
+    let stationCount=0;
+    nodeMembers.forEach((nm,idx)=>{
+      const t=tagMap[nm.ref]||{};
+      const rw=t.railway||'';
+      const isStation=rw==='station'||rw==='halt'||rw==='stop'||rw==='tram_stop'||nm.role==='stop'||nm.role==='station'||nm.role==='stop_exit_only'||nm.role==='stop_entry_only';
+      if(!isStation)return;
+      const name=clean(t.name||t['name:en']||t['name:ja']||'');
+      const sid=String(nm.ref);
       if(!stations[sid]){
-        stations[sid] = {
-          id: s.id,
-          name: s.name,
-          lat: s.lat,
-          lon: s.lon,
-          type: s.role,
-          tags: s.tags,
-          lines: [],
-          marker: null,
-          seq: {}
-        };
+        stations[sid]={id:nm.ref,name,lat:nm.lat,lon:nm.lon,type:nm.role||rw,tags:t,lines:[],marker:null,seq:{}};
+      } else if(!stations[sid].name && name){
+        stations[sid].name=name;
+        stations[sid].tags=t;
       }
-      stations[sid].lines.push({
-        relId: String(relId),
-        relName: meta.name,
-        short: meta.short,
-        colour: colour,
-        role: s.role
-      });
-      stations[sid].seq[String(relId)] = idx;
+      stations[sid].lines.push({relId:String(relId),relName:meta.name,short:meta.short,colour,role:nm.role});
+      stations[sid].seq[String(relId)]=idx;
+      stationCount++;
     });
-
-    return relStations.length;
+    return stationCount;
   }
 
-  // ── RENDER MARKERS ────────────────────────────────────────────
-  const markerLayer = L.layerGroup().addTo(map);
-  let selectedId = null;
-
-  function primaryColour(st){
-    return st.lines.length ? st.lines[0].colour : '#888';
+  // ─ markers
+  const markerLayer=L.layerGroup().addTo(map);
+  let selectedId=null;
+  function primaryColour(st){ return st.lines.length?st.lines[0].colour:'#888'; }
+  function makeIcon(col,selected=false){
+    const sz=selected?14:10, bw=selected?3:2, sh=selected?'box-shadow:0 0 0 3px rgba(255,255,255,.22);':'';
+    return L.divIcon({className:'',html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:var(--sf,#161b27);border:${bw}px solid ${col};box-sizing:border-box;${sh}"></div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
   }
-
-  function makeIcon(col, selected=false){
-    const size = selected ? 14 : 10;
-    const border = selected ? 3 : 2;
-    const shadow = selected ? 'box-shadow:0 0 0 3px rgba(255,255,255,.25);' : '';
-    return L.divIcon({
-      className:'',
-      html:`<div style="width:${size}px;height:${size}px;border-radius:50%;background:#161b27;border:${border}px solid ${col};box-sizing:border-box;${shadow}"></div>`,
-      iconSize:[size,size],
-      iconAnchor:[size/2,size/2]
-    });
-  }
-
   function renderMarkers(){
     markerLayer.clearLayers();
     Object.values(stations).forEach(st=>{
-      if(!st.name && !st.id) return;
-      const col = primaryColour(st);
-      const mk = L.marker([st.lat,st.lon],{
-        icon: makeIcon(col),
-        title: st.name,
-        zIndexOffset: 100
-      });
+      const col=primaryColour(st);
+      const mk=L.marker([st.lat,st.lon],{icon:makeIcon(col),title:st.name,zIndexOffset:100});
       if(st.name) mk.bindTooltip(st.name,{sticky:true,className:'lt'});
       mk.on('click',()=>selectStation(String(st.id)));
       mk.addTo(markerLayer);
-      st.marker = mk;
+      st.marker=mk;
     });
   }
 
-  // ── SIDEBAR LIST ──────────────────────────────────────────────
-  let filterLine = null;
-  let searchQ = '';
-
+  // ─ sidebar
+  let filterLine=null, searchQ='';
   function buildFilters(){
-    const el = document.getElementById('filters');
-    el.innerHTML = '';
-    const all = document.createElement('button');
-    all.className = 'filter-btn' + (!filterLine?' on':'');
-    all.textContent = 'All';
-    all.onclick = ()=>{ filterLine=null; buildFilters(); buildList(); };
+    const el=document.getElementById('filters'); el.innerHTML='';
+    const all=document.createElement('button');
+    all.className='filter-btn'+(filterLine?'':' on'); all.textContent='All';
+    all.onclick=()=>{filterLine=null;buildFilters();buildList();};
     el.appendChild(all);
     Object.entries(LINE_REGISTRY).forEach(([id,m])=>{
-      const b = document.createElement('button');
-      b.className = 'filter-btn' + (filterLine===id?' on':'');
-      b.textContent = m.short;
-      b.style.cssText = filterLine===id ? '' : `color:${m.colour};border-color:${m.colour}44;`;
-      b.onclick = ()=>{ filterLine=id; buildFilters(); buildList(); };
+      const b=document.createElement('button');
+      b.className='filter-btn'+(filterLine===id?' on':'');
+      b.textContent=m.short;
+      b.style.cssText=filterLine===id?'':`color:${m.colour};border-color:${m.colour}55;`;
+      b.onclick=()=>{filterLine=id;buildFilters();buildList();};
       el.appendChild(b);
     });
   }
-
-  function stationMatchesFilter(st){
-    if(filterLine && !st.lines.some(l=>l.relId===filterLine)) return false;
-    if(searchQ && !st.name.toLowerCase().includes(searchQ)) return false;
-    return true;
-  }
-
   function buildList(){
-    const list = document.getElementById('list');
-    const count = document.getElementById('count');
-    list.innerHTML = '';
-
-    let visible = Object.values(stations).filter(stationMatchesFilter);
-
-    // sort: if filtering by line, sort by sequence; otherwise alphabetical
-    if(filterLine){
-      visible.sort((a,b)=>((a.seq[filterLine]??9999)-(b.seq[filterLine]??9999)));
-    } else {
-      visible.sort((a,b)=>a.name.localeCompare(b.name));
-    }
-
-    count.textContent = visible.length + ' station' + (visible.length!==1?'s':'') + ' shown';
-
-    visible.forEach((st,i)=>{
-      const col = primaryColour(st);
-      const item = document.createElement('div');
-      item.className = 'st-item' + (String(st.id)===selectedId?' active':'');
-      item.dataset.id = st.id;
-      const lineNames = st.lines.map(l=>l.short).join(', ');
-      item.innerHTML =
-        `<span class="st-num">${i+1}</span>`+
-        `<span class="st-dot-sb" style="background:#161b27;border-color:${col}"></span>`+
-        `<span class="st-info">`+
-          `<span class="st-name">${st.name||'(unnamed)'}</span>`+
-          `<span class="st-lines">${lineNames}</span>`+
-        `</span>`+
-        `<span class="st-type">${st.type||''}</span>`;
+    const list=document.getElementById('list'),cnt=document.getElementById('count');
+    list.innerHTML='';
+    let vis=Object.values(stations).filter(st=>{
+      if(filterLine&&!st.lines.some(l=>l.relId===filterLine))return false;
+      if(searchQ&&!st.name.toLowerCase().includes(searchQ))return false;
+      return true;
+    });
+    if(filterLine) vis.sort((a,b)=>(a.seq[filterLine]??9999)-(b.seq[filterLine]??9999));
+    else vis.sort((a,b)=>a.name.localeCompare(b.name));
+    cnt.textContent=vis.length+' station'+(vis.length!==1?'s':'')+' shown';
+    vis.forEach((st,i)=>{
+      const col=primaryColour(st);
+      const item=document.createElement('div');
+      item.className='st-item'+(String(st.id)===selectedId?' active':'');
+      item.dataset.id=st.id;
+      item.innerHTML=`<span class="st-num">${i+1}</span><span class="st-dot-sb" style="background:var(--sf,#161b27);border-color:${col}"></span><span class="st-info"><span class="st-name">${st.name||'(unnamed)'}</span><span class="st-lines">${st.lines.map(l=>l.short).join(', ')}</span></span><span class="st-type">${st.type||''}</span>`;
       item.addEventListener('click',()=>selectStation(String(st.id)));
       list.appendChild(item);
     });
   }
 
-  // ── DETAIL PANEL ──────────────────────────────────────────────
+  // ─ detail
   function selectStation(sid){
-    selectedId = sid;
-    const st = stations[sid];
-    if(!st) return;
-
-    // update marker icons
-    Object.values(stations).forEach(s=>{
-      if(s.marker) s.marker.setIcon(makeIcon(primaryColour(s), String(s.id)===sid));
+    selectedId=sid;
+    const st=stations[sid]; if(!st)return;
+    Object.values(stations).forEach(s=>{ if(s.marker)s.marker.setIcon(makeIcon(primaryColour(s),String(s.id)===sid)); });
+    document.querySelectorAll('.st-item').forEach(el=>el.classList.toggle('active',el.dataset.id===sid));
+    map.flyTo([st.lat,st.lon],Math.max(map.getZoom(),14),{duration:.8});
+    document.getElementById('d-name').textContent=st.name||'(unnamed)';
+    document.getElementById('d-id').textContent='OGF node #'+st.id;
+    document.getElementById('d-coords').textContent=st.lat.toFixed(6)+', '+st.lon.toFixed(6);
+    document.getElementById('d-ogf').href='https://opengeofiction.net/node/'+st.id;
+    const linesEl=document.getElementById('d-lines'); linesEl.innerHTML='';
+    (st.lines.length?st.lines:[]).forEach(l=>{
+      const d=document.createElement('div'); d.className='detail-line';
+      d.innerHTML=`<span class="detail-line-dot" style="background:${l.colour}"></span><span>${l.relName}</span>`;
+      linesEl.appendChild(d);
     });
-
-    // update list highlight
-    document.querySelectorAll('.st-item').forEach(el=>{
-      el.classList.toggle('active', el.dataset.id===sid);
-    });
-
-    // fly to
-    map.flyTo([st.lat, st.lon], Math.max(map.getZoom(), 14), {duration:0.8});
-
-    // populate detail
-    document.getElementById('d-name').textContent = st.name || '(unnamed)';
-    document.getElementById('d-id').textContent = 'OGF node #' + st.id;
-    document.getElementById('d-coords').textContent = st.lat.toFixed(6) + ', ' + st.lon.toFixed(6);
-    document.getElementById('d-ogf').href = 'https://opengeofiction.net/node/' + st.id;
-
-    const linesEl = document.getElementById('d-lines');
-    linesEl.innerHTML = '';
-    if(st.lines.length){
-      st.lines.forEach(l=>{
-        const div = document.createElement('div');
-        div.className = 'detail-line';
-        div.innerHTML = `<span class="detail-line-dot" style="background:${l.colour}"></span><span>${l.relName}</span>`;
-        linesEl.appendChild(div);
-      });
-    } else {
-      linesEl.innerHTML = '<span style="color:var(--tx-f);font-size:10px">No line data</span>';
-    }
-
-    // tags
-    const knownTags = ['railway','name','colour','ref','network','operator','uic_ref','wheelchair','platforms'];
-    const tagEntries = Object.entries(st.tags||{}).filter(([k])=>!['name'].includes(k));
-    const tagsEl = document.getElementById('d-tags');
-    const tagsWrap = document.getElementById('d-tags-wrap');
-    if(tagEntries.length){
-      tagsEl.innerHTML = tagEntries.map(([k,v])=>`<span class="dtag">${k}=${v}</span>`).join('');
-      tagsWrap.style.display = '';
-    } else {
-      tagsWrap.style.display = 'none';
-    }
-
+    if(!st.lines.length) linesEl.innerHTML='<span style="color:var(--tx-f);font-size:10px">No line data</span>';
+    const tagEntries=Object.entries(st.tags||{}).filter(([k])=>k!=='name');
+    const tagsEl=document.getElementById('d-tags'),tw=document.getElementById('d-tags-wrap');
+    if(tagEntries.length){ tagsEl.innerHTML=tagEntries.map(([k,v])=>`<span class="dtag">${k}=${v}</span>`).join(''); tw.style.display=''; }
+    else tw.style.display='none';
     document.getElementById('detail').classList.add('show');
   }
-
   document.getElementById('detail-close').addEventListener('click',()=>{
     document.getElementById('detail').classList.remove('show');
-    selectedId = null;
-    Object.values(stations).forEach(s=>{
-      if(s.marker) s.marker.setIcon(makeIcon(primaryColour(s), false));
-    });
+    selectedId=null;
+    Object.values(stations).forEach(s=>{ if(s.marker)s.marker.setIcon(makeIcon(primaryColour(s),false)); });
     document.querySelectorAll('.st-item').forEach(el=>el.classList.remove('active'));
   });
 
-  // ── SEARCH ────────────────────────────────────────────────────
-  document.getElementById('search').addEventListener('input', e=>{
-    searchQ = e.target.value.toLowerCase().trim();
-    buildList();
-  });
+  document.getElementById('search').addEventListener('input',e=>{ searchQ=e.target.value.toLowerCase().trim(); buildList(); });
 
-  // ── BADGE ─────────────────────────────────────────────────────
   function updateBadge(){
-    const el = document.getElementById('line-badge');
-    const lines = Object.values(LINE_REGISTRY);
-    if(!lines.length) return;
-    const c = lines[0].colour;
-    el.style.background = c;
-    el.style.borderColor = c;
-    el.style.color = '#fff';
-    const total = Object.keys(stations).length;
-    el.textContent = total + ' stations · ' + lines.length + ' line' + (lines.length!==1?'s':'');
+    const el=document.getElementById('line-badge');
+    const lines=Object.values(LINE_REGISTRY); if(!lines.length)return;
+    el.style.background='#334155'; el.style.borderColor='#475569'; el.style.color='#e2e8f0';
+    el.textContent=Object.keys(stations).length+' stations \u00b7 '+lines.length+' line'+(lines.length!==1?'s':'');
   }
 
-  // ── MAIN ──────────────────────────────────────────────────────
   async function main(){
-    const ld = document.getElementById('ld');
-    const ldTxt = document.getElementById('ld-txt');
-    const ldSub = document.getElementById('ld-sub');
-
-    const relIds = Object.keys(LINE_REGISTRY);
-    let done = 0;
-
+    const ld=document.getElementById('ld'),ldTxt=document.getElementById('ld-txt'),ldSub=document.getElementById('ld-sub');
+    const relIds=Object.keys(LINE_REGISTRY);
+    let done=0;
     for(const relId of relIds){
-      const meta = LINE_REGISTRY[relId];
-      ldTxt.textContent = 'Loading ' + meta.short + '\u2026';
-      ldSub.textContent = (done+1) + ' / ' + relIds.length + ' lines';
+      const meta=LINE_REGISTRY[relId];
+      ldTxt.textContent='Loading '+meta.short+'\u2026';
+      ldSub.textContent='Step 1/2: line geometry';
       try{
-        const n = await loadRelation(relId);
-        status('Loaded ' + meta.short + ' (' + n + ' stations)');
-      } catch(e){
-        console.error('Failed to load relation',relId,e);
-        status('Failed to load ' + meta.short);
-      }
+        ldSub.textContent='Step 1/2: line geometry…';
+        // loadRelation handles both passes internally
+        ldSub.textContent='Step 2/2: station names…';
+        const n=await loadRelation(relId);
+        status('Loaded '+meta.short+' ('+n+' stations)');
+      }catch(e){ console.error('Failed',relId,e); status('Failed: '+meta.short); }
       done++;
     }
-
     renderMarkers();
     updateBadge();
     buildFilters();
     buildList();
-
-    // fit map to all loaded geometry
-    const allPts = [];
-    Object.values(lineData).forEach(ld=>ld.polylines.forEach(pl=>allPts.push(...pl.getLatLngs())));
+    const allPts=[];
+    Object.values(lineData).forEach(d=>d.polylines.forEach(pl=>allPts.push(...pl.getLatLngs())));
     if(allPts.length) map.fitBounds(L.latLngBounds(allPts),{padding:[40,40]});
-
     ld.classList.add('done');
     setTimeout(()=>ld.remove(),600);
   }
-
   main();
   </script>
 </body>
