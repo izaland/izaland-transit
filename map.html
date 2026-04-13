@@ -107,14 +107,12 @@
       padding:4px 9px!important;
       line-height:1.25!important;
     }
-    /* byakuzhi: riga principale, più grande */
     .lt-byz{
       display:block;
       font-size:13px;
       font-weight:700;
       letter-spacing:.02em;
     }
-    /* romaji / alfabeto: riga secondaria, più piccola */
     .lt-rom{
       display:block;
       font-size:10px;
@@ -122,7 +120,6 @@
       opacity:.75;
       margin-top:1px;
     }
-    /* solo alfabeto: dimensione normale */
     .lt-only{
       display:block;
       font-size:11px;
@@ -345,58 +342,40 @@
 
   function clean(s){return s.replace(/[\uD800-\uDFFF]{2}/g,'').replace(/^[\u24C2-\u24FF\u2460-\u27BF\s]+/,'').trim();}
 
-  // ── Regex per riconoscere caratteri non-latini (byakuzhi/kanji/ecc.) ──
   const RE_NON_LATIN = /[\u0900-\u097F\u0A80-\u0AFF\u10A0-\u10FF\u1100-\u11FF\u3000-\u9FFF\uA000-\uAAFF\uAC00-\uD7AF\uF900-\uFAFF]/;
 
-  /**
-   * Separa un nome stazione in {byz, rom}.
-   * Pattern: "Romaji 漢字", "漢字 Romaji", solo uno dei due.
-   */
   function splitStationName(s) {
     if (!s) return { byz: null, rom: null };
     const trimmed = s.trim();
-
     if (!RE_NON_LATIN.test(trimmed)) return { byz: null, rom: trimmed };
-
     if (!/[A-Za-z\u00C0-\u024F\u0020-\u007E]/.test(trimmed.replace(/[\s\d\-\u2013\u2014\u00b7.,!?'"()\[\]]/g,''))) {
       return { byz: trimmed, rom: null };
     }
-
     let firstNonLatin = -1;
     for (let i = 0; i < trimmed.length; i++) {
       if (RE_NON_LATIN.test(trimmed[i])) { firstNonLatin = i; break; }
     }
-
     let byzPart, romPart;
     if (firstNonLatin === 0) {
       let endByz = trimmed.length;
       for (let i = 1; i < trimmed.length; i++) {
-        if (trimmed[i - 1] === ' ' && /[A-Za-z\u00C0-\u024F]/.test(trimmed[i])) {
-          endByz = i - 1; break;
-        }
+        if (trimmed[i - 1] === ' ' && /[A-Za-z\u00C0-\u024F]/.test(trimmed[i])) { endByz = i - 1; break; }
       }
       byzPart = trimmed.slice(0, endByz).trim();
       romPart = trimmed.slice(endByz).trim() || null;
     } else {
       let splitAt = -1;
       for (let i = 1; i < trimmed.length; i++) {
-        if (trimmed[i - 1] === ' ' && RE_NON_LATIN.test(trimmed[i])) {
-          splitAt = i - 1; break;
-        }
+        if (trimmed[i - 1] === ' ' && RE_NON_LATIN.test(trimmed[i])) { splitAt = i - 1; break; }
       }
       if (splitAt === -1) return { byz: null, rom: trimmed };
       romPart = trimmed.slice(0, splitAt).trim() || null;
       byzPart = trimmed.slice(splitAt).trim();
     }
-
     if (byzPart && !RE_NON_LATIN.test(byzPart)) return { byz: null, rom: trimmed };
     return { byz: byzPart || null, rom: romPart || null };
   }
 
-  /**
-   * Crea un elemento DOM per il tooltip — Leaflet accetta HTMLElement
-   * in bindTooltip e lo inserisce direttamente, senza escape.
-   */
   function makeStationTooltipEl(name, bold) {
     const { byz, rom } = splitStationName(name);
     const wrap = document.createElement('div');
@@ -487,11 +466,12 @@
       iconAnchor:[5,5]
     });
     const m = L.marker([node.lat,node.lon],{icon,title:name,zIndexOffset:isMain?200:100});
-    if (name) m.bindTooltip(makeStationTooltipEl(name, false),{sticky:true,className:'lt'});
+    // addTo PRIMA di bindTooltip: così il DOM element esiste quando Leaflet aggancia gli eventi
     m.addTo(stLayer);
     m._stName = name;
     m._stMain = isMain;
     m._labelBound = false;
+    if (name) m.bindTooltip(makeStationTooltipEl(name, false),{sticky:true,className:'lt'});
   }
 
   function updateStations() {
