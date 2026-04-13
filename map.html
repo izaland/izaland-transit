@@ -97,7 +97,37 @@
     .ld-txt{font-size:var(--text-sm);color:var(--tx-m);}
     #sbar{position:absolute;bottom:var(--sp4);left:50%;transform:translateX(-50%);z-index:600;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-full);padding:var(--sp2) var(--sp4);font-size:var(--text-xs);color:var(--tx-m);pointer-events:none;transition:opacity .4s;white-space:nowrap;box-shadow:0 4px 16px oklch(0 0 0/.25);}
     #sbar.h{opacity:0;}
-    .lt{background:var(--sf)!important;border:1px solid var(--bd)!important;color:var(--tx-c)!important;font-family:var(--font-body)!important;font-size:11px!important;border-radius:var(--r-sm)!important;padding:3px 8px!important;}
+    /* ── Tooltip base ── */
+    .lt{
+      background:var(--sf)!important;
+      border:1px solid var(--bd)!important;
+      color:var(--tx-c)!important;
+      font-family:var(--font-body)!important;
+      border-radius:var(--r-sm)!important;
+      padding:4px 9px!important;
+      line-height:1.25!important;
+    }
+    /* byakuzhi (kanji/non-latin): riga principale, più grande */
+    .lt-byz{
+      display:block;
+      font-size:13px;
+      font-weight:700;
+      letter-spacing:.02em;
+    }
+    /* romaji / alfabeto: riga secondaria, più piccola */
+    .lt-rom{
+      display:block;
+      font-size:10px;
+      font-weight:400;
+      opacity:.75;
+      margin-top:1px;
+    }
+    /* quando c'è solo alfabeto, dimensione normale */
+    .lt-only{
+      display:block;
+      font-size:11px;
+      font-weight:500;
+    }
     @media(max-width:768px){
       nav{padding:var(--sp3) var(--sp4);}
       .nav-links{gap:var(--sp3);}
@@ -116,7 +146,8 @@
     .st-dot.st-sm{width:6px;height:6px;border:1.5px solid #888;}
     .st-dot.st-md{width:9px;height:9px;border:2px solid #888;}
     .st-dot.st-lg{width:12px;height:12px;border:2.5px solid #888;}
-    .lt-bold{font-weight:700!important;}
+    .lt-bold .lt-byz{font-weight:800!important;}
+    .lt-bold .lt-only{font-weight:700!important;}
     [data-theme="dark"]  .st-dot{background:#161b27;border-color:#94a3b8!important;}
     [data-theme="light"] .st-dot{background:#ffffff;border-color:#475569!important;}
   </style>
@@ -314,6 +345,102 @@
 
   function clean(s){return s.replace(/[\uD800-\uDFFF]{2}/g,'').replace(/^[\u24C2-\u24FF\u2460-\u27BF\s]+/,'').trim();}
 
+  // ── Regex per riconoscere caratteri "non-alfabeto" (byakuzhi/kanji/gujarati/ecc.) ──
+  // Copre CJK unificato, estensioni, katakana, hiragana, hangul, gujarati, georgiano, e altri script non-latini
+  const RE_NON_LATIN = /[\u0900-\u097F\u0A80-\u0AFF\u10A0-\u10FF\u1100-\u11FF\u3000-\u9FFF\uA000-\uAAFF\uAC00-\uD7AF\uF900-\uFAFF]/;
+
+  /**
+   * Separa un nome stazione in {byz, rom}.
+   * byz = parte in byakuzhi/kanji/script non-latino (o null)
+   * rom = parte in alfabeto a-z (o null)
+   *
+   * Pattern riconosciuti:
+   *   "Kanji 漢字"          → byz:"漢字"       rom:"Kanji"
+   *   "漢字 Kanji"          → byz:"漢字"       rom:"Kanji"
+   *   "Kanji"               → byz:null         rom:"Kanji"
+   *   "漢字"                → byz:"漢字"       rom:null
+   */
+  function splitStationName(s) {
+    if (!s) return { byz: null, rom: null };
+
+    // Token: dividi sullo spazio che separa blocchi di script diversi
+    // Strategia: cerca il confine tra sequenza latin e sequenza non-latin
+    const trimmed = s.trim();
+
+    // Caso: tutto alfabeto (nessun carattere non-latino)
+    if (!RE_NON_LATIN.test(trimmed)) {
+      return { byz: null, rom: trimmed };
+    }
+
+    // Caso: tutto non-latino (nessuna lettera a-z A-Z né diacritici latini estesi comuni)
+    // Latin extended: \u00C0-\u024F
+    if (!/[A-Za-z\u00C0-\u024F\u0020-\u007E]/.test(trimmed.replace(/[\s\d\-–—·.,!?'"()\[\]]/g,''))) {
+      return { byz: trimmed, rom: null };
+    }
+
+    // Caso misto: troviamo dove finisce un blocco e inizia l'altro.
+    // Cerchiamo l'indice del primo carattere non-latino nel testo.
+    let firstNonLatin = -1;
+    for (let i = 0; i < trimmed.length; i++) {
+      if (RE_NON_LATIN.test(trimmed[i])) { firstNonLatin = i; break; }
+    }
+
+    let byzPart, romPart;
+    if (firstNonLatin === 0) {
+      // byakuzhi in testa: "漢字 Kanji"
+      // Trova dove finisce il blocco non-latino
+      let endByz = trimmed.length;
+      for (let i = 0; i < trimmed.length; i++) {
+        // La parte latina inizia quando troviamo una lettera latina dopo uno spazio
+        if (i > 0 && trimmed[i - 1] === ' ' && /[A-Za-z\u00C0-\u024F]/.test(trimmed[i])) {
+          endByz = i - 1;
+          break;
+        }
+      }
+      byzPart = trimmed.slice(0, endByz).trim();
+      romPart = trimmed.slice(endByz).trim() || null;
+    } else {
+      // alfabeto in testa: "Kanji 漢字" (il più comune nei dati)
+      // Trova il primo spazio che precede un blocco non-latino
+      let splitAt = -1;
+      for (let i = 1; i < trimmed.length; i++) {
+        if (trimmed[i - 1] === ' ' && RE_NON_LATIN.test(trimmed[i])) {
+          splitAt = i - 1;
+          break;
+        }
+      }
+      if (splitAt === -1) {
+        // fallback: tutto come rom
+        return { byz: null, rom: trimmed };
+      }
+      romPart = trimmed.slice(0, splitAt).trim() || null;
+      byzPart = trimmed.slice(splitAt).trim();
+    }
+
+    // Pulizia finale: se byzPart non contiene effettivamente caratteri non-latini, scambia
+    if (byzPart && !RE_NON_LATIN.test(byzPart)) {
+      return { byz: null, rom: trimmed };
+    }
+
+    return { byz: byzPart || null, rom: romPart || null };
+  }
+
+  /**
+   * Genera l'HTML per il tooltip della stazione.
+   * Se c'è byakuzhi: byakuzhi grande sopra, alfabeto piccolo sotto.
+   * Se c'è solo alfabeto: un'unica riga normale.
+   */
+  function stationTooltipHtml(name) {
+    const { byz, rom } = splitStationName(name);
+    if (byz && rom) {
+      return '<span class="lt-byz">' + byz + '</span><span class="lt-rom">' + rom + '</span>';
+    }
+    if (byz) {
+      return '<span class="lt-byz">' + byz + '</span>';
+    }
+    return '<span class="lt-only">' + (rom || name) + '</span>';
+  }
+
   const sbar=document.getElementById('sbar');
   function status(msg,ms=3000){sbar.textContent=msg;sbar.classList.remove('h');clearTimeout(sbar._t);sbar._t=setTimeout(()=>sbar.classList.add('h'),ms);}
 
@@ -386,7 +513,7 @@
       iconAnchor:[5,5]
     });
     const m = L.marker([node.lat,node.lon],{icon,title:name,zIndexOffset:isMain?200:100});
-    if (name) m.bindTooltip(name,{sticky:true,className:'lt'});
+    if (name) m.bindTooltip(stationTooltipHtml(name),{sticky:true,className:'lt',interactive:false});
     m.addTo(stLayer);
     m._stName = name;
     m._stMain = isMain;
@@ -402,19 +529,20 @@
       el.style.display='';
       dot.className = z >= 16 ? 'st-dot st-lg' : z >= 14 ? 'st-dot st-md' : 'st-dot st-sm';
       const wantPerm = z >= 14 && !!m._stName;
+      const boldCls = z >= 16 ? 'lt lt-bold' : 'lt';
       if (wantPerm && !m._labelBound) {
         m.unbindTooltip();
-        m.bindTooltip(m._stName,{
+        m.bindTooltip(stationTooltipHtml(m._stName),{
           permanent:true,
           direction:'right',
           offset:[8,0],
-          className:z>=16?'lt lt-bold':'lt'
+          className:boldCls
         }).openTooltip();
         m._labelBound = true;
       } else if (!wantPerm && m._labelBound) {
         m.unbindTooltip();
         m._labelBound = false;
-        if (m._stName) m.bindTooltip(m._stName,{sticky:true,className:'lt'});
+        if (m._stName) m.bindTooltip(stationTooltipHtml(m._stName),{sticky:true,className:'lt',interactive:false});
       }
     });
   }
