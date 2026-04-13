@@ -546,7 +546,6 @@
       const z=A*Math.sin(p1)+B*Math.sin(p2);
       pts.push([Math.atan2(z,Math.sqrt(x*x+y*y))/R, Math.atan2(y,x)/R]);
     }
-    // antimeridian split
     const segs=[[pts[0]]];
     for(let i=1;i<pts.length;i++){
       if(Math.abs(pts[i][1]-pts[i-1][1])>180)segs.push([]);
@@ -556,12 +555,12 @@
   }
 
   /* ROUTE MAP BUILDER */
-  const OGF_TILE='https://{s}.tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png';
+  // ✔ correct OGF tile URL — no subdomains
+  const OGF_TILE='https://tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png';
   const ATTR='&copy; <a href="https://opengeofiction.net">OpenGeofiction</a> contributors';
   const DATA_URL='https://data.opengeofiction.net/utility/airline_routes.json';
   const AIRLINE_COLOR={IZ:'#60a5fa',UE:'#34d399',NS:'#f59e0b','8M':'#f472b6',FZ:'#a78bfa',TK:'#fb923c'};
 
-  // single shared fetch — all airlines share the same full JSON
   let _allRoutes=null;
   async function getAllRoutes(){
     if(_allRoutes)return _allRoutes;
@@ -587,16 +586,14 @@
       minZoom:cfg.min||2,
       maxZoom:cfg.max||10
     });
-    L.tileLayer(OGF_TILE,{attribution:ATTR,subdomains:'abc',maxZoom:19}).addTo(map);
+    // no subdomains needed for OGF tile server
+    L.tileLayer(OGF_TILE,{attribution:ATTR,maxZoom:19}).addTo(map);
 
     getAllRoutes().then(allRoutes=>{
-      // ✔ filter client-side by airline_code
       const routes=allRoutes.filter(r=>
-        (r.airline_code||'').toUpperCase()===(id).toUpperCase()
+        (r.airline_code||'').toUpperCase()===id.toUpperCase()
       );
-
       loadEl.classList.add('hidden');
-
       if(!routes.length){
         loadEl.innerHTML=`<span class="map-error">No route data found for <strong>${id}</strong>.</span>`;
         loadEl.classList.remove('hidden');
@@ -604,21 +601,18 @@
         return;
       }
 
-      // airports
       const airports={};
       routes.forEach(r=>{
         airports[r.origin_code]={lat:+r.origin_lat,lon:+r.origin_lon,name:r.origin_name,city:r.origin_city};
         airports[r.dest_code]={lat:+r.dest_lat,lon:+r.dest_lon,name:r.dest_name,city:r.dest_city};
       });
 
-      // arcs
       routes.forEach(r=>{
         const pts=greatCirclePoints(+r.origin_lat,+r.origin_lon,+r.dest_lat,+r.dest_lon,80);
-        const segs=(Array.isArray(pts[0][0]))?pts:[pts];
+        const segs=(Array.isArray(pts[0])&&Array.isArray(pts[0][0]))?pts:[pts];
         segs.forEach(seg=>L.polyline(seg,{color,weight:1.5,opacity:.6}).addTo(map));
       });
 
-      // dots
       const dotIcon=L.divIcon({className:'',
         html:`<div style="width:7px;height:7px;border-radius:50%;background:${color};border:1.5px solid rgba(255,255,255,.75);box-shadow:0 0 4px ${color}88"></div>`,
         iconSize:[7,7],iconAnchor:[3.5,3.5]});
@@ -628,11 +622,9 @@
           .addTo(map);
       });
 
-      // summary text
-      const nRoutes=routes.length, nAP=Object.keys(airports).length;
-      if(summaryEl)summaryEl.textContent=`${nRoutes} route${nRoutes!==1?'s':''} · ${nAP} airports — click to expand`;
+      const nR=routes.length,nA=Object.keys(airports).length;
+      if(summaryEl)summaryEl.textContent=`${nR} route${nR!==1?'s':''} · ${nA} airports — click to expand`;
 
-      // route table
       if(tbodyEl){
         tbodyEl.innerHTML=routes.map(r=>`<tr>
           <td><span class="code-badge">${r.origin_code||''}</span></td>
@@ -641,8 +633,6 @@
           <td>${r.dest_city||r.dest_name||''}</td>
           <td style="text-align:right;">${r.distance_km?Math.round(+r.distance_km).toLocaleString():''}</td>
         </tr>`).join('');
-
-        // sortable
         const ths=tbodyEl.closest('table').querySelectorAll('th[data-rt]');
         let sc2=null,sd2=1;
         ths.forEach(th=>{
