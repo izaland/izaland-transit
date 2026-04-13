@@ -271,9 +271,13 @@
   function isNoneVisible(){ return visibleLines!==null&&visibleLines.size===0; }
   function setAll(){ visibleLines=null; applyVisibility(); buildFilters(); buildList(); }
   function setNone(){ visibleLines=new Set(); applyVisibility(); buildFilters(); buildList(); }
-  function toggleLine(relId){
+
+  // Toggle all relIds that share the same short code (i.e. the whole "group")
+  function toggleLineGroup(relIds){
     if(visibleLines===null) visibleLines=new Set(allLineIds);
-    if(visibleLines.has(relId)) visibleLines.delete(relId); else visibleLines.add(relId);
+    const anyOn=relIds.some(id=>visibleLines.has(id));
+    if(anyOn) relIds.forEach(id=>visibleLines.delete(id));
+    else      relIds.forEach(id=>visibleLines.add(id));
     if(visibleLines.size===allLineIds.length) visibleLines=null;
     applyVisibility(); buildFilters(); buildList();
   }
@@ -316,8 +320,6 @@
     return meta?meta.colour:'#888';
   }
 
-  // FIX: className='iz-marker' keeps Leaflet's wrapper pointer-events intact
-  // and the inner div also gets pointer-events:auto + cursor:pointer explicitly.
   function makeIcon(col, selected=false){
     const sz=selected?14:10, bw=selected?3:2;
     const shadow=selected?'box-shadow:0 0 0 3px rgba(255,255,255,.22);':'';
@@ -359,6 +361,24 @@
     return 'other';
   }
 
+  // ── Build a de-duplicated, sorted list of line "groups" for a bucket.
+  // Groups are keyed by the display short code; each group holds all relIds
+  // that share that code (e.g. the four branches of line "2").
+  function buildLineGroups(bucket){
+    const groupMap = new Map(); // short -> { short, name, colour, relIds[] }
+    bucket.forEach(({id, m})=>{
+      const key = (m.short || id).trim();
+      if(!groupMap.has(key)){
+        groupMap.set(key, { short: key, name: m.name||key, colour: m.colour||'#888', relIds: [] });
+      }
+      groupMap.get(key).relIds.push(id);
+    });
+    // Sort A-Z with natural numeric ordering (so "2" < "10", "AX" < "CK")
+    return [...groupMap.values()].sort((a,b)=>
+      a.short.localeCompare(b.short, undefined, {numeric:true, sensitivity:'base'})
+    );
+  }
+
   function buildFilters(){
     const el=document.getElementById('filters'); el.innerHTML='';
     const usedLineIds=new Set();
@@ -383,19 +403,21 @@
 
     TYPE_GROUPS.forEach(g=>{
       const lines=buckets[g.key]; if(!lines.length) return;
+      const groups=buildLineGroups(lines);
       const group=document.createElement('div'); group.className='filter-group';
       const lbl=document.createElement('div'); lbl.className='filter-group-label';
       lbl.textContent=g.label; group.appendChild(lbl);
       const chips=document.createElement('div'); chips.className='filter-chips';
-      lines.forEach(({id,m})=>{
-        const on=isVisible(id);
+      groups.forEach(({short, name, colour, relIds})=>{
+        // Group is "on" if at least one of its relIds is visible
+        const on=relIds.some(id=>isVisible(id));
         const b=document.createElement('button');
         b.className='filter-btn '+(on?'on':'off');
-        b.textContent=m.short||id; b.title=m.name||id;
-        b.style.borderColor=m.colour+'88';
-        if(on){ b.style.background=m.colour; b.style.color='#fff'; }
-        else { b.style.color=m.colour; }
-        b.onclick=()=>toggleLine(id);
+        b.textContent=short; b.title=name;
+        b.style.borderColor=colour+'88';
+        if(on){ b.style.background=colour; b.style.color='#fff'; }
+        else { b.style.color=colour; }
+        b.onclick=()=>toggleLineGroup(relIds);
         chips.appendChild(b);
       });
       group.appendChild(chips); el.appendChild(group);
