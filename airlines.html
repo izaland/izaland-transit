@@ -5,39 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Airlines — Izaland</title>
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     :root {
-      --font-body: 'Satoshi', 'Inter', sans-serif;
-      --font-display: 'Cabinet Grotesk', 'Satoshi', sans-serif;
-      --text-xs:   clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-      --text-sm:   clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
-      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-      --text-lg:   clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
-      --text-xl:   clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
-      --text-2xl:  clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --font-body:'Satoshi','Inter',sans-serif;
+      --font-display:'Cabinet Grotesk','Satoshi',sans-serif;
+      --text-xs:clamp(.75rem,.7rem + .25vw,.875rem);
+      --text-sm:clamp(.875rem,.8rem + .35vw,1rem);
+      --text-base:clamp(1rem,.95rem + .25vw,1.125rem);
+      --text-lg:clamp(1.125rem,1rem + .75vw,1.5rem);
+      --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+      --text-2xl:clamp(2rem,1.2rem + 2.5vw,3.5rem);
       --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;
       --space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;
       --space-10:2.5rem;--space-12:3rem;--space-16:4rem;
       --radius-sm:.375rem;--radius-md:.5rem;--radius-lg:.75rem;
       --radius-xl:1rem;--radius-full:9999px;
-      --transition:180ms cubic-bezier(0.16,1,0.3,1);
+      --transition:180ms cubic-bezier(.16,1,.3,1);
     }
     [data-theme="dark"]{
       --bg:#0f1117;--surface:#161b27;--surface-2:#1c2235;
       --border:#2a3147;--text:#e2e8f0;--text-muted:#94a3b8;--text-faint:#4a5568;
       --accent:#60a5fa;
+      --map-filter:brightness(.9) saturate(.8);
     }
     [data-theme="light"]{
       --bg:#f8fafc;--surface:#ffffff;--surface-2:#f1f5f9;
       --border:#e2e8f0;--text:#1e293b;--text-muted:#64748b;--text-faint:#cbd5e1;
       --accent:#2563eb;
+      --map-filter:none;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;scroll-padding-top:5rem;}
     body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--text);background:var(--bg);line-height:1.6;}
     img{display:block;max-width:100%;height:auto;}
+
     /* NAV */
-    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-8);background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
+    nav{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-8);background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
     .nav-logo{display:flex;align-items:center;gap:var(--space-3);text-decoration:none;color:var(--text);}
     .nav-logo img{height:40px;width:auto;}
     .logo-dark{display:block!important;}.logo-light{display:none!important;}
@@ -51,9 +55,9 @@
     .theme-btn:hover{color:var(--text);border-color:var(--text-muted);}
     .nav-item{position:relative;}
     .nav-item>button{background:none;border:none;font-size:var(--text-sm);color:var(--text-muted);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0;transition:color var(--transition);}
-    .nav-item>button:hover{color:var(--text);}
+    .nav-item>button:hover,.nav-item.active>button{color:var(--text);}
     .nav-item.active>button{color:var(--accent);}
-    .nav-item>button svg{transition:transform var(--transition);}
+    .nav-item>button svg,.nav-item--sub>button svg{transition:transform var(--transition);}
     .nav-item.open>button svg{transform:rotate(180deg);}
     .dropdown{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-4px);min-width:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-2);box-shadow:0 8px 24px oklch(0 0 0/.18);opacity:0;pointer-events:none;transition:opacity var(--transition),transform var(--transition);}
     .nav-item.open .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
@@ -63,21 +67,21 @@
     .dropdown-label{display:block;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);padding:var(--space-2) var(--space-3) var(--space-1);}
     .nav-item--sub{position:relative;}
     .nav-item--sub>button{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;padding:var(--space-2) var(--space-3);font-size:var(--text-sm);color:var(--text-muted);font-weight:500;cursor:pointer;border-radius:var(--radius-md);transition:background var(--transition),color var(--transition);gap:var(--space-2);}
-    .nav-item--sub>button:hover{background:var(--surface-2);color:var(--text);}
-    .nav-item--sub.open>button{color:var(--text);}
-    .nav-item--sub>button svg{transition:transform var(--transition);flex-shrink:0;}
+    .nav-item--sub>button:hover,.nav-item--sub.open>button{background:var(--surface-2);color:var(--text);}
     .nav-item--sub.open>button svg{transform:rotate(180deg);}
     .dropdown--sub{position:absolute;top:0;left:calc(100% + 6px);min-width:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-2);box-shadow:0 8px 24px oklch(0 0 0/.18);opacity:0;pointer-events:none;transition:opacity var(--transition),transform var(--transition);transform:translateX(-4px);}
     .nav-item--sub.open .dropdown--sub{opacity:1;pointer-events:auto;transform:translateX(0);}
+
     /* PAGE */
     .page-hero{padding:var(--space-12) var(--space-8) var(--space-8);max-width:1200px;margin:0 auto;}
     .page-label{font-size:var(--text-xs);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:var(--space-2);}
-    .page-title{font-family:var(--font-display);font-size:var(--text-2xl);font-weight:800;letter-spacing:-0.03em;line-height:1.1;margin-bottom:var(--space-4);}
+    .page-title{font-family:var(--font-display);font-size:var(--text-2xl);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:var(--space-4);}
     .page-desc{font-size:var(--text-base);color:var(--text-muted);max-width:72ch;line-height:1.7;}
     .section{padding:0 var(--space-8) var(--space-12);max-width:1200px;margin:0 auto;}
     .section-label{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:var(--space-2);}
-    .section-title{font-family:var(--font-display);font-size:var(--text-xl);font-weight:800;letter-spacing:-0.02em;margin-bottom:var(--space-6);}
-    /* AIRLINE TABLE */
+    .section-title{font-family:var(--font-display);font-size:var(--text-xl);font-weight:800;letter-spacing:-.02em;margin-bottom:var(--space-6);}
+
+    /* OVERVIEW TABLE */
     .table-wrap{overflow-x:auto;border-radius:var(--radius-xl);border:1px solid var(--border);}
     table{width:100%;border-collapse:collapse;}
     th{background:var(--surface-2);padding:var(--space-3) var(--space-4);text-align:left;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);white-space:nowrap;cursor:pointer;user-select:none;}
@@ -93,7 +97,8 @@
     .alliance-worldstar{background:#1d4ed8;color:white;}
     .alliance-onesky{background:#0f766e;color:white;}
     .alliance-none{background:var(--surface-2);color:var(--text-faint);border:1px solid var(--border);}
-    /* AIRLINE DETAIL SECTIONS */
+
+    /* AIRLINE DETAIL */
     .airline-section{border:1px solid var(--border);border-radius:var(--radius-xl);margin-bottom:var(--space-6);overflow:hidden;}
     .airline-header{display:flex;align-items:center;gap:var(--space-6);padding:var(--space-6);background:var(--surface);border-bottom:1px solid var(--border);}
     .airline-logo-wrap{width:140px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
@@ -106,16 +111,26 @@
     .meta-badge strong{color:var(--text);}
     .airline-body{padding:var(--space-6);}
     .airline-desc{font-size:var(--text-sm);color:var(--text-muted);line-height:1.7;margin-bottom:var(--space-6);}
-    /* ROUTE MAP PLACEHOLDER */
-    .route-map-ph{border:2px dashed var(--border);border-radius:var(--radius-lg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-2);min-height:240px;color:var(--text-faint);font-size:var(--text-sm);margin-bottom:var(--space-4);}
-    .route-map-ph svg{opacity:.35;}
-    .route-map-ph span{font-size:var(--text-xs);}
-    /* STATS ROW */
     .stats-row{display:flex;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-6);}
     .stat-box{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);flex:1;min-width:120px;}
     .stat-val{font-family:var(--font-display);font-size:var(--text-xl);font-weight:800;line-height:1;margin-bottom:4px;}
     .stat-lbl{font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;}
-    /* footer */
+
+    /* ROUTE MAP */
+    .route-map-wrap{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border);margin-bottom:var(--space-6);position:relative;}
+    .route-map{height:380px;background:var(--surface-2);}
+    .route-map .leaflet-tile-pane{filter:var(--map-filter);}
+    .map-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-2);color:var(--text-faint);font-size:var(--text-sm);background:var(--surface-2);z-index:10;transition:opacity .3s;}
+    .map-loading.hidden{opacity:0;pointer-events:none;}
+    .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .map-error{color:#f87171;font-size:var(--text-xs);}
+
+    /* ROUTE TABLE */
+    .route-table-wrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border);margin-bottom:var(--space-4);}
+    .route-table-wrap table th{font-size:10px;}
+    .route-count{font-size:var(--text-xs);color:var(--text-muted);margin-bottom:var(--space-3);}
+
     footer{border-top:1px solid var(--border);padding:var(--space-8);text-align:center;font-size:var(--text-sm);color:var(--text-muted);}
     footer a{color:var(--accent);text-decoration:none;}
     @media(max-width:768px){
@@ -124,15 +139,23 @@
       .page-hero,.section{padding-left:var(--space-4);padding-right:var(--space-4);}
       .airline-header{flex-direction:column;align-items:flex-start;}
       .airline-logo-wrap{width:100%;justify-content:flex-start;}
+      .route-map{height:260px;}
     }
+
+    /* Leaflet popup overrides */
+    .leaflet-popup-content-wrapper{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:0 4px 16px oklch(0 0 0/.3);}
+    .leaflet-popup-tip{background:var(--surface);}
+    .leaflet-popup-content{margin:10px 14px;font-size:13px;font-family:var(--font-body);line-height:1.5;}
+    .popup-code{font-weight:800;color:var(--accent);}
+    .popup-city{color:var(--text-muted);font-size:11px;}
   </style>
 </head>
 <body>
 
   <nav>
     <a href="index.html" class="nav-logo">
-      <img class="logo-dark"  src="frontend/Izarail Urban Networks dark.svg"   alt="Izarail Urban Networks" height="40" loading="eager">
-      <img class="logo-light" src="frontend/Izarail Urban Networks bright.svg" alt="Izarail Urban Networks" height="40" loading="eager">
+      <img class="logo-dark"  src="frontend/Izarail Urban Networks dark.svg"   alt="Izarail" height="40" loading="eager">
+      <img class="logo-light" src="frontend/Izarail Urban Networks bright.svg" alt="Izarail" height="40" loading="eager">
     </a>
     <div class="nav-links">
       <a href="index.html">Home</a>
@@ -148,7 +171,7 @@
             <button>Map <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button>
             <div class="dropdown--sub">
               <span class="dropdown-label">City maps</span>
-              <a href="map.html">Sai&#x00F0;aul</a>
+              <a href="map.html">Sai&#xF0;aul</a>
               <a href="map-warohan.html">Warohan</a>
               <a href="map-panaireki.html">Panaireki</a>
               <a href="map-sannupuri.html">Sannupuri</a>
@@ -177,7 +200,6 @@
     </div>
   </nav>
 
-  <!-- HERO -->
   <div class="page-hero">
     <div class="page-label">Aviation — Izaland</div>
     <h1 class="page-title">Airlines</h1>
@@ -192,7 +214,7 @@
       <table id="airline-table">
         <thead>
           <tr>
-            <th class="no-sort" style="width:120px;">Logo</th>
+            <th style="width:120px;">Logo</th>
             <th data-col="name">Airline</th>
             <th data-col="native">Izaki Name</th>
             <th data-col="waat">WAAT</th>
@@ -204,9 +226,9 @@
         </thead>
         <tbody>
           <tr data-name="Izaland Airlines" data-native="華邦航空" data-waat="IZ" data-anaca="IZA" data-alliance="WorldStar" data-fleet="192" data-hub="SUL">
-            <td class="logo-cell"><img src="frontend/airlines/Izaland Airlines.svg" alt="Izaland Airlines logo" loading="lazy"></td>
+            <td class="logo-cell"><img src="frontend/airlines/Izaland Airlines.svg" alt="" loading="lazy"></td>
             <td><a href="#iz" style="color:var(--text);text-decoration:none;font-weight:600;">Izaland Airlines</a></td>
-            <td style="font-size:var(--text-sm);">華邦航空</td>
+            <td>華邦航空</td>
             <td><span class="code-badge">IZ</span></td>
             <td><code style="font-size:var(--text-xs);color:var(--text-muted);">IZA</code></td>
             <td><span class="alliance-badge alliance-worldstar">WorldStar</span></td>
@@ -214,9 +236,9 @@
             <td>SUL</td>
           </tr>
           <tr data-name="Uletha Eastern" data-native="" data-waat="UE" data-anaca="UEA" data-alliance="OneSky" data-fleet="113" data-hub="SUL">
-            <td class="logo-cell"><img src="frontend/airlines/Uletha Eastern logo.svg" alt="Uletha Eastern logo" loading="lazy"></td>
+            <td class="logo-cell"><img src="frontend/airlines/Uletha Eastern logo.svg" alt="" loading="lazy"></td>
             <td><a href="#ue" style="color:var(--text);text-decoration:none;font-weight:600;">Uletha Eastern</a></td>
-            <td style="font-size:0.95em;">૮ેધૅઠ ૮ાઃટ્​ઠઃપ્航空</td>
+            <td style="font-size:.9em;">૮ેધૅઠ ૮ાઃટ્​ઠઃપ્航空</td>
             <td><span class="code-badge">UE</span></td>
             <td><code style="font-size:var(--text-xs);color:var(--text-muted);">UEA</code></td>
             <td><span class="alliance-badge alliance-onesky">OneSky</span></td>
@@ -224,9 +246,9 @@
             <td>SUL</td>
           </tr>
           <tr data-name="Northern Sea Airways" data-native="" data-waat="NS" data-anaca="NOS" data-alliance="-" data-fleet="75" data-hub="SNP">
-            <td class="logo-cell"><img src="frontend/airlines/Northern Sea Airways logo.png" alt="Northern Sea Airways logo" loading="lazy"></td>
+            <td class="logo-cell"><img src="frontend/airlines/Northern Sea Airways logo.png" alt="" loading="lazy"></td>
             <td><a href="#ns" style="color:var(--text);text-decoration:none;font-weight:600;">Northern Sea Airways</a></td>
-            <td style="font-size:0.95em;">પ૾દ્ટઃપ્​ટાઃ ૮ૅઃદ્૮િૅ૩ટ્</td>
+            <td style="font-size:.9em;">પ૾દ્ટઃપ્​ટાઃ ૮ૅઃદ્૮િૅ૩ટ્</td>
             <td><span class="code-badge">NS</span></td>
             <td><code style="font-size:var(--text-xs);color:var(--text-muted);">NOS</code></td>
             <td><span class="alliance-badge alliance-none">—</span></td>
@@ -234,9 +256,9 @@
             <td>SNP</td>
           </tr>
           <tr data-name="Mike Wings" data-native="" data-waat="8M" data-anaca="MWG" data-alliance="-" data-fleet="82" data-hub="TSW">
-            <td class="logo-cell"><img src="frontend/airlines/Mike Wings.svg" alt="Mike Wings logo" loading="lazy"></td>
+            <td class="logo-cell"><img src="frontend/airlines/Mike Wings.svg" alt="" loading="lazy"></td>
             <td style="font-weight:600;">Mike Wings</td>
-            <td style="font-size:0.95em;">ઇ૮ાડા ૮િાઃપ્​ટ્</td>
+            <td style="font-size:.9em;">ઇ૮ાડા ૮િાઃપ્​ટ્</td>
             <td><span class="code-badge">8M</span></td>
             <td><code style="font-size:var(--text-xs);color:var(--text-muted);">MWG</code></td>
             <td><span class="alliance-badge alliance-none">—</span></td>
@@ -244,9 +266,9 @@
             <td>TSW</td>
           </tr>
           <tr data-name="Fliza" data-native="" data-waat="FZ" data-anaca="FLZ" data-alliance="-" data-fleet="50" data-hub="TSW">
-            <td class="logo-cell"><img src="frontend/airlines/Fliza logo.svg" alt="Fliza logo" loading="lazy"></td>
+            <td class="logo-cell"><img src="frontend/airlines/Fliza logo.svg" alt="" loading="lazy"></td>
             <td style="font-weight:600;">Fliza</td>
-            <td style="font-size:0.95em;">ળેધ૮ાટૃ</td>
+            <td style="font-size:.9em;">ળેધ૮ાટૃ</td>
             <td><span class="code-badge">FZ</span></td>
             <td><code style="font-size:var(--text-xs);color:var(--text-muted);">FLZ</code></td>
             <td><span class="alliance-badge alliance-none">—</span></td>
@@ -254,9 +276,9 @@
             <td>TSW</td>
           </tr>
           <tr data-name="Tamoki Air" data-native="" data-waat="TK" data-anaca="TAM" data-alliance="-" data-fleet="37" data-hub="WRN">
-            <td class="logo-cell"><img src="frontend/airlines/Tamoki Air logo.svg" alt="Tamoki Air logo" loading="lazy"></td>
+            <td class="logo-cell"><img src="frontend/airlines/Tamoki Air logo.svg" alt="" loading="lazy"></td>
             <td style="font-weight:600;">Tamoki Air</td>
-            <td style="font-size:0.95em;">太甜૮ૅઃદ્</td>
+            <td style="font-size:.9em;">太甜૮ૅઃદ્</td>
             <td><span class="code-badge">TK</span></td>
             <td><code style="font-size:var(--text-xs);color:var(--text-muted);">TAM</code></td>
             <td><span class="alliance-badge alliance-none">—</span></td>
@@ -268,21 +290,20 @@
     </div>
   </div>
 
-  <!-- IZALAND AIRLINES -->
+  <!-- AIRLINE SECTIONS -->
   <div class="section">
     <div class="section-label">Flag Carrier</div>
     <div class="section-title">Major Airlines</div>
 
+    <!-- IZ -->
     <div class="airline-section" id="iz">
       <div class="airline-header">
-        <div class="airline-logo-wrap">
-          <img src="frontend/airlines/Izaland Airlines.svg" alt="Izaland Airlines">
-        </div>
+        <div class="airline-logo-wrap"><img src="frontend/airlines/Izaland Airlines.svg" alt="Izaland Airlines"></div>
         <div class="airline-meta">
           <div class="airline-name">Izaland Airlines</div>
           <div class="airline-name-native">華邦航空</div>
           <div class="airline-badges">
-            <span class="meta-badge"><strong>IZ</strong> &nbsp; WAAT</span>
+            <span class="meta-badge"><strong>IZ</strong>&nbsp;WAAT</span>
             <span class="meta-badge">ANACA: <strong>IZA</strong></span>
             <span class="meta-badge">Hub: <strong>SUL</strong></span>
             <span class="meta-badge">Fleet: <strong>192</strong></span>
@@ -297,26 +318,36 @@
           <div class="stat-box"><div class="stat-val">WorldStar</div><div class="stat-lbl">Alliance</div></div>
           <div class="stat-box"><div class="stat-val">IZ</div><div class="stat-lbl">WAAT Code</div></div>
         </div>
-        <p class="airline-desc">Izaland's flag carrier and largest airline by fleet size, operating long-haul intercontinental routes as well as domestic trunk services. As a founding member of the WorldStar alliance, it provides codeshare coverage across Uletha and Archanta.</p>
-        <div class="route-map-ph">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          <strong>Route map &mdash; IZ</strong>
-          <span>Route map will appear here once data is available</span>
+        <p class="airline-desc">Izaland's flag carrier and largest airline by fleet size, operating long-haul intercontinental routes as well as domestic trunk services. As a member of the WorldStar alliance, it provides codeshare coverage across Uletha and Archanta.</p>
+        <div class="route-map-wrap">
+          <div id="map-iz" class="route-map"></div>
+          <div class="map-loading" id="loading-iz"><div class="spinner"></div><span>Loading route data…</span></div>
+        </div>
+        <div class="route-count" id="count-iz"></div>
+        <div class="route-table-wrap">
+          <table>
+            <thead><tr>
+              <th data-rt="iz" data-col="origin_code">Origin</th>
+              <th data-rt="iz" data-col="origin_city">City</th>
+              <th data-rt="iz" data-col="dest_code">Dest</th>
+              <th data-rt="iz" data-col="dest_city">City</th>
+              <th data-rt="iz" data-col="distance_km" style="text-align:right;">km</th>
+            </tr></thead>
+            <tbody id="routes-iz"></tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- ULETHA EASTERN -->
+    <!-- UE -->
     <div class="airline-section" id="ue">
       <div class="airline-header">
-        <div class="airline-logo-wrap">
-          <img src="frontend/airlines/Uletha Eastern logo.svg" alt="Uletha Eastern">
-        </div>
+        <div class="airline-logo-wrap"><img src="frontend/airlines/Uletha Eastern logo.svg" alt="Uletha Eastern"></div>
         <div class="airline-meta">
           <div class="airline-name">Uletha Eastern</div>
           <div class="airline-name-native">૮ેધૅઠ ૮ાઃટ્​ઠઃપ્航空</div>
           <div class="airline-badges">
-            <span class="meta-badge"><strong>UE</strong> &nbsp; WAAT</span>
+            <span class="meta-badge"><strong>UE</strong>&nbsp;WAAT</span>
             <span class="meta-badge">ANACA: <strong>UEA</strong></span>
             <span class="meta-badge">Hub: <strong>SUL</strong></span>
             <span class="meta-badge">Fleet: <strong>113</strong></span>
@@ -331,26 +362,36 @@
           <div class="stat-box"><div class="stat-val">OneSky</div><div class="stat-lbl">Alliance</div></div>
           <div class="stat-box"><div class="stat-val">UE</div><div class="stat-lbl">WAAT Code</div></div>
         </div>
-        <p class="airline-desc">Second largest airline in Izaland, with a focus on Eastern Uletha and Archanta. A member of the OneSky alliance, Uletha Eastern complements the flag carrier with a distinct network emphasising medium-haul and regional connections.</p>
-        <div class="route-map-ph">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          <strong>Route map &mdash; UE</strong>
-          <span>Route map will appear here once data is available</span>
+        <p class="airline-desc">Second largest airline in Izaland, focusing on Eastern Uletha and Archanta. A member of the OneSky alliance, Uletha Eastern complements the flag carrier with a distinct medium-haul and regional network.</p>
+        <div class="route-map-wrap">
+          <div id="map-ue" class="route-map"></div>
+          <div class="map-loading" id="loading-ue"><div class="spinner"></div><span>Loading route data…</span></div>
+        </div>
+        <div class="route-count" id="count-ue"></div>
+        <div class="route-table-wrap">
+          <table>
+            <thead><tr>
+              <th data-rt="ue" data-col="origin_code">Origin</th>
+              <th data-rt="ue" data-col="origin_city">City</th>
+              <th data-rt="ue" data-col="dest_code">Dest</th>
+              <th data-rt="ue" data-col="dest_city">City</th>
+              <th data-rt="ue" data-col="distance_km" style="text-align:right;">km</th>
+            </tr></thead>
+            <tbody id="routes-ue"></tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- NORTHERN SEA AIRWAYS -->
+    <!-- NS -->
     <div class="airline-section" id="ns">
       <div class="airline-header">
-        <div class="airline-logo-wrap">
-          <img src="frontend/airlines/Northern Sea Airways logo.png" alt="Northern Sea Airways">
-        </div>
+        <div class="airline-logo-wrap"><img src="frontend/airlines/Northern Sea Airways logo.png" alt="Northern Sea Airways"></div>
         <div class="airline-meta">
           <div class="airline-name">Northern Sea Airways</div>
           <div class="airline-name-native">પ૾દ્ટઃપ્​ટાઃ ૮ૅઃદ્૮િૅ૩ટ્</div>
           <div class="airline-badges">
-            <span class="meta-badge"><strong>NS</strong> &nbsp; WAAT</span>
+            <span class="meta-badge"><strong>NS</strong>&nbsp;WAAT</span>
             <span class="meta-badge">ANACA: <strong>NOS</strong></span>
             <span class="meta-badge">Hub: <strong>SNP</strong></span>
             <span class="meta-badge">Fleet: <strong>75</strong></span>
@@ -366,10 +407,22 @@
           <div class="stat-box"><div class="stat-val">NS</div><div class="stat-lbl">WAAT Code</div></div>
         </div>
         <p class="airline-desc">Semi-low-cost carrier operating as a Joint Venture, with hubs in Sannupuri (Izaland), Kyuoi (Nuen) and Nautecove (Canterra). Focuses on north-eastern Uletha, filling gaps not served by the two major carriers.</p>
-        <div class="route-map-ph">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          <strong>Route map &mdash; NS</strong>
-          <span>Route map will appear here once data is available</span>
+        <div class="route-map-wrap">
+          <div id="map-ns" class="route-map"></div>
+          <div class="map-loading" id="loading-ns"><div class="spinner"></div><span>Loading route data…</span></div>
+        </div>
+        <div class="route-count" id="count-ns"></div>
+        <div class="route-table-wrap">
+          <table>
+            <thead><tr>
+              <th data-rt="ns" data-col="origin_code">Origin</th>
+              <th data-rt="ns" data-col="origin_city">City</th>
+              <th data-rt="ns" data-col="dest_code">Dest</th>
+              <th data-rt="ns" data-col="dest_city">City</th>
+              <th data-rt="ns" data-col="distance_km" style="text-align:right;">km</th>
+            </tr></thead>
+            <tbody id="routes-ns"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -379,8 +432,11 @@
     <p>Izaland Transit Portal &middot; <a href="index.html">Back to Home</a></p>
   </footer>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-  // ─ Theme
+  /* ─────────────────────────────────────────────
+     THEME
+  ───────────────────────────────────────────── */
   (function(){
     const t=document.querySelector('[data-theme-toggle]'),r=document.documentElement;
     let d=r.getAttribute('data-theme')||'dark';
@@ -393,9 +449,11 @@
     });
   })();
 
-  // ─ Nav dropdowns
+  /* ─────────────────────────────────────────────
+     NAV DROPDOWNS
+  ───────────────────────────────────────────── */
   document.querySelectorAll('.nav-item:not(.nav-item--sub)').forEach(item=>{
-    const btn=item.querySelector(':scope>button'); if(!btn)return;
+    const btn=item.querySelector(':scope>button');if(!btn)return;
     btn.addEventListener('click',e=>{
       e.stopPropagation();
       const open=item.classList.contains('open');
@@ -405,7 +463,7 @@
     });
   });
   document.querySelectorAll('.nav-item--sub').forEach(sub=>{
-    const btn=sub.querySelector(':scope>button'); if(!btn)return;
+    const btn=sub.querySelector(':scope>button');if(!btn)return;
     btn.addEventListener('click',e=>{
       e.stopPropagation();
       const open=sub.classList.contains('open');
@@ -414,33 +472,193 @@
     });
   });
   document.addEventListener('click',()=>{
-    document.querySelectorAll('.nav-item.open').forEach(o=>o.classList.remove('open'));
-    document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
+    document.querySelectorAll('.nav-item.open,.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
   });
 
-  // ─ Sortable table
+  /* ─────────────────────────────────────────────
+     OVERVIEW TABLE SORT
+  ───────────────────────────────────────────── */
   (function(){
     const tbody=document.querySelector('#airline-table tbody');
-    const ths=document.querySelectorAll('#airline-table th[data-col]');
-    let sortCol=null, sortDir=1;
-    ths.forEach(th=>{
+    let sortCol=null,sortDir=1;
+    document.querySelectorAll('#airline-table th[data-col]').forEach(th=>{
       th.addEventListener('click',()=>{
         const col=th.dataset.col;
-        if(sortCol===col){ sortDir*=-1; }
-        else{ sortCol=col; sortDir=1; }
-        ths.forEach(h=>h.classList.remove('sort-asc','sort-desc'));
+        sortDir=(sortCol===col)?sortDir*-1:1;
+        sortCol=col;
+        document.querySelectorAll('#airline-table th').forEach(h=>h.classList.remove('sort-asc','sort-desc'));
         th.classList.add(sortDir===1?'sort-asc':'sort-desc');
-        const rows=[...tbody.querySelectorAll('tr')];
-        rows.sort((a,b)=>{
-          let av=a.dataset[col]||'', bv=b.dataset[col]||'';
-          const an=parseFloat(av), bn=parseFloat(bv);
-          if(!isNaN(an)&&!isNaN(bn)) return (an-bn)*sortDir;
-          return av.localeCompare(bv)*sortDir;
-        });
-        rows.forEach(r=>tbody.appendChild(r));
+        [...tbody.querySelectorAll('tr')]
+          .sort((a,b)=>{
+            let av=a.dataset[col]||'',bv=b.dataset[col]||'';
+            const an=parseFloat(av),bn=parseFloat(bv);
+            return(!isNaN(an)&&!isNaN(bn))?(an-bn)*sortDir:av.localeCompare(bv)*sortDir;
+          })
+          .forEach(r=>tbody.appendChild(r));
       });
     });
   })();
+
+  /* ─────────────────────────────────────────────
+     GREAT-CIRCLE ARC
+     Returns array of [lat,lon] points (handles antimeridian split)
+  ───────────────────────────────────────────── */
+  function greatCirclePoints(lat1,lon1,lat2,lon2,n){
+    n=n||80;
+    const R=Math.PI/180;
+    const φ1=lat1*R,λ1=lon1*R,φ2=lat2*R,λ2=lon2*R;
+    const d=2*Math.asin(Math.sqrt(
+      Math.sin((φ2-φ1)/2)**2+Math.cos(φ1)*Math.cos(φ2)*Math.sin((λ2-λ1)/2)**2
+    ));
+    if(d<1e-6)return[[lat1,lon1],[lat2,lon2]];
+    const pts=[];
+    for(let i=0;i<=n;i++){
+      const f=i/n;
+      const A=Math.sin((1-f)*d)/Math.sin(d);
+      const B=Math.sin(f*d)/Math.sin(d);
+      const x=A*Math.cos(φ1)*Math.cos(λ1)+B*Math.cos(φ2)*Math.cos(λ2);
+      const y=A*Math.cos(φ1)*Math.sin(λ1)+B*Math.cos(φ2)*Math.sin(λ2);
+      const z=A*Math.sin(φ1)+B*Math.sin(φ2);
+      const lat=Math.atan2(z,Math.sqrt(x*x+y*y))/R;
+      const lon=Math.atan2(y,x)/R;
+      pts.push([lat,lon]);
+    }
+    // split at antimeridian
+    const segs=[[]];
+    for(let i=1;i<pts.length;i++){
+      if(Math.abs(pts[i][1]-pts[i-1][1])>180)segs.push([]);
+      segs[segs.length-1].push(pts[i]);
+    }
+    segs[0].unshift(pts[0]);
+    return segs.length===1?pts:segs;
+  }
+
+  /* ─────────────────────────────────────────────
+     ROUTE MAP BUILDER
+  ───────────────────────────────────────────── */
+  const OGF_TILE = 'https://{s}.tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png';
+  const ATTR = '&copy; <a href="https://opengeofiction.net">OpenGeofiction</a> contributors';
+  const DATA_URL = 'https://data.opengeofiction.net/utility/airline_routes.json';
+
+  // per-airline accent colours
+  const AIRLINE_COLOR = {
+    IZ:'#60a5fa', UE:'#34d399', NS:'#f59e0b',
+    '8M':'#f472b6', FZ:'#a78bfa', TK:'#fb923c'
+  };
+
+  // cache fetched data
+  const _cache = {};
+
+  async function fetchRoutes(id){
+    if(_cache[id])return _cache[id];
+    const url=`${DATA_URL}?airline_code=${encodeURIComponent(id)}&return=0`;
+    const res=await fetch(url);
+    if(!res.ok)throw new Error(`HTTP ${res.status}`);
+    const json=await res.json();
+    // support both array root and { data: [...] } shape
+    _cache[id]=Array.isArray(json)?json:(json.data||json.routes||[]);
+    return _cache[id];
+  }
+
+  function buildRouteMap(id,cfg){
+    const slug=id.toLowerCase().replace(/[^a-z0-9]/g,'m');
+    const mapDiv=document.getElementById('map-'+slug);
+    const loadEl=document.getElementById('loading-'+slug);
+    const countEl=document.getElementById('count-'+slug);
+    const tbodyEl=document.getElementById('routes-'+slug);
+    if(!mapDiv)return;
+
+    const color=AIRLINE_COLOR[id]||'#60a5fa';
+    const map=L.map(mapDiv,{
+      center:[cfg.lat||0,cfg.lon||90],
+      zoom:cfg.z||3,
+      minZoom:cfg.min||2,
+      maxZoom:cfg.max||10,
+      attributionControl:true
+    });
+    L.tileLayer(OGF_TILE,{attribution:ATTR,subdomains:'abc',maxZoom:19}).addTo(map);
+
+    fetchRoutes(id).then(routes=>{
+      loadEl.classList.add('hidden');
+      if(!routes.length){
+        loadEl.innerHTML='<span class="map-error">No route data available for '+id+'</span>';
+        loadEl.classList.remove('hidden');
+        return;
+      }
+
+      // deduplicate airports
+      const airports={};
+      routes.forEach(r=>{
+        airports[r.origin_code]={lat:+r.origin_lat,lon:+r.origin_lon,name:r.origin_name,city:r.origin_city};
+        airports[r.dest_code]={lat:+r.dest_lat,lon:+r.dest_lon,name:r.dest_name,city:r.dest_city};
+      });
+
+      // draw arcs
+      routes.forEach(r=>{
+        const pts=greatCirclePoints(+r.origin_lat,+r.origin_lon,+r.dest_lat,+r.dest_lon,80);
+        const isMulti=Array.isArray(pts[0][0]);  // split segments
+        const segs=isMulti?pts:[pts];
+        segs.forEach(seg=>{
+          L.polyline(seg,{color,weight:1.5,opacity:.55}).addTo(map);
+        });
+      });
+
+      // draw airport dots
+      const dotIcon=L.divIcon({className:'',html:`<div style="width:7px;height:7px;border-radius:50%;background:${color};border:1.5px solid rgba(255,255,255,.7);box-shadow:0 0 4px ${color}88;"></div>`,iconSize:[7,7],iconAnchor:[3.5,3.5]});
+      Object.entries(airports).forEach(([code,ap])=>{
+        L.marker([ap.lat,ap.lon],{icon:dotIcon})
+          .bindPopup(`<span class="popup-code">${code}</span><br><b>${ap.name||''}</b><br><span class="popup-city">${ap.city||''}</span>`)
+          .addTo(map);
+      });
+
+      // route table
+      if(countEl)countEl.textContent=`${routes.length} route${routes.length!==1?'s':''} · ${Object.keys(airports).length} airports`;
+      if(tbodyEl){
+        tbodyEl.innerHTML=routes.map(r=>`
+          <tr>
+            <td><span class="code-badge">${r.origin_code}</span></td>
+            <td>${r.origin_city||r.origin_name||''}</td>
+            <td><span class="code-badge">${r.dest_code}</span></td>
+            <td>${r.dest_city||r.dest_name||''}</td>
+            <td style="text-align:right;">${r.distance_km?Math.round(r.distance_km).toLocaleString():''}</td>
+          </tr>`).join('');
+
+        // sortable route table
+        const ths=tbodyEl.closest('table').querySelectorAll('th[data-rt]');
+        let rtSortCol=null,rtSortDir=1;
+        ths.forEach(th=>{
+          th.style.cursor='pointer';th.style.userSelect='none';
+          th.addEventListener('click',()=>{
+            const col=th.dataset.col;
+            rtSortDir=(rtSortCol===col)?rtSortDir*-1:1;
+            rtSortCol=col;
+            ths.forEach(h=>h.classList.remove('sort-asc','sort-desc'));
+            th.classList.add(rtSortDir===1?'sort-asc':'sort-desc');
+            [...tbodyEl.querySelectorAll('tr')]
+              .sort((a,b)=>{
+                const ai=Array.from(a.cells),bi=Array.from(b.cells);
+                const idx=Array.from(ths).indexOf(th);
+                const av=ai[idx]?.textContent.trim()||'';
+                const bv=bi[idx]?.textContent.trim()||'';
+                const an=parseFloat(av.replace(/,/g,'')),bn=parseFloat(bv.replace(/,/g,''));
+                return(!isNaN(an)&&!isNaN(bn))?(an-bn)*rtSortDir:av.localeCompare(bv)*rtSortDir;
+              })
+              .forEach(r=>tbodyEl.appendChild(r));
+          });
+        });
+      }
+    }).catch(err=>{
+      loadEl.innerHTML=`<span class="map-error">Could not load routes: ${err.message}</span>`;
+      loadEl.classList.remove('hidden');
+    });
+  }
+
+  /* ─────────────────────────────────────────────
+     INIT MAPS
+  ───────────────────────────────────────────── */
+  buildRouteMap('IZ',  {lat:-20.0, lon:90.0,  z:3});
+  buildRouteMap('UE',  {lat:0.0,   lon:90.0,  z:3});
+  buildRouteMap('NS',  {lat:45.0,  lon:120.0, z:4, min:2, max:10});
   </script>
 </body>
 </html>
