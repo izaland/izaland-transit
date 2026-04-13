@@ -320,17 +320,42 @@
     return meta?meta.colour:'#888';
   }
 
+  // Returns dot size params based on current zoom level
+  function dotParams(z, selected){
+    if(selected) return { sz:14, bw:3, micro:false };
+    if(z >= 16)  return { sz:12, bw:2.5, micro:false };
+    if(z >= 14)  return { sz:9,  bw:2,   micro:false };
+    if(z >= 12)  return { sz:6,  bw:1.5, micro:false };
+    return               { sz:3,  bw:0,   micro:true  };
+  }
+
   function makeIcon(col, selected=false){
-    const sz=selected?14:10, bw=selected?3:2;
-    const shadow=selected?'box-shadow:0 0 0 3px rgba(255,255,255,.22);':'';
-    const html=`<div style="width:${sz}px;height:${sz}px;border-radius:50%;`+
-      `background:var(--sf,#161b27);border:${bw}px solid ${col};`+
-      `box-sizing:border-box;pointer-events:auto;cursor:pointer;${shadow}"></div>`;
+    const z = map.getZoom();
+    const { sz, bw, micro } = dotParams(z, selected);
+    const shadow = selected ? 'box-shadow:0 0 0 3px rgba(255,255,255,.22);' : '';
+    let html;
+    if(micro){
+      // flat solid dot, no border, no bg — maximally minimal
+      html = `<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${col};box-sizing:border-box;pointer-events:auto;cursor:pointer;"></div>`;
+    } else {
+      html = `<div style="width:${sz}px;height:${sz}px;border-radius:50%;`+
+        `background:var(--sf,#161b27);border:${bw}px solid ${col};`+
+        `box-sizing:border-box;pointer-events:auto;cursor:pointer;${shadow}"></div>`;
+    }
     return L.divIcon({
       className: 'iz-marker',
       html,
       iconSize:   [sz, sz],
       iconAnchor: [sz/2, sz/2]
+    });
+  }
+
+  function updateMarkerIcons(){
+    Object.values(stations).forEach(st=>{
+      if(!st.marker) return;
+      const col = primaryColour(st);
+      const sel = String(st.id) === selectedId;
+      st.marker.setIcon(makeIcon(col, sel));
     });
   }
 
@@ -345,6 +370,8 @@
       markerLayer.addLayer(mk);
     });
   }
+
+  map.on('zoomend', updateMarkerIcons);
 
   // ─ sidebar
   let searchQ='';
@@ -362,10 +389,8 @@
   }
 
   // ── Build a de-duplicated, sorted list of line "groups" for a bucket.
-  // Groups are keyed by the display short code; each group holds all relIds
-  // that share that code (e.g. the four branches of line "2").
   function buildLineGroups(bucket){
-    const groupMap = new Map(); // short -> { short, name, colour, relIds[] }
+    const groupMap = new Map();
     bucket.forEach(({id, m})=>{
       const key = (m.short || id).trim();
       if(!groupMap.has(key)){
@@ -373,7 +398,6 @@
       }
       groupMap.get(key).relIds.push(id);
     });
-    // Sort A-Z with natural numeric ordering (so "2" < "10", "AX" < "CK")
     return [...groupMap.values()].sort((a,b)=>
       a.short.localeCompare(b.short, undefined, {numeric:true, sensitivity:'base'})
     );
@@ -409,7 +433,6 @@
       lbl.textContent=g.label; group.appendChild(lbl);
       const chips=document.createElement('div'); chips.className='filter-chips';
       groups.forEach(({short, name, colour, relIds})=>{
-        // Group is "on" if at least one of its relIds is visible
         const on=relIds.some(id=>isVisible(id));
         const b=document.createElement('button');
         b.className='filter-btn '+(on?'on':'off');
