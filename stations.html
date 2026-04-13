@@ -77,20 +77,10 @@
     .filter-group-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-f);margin-bottom:var(--sp2);display:flex;align-items:center;gap:6px;}
     .filter-group-label::after{content:'';flex:1;height:1px;background:var(--bd);}
     .filter-chips{display:flex;flex-wrap:wrap;gap:var(--sp1);}
-    /* line toggle buttons: ON = coloured fill, OFF = dimmed */
-    .filter-btn{
-      padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
-      border:1px solid var(--bd);border-radius:var(--r-full);background:none;
-      color:var(--tx-f);cursor:pointer;transition:all var(--tx);white-space:nowrap;
-    }
+    .filter-btn{padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--bd);border-radius:var(--r-full);background:none;color:var(--tx-f);cursor:pointer;transition:all var(--tx);white-space:nowrap;}
     .filter-btn.on{ color:white; }
     .filter-btn.off{ opacity:.35; }
-    /* All / None special buttons */
-    .ctrl-btn{
-      padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
-      border:1px solid var(--bd);border-radius:var(--r-full);background:none;
-      color:var(--tx-m);cursor:pointer;transition:all var(--tx);white-space:nowrap;
-    }
+    .ctrl-btn{padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--bd);border-radius:var(--r-full);background:none;color:var(--tx-m);cursor:pointer;transition:all var(--tx);white-space:nowrap;}
     .ctrl-btn:hover{background:var(--sf2);color:var(--tx-c);border-color:var(--tx-m);}
     .ctrl-btn.active{background:var(--ac);color:white;border-color:var(--ac);}
     /* ─────────────────── */
@@ -129,6 +119,8 @@
     #sbar{position:absolute;bottom:var(--sp4);right:var(--sp4);z-index:600;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-full);padding:var(--sp2) var(--sp4);font-size:var(--text-xs);color:var(--tx-m);pointer-events:none;transition:opacity .4s;white-space:nowrap;box-shadow:0 4px 16px oklch(0 0 0/.25);}
     #sbar.h{opacity:0;}
     .lt{background:var(--sf)!important;border:1px solid var(--bd)!important;color:var(--tx-c)!important;font-family:var(--font-body)!important;font-size:11px!important;border-radius:var(--r-sm)!important;padding:3px 8px!important;}
+    /* fix: divIcon click area */
+    .iz-marker{ pointer-events:auto!important; cursor:pointer; }
     @media(max-width:768px){
       nav{padding:var(--sp3) var(--sp4);} .nav-links{gap:var(--sp3);}
       .app{flex-direction:column;}
@@ -271,116 +263,96 @@
   let lineRegistry={};
   let lineGeom={};
 
-  // ──────────────────────────────────────────
-  // VISIBILITY STATE
-  // visibleLines = Set of relIds currently shown on map.
-  // null = "all visible" (initial state, avoid building a huge Set upfront)
-  let visibleLines = null; // null means ALL
-  let allLineIds = [];     // populated after data loads
-
-  function isVisible(relId){ return visibleLines === null || visibleLines.has(relId); }
-  function isAllVisible(){ return visibleLines === null || visibleLines.size === allLineIds.length; }
-  function isNoneVisible(){ return visibleLines !== null && visibleLines.size === 0; }
-
-  function setAll(){
-    visibleLines = null;
-    applyVisibility();
-    buildFilters();
-    buildList();
-  }
-  function setNone(){
-    visibleLines = new Set();
-    applyVisibility();
-    buildFilters();
-    buildList();
-  }
+  // ── VISIBILITY STATE
+  let visibleLines = null;
+  let allLineIds = [];
+  function isVisible(relId){ return visibleLines===null||visibleLines.has(relId); }
+  function isAllVisible(){ return visibleLines===null||visibleLines.size===allLineIds.length; }
+  function isNoneVisible(){ return visibleLines!==null&&visibleLines.size===0; }
+  function setAll(){ visibleLines=null; applyVisibility(); buildFilters(); buildList(); }
+  function setNone(){ visibleLines=new Set(); applyVisibility(); buildFilters(); buildList(); }
   function toggleLine(relId){
-    // Switch from "all" mode to explicit set first
-    if(visibleLines === null) visibleLines = new Set(allLineIds);
-    if(visibleLines.has(relId)) visibleLines.delete(relId);
-    else visibleLines.add(relId);
-    // If all are back on, reset to null (all mode)
-    if(visibleLines.size === allLineIds.length) visibleLines = null;
-    applyVisibility();
-    buildFilters();
-    buildList();
+    if(visibleLines===null) visibleLines=new Set(allLineIds);
+    if(visibleLines.has(relId)) visibleLines.delete(relId); else visibleLines.add(relId);
+    if(visibleLines.size===allLineIds.length) visibleLines=null;
+    applyVisibility(); buildFilters(); buildList();
   }
-  // ──────────────────────────────────────────
 
-  // ─ per-line polyline + marker storage
-  const linePolylines = {};  // relId -> [L.Polyline, ...]
-  const markerLayer = L.layerGroup().addTo(map);
-  let selectedId = null;
+  const linePolylines={};
+  const markerLayer=L.layerGroup().addTo(map);
+  let selectedId=null;
 
   function renderPolylines(){
-    // Build per-line polyline groups
-    Object.entries(lineGeom).forEach(([relId, segments])=>{
-      const meta = lineRegistry[relId];
-      if(!meta || meta.type==='disabled') return;
-      const colour = meta.colour || '#888';
-      const name   = meta.name   || relId;
-      const pls = [];
+    Object.entries(lineGeom).forEach(([relId,segments])=>{
+      const meta=lineRegistry[relId];
+      if(!meta||meta.type==='disabled') return;
+      const colour=meta.colour||'#888', name=meta.name||relId, pls=[];
       segments.forEach(seg=>{
         if(seg.length<2) return;
-        const pl = L.polyline(seg,{color:colour,weight:4,opacity:.85,smoothFactor:1.2});
+        const pl=L.polyline(seg,{color:colour,weight:4,opacity:.85,smoothFactor:1.2});
         pl.bindTooltip(name,{sticky:true,className:'lt'});
-        pl.addTo(map);
-        pls.push(pl);
+        pl.addTo(map); pls.push(pl);
       });
-      linePolylines[relId] = pls;
+      linePolylines[relId]=pls;
     });
   }
 
   function applyVisibility(){
-    // Polylines
-    Object.entries(linePolylines).forEach(([relId, pls])=>{
-      const on = isVisible(relId);
+    Object.entries(linePolylines).forEach(([relId,pls])=>{
+      const on=isVisible(relId);
       pls.forEach(pl=>{ if(on) map.addLayer(pl); else map.removeLayer(pl); });
     });
-    // Markers: show station only if at least one of its lines is visible
     Object.values(stations).forEach(st=>{
       if(!st.marker) return;
-      const show = st.lines.some(l => isVisible(l.relId));
-      if(show) markerLayer.addLayer(st.marker);
-      else     markerLayer.removeLayer(st.marker);
+      const show=st.lines.some(l=>isVisible(l.relId));
+      if(show) markerLayer.addLayer(st.marker); else markerLayer.removeLayer(st.marker);
     });
   }
 
   function primaryColour(st){
     if(!st.lines||!st.lines.length) return '#888';
-    // prefer first visible line colour
-    const vis = st.lines.find(l=>isVisible(l.relId));
-    const meta = lineRegistry[(vis||st.lines[0]).relId];
-    return meta ? meta.colour : '#888';
+    const vis=st.lines.find(l=>isVisible(l.relId));
+    const meta=lineRegistry[(vis||st.lines[0]).relId];
+    return meta?meta.colour:'#888';
   }
-  function makeIcon(col,selected=false){
-    const sz=selected?14:10, bw=selected?3:2, sh=selected?'box-shadow:0 0 0 3px rgba(255,255,255,.22);':'';
-    return L.divIcon({className:'',html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:var(--sf,#161b27);border:${bw}px solid ${col};box-sizing:border-box;${sh}"></div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
+
+  // FIX: className='iz-marker' keeps Leaflet's wrapper pointer-events intact
+  // and the inner div also gets pointer-events:auto + cursor:pointer explicitly.
+  function makeIcon(col, selected=false){
+    const sz=selected?14:10, bw=selected?3:2;
+    const shadow=selected?'box-shadow:0 0 0 3px rgba(255,255,255,.22);':'';
+    const html=`<div style="width:${sz}px;height:${sz}px;border-radius:50%;`+
+      `background:var(--sf,#161b27);border:${bw}px solid ${col};`+
+      `box-sizing:border-box;pointer-events:auto;cursor:pointer;${shadow}"></div>`;
+    return L.divIcon({
+      className: 'iz-marker',
+      html,
+      iconSize:   [sz, sz],
+      iconAnchor: [sz/2, sz/2]
+    });
   }
 
   function renderMarkers(){
     markerLayer.clearLayers();
     Object.values(stations).forEach(st=>{
-      const col = primaryColour(st);
-      const mk  = L.marker([st.lat,st.lon],{icon:makeIcon(col),title:st.name,zIndexOffset:100});
+      const col=primaryColour(st);
+      const mk=L.marker([st.lat,st.lon],{icon:makeIcon(col),title:st.name,zIndexOffset:100});
       if(st.name) mk.bindTooltip(st.name,{sticky:true,className:'lt'});
       mk.on('click',()=>selectStation(String(st.id)));
-      st.marker = mk;
+      st.marker=mk;
       markerLayer.addLayer(mk);
     });
   }
 
   // ─ sidebar
-  let searchQ = '';
-
-  const TYPE_GROUPS = [
-    { key:'train',      label:'🚆 Train',      types:['train','railway'] },
-    { key:'subway',     label:'🚇 Metro',      types:['subway'] },
-    { key:'light_rail', label:'🚊 Light Rail', types:['light_rail','tram'] },
-    { key:'monorail',   label:'🚝 Monorail',   types:['monorail'] },
-    { key:'other',      label:'🔹 Other',      types:[] },
+  let searchQ='';
+  const TYPE_GROUPS=[
+    {key:'train',      label:'🚆 Train',      types:['train','railway']},
+    {key:'subway',     label:'🚇 Metro',      types:['subway']},
+    {key:'light_rail', label:'🚊 Light Rail', types:['light_rail','tram']},
+    {key:'monorail',   label:'🚝 Monorail',   types:['monorail']},
+    {key:'other',      label:'🔹 Other',      types:[]},
   ];
-
   function typeGroup(t){
     if(!t||t==='disabled') return null;
     for(const g of TYPE_GROUPS){ if(g.types.includes(t)) return g.key; }
@@ -388,139 +360,98 @@
   }
 
   function buildFilters(){
-    const el = document.getElementById('filters');
-    el.innerHTML = '';
-
-    const usedLineIds = new Set();
+    const el=document.getElementById('filters'); el.innerHTML='';
+    const usedLineIds=new Set();
     Object.values(stations).forEach(st=>st.lines.forEach(l=>usedLineIds.add(l.relId)));
-
-    const buckets = {};
+    const buckets={};
     TYPE_GROUPS.forEach(g=>buckets[g.key]=[]);
     Object.entries(lineRegistry).forEach(([id,m])=>{
       if(!usedLineIds.has(id)||m.type==='disabled') return;
-      const gk = typeGroup(m.type)||'other';
-      buckets[gk].push({id,m});
+      buckets[typeGroup(m.type)||'other'].push({id,m});
     });
 
-    // ─ "All" / "None" control row
-    const ctrlGroup = document.createElement('div');
-    ctrlGroup.className = 'filter-group';
-    const ctrlChips = document.createElement('div');
-    ctrlChips.className = 'filter-chips';
+    const ctrlGroup=document.createElement('div'); ctrlGroup.className='filter-group';
+    const ctrlChips=document.createElement('div'); ctrlChips.className='filter-chips';
+    const allBtn=document.createElement('button');
+    allBtn.className='ctrl-btn'+(isAllVisible()?' active':'');
+    allBtn.textContent='All'; allBtn.title='Show all lines'; allBtn.onclick=()=>setAll();
+    const noneBtn=document.createElement('button');
+    noneBtn.className='ctrl-btn'+(isNoneVisible()?' active':'');
+    noneBtn.textContent='None'; noneBtn.title='Hide all lines'; noneBtn.onclick=()=>setNone();
+    ctrlChips.appendChild(allBtn); ctrlChips.appendChild(noneBtn);
+    ctrlGroup.appendChild(ctrlChips); el.appendChild(ctrlGroup);
 
-    const allBtn = document.createElement('button');
-    allBtn.className = 'ctrl-btn' + (isAllVisible() ? ' active' : '');
-    allBtn.textContent = 'All';
-    allBtn.title = 'Show all lines';
-    allBtn.onclick = () => setAll();
-
-    const noneBtn = document.createElement('button');
-    noneBtn.className = 'ctrl-btn' + (isNoneVisible() ? ' active' : '');
-    noneBtn.textContent = 'None';
-    noneBtn.title = 'Hide all lines';
-    noneBtn.onclick = () => setNone();
-
-    ctrlChips.appendChild(allBtn);
-    ctrlChips.appendChild(noneBtn);
-    ctrlGroup.appendChild(ctrlChips);
-    el.appendChild(ctrlGroup);
-
-    // ─ one section per type group
     TYPE_GROUPS.forEach(g=>{
-      const lines = buckets[g.key];
-      if(!lines.length) return;
-
-      const group = document.createElement('div');
-      group.className = 'filter-group';
-
-      const lbl = document.createElement('div');
-      lbl.className = 'filter-group-label';
-      lbl.textContent = g.label;
-      group.appendChild(lbl);
-
-      const chips = document.createElement('div');
-      chips.className = 'filter-chips';
-
+      const lines=buckets[g.key]; if(!lines.length) return;
+      const group=document.createElement('div'); group.className='filter-group';
+      const lbl=document.createElement('div'); lbl.className='filter-group-label';
+      lbl.textContent=g.label; group.appendChild(lbl);
+      const chips=document.createElement('div'); chips.className='filter-chips';
       lines.forEach(({id,m})=>{
-        const on = isVisible(id);
-        const b  = document.createElement('button');
-        b.className = 'filter-btn ' + (on ? 'on' : 'off');
-        b.textContent = m.short || id;
-        b.title = m.name || id;
-        // coloured border always; fill only when ON
-        b.style.borderColor = m.colour + '88';
-        if(on){
-          b.style.background = m.colour;
-          b.style.color = '#fff';
-        } else {
-          b.style.color = m.colour;
-        }
-        b.onclick = () => toggleLine(id);
+        const on=isVisible(id);
+        const b=document.createElement('button');
+        b.className='filter-btn '+(on?'on':'off');
+        b.textContent=m.short||id; b.title=m.name||id;
+        b.style.borderColor=m.colour+'88';
+        if(on){ b.style.background=m.colour; b.style.color='#fff'; }
+        else { b.style.color=m.colour; }
+        b.onclick=()=>toggleLine(id);
         chips.appendChild(b);
       });
-
-      group.appendChild(chips);
-      el.appendChild(group);
+      group.appendChild(chips); el.appendChild(group);
     });
   }
 
   function buildList(){
-    const list = document.getElementById('list');
-    const cnt  = document.getElementById('count');
-    list.innerHTML = '';
-
-    // In list: show stations that have at least one visible line AND match search
-    let vis = Object.values(stations).filter(st=>{
-      const hasVisible = st.lines.some(l=>isVisible(l.relId));
-      if(!hasVisible) return false;
-      if(searchQ && !st.name.toLowerCase().includes(searchQ)) return false;
+    const list=document.getElementById('list'), cnt=document.getElementById('count');
+    list.innerHTML='';
+    let vis=Object.values(stations).filter(st=>{
+      if(!st.lines.some(l=>isVisible(l.relId))) return false;
+      if(searchQ&&!st.name.toLowerCase().includes(searchQ)) return false;
       return true;
     });
     vis.sort((a,b)=>a.name.localeCompare(b.name));
-    cnt.textContent = vis.length + ' station' + (vis.length!==1?'s':'') + ' shown';
-
+    cnt.textContent=vis.length+' station'+(vis.length!==1?'s':'')+' shown';
     vis.forEach((st,i)=>{
-      const col  = primaryColour(st);
-      const item = document.createElement('div');
-      item.className = 'st-item' + (String(st.id)===selectedId ? ' active' : '');
-      item.dataset.id = st.id;
-      const lineNames = st.lines.map(l=>{ const m=lineRegistry[l.relId]; return m?m.short:l.relId; });
-      item.innerHTML = `<span class="st-num">${i+1}</span><span class="st-dot-sb" style="background:var(--sf,#161b27);border-color:${col}"></span><span class="st-info"><span class="st-name">${st.name||'(unnamed)'}</span><span class="st-lines">${lineNames.join(', ')}</span></span><span class="st-type">${st.type||''}</span>`;
+      const col=primaryColour(st);
+      const item=document.createElement('div');
+      item.className='st-item'+(String(st.id)===selectedId?' active':'');
+      item.dataset.id=st.id;
+      const lineNames=st.lines.map(l=>{ const m=lineRegistry[l.relId]; return m?m.short:l.relId; });
+      item.innerHTML=`<span class="st-num">${i+1}</span><span class="st-dot-sb" style="background:var(--sf,#161b27);border-color:${col}"></span><span class="st-info"><span class="st-name">${st.name||'(unnamed)'}</span><span class="st-lines">${lineNames.join(', ')}</span></span><span class="st-type">${st.type||''}</span>`;
       item.addEventListener('click',()=>selectStation(String(st.id)));
       list.appendChild(item);
     });
   }
 
-  // ─ detail panel
   function selectStation(sid){
-    selectedId = sid;
-    const st = stations[sid]; if(!st) return;
-    Object.values(stations).forEach(s=>{ if(s.marker) s.marker.setIcon(makeIcon(primaryColour(s), String(s.id)===sid)); });
-    document.querySelectorAll('.st-item').forEach(el=>el.classList.toggle('active', el.dataset.id===sid));
-    map.flyTo([st.lat,st.lon], Math.max(map.getZoom(),14), {duration:.8});
-    document.getElementById('d-name').textContent  = st.name||'(unnamed)';
-    document.getElementById('d-id').textContent    = 'OGF node #'+st.id;
-    document.getElementById('d-coords').textContent= st.lat.toFixed(6)+', '+st.lon.toFixed(6);
-    document.getElementById('d-ogf').href           = 'https://opengeofiction.net/node/'+st.id;
-    const linesEl = document.getElementById('d-lines'); linesEl.innerHTML='';
+    selectedId=sid;
+    const st=stations[sid]; if(!st) return;
+    Object.values(stations).forEach(s=>{ if(s.marker) s.marker.setIcon(makeIcon(primaryColour(s),String(s.id)===sid)); });
+    document.querySelectorAll('.st-item').forEach(el=>el.classList.toggle('active',el.dataset.id===sid));
+    map.flyTo([st.lat,st.lon],Math.max(map.getZoom(),14),{duration:.8});
+    document.getElementById('d-name').textContent=st.name||'(unnamed)';
+    document.getElementById('d-id').textContent='OGF node #'+st.id;
+    document.getElementById('d-coords').textContent=st.lat.toFixed(6)+', '+st.lon.toFixed(6);
+    document.getElementById('d-ogf').href='https://opengeofiction.net/node/'+st.id;
+    const linesEl=document.getElementById('d-lines'); linesEl.innerHTML='';
     (st.lines||[]).forEach(l=>{
-      const meta = lineRegistry[l.relId];
-      const col  = meta ? meta.colour : '#888';
-      const name = meta ? meta.name   : 'Line '+l.relId;
-      const d = document.createElement('div'); d.className='detail-line';
+      const meta=lineRegistry[l.relId], col=meta?meta.colour:'#888', name=meta?meta.name:'Line '+l.relId;
+      const d=document.createElement('div'); d.className='detail-line';
       d.innerHTML=`<span class="detail-line-dot" style="background:${col}"></span><span>${name}</span>`;
       linesEl.appendChild(d);
     });
     if(!linesEl.children.length) linesEl.innerHTML='<span style="color:var(--tx-f);font-size:10px">No line data</span>';
-    const tagEntries = Object.entries(st.tags||{}).filter(([k])=>k!=='name');
-    const tagsEl = document.getElementById('d-tags'), tw = document.getElementById('d-tags-wrap');
+    const tagEntries=Object.entries(st.tags||{}).filter(([k])=>k!=='name');
+    const tagsEl=document.getElementById('d-tags'), tw=document.getElementById('d-tags-wrap');
     if(tagEntries.length){ tagsEl.innerHTML=tagEntries.map(([k,v])=>`<span class="dtag">${k}=${v}</span>`).join(''); tw.style.display=''; }
     else tw.style.display='none';
     document.getElementById('detail').classList.add('show');
   }
+
   document.getElementById('detail-close').addEventListener('click',()=>{
     document.getElementById('detail').classList.remove('show');
-    selectedId = null;
+    selectedId=null;
     Object.values(stations).forEach(s=>{ if(s.marker) s.marker.setIcon(makeIcon(primaryColour(s),false)); });
     document.querySelectorAll('.st-item').forEach(el=>el.classList.remove('active'));
   });
@@ -536,49 +467,34 @@
 
   async function main(){
     const ld=document.getElementById('ld'),ldTxt=document.getElementById('ld-txt'),ldSub=document.getElementById('ld-sub');
-    ldTxt.textContent='Loading data…';
-    ldSub.textContent='Fetching stations and line geometry';
+    ldTxt.textContent='Loading data…'; ldSub.textContent='Fetching stations and line geometry';
     try{
       const [stResp,lnResp]=await Promise.all([fetch('data/stations.json'),fetch('data/lines.json')]);
       if(!stResp.ok) throw new Error('stations.json: HTTP '+stResp.status);
       if(!lnResp.ok) throw new Error('lines.json: HTTP '+lnResp.status);
       const [stData,lnData]=await Promise.all([stResp.json(),lnResp.json()]);
-
-      lineRegistry = stData.lines || {};
-      lineGeom     = lnData.lines || {};
-
-      // build allLineIds list (non-disabled, used by at least one station)
-      const usedIds = new Set();
+      lineRegistry=stData.lines||{};
+      lineGeom=lnData.lines||{};
+      const usedIds=new Set();
       (stData.stations||[]).forEach(st=>(st.lines||[]).forEach(l=>usedIds.add(String(l.relId))));
-      allLineIds = Object.keys(lineRegistry).filter(id=>lineRegistry[id].type!=='disabled'&&usedIds.has(id));
-
+      allLineIds=Object.keys(lineRegistry).filter(id=>lineRegistry[id].type!=='disabled'&&usedIds.has(id));
       (stData.stations||[]).forEach(st=>{
         stations[String(st.id)]={
-          id:st.id, name:st.name||'', lat:st.lat, lon:st.lon,
-          type:st.type||'station', tags:st.tags||{},
+          id:st.id,name:st.name||'',lat:st.lat,lon:st.lon,
+          type:st.type||'station',tags:st.tags||{},
           lines:(st.lines||[]).map(l=>({relId:String(l.relId),seq:l.seq})),
           marker:null
         };
       });
-
       ldSub.textContent='Rendering…';
-      renderPolylines();
-      renderMarkers();
-      updateBadge();
-      buildFilters();
-      buildList();
-
+      renderPolylines(); renderMarkers(); updateBadge(); buildFilters(); buildList();
       const pts=Object.values(stations).map(s=>[s.lat,s.lon]);
       if(pts.length) map.fitBounds(L.latLngBounds(pts),{padding:[40,40]});
       status('Loaded '+(stData.stations||[]).length+' stations');
     } catch(e){
-      console.error(e);
-      ldTxt.textContent='Failed to load data';
-      ldSub.textContent=String(e);
-      return;
+      console.error(e); ldTxt.textContent='Failed to load data'; ldSub.textContent=String(e); return;
     }
-    ld.classList.add('done');
-    setTimeout(()=>ld.remove(),600);
+    ld.classList.add('done'); setTimeout(()=>ld.remove(),600);
   }
   main();
   </script>
