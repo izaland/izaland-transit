@@ -117,19 +117,57 @@
     .stat-lbl{font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;}
 
     /* ROUTE MAP */
-    .route-map-wrap{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border);margin-bottom:var(--space-6);position:relative;}
+    .route-map-wrap{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border);margin-bottom:var(--space-4);position:relative;}
     .route-map{height:380px;background:var(--surface-2);}
     .route-map .leaflet-tile-pane{filter:var(--map-filter);}
     .map-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-2);color:var(--text-faint);font-size:var(--text-sm);background:var(--surface-2);z-index:10;transition:opacity .3s;}
     .map-loading.hidden{opacity:0;pointer-events:none;}
     .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg);}}
-    .map-error{color:#f87171;font-size:var(--text-xs);}
+    .map-error{color:#f87171;font-size:var(--text-xs);text-align:center;padding:var(--space-4);}
 
-    /* ROUTE TABLE */
-    .route-table-wrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border);margin-bottom:var(--space-4);}
-    .route-table-wrap table th{font-size:10px;}
-    .route-count{font-size:var(--text-xs);color:var(--text-muted);margin-bottom:var(--space-3);}
+    /* COLLAPSIBLE ROUTE TABLE */
+    details.route-details{
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      margin-top:var(--space-4);
+      overflow:hidden;
+    }
+    details.route-details summary{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:var(--space-3) var(--space-4);
+      background:var(--surface-2);
+      font-size:var(--text-xs);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--text-muted);
+      cursor:pointer;
+      user-select:none;
+      list-style:none;
+      gap:var(--space-3);
+    }
+    details.route-details summary::-webkit-details-marker{display:none;}
+    details.route-details summary::after{
+      content:'';
+      display:inline-block;
+      width:10px;height:10px;
+      border-right:2px solid var(--text-faint);
+      border-bottom:2px solid var(--text-faint);
+      transform:rotate(45deg);
+      transition:transform var(--transition);
+      flex-shrink:0;
+      margin-top:-3px;
+    }
+    details.route-details[open] summary::after{
+      transform:rotate(-135deg);
+      margin-top:3px;
+    }
+    details.route-details summary:hover{color:var(--text);background:var(--surface);}
+    .route-table-inner{overflow-x:auto;}
+    .route-table-inner table th{font-size:10px;background:var(--surface);}
 
     footer{border-top:1px solid var(--border);padding:var(--space-8);text-align:center;font-size:var(--text-sm);color:var(--text-muted);}
     footer a{color:var(--accent);text-decoration:none;}
@@ -141,8 +179,6 @@
       .airline-logo-wrap{width:100%;justify-content:flex-start;}
       .route-map{height:260px;}
     }
-
-    /* Leaflet popup overrides */
     .leaflet-popup-content-wrapper{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:0 4px 16px oklch(0 0 0/.3);}
     .leaflet-popup-tip{background:var(--surface);}
     .leaflet-popup-content{margin:10px 14px;font-size:13px;font-family:var(--font-body);line-height:1.5;}
@@ -206,7 +242,6 @@
     <p class="page-desc">Izaland has two major airlines: <strong>Izaland Airlines</strong> (IZ), the flag carrier, and <strong>Uletha Eastern Airways</strong> (UE). Several low-cost and semi-low-cost carriers serve the country domestically and regionally.</p>
   </div>
 
-  <!-- OVERVIEW TABLE -->
   <div class="section">
     <div class="section-label">Overview</div>
     <div class="section-title">Airlines based in Izaland</div>
@@ -290,7 +325,6 @@
     </div>
   </div>
 
-  <!-- AIRLINE SECTIONS -->
   <div class="section">
     <div class="section-label">Flag Carrier</div>
     <div class="section-title">Major Airlines</div>
@@ -323,19 +357,21 @@
           <div id="map-iz" class="route-map"></div>
           <div class="map-loading" id="loading-iz"><div class="spinner"></div><span>Loading route data…</span></div>
         </div>
-        <div class="route-count" id="count-iz"></div>
-        <div class="route-table-wrap">
-          <table>
-            <thead><tr>
-              <th data-rt="iz" data-col="origin_code">Origin</th>
-              <th data-rt="iz" data-col="origin_city">City</th>
-              <th data-rt="iz" data-col="dest_code">Dest</th>
-              <th data-rt="iz" data-col="dest_city">City</th>
-              <th data-rt="iz" data-col="distance_km" style="text-align:right;">km</th>
-            </tr></thead>
-            <tbody id="routes-iz"></tbody>
-          </table>
-        </div>
+        <details class="route-details" id="details-iz">
+          <summary><span id="summary-iz">Route list</span></summary>
+          <div class="route-table-inner">
+            <table>
+              <thead><tr>
+                <th data-rt="iz" data-col="0">Origin</th>
+                <th data-rt="iz" data-col="1">City</th>
+                <th data-rt="iz" data-col="2">Dest</th>
+                <th data-rt="iz" data-col="3">City</th>
+                <th data-rt="iz" data-col="4" style="text-align:right;">km</th>
+              </tr></thead>
+              <tbody id="routes-iz"></tbody>
+            </table>
+          </div>
+        </details>
       </div>
     </div>
 
@@ -367,19 +403,21 @@
           <div id="map-ue" class="route-map"></div>
           <div class="map-loading" id="loading-ue"><div class="spinner"></div><span>Loading route data…</span></div>
         </div>
-        <div class="route-count" id="count-ue"></div>
-        <div class="route-table-wrap">
-          <table>
-            <thead><tr>
-              <th data-rt="ue" data-col="origin_code">Origin</th>
-              <th data-rt="ue" data-col="origin_city">City</th>
-              <th data-rt="ue" data-col="dest_code">Dest</th>
-              <th data-rt="ue" data-col="dest_city">City</th>
-              <th data-rt="ue" data-col="distance_km" style="text-align:right;">km</th>
-            </tr></thead>
-            <tbody id="routes-ue"></tbody>
-          </table>
-        </div>
+        <details class="route-details" id="details-ue">
+          <summary><span id="summary-ue">Route list</span></summary>
+          <div class="route-table-inner">
+            <table>
+              <thead><tr>
+                <th data-rt="ue" data-col="0">Origin</th>
+                <th data-rt="ue" data-col="1">City</th>
+                <th data-rt="ue" data-col="2">Dest</th>
+                <th data-rt="ue" data-col="3">City</th>
+                <th data-rt="ue" data-col="4" style="text-align:right;">km</th>
+              </tr></thead>
+              <tbody id="routes-ue"></tbody>
+            </table>
+          </div>
+        </details>
       </div>
     </div>
 
@@ -411,19 +449,21 @@
           <div id="map-ns" class="route-map"></div>
           <div class="map-loading" id="loading-ns"><div class="spinner"></div><span>Loading route data…</span></div>
         </div>
-        <div class="route-count" id="count-ns"></div>
-        <div class="route-table-wrap">
-          <table>
-            <thead><tr>
-              <th data-rt="ns" data-col="origin_code">Origin</th>
-              <th data-rt="ns" data-col="origin_city">City</th>
-              <th data-rt="ns" data-col="dest_code">Dest</th>
-              <th data-rt="ns" data-col="dest_city">City</th>
-              <th data-rt="ns" data-col="distance_km" style="text-align:right;">km</th>
-            </tr></thead>
-            <tbody id="routes-ns"></tbody>
-          </table>
-        </div>
+        <details class="route-details" id="details-ns">
+          <summary><span id="summary-ns">Route list</span></summary>
+          <div class="route-table-inner">
+            <table>
+              <thead><tr>
+                <th data-rt="ns" data-col="0">Origin</th>
+                <th data-rt="ns" data-col="1">City</th>
+                <th data-rt="ns" data-col="2">Dest</th>
+                <th data-rt="ns" data-col="3">City</th>
+                <th data-rt="ns" data-col="4" style="text-align:right;">km</th>
+              </tr></thead>
+              <tbody id="routes-ns"></tbody>
+            </table>
+          </div>
+        </details>
       </div>
     </div>
   </div>
@@ -434,9 +474,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-  /* ─────────────────────────────────────────────
-     THEME
-  ───────────────────────────────────────────── */
+  /* THEME */
   (function(){
     const t=document.querySelector('[data-theme-toggle]'),r=document.documentElement;
     let d=r.getAttribute('data-theme')||'dark';
@@ -449,16 +487,13 @@
     });
   })();
 
-  /* ─────────────────────────────────────────────
-     NAV DROPDOWNS
-  ───────────────────────────────────────────── */
+  /* NAV */
   document.querySelectorAll('.nav-item:not(.nav-item--sub)').forEach(item=>{
     const btn=item.querySelector(':scope>button');if(!btn)return;
     btn.addEventListener('click',e=>{
       e.stopPropagation();
       const open=item.classList.contains('open');
-      document.querySelectorAll('.nav-item.open').forEach(o=>o.classList.remove('open'));
-      document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
+      document.querySelectorAll('.nav-item.open,.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
       if(!open)item.classList.add('open');
     });
   });
@@ -475,96 +510,73 @@
     document.querySelectorAll('.nav-item.open,.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
   });
 
-  /* ─────────────────────────────────────────────
-     OVERVIEW TABLE SORT
-  ───────────────────────────────────────────── */
+  /* OVERVIEW TABLE SORT */
   (function(){
     const tbody=document.querySelector('#airline-table tbody');
-    let sortCol=null,sortDir=1;
+    let sc=null,sd=1;
     document.querySelectorAll('#airline-table th[data-col]').forEach(th=>{
       th.addEventListener('click',()=>{
         const col=th.dataset.col;
-        sortDir=(sortCol===col)?sortDir*-1:1;
-        sortCol=col;
+        sd=(sc===col)?sd*-1:1; sc=col;
         document.querySelectorAll('#airline-table th').forEach(h=>h.classList.remove('sort-asc','sort-desc'));
-        th.classList.add(sortDir===1?'sort-asc':'sort-desc');
+        th.classList.add(sd===1?'sort-asc':'sort-desc');
         [...tbody.querySelectorAll('tr')]
           .sort((a,b)=>{
             let av=a.dataset[col]||'',bv=b.dataset[col]||'';
             const an=parseFloat(av),bn=parseFloat(bv);
-            return(!isNaN(an)&&!isNaN(bn))?(an-bn)*sortDir:av.localeCompare(bv)*sortDir;
-          })
-          .forEach(r=>tbody.appendChild(r));
+            return(!isNaN(an)&&!isNaN(bn))?(an-bn)*sd:av.localeCompare(bv)*sd;
+          }).forEach(r=>tbody.appendChild(r));
       });
     });
   })();
 
-  /* ─────────────────────────────────────────────
-     GREAT-CIRCLE ARC
-     Returns array of [lat,lon] points (handles antimeridian split)
-  ───────────────────────────────────────────── */
+  /* GREAT-CIRCLE ARC */
   function greatCirclePoints(lat1,lon1,lat2,lon2,n){
     n=n||80;
     const R=Math.PI/180;
-    const φ1=lat1*R,λ1=lon1*R,φ2=lat2*R,λ2=lon2*R;
+    const p1=lat1*R,l1=lon1*R,p2=lat2*R,l2=lon2*R;
     const d=2*Math.asin(Math.sqrt(
-      Math.sin((φ2-φ1)/2)**2+Math.cos(φ1)*Math.cos(φ2)*Math.sin((λ2-λ1)/2)**2
-    ));
+      Math.sin((p2-p1)/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin((l2-l1)/2)**2));
     if(d<1e-6)return[[lat1,lon1],[lat2,lon2]];
     const pts=[];
     for(let i=0;i<=n;i++){
-      const f=i/n;
-      const A=Math.sin((1-f)*d)/Math.sin(d);
-      const B=Math.sin(f*d)/Math.sin(d);
-      const x=A*Math.cos(φ1)*Math.cos(λ1)+B*Math.cos(φ2)*Math.cos(λ2);
-      const y=A*Math.cos(φ1)*Math.sin(λ1)+B*Math.cos(φ2)*Math.sin(λ2);
-      const z=A*Math.sin(φ1)+B*Math.sin(φ2);
-      const lat=Math.atan2(z,Math.sqrt(x*x+y*y))/R;
-      const lon=Math.atan2(y,x)/R;
-      pts.push([lat,lon]);
+      const f=i/n,A=Math.sin((1-f)*d)/Math.sin(d),B=Math.sin(f*d)/Math.sin(d);
+      const x=A*Math.cos(p1)*Math.cos(l1)+B*Math.cos(p2)*Math.cos(l2);
+      const y=A*Math.cos(p1)*Math.sin(l1)+B*Math.cos(p2)*Math.sin(l2);
+      const z=A*Math.sin(p1)+B*Math.sin(p2);
+      pts.push([Math.atan2(z,Math.sqrt(x*x+y*y))/R, Math.atan2(y,x)/R]);
     }
-    // split at antimeridian
-    const segs=[[]];
+    // antimeridian split
+    const segs=[[pts[0]]];
     for(let i=1;i<pts.length;i++){
       if(Math.abs(pts[i][1]-pts[i-1][1])>180)segs.push([]);
       segs[segs.length-1].push(pts[i]);
     }
-    segs[0].unshift(pts[0]);
     return segs.length===1?pts:segs;
   }
 
-  /* ─────────────────────────────────────────────
-     ROUTE MAP BUILDER
-  ───────────────────────────────────────────── */
-  const OGF_TILE = 'https://{s}.tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png';
-  const ATTR = '&copy; <a href="https://opengeofiction.net">OpenGeofiction</a> contributors';
-  const DATA_URL = 'https://data.opengeofiction.net/utility/airline_routes.json';
+  /* ROUTE MAP BUILDER */
+  const OGF_TILE='https://{s}.tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png';
+  const ATTR='&copy; <a href="https://opengeofiction.net">OpenGeofiction</a> contributors';
+  const DATA_URL='https://data.opengeofiction.net/utility/airline_routes.json';
+  const AIRLINE_COLOR={IZ:'#60a5fa',UE:'#34d399',NS:'#f59e0b','8M':'#f472b6',FZ:'#a78bfa',TK:'#fb923c'};
 
-  // per-airline accent colours
-  const AIRLINE_COLOR = {
-    IZ:'#60a5fa', UE:'#34d399', NS:'#f59e0b',
-    '8M':'#f472b6', FZ:'#a78bfa', TK:'#fb923c'
-  };
-
-  // cache fetched data
-  const _cache = {};
-
-  async function fetchRoutes(id){
-    if(_cache[id])return _cache[id];
-    const url=`${DATA_URL}?airline_code=${encodeURIComponent(id)}&return=0`;
-    const res=await fetch(url);
+  // single shared fetch — all airlines share the same full JSON
+  let _allRoutes=null;
+  async function getAllRoutes(){
+    if(_allRoutes)return _allRoutes;
+    const res=await fetch(DATA_URL);
     if(!res.ok)throw new Error(`HTTP ${res.status}`);
     const json=await res.json();
-    // support both array root and { data: [...] } shape
-    _cache[id]=Array.isArray(json)?json:(json.data||json.routes||[]);
-    return _cache[id];
+    _allRoutes=Array.isArray(json)?json:(json.data||json.routes||[]);
+    return _allRoutes;
   }
 
   function buildRouteMap(id,cfg){
     const slug=id.toLowerCase().replace(/[^a-z0-9]/g,'m');
     const mapDiv=document.getElementById('map-'+slug);
     const loadEl=document.getElementById('loading-'+slug);
-    const countEl=document.getElementById('count-'+slug);
+    const summaryEl=document.getElementById('summary-'+slug);
     const tbodyEl=document.getElementById('routes-'+slug);
     if(!mapDiv)return;
 
@@ -573,77 +585,80 @@
       center:[cfg.lat||0,cfg.lon||90],
       zoom:cfg.z||3,
       minZoom:cfg.min||2,
-      maxZoom:cfg.max||10,
-      attributionControl:true
+      maxZoom:cfg.max||10
     });
     L.tileLayer(OGF_TILE,{attribution:ATTR,subdomains:'abc',maxZoom:19}).addTo(map);
 
-    fetchRoutes(id).then(routes=>{
+    getAllRoutes().then(allRoutes=>{
+      // ✔ filter client-side by airline_code
+      const routes=allRoutes.filter(r=>
+        (r.airline_code||'').toUpperCase()===(id).toUpperCase()
+      );
+
       loadEl.classList.add('hidden');
+
       if(!routes.length){
-        loadEl.innerHTML='<span class="map-error">No route data available for '+id+'</span>';
+        loadEl.innerHTML=`<span class="map-error">No route data found for <strong>${id}</strong>.</span>`;
         loadEl.classList.remove('hidden');
+        if(summaryEl)summaryEl.textContent='No routes';
         return;
       }
 
-      // deduplicate airports
+      // airports
       const airports={};
       routes.forEach(r=>{
         airports[r.origin_code]={lat:+r.origin_lat,lon:+r.origin_lon,name:r.origin_name,city:r.origin_city};
         airports[r.dest_code]={lat:+r.dest_lat,lon:+r.dest_lon,name:r.dest_name,city:r.dest_city};
       });
 
-      // draw arcs
+      // arcs
       routes.forEach(r=>{
         const pts=greatCirclePoints(+r.origin_lat,+r.origin_lon,+r.dest_lat,+r.dest_lon,80);
-        const isMulti=Array.isArray(pts[0][0]);  // split segments
-        const segs=isMulti?pts:[pts];
-        segs.forEach(seg=>{
-          L.polyline(seg,{color,weight:1.5,opacity:.55}).addTo(map);
-        });
+        const segs=(Array.isArray(pts[0][0]))?pts:[pts];
+        segs.forEach(seg=>L.polyline(seg,{color,weight:1.5,opacity:.6}).addTo(map));
       });
 
-      // draw airport dots
-      const dotIcon=L.divIcon({className:'',html:`<div style="width:7px;height:7px;border-radius:50%;background:${color};border:1.5px solid rgba(255,255,255,.7);box-shadow:0 0 4px ${color}88;"></div>`,iconSize:[7,7],iconAnchor:[3.5,3.5]});
+      // dots
+      const dotIcon=L.divIcon({className:'',
+        html:`<div style="width:7px;height:7px;border-radius:50%;background:${color};border:1.5px solid rgba(255,255,255,.75);box-shadow:0 0 4px ${color}88"></div>`,
+        iconSize:[7,7],iconAnchor:[3.5,3.5]});
       Object.entries(airports).forEach(([code,ap])=>{
         L.marker([ap.lat,ap.lon],{icon:dotIcon})
           .bindPopup(`<span class="popup-code">${code}</span><br><b>${ap.name||''}</b><br><span class="popup-city">${ap.city||''}</span>`)
           .addTo(map);
       });
 
-      // route table
-      if(countEl)countEl.textContent=`${routes.length} route${routes.length!==1?'s':''} · ${Object.keys(airports).length} airports`;
-      if(tbodyEl){
-        tbodyEl.innerHTML=routes.map(r=>`
-          <tr>
-            <td><span class="code-badge">${r.origin_code}</span></td>
-            <td>${r.origin_city||r.origin_name||''}</td>
-            <td><span class="code-badge">${r.dest_code}</span></td>
-            <td>${r.dest_city||r.dest_name||''}</td>
-            <td style="text-align:right;">${r.distance_km?Math.round(r.distance_km).toLocaleString():''}</td>
-          </tr>`).join('');
+      // summary text
+      const nRoutes=routes.length, nAP=Object.keys(airports).length;
+      if(summaryEl)summaryEl.textContent=`${nRoutes} route${nRoutes!==1?'s':''} · ${nAP} airports — click to expand`;
 
-        // sortable route table
+      // route table
+      if(tbodyEl){
+        tbodyEl.innerHTML=routes.map(r=>`<tr>
+          <td><span class="code-badge">${r.origin_code||''}</span></td>
+          <td>${r.origin_city||r.origin_name||''}</td>
+          <td><span class="code-badge">${r.dest_code||''}</span></td>
+          <td>${r.dest_city||r.dest_name||''}</td>
+          <td style="text-align:right;">${r.distance_km?Math.round(+r.distance_km).toLocaleString():''}</td>
+        </tr>`).join('');
+
+        // sortable
         const ths=tbodyEl.closest('table').querySelectorAll('th[data-rt]');
-        let rtSortCol=null,rtSortDir=1;
+        let sc2=null,sd2=1;
         ths.forEach(th=>{
           th.style.cursor='pointer';th.style.userSelect='none';
           th.addEventListener('click',()=>{
-            const col=th.dataset.col;
-            rtSortDir=(rtSortCol===col)?rtSortDir*-1:1;
-            rtSortCol=col;
+            const ci=+th.dataset.col;
+            sd2=(sc2===ci)?sd2*-1:1; sc2=ci;
             ths.forEach(h=>h.classList.remove('sort-asc','sort-desc'));
-            th.classList.add(rtSortDir===1?'sort-asc':'sort-desc');
+            th.classList.add(sd2===1?'sort-asc':'sort-desc');
             [...tbodyEl.querySelectorAll('tr')]
               .sort((a,b)=>{
-                const ai=Array.from(a.cells),bi=Array.from(b.cells);
-                const idx=Array.from(ths).indexOf(th);
-                const av=ai[idx]?.textContent.trim()||'';
-                const bv=bi[idx]?.textContent.trim()||'';
+                const av=a.cells[ci]?.textContent.trim()||'';
+                const bv=b.cells[ci]?.textContent.trim()||'';
                 const an=parseFloat(av.replace(/,/g,'')),bn=parseFloat(bv.replace(/,/g,''));
-                return(!isNaN(an)&&!isNaN(bn))?(an-bn)*rtSortDir:av.localeCompare(bv)*rtSortDir;
-              })
-              .forEach(r=>tbodyEl.appendChild(r));
+                return(!isNaN(an)&&!isNaN(bn))?(an-bn)*sd2:av.localeCompare(bv)*sd2;
+              }).forEach(r=>tbodyEl.appendChild(r));
           });
         });
       }
@@ -653,12 +668,9 @@
     });
   }
 
-  /* ─────────────────────────────────────────────
-     INIT MAPS
-  ───────────────────────────────────────────── */
-  buildRouteMap('IZ',  {lat:-20.0, lon:90.0,  z:3});
-  buildRouteMap('UE',  {lat:0.0,   lon:90.0,  z:3});
-  buildRouteMap('NS',  {lat:45.0,  lon:120.0, z:4, min:2, max:10});
+  buildRouteMap('IZ',{lat:-20.0,lon:90.0,z:3});
+  buildRouteMap('UE',{lat:0.0,  lon:90.0,z:3});
+  buildRouteMap('NS',{lat:45.0, lon:120.0,z:4,min:2,max:10});
   </script>
 </body>
 </html>
