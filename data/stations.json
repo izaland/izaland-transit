@@ -3,7 +3,7 @@
     "187662": {
       "id": "187662",
       "name": "IZX Keishin Line (IZX京深高速鉄道線)",
-      "short": "187662",
+      "short": "IZX KS",
       "colour": "blue",
       "operator": "Izarail",
       "network": "",
@@ -21,7 +21,7 @@
     "278441": {
       "id": "278441",
       "name": "IZX Nankai Line IZX南海線",
-      "short": "278441",
+      "short": "IZX NK",
       "colour": "#990000",
       "operator": "Izarail",
       "network": "Izaland HSR Network",
@@ -30,7 +30,7 @@
     "288171": {
       "id": "288171",
       "name": "IZX Seibu Naeryuku Line IZX西部内陸線 (northbound)",
-      "short": "IZSN",
+      "short": "IZX SN",
       "colour": "darkred",
       "operator": "Izarail",
       "network": "IZX",
@@ -39,7 +39,7 @@
     "288508": {
       "id": "288508",
       "name": "IZX Ryānkai Line 両海IZX",
-      "short": "RK",
+      "short": "IZX RK",
       "colour": "green",
       "operator": "IZX (Izarail)",
       "network": "IZX",
@@ -272,7 +272,7 @@
     },
     "272137": {
       "id": "272137",
-      "name": "新東西連絡経路事業(2022)",
+      "name": "新東西連絡経路鐵道",
       "short": "SD01",
       "colour": "#0099CC",
       "operator": "",
@@ -399,7 +399,7 @@
     "292343": {
       "id": "292343",
       "name": "🅼 Line 18 (for ??)",
-      "short": "292343",
+      "short": "18",
       "colour": "#999999",
       "operator": "Sainðaul Metro",
       "network": "Sainðaul Metro",
@@ -408,7 +408,7 @@
     "302747": {
       "id": "302747",
       "name": "Nijikutō Main Line 西海本線",
-      "short": "302747",
+      "short": "NJM",
       "colour": "black",
       "operator": "Izarail",
       "network": "",
@@ -426,7 +426,7 @@
     "303222": {
       "id": "303222",
       "name": "Shinsabu Hidano Line Thru Service",
-      "short": "303222",
+      "short": "SSHT",
       "colour": "#BC8F8F",
       "operator": "",
       "network": "",
@@ -435,7 +435,7 @@
     "303223": {
       "id": "303223",
       "name": "Shinsabu Oitsura Line Thru Service",
-      "short": "303223",
+      "short": "SSOT",
       "colour": "#FFFACD",
       "operator": "Shinsabu Railway",
       "network": "Sainðaul Metro",
@@ -444,7 +444,7 @@
     "303227": {
       "id": "303227",
       "name": "Shikisabu dyenches thru service",
-      "short": "303227",
+      "short": "SKST",
       "colour": "#D2B48C",
       "operator": "",
       "network": "",
@@ -525,7 +525,7 @@
     "394413": {
       "id": "394413",
       "name": "Saindzaul - Remiville",
-      "short": "394413",
+      "short": "SLRM",
       "colour": "#888888",
       "operator": "Izarail",
       "network": "",
@@ -588,7 +588,7 @@
     "424786": {
       "id": "424786",
       "name": "🅼 Line 4 (rapid service for Kawaei 珂夬栄方面快速)",
-      "short": "4RP",
+      "short": "4",
       "colour": "#FFD912",
       "operator": "Sainðaul Metro",
       "network": "Sainðaul Metro",
@@ -705,7 +705,7 @@
     "449777": {
       "id": "449777",
       "name": "Minarajaki SUL - PSM",
-      "short": "449777",
+      "short": "MNJ",
       "colour": "#888888",
       "operator": "Izarail",
       "network": "",
@@ -741,7 +741,7 @@
     "326613": {
       "id": "326613",
       "name": "Chishi Rapid Line 歯師快速線 (師包方面)",
-      "short": "CSR",
+      "short": "IR CS",
       "colour": "#bfff00",
       "operator": "Izarail",
       "network": "Capital Suburban Network",
@@ -750,7 +750,7 @@
     "325613": {
       "id": "325613",
       "name": "🆂 Nakitsahe Line",
-      "short": "RC",
+      "short": "IR NT",
       "colour": "#e0d040",
       "operator": "Izarail",
       "network": "Riyatoma Suburban Railway Service",
@@ -759,7 +759,7 @@
     "325633": {
       "id": "325633",
       "name": "🆂 Shippanu Line",
-      "short": "RD",
+      "short": "IZ SP",
       "colour": "#1690FF",
       "operator": "Izarail",
       "network": "Riyatoma Suburban Railway Service",
@@ -777,7 +777,7 @@
     "325848": {
       "id": "325848",
       "name": "Riyatoma Metro Line 2",
-      "short": "R2",
+      "short": "RY2",
       "colour": "#00d659",
       "operator": "Riyatoma Urban Transit Corporation",
       "network": "",
@@ -786,7 +786,7 @@
     "325857": {
       "id": "325857",
       "name": "Riyatoma Metro Line 4",
-      "short": "R4",
+      "short": "RY4",
       "colour": "#d9534f",
       "operator": "Riyatoma Urban Transit Corporation",
       "network": "",
@@ -795,7 +795,7 @@
     "325858": {
       "id": "325858",
       "name": "Riyatoma Metro Line 3",
-      "short": "R3",
+      "short": "RY3",
       "colour": "#428bca",
       "operator": "Riyatoma Urban Transit Corporation",
       "network": "",
@@ -804,7 +804,7 @@
     "526355": {
       "id": "526355",
       "name": "Riyatoma Metro Line 5",
-      "short": "R5",
+      "short": "RY5",
       "colour": "violet",
       "operator": "Riyatoma Urban Transit Corporation",
       "network": "",
