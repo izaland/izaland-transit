@@ -737,6 +737,15 @@
       "operator": "Kayan High Speed Railway 嘉鞍高速鉄道株式会社",
       "network": "",
       "type": "subway"
+    },
+    "326613": {
+      "id": "326613",
+      "name": "Chishi Rapid Line 歯師快速線 (師包方面)",
+      "short": "CSR",
+      "colour": "#bfff00",
+      "operator": "Izarail",
+      "network": "Capital Suburban Network",
+      "type": "train"
     }
   },
   "stations": [
@@ -1046,6 +1055,10 @@
         {
           "relId": "288508",
           "seq": 188
+        },
+        {
+          "relId": "326613",
+          "seq": 25
         },
         {
           "relId": "470427",
@@ -3874,6 +3887,10 @@
       },
       "lines": [
         {
+          "relId": "326613",
+          "seq": 22
+        },
+        {
           "relId": "414674",
           "seq": 9
         }
@@ -4317,6 +4334,10 @@
       },
       "lines": [
         {
+          "relId": "326613",
+          "seq": 23
+        },
+        {
           "relId": "414674",
           "seq": 12
         }
@@ -4719,6 +4740,10 @@
         {
           "relId": "283140",
           "seq": 3
+        },
+        {
+          "relId": "326613",
+          "seq": 20
         }
       ]
     },
@@ -5103,6 +5128,10 @@
         "voltage": "3000"
       },
       "lines": [
+        {
+          "relId": "326613",
+          "seq": 24
+        },
         {
           "relId": "414674",
           "seq": 14
@@ -5885,6 +5914,2845 @@
       ]
     },
     {
+      "id": "124064329",
+      "name": "Bibawara",
+      "lat": 36.1391727,
+      "lon": 129.0093788,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 31
+        },
+        {
+          "relId": "326968",
+          "seq": 17
+        },
+        {
+          "relId": "327143",
+          "seq": 69
+        },
+        {
+          "relId": "424883",
+          "seq": 21
+        },
+        {
+          "relId": "424884",
+          "seq": 46
+        },
+        {
+          "relId": "424885",
+          "seq": 56
+        }
+      ]
+    },
+    {
+      "id": "124064334",
+      "name": "Shiitehongi 茛本名",
+      "lat": 36.0507518,
+      "lon": 128.9757518,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 22
+        },
+        {
+          "relId": "272393",
+          "seq": 8
+        },
+        {
+          "relId": "272494",
+          "seq": 20
+        },
+        {
+          "relId": "272509",
+          "seq": 70
+        },
+        {
+          "relId": "272510",
+          "seq": 48
+        },
+        {
+          "relId": "424883",
+          "seq": 16
+        },
+        {
+          "relId": "424884",
+          "seq": 41
+        },
+        {
+          "relId": "424885",
+          "seq": 47
+        },
+        {
+          "relId": "470427",
+          "seq": 29
+        }
+      ]
+    },
+    {
+      "id": "124066078",
+      "name": "Rakkashoni 鳶腳",
+      "lat": 36.0263271,
+      "lon": 129.0422857,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 19
+        },
+        {
+          "relId": "272491",
+          "seq": 12
+        },
+        {
+          "relId": "272509",
+          "seq": 76
+        },
+        {
+          "relId": "424869",
+          "seq": 13
+        },
+        {
+          "relId": "424886",
+          "seq": 19
+        },
+        {
+          "relId": "424887",
+          "seq": 19
+        }
+      ]
+    },
+    {
+      "id": "124066081",
+      "name": "Tomiganei 庭ヶ汢",
+      "lat": 36.0086704,
+      "lon": 129.0175638,
+      "type": "station",
+      "tags": {
+        "colour": "#C40062",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 18
+        },
+        {
+          "relId": "272491",
+          "seq": 15
+        },
+        {
+          "relId": "272509",
+          "seq": 73
+        }
+      ]
+    },
+    {
+      "id": "124066085",
+      "name": "Ōbakura 大砌",
+      "lat": 36.0072109,
+      "lon": 128.9771076,
+      "type": "station",
+      "tags": {
+        "colour": "#72E400",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242567",
+          "seq": 2
+        },
+        {
+          "relId": "242571",
+          "seq": 11
+        },
+        {
+          "relId": "272393",
+          "seq": 3
+        },
+        {
+          "relId": "272491",
+          "seq": 19
+        },
+        {
+          "relId": "272509",
+          "seq": 87
+        },
+        {
+          "relId": "424996",
+          "seq": 12
+        }
+      ]
+    },
+    {
+      "id": "124066185",
+      "name": "Migawarae",
+      "lat": 36.0984037,
+      "lon": 129.055989,
+      "type": "station",
+      "tags": {
+        "colour": "#72E400",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242567",
+          "seq": 16
+        },
+        {
+          "relId": "326968",
+          "seq": 11
+        },
+        {
+          "relId": "327143",
+          "seq": 75
+        }
+      ]
+    },
+    {
+      "id": "124295240",
+      "name": "Shotsumaichi",
+      "lat": 36.0435392,
+      "lon": 129.027898,
+      "type": "station",
+      "tags": {
+        "colour": "#816cb1",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242567",
+          "seq": 9
+        },
+        {
+          "relId": "242570",
+          "seq": 87
+        }
+      ]
+    },
+    {
+      "id": "124295241",
+      "name": "Ominotori Shikusa 天狛四彫",
+      "lat": 36.0447094,
+      "lon": 129.0398392,
+      "type": "station",
+      "tags": {
+        "colour": "#72E400",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242567",
+          "seq": 10
+        }
+      ]
+    },
+    {
+      "id": "124295242",
+      "name": "Isenebo 床踔",
+      "lat": 36.0519671,
+      "lon": 129.0485773,
+      "type": "station",
+      "tags": {
+        "colour": "#72E400",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242567",
+          "seq": 11
+        },
+        {
+          "relId": "272509",
+          "seq": 79
+        }
+      ]
+    },
+    {
+      "id": "124295243",
+      "name": "Kadewara",
+      "lat": 36.0591962,
+      "lon": 129.0556642,
+      "type": "station",
+      "tags": {
+        "colour": "#72E400",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242567",
+          "seq": 12
+        }
+      ]
+    },
+    {
+      "id": "124295244",
+      "name": "Shichirupas 四池流発",
+      "lat": 36.0687854,
+      "lon": 129.0578075,
+      "type": "station",
+      "tags": {
+        "colour": "#72E400",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242567",
+          "seq": 13
+        }
+      ]
+    },
+    {
+      "id": "124295245",
+      "name": "Tsarawari",
+      "lat": 36.0773526,
+      "lon": 129.0558507,
+      "type": "station",
+      "tags": {
+        "colour": "#72E400",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242567",
+          "seq": 14
+        }
+      ]
+    },
+    {
+      "id": "124627625",
+      "name": "Ibarosu 歯舢",
+      "lat": 36.2540759,
+      "lon": 128.815177,
+      "type": "station",
+      "tags": {
+        "electrified": "contact_line",
+        "gauge": "1435",
+        "oneway": "yes",
+        "railway": "station",
+        "voltage": "3000"
+      },
+      "lines": [
+        {
+          "relId": "272674",
+          "seq": 27
+        },
+        {
+          "relId": "326613",
+          "seq": 19
+        },
+        {
+          "relId": "326860",
+          "seq": 4
+        },
+        {
+          "relId": "326861",
+          "seq": 12
+        }
+      ]
+    },
+    {
+      "id": "126666498",
+      "name": "Shin-Tsukaso 新鷸蘇",
+      "lat": 35.9921501,
+      "lon": 129.1134775,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 5
+        },
+        {
+          "relId": "272126",
+          "seq": 12
+        },
+        {
+          "relId": "280778",
+          "seq": 2
+        },
+        {
+          "relId": "303222",
+          "seq": 4
+        },
+        {
+          "relId": "303227",
+          "seq": 6
+        },
+        {
+          "relId": "424886",
+          "seq": 5
+        }
+      ]
+    },
+    {
+      "id": "126666499",
+      "name": "Kawaei 珂夬栄",
+      "lat": 36.0067276,
+      "lon": 129.1079424,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "oneway": "yes",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242547",
+          "seq": 30
+        },
+        {
+          "relId": "242565",
+          "seq": 16
+        },
+        {
+          "relId": "338140",
+          "seq": 24
+        },
+        {
+          "relId": "424786",
+          "seq": 20
+        },
+        {
+          "relId": "424886",
+          "seq": 16
+        }
+      ]
+    },
+    {
+      "id": "128525299",
+      "name": "Egunsen Shokumüs'wen",
+      "lat": 36.0244478,
+      "lon": 128.9703305,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242546",
+          "seq": 12
+        },
+        {
+          "relId": "242548",
+          "seq": 14
+        },
+        {
+          "relId": "242565",
+          "seq": 25
+        },
+        {
+          "relId": "424869",
+          "seq": 7
+        },
+        {
+          "relId": "424886",
+          "seq": 25
+        },
+        {
+          "relId": "424887",
+          "seq": 25
+        }
+      ]
+    },
+    {
+      "id": "128525371",
+      "name": "官川 Kansāri",
+      "lat": 36.0191268,
+      "lon": 128.9815942,
+      "type": "station",
+      "tags": {
+        "colour": "#C46200",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 18
+        },
+        {
+          "relId": "242567",
+          "seq": 3
+        },
+        {
+          "relId": "242569",
+          "seq": 17
+        },
+        {
+          "relId": "424883",
+          "seq": 12
+        },
+        {
+          "relId": "424884",
+          "seq": 37
+        },
+        {
+          "relId": "424885",
+          "seq": 43
+        },
+        {
+          "relId": "424997",
+          "seq": 17
+        }
+      ]
+    },
+    {
+      "id": "128669527",
+      "name": "Eigan-ji 栄鳫寺",
+      "lat": 36.0188255,
+      "lon": 128.9909786,
+      "type": "station",
+      "tags": {
+        "colour": "#C46200",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 16
+        },
+        {
+          "relId": "242569",
+          "seq": 18
+        },
+        {
+          "relId": "411419",
+          "seq": 17
+        },
+        {
+          "relId": "424997",
+          "seq": 18
+        }
+      ]
+    },
+    {
+      "id": "129227893",
+      "name": "Abawauri 燕宦",
+      "lat": 36.0289548,
+      "lon": 128.9285227,
+      "type": "station",
+      "tags": {
+        "colour": "#0099CC",
+        "oneway": "yes",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242547",
+          "seq": 32
+        },
+        {
+          "relId": "242578",
+          "seq": 6
+        },
+        {
+          "relId": "272137",
+          "seq": 1
+        },
+        {
+          "relId": "338140",
+          "seq": 9
+        },
+        {
+          "relId": "424786",
+          "seq": 28
+        },
+        {
+          "relId": "425101",
+          "seq": 31
+        }
+      ]
+    },
+    {
+      "id": "129227939",
+      "name": "Heinomoji 駕桃",
+      "lat": 36.0317114,
+      "lon": 128.9366552,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "oneway": "yes",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242546",
+          "seq": 5
+        },
+        {
+          "relId": "242547",
+          "seq": 31
+        },
+        {
+          "relId": "242565",
+          "seq": 9
+        },
+        {
+          "relId": "338140",
+          "seq": 10
+        },
+        {
+          "relId": "424786",
+          "seq": 27
+        },
+        {
+          "relId": "424869",
+          "seq": 5
+        },
+        {
+          "relId": "424886",
+          "seq": 9
+        },
+        {
+          "relId": "424887",
+          "seq": 12
+        }
+      ]
+    },
+    {
+      "id": "129227940",
+      "name": "Awasada 邊褒",
+      "lat": 36.0240806,
+      "lon": 128.9407274,
+      "type": "station",
+      "tags": {
+        "colour": "#00A2D3",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242546",
+          "seq": 6
+        },
+        {
+          "relId": "242548",
+          "seq": 12
+        }
+      ]
+    },
+    {
+      "id": "129254587",
+      "name": "Niji-Kumasui 西枝水",
+      "lat": 36.0251377,
+      "lon": 128.9286509,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 8
+        },
+        {
+          "relId": "424869",
+          "seq": 4
+        },
+        {
+          "relId": "424886",
+          "seq": 8
+        },
+        {
+          "relId": "424887",
+          "seq": 11
+        }
+      ]
+    },
+    {
+      "id": "135394631",
+      "name": "Mokoba 母槻",
+      "lat": 35.9721348,
+      "lon": 129.1210895,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 1
+        },
+        {
+          "relId": "424886",
+          "seq": 1
+        }
+      ]
+    },
+    {
+      "id": "135874133",
+      "name": "Teyomuka",
+      "lat": 36.0199686,
+      "lon": 128.9287639,
+      "type": "station",
+      "tags": {
+        "colour": "#C40062",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 11
+        }
+      ]
+    },
+    {
+      "id": "135876986",
+      "name": "Jufurai 朱布来",
+      "lat": 36.0485222,
+      "lon": 128.9948185,
+      "type": "station",
+      "tags": {
+        "colour": "#72E400",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242567",
+          "seq": 7
+        },
+        {
+          "relId": "272120",
+          "seq": 16
+        },
+        {
+          "relId": "272393",
+          "seq": 6
+        },
+        {
+          "relId": "292343",
+          "seq": 12
+        }
+      ]
+    },
+    {
+      "id": "145681683",
+      "name": "Masuda Hibaru 馬砅任尭",
+      "lat": 36.026601,
+      "lon": 128.9795627,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 24
+        },
+        {
+          "relId": "424869",
+          "seq": 8
+        },
+        {
+          "relId": "424886",
+          "seq": 24
+        },
+        {
+          "relId": "424887",
+          "seq": 24
+        }
+      ]
+    },
+    {
+      "id": "145985092",
+      "name": "Tsenduma",
+      "lat": 36.0655367,
+      "lon": 128.9728441,
+      "type": "station",
+      "tags": {
+        "colour": "#816cb1",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 23
+        },
+        {
+          "relId": "242570",
+          "seq": 82
+        },
+        {
+          "relId": "424883",
+          "seq": 17
+        },
+        {
+          "relId": "424884",
+          "seq": 42
+        },
+        {
+          "relId": "424885",
+          "seq": 48
+        }
+      ]
+    },
+    {
+      "id": "145985093",
+      "name": "Shin-Makurigawa",
+      "lat": 36.0743068,
+      "lon": 128.971626,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 24
+        },
+        {
+          "relId": "292343",
+          "seq": 15
+        },
+        {
+          "relId": "424883",
+          "seq": 18
+        },
+        {
+          "relId": "424884",
+          "seq": 43
+        },
+        {
+          "relId": "424885",
+          "seq": 49
+        }
+      ]
+    },
+    {
+      "id": "145985094",
+      "name": "Garotsu Lake",
+      "lat": 36.0871867,
+      "lon": 128.977857,
+      "type": "station",
+      "tags": {
+        "colour": "#C46200",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 25
+        },
+        {
+          "relId": "242569",
+          "seq": 7
+        },
+        {
+          "relId": "424885",
+          "seq": 50
+        },
+        {
+          "relId": "424997",
+          "seq": 7
+        }
+      ]
+    },
+    {
+      "id": "145985095",
+      "name": "Rillantsoye",
+      "lat": 36.112719,
+      "lon": 128.9951739,
+      "type": "station",
+      "tags": {
+        "colour": "#C46200",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 28
+        },
+        {
+          "relId": "242569",
+          "seq": 4
+        },
+        {
+          "relId": "424883",
+          "seq": 20
+        },
+        {
+          "relId": "424885",
+          "seq": 53
+        },
+        {
+          "relId": "424997",
+          "seq": 4
+        }
+      ]
+    },
+    {
+      "id": "145985096",
+      "name": "Niji-Shakihori",
+      "lat": 36.1214889,
+      "lon": 128.9996179,
+      "type": "station",
+      "tags": {
+        "colour": "#C46200",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 29
+        },
+        {
+          "relId": "242569",
+          "seq": 3
+        },
+        {
+          "relId": "424884",
+          "seq": 45
+        },
+        {
+          "relId": "424885",
+          "seq": 54
+        },
+        {
+          "relId": "424997",
+          "seq": 3
+        }
+      ]
+    },
+    {
+      "id": "145985097",
+      "name": "Gawaraze",
+      "lat": 36.1309264,
+      "lon": 129.0016142,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 30
+        },
+        {
+          "relId": "424885",
+          "seq": 55
+        }
+      ]
+    },
+    {
+      "id": "148428068",
+      "name": "Tahnakusa",
+      "lat": 36.0099261,
+      "lon": 128.9615975,
+      "type": "station",
+      "tags": {
+        "colour": "#00A2D3",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242546",
+          "seq": 11
+        },
+        {
+          "relId": "242571",
+          "seq": 9
+        },
+        {
+          "relId": "242573",
+          "seq": 64
+        },
+        {
+          "relId": "424996",
+          "seq": 10
+        }
+      ]
+    },
+    {
+      "id": "169508181",
+      "name": "Kishagoi - Exhibitown 喜舎拘-૮ૅડાયારૃાઠ૮ેપ્",
+      "lat": 36.0580173,
+      "lon": 128.9012765,
+      "type": "station",
+      "tags": {
+        "colour": "#816cb1",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242546",
+          "seq": 20
+        },
+        {
+          "relId": "242548",
+          "seq": 2
+        },
+        {
+          "relId": "242573",
+          "seq": 58
+        },
+        {
+          "relId": "272674",
+          "seq": 10
+        },
+        {
+          "relId": "326861",
+          "seq": 29
+        }
+      ]
+    },
+    {
+      "id": "176667824",
+      "name": "Omenika Jinatsu 弁丹佳治芝",
+      "lat": 36.0247081,
+      "lon": 129.0321503,
+      "type": "station",
+      "tags": {
+        "colour": "#816cb1",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 20
+        },
+        {
+          "relId": "242570",
+          "seq": 89
+        },
+        {
+          "relId": "411419",
+          "seq": 14
+        },
+        {
+          "relId": "424869",
+          "seq": 12
+        },
+        {
+          "relId": "424886",
+          "seq": 20
+        },
+        {
+          "relId": "424887",
+          "seq": 20
+        }
+      ]
+    },
+    {
+      "id": "176668162",
+      "name": "Oiseharu (Metro)",
+      "lat": 36.0135479,
+      "lon": 129.0004274,
+      "type": "station",
+      "tags": {
+        "colour": "#C40062",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 17
+        },
+        {
+          "relId": "292343",
+          "seq": 10
+        }
+      ]
+    },
+    {
+      "id": "177044015",
+      "name": "Kanbata 巻岩",
+      "lat": 36.0264915,
+      "lon": 128.9554344,
+      "type": "station",
+      "tags": {
+        "colour": "#bcbf62",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 13
+        },
+        {
+          "relId": "242569",
+          "seq": 15
+        },
+        {
+          "relId": "242572",
+          "seq": 15
+        },
+        {
+          "relId": "272137",
+          "seq": 2
+        },
+        {
+          "relId": "424997",
+          "seq": 15
+        }
+      ]
+    },
+    {
+      "id": "183340984",
+      "name": "Aguri 2-sa 阿久里二沙",
+      "lat": 36.0405649,
+      "lon": 128.9820828,
+      "type": "station",
+      "tags": {
+        "colour": "#72E400",
+        "oneway": "yes",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242547",
+          "seq": 34
+        },
+        {
+          "relId": "242567",
+          "seq": 6
+        },
+        {
+          "relId": "338140",
+          "seq": 13
+        },
+        {
+          "relId": "424786",
+          "seq": 25
+        }
+      ]
+    },
+    {
+      "id": "183370154",
+      "name": "Shakihori Sports Park",
+      "lat": 36.1045367,
+      "lon": 128.9939758,
+      "type": "station",
+      "tags": {
+        "colour": "#C46200",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 27
+        },
+        {
+          "relId": "242569",
+          "seq": 5
+        },
+        {
+          "relId": "424885",
+          "seq": 52
+        },
+        {
+          "relId": "424997",
+          "seq": 5
+        }
+      ]
+    },
+    {
+      "id": "183370155",
+      "name": "Komayunden - Dōnmus Kōwen 冬允殿-動物公園",
+      "lat": 36.0944224,
+      "lon": 128.985047,
+      "type": "station",
+      "tags": {
+        "colour": "#00A2D3",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242546",
+          "seq": 19
+        },
+        {
+          "relId": "242566",
+          "seq": 26
+        },
+        {
+          "relId": "242569",
+          "seq": 6
+        },
+        {
+          "relId": "424883",
+          "seq": 19
+        },
+        {
+          "relId": "424884",
+          "seq": 44
+        },
+        {
+          "relId": "424885",
+          "seq": 51
+        },
+        {
+          "relId": "424997",
+          "seq": 6
+        }
+      ]
+    },
+    {
+      "id": "183370156",
+      "name": "Ekinðuka 虓પ્鵜",
+      "lat": 36.0389217,
+      "lon": 128.9728799,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "oneway": "yes",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242547",
+          "seq": 33
+        },
+        {
+          "relId": "242566",
+          "seq": 21
+        },
+        {
+          "relId": "338140",
+          "seq": 12
+        },
+        {
+          "relId": "424786",
+          "seq": 26
+        },
+        {
+          "relId": "424883",
+          "seq": 15
+        },
+        {
+          "relId": "424884",
+          "seq": 40
+        },
+        {
+          "relId": "424885",
+          "seq": 46
+        }
+      ]
+    },
+    {
+      "id": "183370157",
+      "name": "Amachi Kanlikoika 貽知官梨柳",
+      "lat": 36.0015092,
+      "lon": 128.9842821,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 16
+        },
+        {
+          "relId": "424883",
+          "seq": 10
+        },
+        {
+          "relId": "424884",
+          "seq": 35
+        },
+        {
+          "relId": "424885",
+          "seq": 41
+        }
+      ]
+    },
+    {
+      "id": "183370158",
+      "name": "Iyogateri",
+      "lat": 35.9723409,
+      "lon": 129.0397435,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 10
+        },
+        {
+          "relId": "242568",
+          "seq": 18
+        },
+        {
+          "relId": "424883",
+          "seq": 4
+        },
+        {
+          "relId": "424884",
+          "seq": 29
+        },
+        {
+          "relId": "424885",
+          "seq": 35
+        }
+      ]
+    },
+    {
+      "id": "183370159",
+      "name": "Patoshintsa 岩爪",
+      "lat": 35.9819947,
+      "lon": 129.0002583,
+      "type": "station",
+      "tags": {
+        "colour": "#72E400",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242567",
+          "seq": 19
+        }
+      ]
+    },
+    {
+      "id": "183370160",
+      "name": "Shin-Tsaikikori",
+      "lat": 35.9946652,
+      "lon": 129.0203242,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 10
+        },
+        {
+          "relId": "242566",
+          "seq": 13
+        },
+        {
+          "relId": "272126",
+          "seq": 5
+        },
+        {
+          "relId": "424883",
+          "seq": 7
+        },
+        {
+          "relId": "424884",
+          "seq": 32
+        },
+        {
+          "relId": "424885",
+          "seq": 38
+        }
+      ]
+    },
+    {
+      "id": "183370161",
+      "name": "Intsushitsa Kuyakujo",
+      "lat": 35.9944436,
+      "lon": 129.0070731,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 14
+        },
+        {
+          "relId": "242571",
+          "seq": 13
+        },
+        {
+          "relId": "424883",
+          "seq": 8
+        },
+        {
+          "relId": "424884",
+          "seq": 33
+        },
+        {
+          "relId": "424885",
+          "seq": 39
+        },
+        {
+          "relId": "424996",
+          "seq": 14
+        }
+      ]
+    },
+    {
+      "id": "183370162",
+      "name": "Yunpotsai Soisuma",
+      "lat": 35.9941335,
+      "lon": 128.9912617,
+      "type": "station",
+      "tags": {
+        "colour": "#72E400",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 15
+        },
+        {
+          "relId": "242567",
+          "seq": 20
+        },
+        {
+          "relId": "292343",
+          "seq": 9
+        },
+        {
+          "relId": "424883",
+          "seq": 9
+        },
+        {
+          "relId": "424884",
+          "seq": 34
+        },
+        {
+          "relId": "424885",
+          "seq": 40
+        }
+      ]
+    },
+    {
+      "id": "183370165",
+      "name": "Powanuki",
+      "lat": 35.972515,
+      "lon": 129.0020547,
+      "type": "station",
+      "tags": {
+        "colour": "#816cb1",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242567",
+          "seq": 18
+        },
+        {
+          "relId": "242570",
+          "seq": 96
+        }
+      ]
+    },
+    {
+      "id": "183370166",
+      "name": "Tanjānli",
+      "lat": 35.9670522,
+      "lon": 129.0089996,
+      "type": "station",
+      "tags": {
+        "colour": "#72E400",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242567",
+          "seq": 17
+        },
+        {
+          "relId": "242568",
+          "seq": 15
+        },
+        {
+          "relId": "242571",
+          "seq": 15
+        },
+        {
+          "relId": "424996",
+          "seq": 16
+        }
+      ]
+    },
+    {
+      "id": "183370173",
+      "name": "Nworisahta",
+      "lat": 35.9771068,
+      "lon": 129.0120966,
+      "type": "station",
+      "tags": {
+        "colour": "#816cb1",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242570",
+          "seq": 95
+        },
+        {
+          "relId": "242571",
+          "seq": 14
+        },
+        {
+          "relId": "424996",
+          "seq": 15
+        }
+      ]
+    },
+    {
+      "id": "183370181",
+      "name": "Ðaihate",
+      "lat": 35.9833947,
+      "lon": 129.0240074,
+      "type": "station",
+      "tags": {
+        "colour": "#816cb1",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 12
+        },
+        {
+          "relId": "242570",
+          "seq": 94
+        },
+        {
+          "relId": "424883",
+          "seq": 6
+        },
+        {
+          "relId": "424884",
+          "seq": 31
+        },
+        {
+          "relId": "424885",
+          "seq": 37
+        }
+      ]
+    },
+    {
+      "id": "183370188",
+      "name": "Mewakate Kippai",
+      "lat": 35.9379222,
+      "lon": 129.0306988,
+      "type": "station",
+      "tags": {
+        "colour": "#f985bb",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242571",
+          "seq": 4
+        },
+        {
+          "relId": "242573",
+          "seq": 73
+        },
+        {
+          "relId": "292343",
+          "seq": 7
+        }
+      ]
+    },
+    {
+      "id": "183370190",
+      "name": "Mewakate - Yōneo Motu",
+      "lat": 35.9396765,
+      "lon": 129.0071826,
+      "type": "station",
+      "tags": {
+        "colour": "#f985bb",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242573",
+          "seq": 72
+        },
+        {
+          "relId": "292343",
+          "seq": 6
+        },
+        {
+          "relId": "424996",
+          "seq": 4
+        }
+      ]
+    },
+    {
+      "id": "183370195",
+      "name": "Sainðaul National University 安作崎國立大學",
+      "lat": 36.0000284,
+      "lon": 128.9764571,
+      "type": "station",
+      "tags": {
+        "colour": "#f985bb",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242567",
+          "seq": 1
+        },
+        {
+          "relId": "242573",
+          "seq": 66
+        }
+      ]
+    },
+    {
+      "id": "183726928",
+      "name": "Ristai-Nyūngu 立大入口",
+      "lat": 36.0056338,
+      "lon": 129.0790058,
+      "type": "station",
+      "tags": {
+        "colour": "#FFD912",
+        "oneway": "yes",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242547",
+          "seq": 28
+        },
+        {
+          "relId": "338140",
+          "seq": 22
+        },
+        {
+          "relId": "424786",
+          "seq": 21
+        }
+      ]
+    },
+    {
+      "id": "186940230",
+      "name": "Kukuris Opera 國立歌劇院",
+      "lat": 36.0274492,
+      "lon": 129.0200269,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 21
+        },
+        {
+          "relId": "424869",
+          "seq": 11
+        },
+        {
+          "relId": "424886",
+          "seq": 21
+        },
+        {
+          "relId": "424887",
+          "seq": 21
+        }
+      ]
+    },
+    {
+      "id": "186940383",
+      "name": "Nagida Totsu 䲺橋",
+      "lat": 36.0301837,
+      "lon": 129.0091113,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 23
+        },
+        {
+          "relId": "424869",
+          "seq": 10
+        },
+        {
+          "relId": "424886",
+          "seq": 23
+        },
+        {
+          "relId": "424887",
+          "seq": 23
+        }
+      ]
+    },
+    {
+      "id": "186955500",
+      "name": "Takejori Shimin Kōwen 館恵市民公園",
+      "lat": 35.9878423,
+      "lon": 129.1152538,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 4
+        },
+        {
+          "relId": "424886",
+          "seq": 4
+        }
+      ]
+    },
+    {
+      "id": "186955501",
+      "name": "Yamaiki Town 倉琳ઠ૮ેપ્",
+      "lat": 35.9828669,
+      "lon": 129.1162325,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 3
+        },
+        {
+          "relId": "424886",
+          "seq": 3
+        }
+      ]
+    },
+    {
+      "id": "186955502",
+      "name": "Shiki-Mokoba 北母槻",
+      "lat": 35.9779999,
+      "lon": 129.1161788,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 2
+        },
+        {
+          "relId": "424886",
+          "seq": 2
+        }
+      ]
+    },
+    {
+      "id": "187344182",
+      "name": "Tsukasai",
+      "lat": 36.1986784,
+      "lon": 128.5451873,
+      "type": "station",
+      "tags": {
+        "colour": "#C40062",
+        "operator": "Izarail",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 7
+        },
+        {
+          "relId": "272510",
+          "seq": 7
+        }
+      ]
+    },
+    {
+      "id": "201033000",
+      "name": "Matori Nanmun",
+      "lat": 35.9869503,
+      "lon": 129.040683,
+      "type": "station",
+      "tags": {
+        "colour": "#C40062",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 20
+        }
+      ]
+    },
+    {
+      "id": "201033001",
+      "name": "Wasehai-Nuhajori",
+      "lat": 35.9871685,
+      "lon": 129.0308342,
+      "type": "station",
+      "tags": {
+        "colour": "#C40062",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 19
+        }
+      ]
+    },
+    {
+      "id": "201033004",
+      "name": "Shōryan Daishi",
+      "lat": 35.9846333,
+      "lon": 129.0483614,
+      "type": "station",
+      "tags": {
+        "colour": "#C40062",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 21
+        },
+        {
+          "relId": "242568",
+          "seq": 20
+        },
+        {
+          "relId": "272126",
+          "seq": 8
+        }
+      ]
+    },
+    {
+      "id": "201351276",
+      "name": "Oitsura 粕鵲",
+      "lat": 36.0528522,
+      "lon": 129.1276173,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "272491",
+          "seq": 4
+        },
+        {
+          "relId": "272492",
+          "seq": 11
+        },
+        {
+          "relId": "303223",
+          "seq": 5
+        },
+        {
+          "relId": "326968",
+          "seq": 6
+        },
+        {
+          "relId": "327143",
+          "seq": 80
+        },
+        {
+          "relId": "424869",
+          "seq": 21
+        },
+        {
+          "relId": "424887",
+          "seq": 15
+        }
+      ]
+    },
+    {
+      "id": "202909005",
+      "name": "Tayakure 貞師",
+      "lat": 35.9991904,
+      "lon": 129.1107283,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 17
+        },
+        {
+          "relId": "424886",
+          "seq": 17
+        }
+      ]
+    },
+    {
+      "id": "202909262",
+      "name": "Shiki-Kawaei 北珂夬栄",
+      "lat": 36.0166143,
+      "lon": 129.1038247,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 15
+        },
+        {
+          "relId": "424886",
+          "seq": 15
+        }
+      ]
+    },
+    {
+      "id": "202909263",
+      "name": "Akaimori 蛞生竹",
+      "lat": 36.0237994,
+      "lon": 129.1003928,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 14
+        },
+        {
+          "relId": "424886",
+          "seq": 14
+        }
+      ]
+    },
+    {
+      "id": "202909265",
+      "name": "Ōdahui Kōwen",
+      "lat": 36.0297562,
+      "lon": 129.0977251,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 13
+        },
+        {
+          "relId": "424886",
+          "seq": 13
+        }
+      ]
+    },
+    {
+      "id": "202909275",
+      "name": "Sumatake-Nehkehama",
+      "lat": 36.0294965,
+      "lon": 129.0819373,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 11
+        },
+        {
+          "relId": "424869",
+          "seq": 16
+        },
+        {
+          "relId": "424886",
+          "seq": 11
+        },
+        {
+          "relId": "424887",
+          "seq": 16
+        }
+      ]
+    },
+    {
+      "id": "202909276",
+      "name": "Otsumi-Hajafuki",
+      "lat": 36.0267897,
+      "lon": 129.0703483,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 12
+        },
+        {
+          "relId": "424869",
+          "seq": 15
+        },
+        {
+          "relId": "424886",
+          "seq": 12
+        },
+        {
+          "relId": "424887",
+          "seq": 17
+        }
+      ]
+    },
+    {
+      "id": "202909278",
+      "name": "Sumatake-Kyōmasa",
+      "lat": 36.0238921,
+      "lon": 129.057823,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 18
+        },
+        {
+          "relId": "424869",
+          "seq": 14
+        },
+        {
+          "relId": "424886",
+          "seq": 18
+        },
+        {
+          "relId": "424887",
+          "seq": 18
+        }
+      ]
+    },
+    {
+      "id": "214014848",
+      "name": "Kanlikoika Yukashire",
+      "lat": 35.9740635,
+      "lon": 129.0274786,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 11
+        },
+        {
+          "relId": "424883",
+          "seq": 5
+        },
+        {
+          "relId": "424884",
+          "seq": 30
+        },
+        {
+          "relId": "424885",
+          "seq": 36
+        }
+      ]
+    },
+    {
+      "id": "229641679",
+      "name": "Tsurunara",
+      "lat": 36.0026678,
+      "lon": 129.018252,
+      "type": "station",
+      "tags": {
+        "colour": "#C40062",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 9
+        }
+      ]
+    },
+    {
+      "id": "229641680",
+      "name": "Yauraki 葯洛",
+      "lat": 36.0096243,
+      "lon": 128.9468268,
+      "type": "station",
+      "tags": {
+        "colour": "#bcbf62",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242546",
+          "seq": 0
+        },
+        {
+          "relId": "242571",
+          "seq": 8
+        },
+        {
+          "relId": "242572",
+          "seq": 17
+        },
+        {
+          "relId": "424996",
+          "seq": 9
+        }
+      ]
+    },
+    {
+      "id": "229654731",
+      "name": "Kuyahede",
+      "lat": 36.1952037,
+      "lon": 128.5894012,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 8
+        },
+        {
+          "relId": "242565",
+          "seq": 6
+        },
+        {
+          "relId": "424886",
+          "seq": 6
+        },
+        {
+          "relId": "424887",
+          "seq": 9
+        }
+      ]
+    },
+    {
+      "id": "229654732",
+      "name": "Ogiwata 槃芳",
+      "lat": 36.032931,
+      "lon": 128.956348,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 7
+        },
+        {
+          "relId": "338140",
+          "seq": 11
+        },
+        {
+          "relId": "424869",
+          "seq": 6
+        },
+        {
+          "relId": "424886",
+          "seq": 7
+        },
+        {
+          "relId": "424887",
+          "seq": 10
+        }
+      ]
+    },
+    {
+      "id": "250139350",
+      "name": "Gamonate",
+      "lat": 36.1692838,
+      "lon": 128.9989669,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 9
+        },
+        {
+          "relId": "424883",
+          "seq": 3
+        },
+        {
+          "relId": "424884",
+          "seq": 28
+        },
+        {
+          "relId": "424885",
+          "seq": 34
+        }
+      ]
+    },
+    {
+      "id": "250139352",
+      "name": "Innotawa",
+      "lat": 36.158153,
+      "lon": 129.0042584,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 7
+        },
+        {
+          "relId": "424885",
+          "seq": 32
+        }
+      ]
+    },
+    {
+      "id": "250139353",
+      "name": "Nari-Surikato",
+      "lat": 36.1499658,
+      "lon": 129.0107852,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 8
+        },
+        {
+          "relId": "424885",
+          "seq": 33
+        }
+      ]
+    },
+    {
+      "id": "250346476",
+      "name": "Moriyose Nanmun",
+      "lat": 36.1948601,
+      "lon": 129.0061559,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 1
+        },
+        {
+          "relId": "424885",
+          "seq": 26
+        }
+      ]
+    },
+    {
+      "id": "250346477",
+      "name": "Kanegodaul",
+      "lat": 36.190887,
+      "lon": 128.996938,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 0
+        },
+        {
+          "relId": "424885",
+          "seq": 25
+        }
+      ]
+    },
+    {
+      "id": "256637105",
+      "name": "Jakkata 早泉",
+      "lat": 36.3011134,
+      "lon": 128.962322,
+      "type": "station",
+      "tags": {
+        "electrified": "contact_line",
+        "gauge": "1435",
+        "oneway": "yes",
+        "railway": "station",
+        "voltage": "3000"
+      },
+      "lines": [
+        {
+          "relId": "326613",
+          "seq": 21
+        }
+      ]
+    },
+    {
+      "id": "262194820",
+      "name": "Kubodanki",
+      "lat": 35.9469805,
+      "lon": 129.0246805,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242571",
+          "seq": 5
+        }
+      ]
+    },
+    {
+      "id": "262194821",
+      "name": "Shiki-Kubodanki",
+      "lat": 35.953631,
+      "lon": 129.0092435,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242571",
+          "seq": 6
+        }
+      ]
+    },
+    {
+      "id": "262195160",
+      "name": "Ominotori Hasenoki",
+      "lat": 36.0019575,
+      "lon": 128.997661,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242571",
+          "seq": 7
+        },
+        {
+          "relId": "292343",
+          "seq": 8
+        },
+        {
+          "relId": "424996",
+          "seq": 8
+        }
+      ]
+    },
+    {
+      "id": "283574154",
+      "name": "Shīfau 師包",
+      "lat": 36.4315205,
+      "lon": 129.4357258,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "326613",
+          "seq": 27
+        }
+      ]
+    },
+    {
+      "id": "283574158",
+      "name": "Jakkushonan 瀬岨男",
+      "lat": 36.4199854,
+      "lon": 129.3174851,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "272492",
+          "seq": 3
+        },
+        {
+          "relId": "326613",
+          "seq": 26
+        }
+      ]
+    },
+    {
+      "id": "321304867",
+      "name": "Sunbui 栒芙依",
+      "lat": 36.0456139,
+      "lon": 129.1250563,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "424869",
+          "seq": 20
+        },
+        {
+          "relId": "424887",
+          "seq": 5
+        }
+      ]
+    },
+    {
+      "id": "321304869",
+      "name": "Kanasamaki 崔蒔",
+      "lat": 36.0357892,
+      "lon": 129.1178036,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "424869",
+          "seq": 19
+        },
+        {
+          "relId": "424887",
+          "seq": 4
+        }
+      ]
+    },
+    {
+      "id": "321304870",
+      "name": "Otsumi-Makintoshi Meidai-adae 南馬ᐢ貴氾・明大前",
+      "lat": 36.0343073,
+      "lon": 129.1050643,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "424869",
+          "seq": 18
+        },
+        {
+          "relId": "424887",
+          "seq": 3
+        }
+      ]
+    },
+    {
+      "id": "321305089",
+      "name": "Ārikkohanu Yunobu 鶴神由見夫",
+      "lat": 36.0316425,
+      "lon": 129.0905997,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242565",
+          "seq": 0
+        },
+        {
+          "relId": "424869",
+          "seq": 17
+        },
+        {
+          "relId": "424886",
+          "seq": 0
+        },
+        {
+          "relId": "424887",
+          "seq": 0
+        }
+      ]
+    },
+    {
+      "id": "321305792",
+      "name": "Obikasunde 吾比加嵶",
+      "lat": 36.0882855,
+      "lon": 129.113797,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "424869",
+          "seq": 24
+        },
+        {
+          "relId": "424887",
+          "seq": 6
+        }
+      ]
+    },
+    {
+      "id": "321305793",
+      "name": "Tsutsuro Uguttaya 笙呂茨貞",
+      "lat": 36.0750509,
+      "lon": 129.1211893,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "424869",
+          "seq": 22
+        },
+        {
+          "relId": "424887",
+          "seq": 7
+        }
+      ]
+    },
+    {
+      "id": "321305795",
+      "name": "Oitsura Daikōwen 粕鵲大公園",
+      "lat": 36.0647155,
+      "lon": 129.1267869,
+      "type": "station",
+      "tags": {
+        "colour": "#FF0000",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "424869",
+          "seq": 23
+        },
+        {
+          "relId": "424887",
+          "seq": 8
+        }
+      ]
+    },
+    {
+      "id": "322699571",
+      "name": "Chastano 椋見",
+      "lat": 36.2119695,
+      "lon": 129.0072974,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 3
+        },
+        {
+          "relId": "424885",
+          "seq": 28
+        }
+      ]
+    },
+    {
+      "id": "322735922",
+      "name": "Sanzhō 参淨",
+      "lat": 36.2292837,
+      "lon": 128.9937578,
+      "type": "station",
+      "tags": {
+        "colour": "#009E4F",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242566",
+          "seq": 4
+        },
+        {
+          "relId": "424885",
+          "seq": 29
+        }
+      ]
+    },
+    {
+      "id": "342508941",
+      "name": "Niji-Yōneo",
+      "lat": 35.9018943,
+      "lon": 128.9852016,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "424996",
+          "seq": 7
+        }
+      ]
+    },
+    {
+      "id": "342508942",
+      "name": "Yōneo Juwon",
+      "lat": 35.903123,
+      "lon": 128.9994884,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "424996",
+          "seq": 6
+        }
+      ]
+    },
+    {
+      "id": "342508943",
+      "name": "Uhtashiruul 妻和崎",
+      "lat": 35.913666,
+      "lon": 129.0083427,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "424996",
+          "seq": 5
+        }
+      ]
+    },
+    {
+      "id": "368583211",
+      "name": "Shin-Tsumasui 新都馬水",
+      "lat": 36.0475969,
+      "lon": 128.8997451,
+      "type": "station",
+      "tags": {
+        "colour": "#C40062",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 1
+        }
+      ]
+    },
+    {
+      "id": "368583212",
+      "name": "Station TBD 未定驛",
+      "lat": 36.0379708,
+      "lon": 128.895913,
+      "type": "station",
+      "tags": {
+        "colour": "#C40062",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 0
+        }
+      ]
+    },
+    {
+      "id": "368583213",
+      "name": "Hadantoyo 琦砂",
+      "lat": 36.0140174,
+      "lon": 128.8999272,
+      "type": "station",
+      "tags": {
+        "colour": "#0099CC",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 5
+        },
+        {
+          "relId": "272137",
+          "seq": 0
+        }
+      ]
+    },
+    {
+      "id": "368583225",
+      "name": "Yuparaul 枕崎",
+      "lat": 36.0036411,
+      "lon": 128.9283378,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242571",
+          "seq": 3
+        },
+        {
+          "relId": "424996",
+          "seq": 3
+        }
+      ]
+    },
+    {
+      "id": "368583228",
+      "name": "Takkurahama 琢玖羅島",
+      "lat": 36.0154162,
+      "lon": 128.9188659,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242571",
+          "seq": 0
+        },
+        {
+          "relId": "424996",
+          "seq": 0
+        }
+      ]
+    },
+    {
+      "id": "368744269",
+      "name": "Takkurahama 琢玖羅島",
+      "lat": 36.0157828,
+      "lon": 128.92109,
+      "type": "station",
+      "tags": {
+        "colour": "#C40062",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 6
+        }
+      ]
+    },
+    {
+      "id": "369511437",
+      "name": "Nihkyonta Mirai 濱角未來",
+      "lat": 36.0289654,
+      "lon": 128.8943333,
+      "type": "station",
+      "tags": {
+        "colour": "#C40062",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 3
+        }
+      ]
+    },
+    {
+      "id": "369511438",
+      "name": "Yeisonzuta 八砅",
+      "lat": 36.0134968,
+      "lon": 128.9104534,
+      "type": "station",
+      "tags": {
+        "colour": "#C40062",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242548",
+          "seq": 4
+        }
+      ]
+    },
+    {
+      "id": "369511451",
+      "name": "Sahnaden 舩取",
+      "lat": 36.0065841,
+      "lon": 128.9113512,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242571",
+          "seq": 1
+        },
+        {
+          "relId": "424996",
+          "seq": 1
+        }
+      ]
+    },
+    {
+      "id": "369511452",
+      "name": "Station TBD 未定驛",
+      "lat": 36.0013843,
+      "lon": 128.9166551,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242571",
+          "seq": 2
+        },
+        {
+          "relId": "424996",
+          "seq": 2
+        }
+      ]
+    },
+    {
       "id": "122813475",
       "name": "Shakihori 石登",
       "lat": 36.1241086,
@@ -6312,43 +9180,6 @@
       ]
     },
     {
-      "id": "124064329",
-      "name": "Bibawara",
-      "lat": 36.1391727,
-      "lon": 129.0093788,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 31
-        },
-        {
-          "relId": "326968",
-          "seq": 17
-        },
-        {
-          "relId": "327143",
-          "seq": 69
-        },
-        {
-          "relId": "424883",
-          "seq": 21
-        },
-        {
-          "relId": "424884",
-          "seq": 46
-        },
-        {
-          "relId": "424885",
-          "seq": 56
-        }
-      ]
-    },
-    {
       "id": "124064331",
       "name": "Kayahori Bunki",
       "lat": 36.1521663,
@@ -6401,55 +9232,6 @@
         {
           "relId": "272510",
           "seq": 42
-        }
-      ]
-    },
-    {
-      "id": "124064334",
-      "name": "Shiitehongi 茛本名",
-      "lat": 36.0507518,
-      "lon": 128.9757518,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 22
-        },
-        {
-          "relId": "272393",
-          "seq": 8
-        },
-        {
-          "relId": "272494",
-          "seq": 20
-        },
-        {
-          "relId": "272509",
-          "seq": 70
-        },
-        {
-          "relId": "272510",
-          "seq": 48
-        },
-        {
-          "relId": "424883",
-          "seq": 16
-        },
-        {
-          "relId": "424884",
-          "seq": 41
-        },
-        {
-          "relId": "424885",
-          "seq": 47
-        },
-        {
-          "relId": "470427",
-          "seq": 29
         }
       ]
     },
@@ -6664,43 +9446,6 @@
       ]
     },
     {
-      "id": "124066078",
-      "name": "Rakkashoni 鳶腳",
-      "lat": 36.0263271,
-      "lon": 129.0422857,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 19
-        },
-        {
-          "relId": "272491",
-          "seq": 12
-        },
-        {
-          "relId": "272509",
-          "seq": 76
-        },
-        {
-          "relId": "424869",
-          "seq": 13
-        },
-        {
-          "relId": "424886",
-          "seq": 19
-        },
-        {
-          "relId": "424887",
-          "seq": 19
-        }
-      ]
-    },
-    {
       "id": "124066080",
       "name": "Oritoku 壌外",
       "lat": 36.0133767,
@@ -6726,31 +9471,6 @@
         {
           "relId": "424997",
           "seq": 21
-        }
-      ]
-    },
-    {
-      "id": "124066081",
-      "name": "Tomiganei 庭ヶ汢",
-      "lat": 36.0086704,
-      "lon": 129.0175638,
-      "type": "station",
-      "tags": {
-        "colour": "#C40062",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 18
-        },
-        {
-          "relId": "272491",
-          "seq": 15
-        },
-        {
-          "relId": "272509",
-          "seq": 73
         }
       ]
     },
@@ -6793,68 +9513,6 @@
         {
           "relId": "272509",
           "seq": 71
-        }
-      ]
-    },
-    {
-      "id": "124066085",
-      "name": "Ōbakura 大砌",
-      "lat": 36.0072109,
-      "lon": 128.9771076,
-      "type": "station",
-      "tags": {
-        "colour": "#72E400",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242567",
-          "seq": 2
-        },
-        {
-          "relId": "242571",
-          "seq": 11
-        },
-        {
-          "relId": "272393",
-          "seq": 3
-        },
-        {
-          "relId": "272491",
-          "seq": 19
-        },
-        {
-          "relId": "272509",
-          "seq": 87
-        },
-        {
-          "relId": "424996",
-          "seq": 12
-        }
-      ]
-    },
-    {
-      "id": "124066185",
-      "name": "Migawarae",
-      "lat": 36.0984037,
-      "lon": 129.055989,
-      "type": "station",
-      "tags": {
-        "colour": "#72E400",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242567",
-          "seq": 16
-        },
-        {
-          "relId": "326968",
-          "seq": 11
-        },
-        {
-          "relId": "327143",
-          "seq": 75
         }
       ]
     },
@@ -7039,116 +9697,6 @@
         {
           "relId": "272491",
           "seq": 10
-        }
-      ]
-    },
-    {
-      "id": "124295240",
-      "name": "Shotsumaichi",
-      "lat": 36.0435392,
-      "lon": 129.027898,
-      "type": "station",
-      "tags": {
-        "colour": "#816cb1",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242567",
-          "seq": 9
-        },
-        {
-          "relId": "242570",
-          "seq": 87
-        }
-      ]
-    },
-    {
-      "id": "124295241",
-      "name": "Ominotori Shikusa 天狛四彫",
-      "lat": 36.0447094,
-      "lon": 129.0398392,
-      "type": "station",
-      "tags": {
-        "colour": "#72E400",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242567",
-          "seq": 10
-        }
-      ]
-    },
-    {
-      "id": "124295242",
-      "name": "Isenebo 床踔",
-      "lat": 36.0519671,
-      "lon": 129.0485773,
-      "type": "station",
-      "tags": {
-        "colour": "#72E400",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242567",
-          "seq": 11
-        },
-        {
-          "relId": "272509",
-          "seq": 79
-        }
-      ]
-    },
-    {
-      "id": "124295243",
-      "name": "Kadewara",
-      "lat": 36.0591962,
-      "lon": 129.0556642,
-      "type": "station",
-      "tags": {
-        "colour": "#72E400",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242567",
-          "seq": 12
-        }
-      ]
-    },
-    {
-      "id": "124295244",
-      "name": "Shichirupas 四池流発",
-      "lat": 36.0687854,
-      "lon": 129.0578075,
-      "type": "station",
-      "tags": {
-        "colour": "#72E400",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242567",
-          "seq": 13
-        }
-      ]
-    },
-    {
-      "id": "124295245",
-      "name": "Tsarawari",
-      "lat": 36.0773526,
-      "lon": 129.0558507,
-      "type": "station",
-      "tags": {
-        "colour": "#72E400",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242567",
-          "seq": 14
         }
       ]
     },
@@ -7362,77 +9910,6 @@
       ]
     },
     {
-      "id": "126666498",
-      "name": "Shin-Tsukaso 新鷸蘇",
-      "lat": 35.9921501,
-      "lon": 129.1134775,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 5
-        },
-        {
-          "relId": "272126",
-          "seq": 12
-        },
-        {
-          "relId": "280778",
-          "seq": 2
-        },
-        {
-          "relId": "303222",
-          "seq": 4
-        },
-        {
-          "relId": "303227",
-          "seq": 6
-        },
-        {
-          "relId": "424886",
-          "seq": 5
-        }
-      ]
-    },
-    {
-      "id": "126666499",
-      "name": "Kawaei 珂夬栄",
-      "lat": 36.0067276,
-      "lon": 129.1079424,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "oneway": "yes",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242547",
-          "seq": 30
-        },
-        {
-          "relId": "242565",
-          "seq": 16
-        },
-        {
-          "relId": "338140",
-          "seq": 24
-        },
-        {
-          "relId": "424786",
-          "seq": 20
-        },
-        {
-          "relId": "424886",
-          "seq": 16
-        }
-      ]
-    },
-    {
       "id": "126754740",
       "name": "Zawahan Nojima",
       "lat": 36.0319966,
@@ -7505,43 +9982,6 @@
       ]
     },
     {
-      "id": "128525299",
-      "name": "Egunsen Shokumüs'wen",
-      "lat": 36.0244478,
-      "lon": 128.9703305,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242546",
-          "seq": 12
-        },
-        {
-          "relId": "242548",
-          "seq": 14
-        },
-        {
-          "relId": "242565",
-          "seq": 25
-        },
-        {
-          "relId": "424869",
-          "seq": 7
-        },
-        {
-          "relId": "424886",
-          "seq": 25
-        },
-        {
-          "relId": "424887",
-          "seq": 25
-        }
-      ]
-    },
-    {
       "id": "128525370",
       "name": "Tikkamoto",
       "lat": 36.0172776,
@@ -7559,76 +9999,6 @@
         {
           "relId": "424997",
           "seq": 16
-        }
-      ]
-    },
-    {
-      "id": "128525371",
-      "name": "官川 Kansāri",
-      "lat": 36.0191268,
-      "lon": 128.9815942,
-      "type": "station",
-      "tags": {
-        "colour": "#C46200",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 18
-        },
-        {
-          "relId": "242567",
-          "seq": 3
-        },
-        {
-          "relId": "242569",
-          "seq": 17
-        },
-        {
-          "relId": "424883",
-          "seq": 12
-        },
-        {
-          "relId": "424884",
-          "seq": 37
-        },
-        {
-          "relId": "424885",
-          "seq": 43
-        },
-        {
-          "relId": "424997",
-          "seq": 17
-        }
-      ]
-    },
-    {
-      "id": "128669527",
-      "name": "Eigan-ji 栄鳫寺",
-      "lat": 36.0188255,
-      "lon": 128.9909786,
-      "type": "station",
-      "tags": {
-        "colour": "#C46200",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 16
-        },
-        {
-          "relId": "242569",
-          "seq": 18
-        },
-        {
-          "relId": "411419",
-          "seq": 17
-        },
-        {
-          "relId": "424997",
-          "seq": 18
         }
       ]
     },
@@ -7658,44 +10028,6 @@
         {
           "relId": "425101",
           "seq": 28
-        }
-      ]
-    },
-    {
-      "id": "129227893",
-      "name": "Abawauri 燕宦",
-      "lat": 36.0289548,
-      "lon": 128.9285227,
-      "type": "station",
-      "tags": {
-        "colour": "#0099CC",
-        "oneway": "yes",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242547",
-          "seq": 32
-        },
-        {
-          "relId": "242578",
-          "seq": 6
-        },
-        {
-          "relId": "272137",
-          "seq": 1
-        },
-        {
-          "relId": "338140",
-          "seq": 9
-        },
-        {
-          "relId": "424786",
-          "seq": 28
-        },
-        {
-          "relId": "425101",
-          "seq": 31
         }
       ]
     },
@@ -7746,73 +10078,6 @@
         {
           "relId": "424997",
           "seq": 14
-        }
-      ]
-    },
-    {
-      "id": "129227939",
-      "name": "Heinomoji 駕桃",
-      "lat": 36.0317114,
-      "lon": 128.9366552,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "oneway": "yes",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242546",
-          "seq": 5
-        },
-        {
-          "relId": "242547",
-          "seq": 31
-        },
-        {
-          "relId": "242565",
-          "seq": 9
-        },
-        {
-          "relId": "338140",
-          "seq": 10
-        },
-        {
-          "relId": "424786",
-          "seq": 27
-        },
-        {
-          "relId": "424869",
-          "seq": 5
-        },
-        {
-          "relId": "424886",
-          "seq": 9
-        },
-        {
-          "relId": "424887",
-          "seq": 12
-        }
-      ]
-    },
-    {
-      "id": "129227940",
-      "name": "Awasada 邊褒",
-      "lat": 36.0240806,
-      "lon": 128.9407274,
-      "type": "station",
-      "tags": {
-        "colour": "#00A2D3",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242546",
-          "seq": 6
-        },
-        {
-          "relId": "242548",
-          "seq": 12
         }
       ]
     },
@@ -7925,35 +10190,6 @@
       ]
     },
     {
-      "id": "129254587",
-      "name": "Niji-Kumasui 西枝水",
-      "lat": 36.0251377,
-      "lon": 128.9286509,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 8
-        },
-        {
-          "relId": "424869",
-          "seq": 4
-        },
-        {
-          "relId": "424886",
-          "seq": 8
-        },
-        {
-          "relId": "424887",
-          "seq": 11
-        }
-      ]
-    },
-    {
       "id": "135115998",
       "name": "Pakkishoi",
       "lat": 36.0881131,
@@ -7970,73 +10206,6 @@
         {
           "relId": "327143",
           "seq": 76
-        }
-      ]
-    },
-    {
-      "id": "135394631",
-      "name": "Mokoba 母槻",
-      "lat": 35.9721348,
-      "lon": 129.1210895,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 1
-        },
-        {
-          "relId": "424886",
-          "seq": 1
-        }
-      ]
-    },
-    {
-      "id": "135874133",
-      "name": "Teyomuka",
-      "lat": 36.0199686,
-      "lon": 128.9287639,
-      "type": "station",
-      "tags": {
-        "colour": "#C40062",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 11
-        }
-      ]
-    },
-    {
-      "id": "135876986",
-      "name": "Jufurai 朱布来",
-      "lat": 36.0485222,
-      "lon": 128.9948185,
-      "type": "station",
-      "tags": {
-        "colour": "#72E400",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242567",
-          "seq": 7
-        },
-        {
-          "relId": "272120",
-          "seq": 16
-        },
-        {
-          "relId": "272393",
-          "seq": 6
-        },
-        {
-          "relId": "292343",
-          "seq": 12
         }
       ]
     },
@@ -8489,35 +10658,6 @@
       ]
     },
     {
-      "id": "145681683",
-      "name": "Masuda Hibaru 馬砅任尭",
-      "lat": 36.026601,
-      "lon": 128.9795627,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 24
-        },
-        {
-          "relId": "424869",
-          "seq": 8
-        },
-        {
-          "relId": "424886",
-          "seq": 24
-        },
-        {
-          "relId": "424887",
-          "seq": 24
-        }
-      ]
-    },
-    {
       "id": "145943685",
       "name": "Minkanawa",
       "lat": 36.0460488,
@@ -8535,188 +10675,6 @@
         {
           "relId": "424997",
           "seq": 13
-        }
-      ]
-    },
-    {
-      "id": "145985092",
-      "name": "Tsenduma",
-      "lat": 36.0655367,
-      "lon": 128.9728441,
-      "type": "station",
-      "tags": {
-        "colour": "#816cb1",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 23
-        },
-        {
-          "relId": "242570",
-          "seq": 82
-        },
-        {
-          "relId": "424883",
-          "seq": 17
-        },
-        {
-          "relId": "424884",
-          "seq": 42
-        },
-        {
-          "relId": "424885",
-          "seq": 48
-        }
-      ]
-    },
-    {
-      "id": "145985093",
-      "name": "Shin-Makurigawa",
-      "lat": 36.0743068,
-      "lon": 128.971626,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 24
-        },
-        {
-          "relId": "292343",
-          "seq": 15
-        },
-        {
-          "relId": "424883",
-          "seq": 18
-        },
-        {
-          "relId": "424884",
-          "seq": 43
-        },
-        {
-          "relId": "424885",
-          "seq": 49
-        }
-      ]
-    },
-    {
-      "id": "145985094",
-      "name": "Garotsu Lake",
-      "lat": 36.0871867,
-      "lon": 128.977857,
-      "type": "station",
-      "tags": {
-        "colour": "#C46200",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 25
-        },
-        {
-          "relId": "242569",
-          "seq": 7
-        },
-        {
-          "relId": "424885",
-          "seq": 50
-        },
-        {
-          "relId": "424997",
-          "seq": 7
-        }
-      ]
-    },
-    {
-      "id": "145985095",
-      "name": "Rillantsoye",
-      "lat": 36.112719,
-      "lon": 128.9951739,
-      "type": "station",
-      "tags": {
-        "colour": "#C46200",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 28
-        },
-        {
-          "relId": "242569",
-          "seq": 4
-        },
-        {
-          "relId": "424883",
-          "seq": 20
-        },
-        {
-          "relId": "424885",
-          "seq": 53
-        },
-        {
-          "relId": "424997",
-          "seq": 4
-        }
-      ]
-    },
-    {
-      "id": "145985096",
-      "name": "Niji-Shakihori",
-      "lat": 36.1214889,
-      "lon": 128.9996179,
-      "type": "station",
-      "tags": {
-        "colour": "#C46200",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 29
-        },
-        {
-          "relId": "242569",
-          "seq": 3
-        },
-        {
-          "relId": "424884",
-          "seq": 45
-        },
-        {
-          "relId": "424885",
-          "seq": 54
-        },
-        {
-          "relId": "424997",
-          "seq": 3
-        }
-      ]
-    },
-    {
-      "id": "145985097",
-      "name": "Gawaraze",
-      "lat": 36.1309264,
-      "lon": 129.0016142,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 30
-        },
-        {
-          "relId": "424885",
-          "seq": 55
         }
       ]
     },
@@ -9503,35 +11461,6 @@
       ]
     },
     {
-      "id": "148428068",
-      "name": "Tahnakusa",
-      "lat": 36.0099261,
-      "lon": 128.9615975,
-      "type": "station",
-      "tags": {
-        "colour": "#00A2D3",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242546",
-          "seq": 11
-        },
-        {
-          "relId": "242571",
-          "seq": 9
-        },
-        {
-          "relId": "242573",
-          "seq": 64
-        },
-        {
-          "relId": "424996",
-          "seq": 10
-        }
-      ]
-    },
-    {
       "id": "167670212",
       "name": "Togamiro",
       "lat": 35.9612553,
@@ -9712,39 +11641,6 @@
         {
           "relId": "272494",
           "seq": 12
-        }
-      ]
-    },
-    {
-      "id": "169508181",
-      "name": "Kishagoi - Exhibitown 喜舎拘-૮ૅડાયારૃાઠ૮ેપ્",
-      "lat": 36.0580173,
-      "lon": 128.9012765,
-      "type": "station",
-      "tags": {
-        "colour": "#816cb1",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242546",
-          "seq": 20
-        },
-        {
-          "relId": "242548",
-          "seq": 2
-        },
-        {
-          "relId": "242573",
-          "seq": 58
-        },
-        {
-          "relId": "272674",
-          "seq": 10
-        },
-        {
-          "relId": "326861",
-          "seq": 29
         }
       ]
     },
@@ -10005,43 +11901,6 @@
       ]
     },
     {
-      "id": "176667824",
-      "name": "Omenika Jinatsu 弁丹佳治芝",
-      "lat": 36.0247081,
-      "lon": 129.0321503,
-      "type": "station",
-      "tags": {
-        "colour": "#816cb1",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 20
-        },
-        {
-          "relId": "242570",
-          "seq": 89
-        },
-        {
-          "relId": "411419",
-          "seq": 14
-        },
-        {
-          "relId": "424869",
-          "seq": 12
-        },
-        {
-          "relId": "424886",
-          "seq": 20
-        },
-        {
-          "relId": "424887",
-          "seq": 20
-        }
-      ]
-    },
-    {
       "id": "176667833",
       "name": "Tamainoki 谷伊坂",
       "lat": 36.0262713,
@@ -10082,27 +11941,6 @@
         {
           "relId": "338140",
           "seq": 17
-        }
-      ]
-    },
-    {
-      "id": "176668162",
-      "name": "Oiseharu (Metro)",
-      "lat": 36.0135479,
-      "lon": 129.0004274,
-      "type": "station",
-      "tags": {
-        "colour": "#C40062",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 17
-        },
-        {
-          "relId": "292343",
-          "seq": 10
         }
       ]
     },
@@ -10173,39 +12011,6 @@
         {
           "relId": "272510",
           "seq": 5
-        }
-      ]
-    },
-    {
-      "id": "177044015",
-      "name": "Kanbata 巻岩",
-      "lat": 36.0264915,
-      "lon": 128.9554344,
-      "type": "station",
-      "tags": {
-        "colour": "#bcbf62",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 13
-        },
-        {
-          "relId": "242569",
-          "seq": 15
-        },
-        {
-          "relId": "242572",
-          "seq": 15
-        },
-        {
-          "relId": "272137",
-          "seq": 2
-        },
-        {
-          "relId": "424997",
-          "seq": 15
         }
       ]
     },
@@ -10296,338 +12101,6 @@
       ]
     },
     {
-      "id": "183340984",
-      "name": "Aguri 2-sa 阿久里二沙",
-      "lat": 36.0405649,
-      "lon": 128.9820828,
-      "type": "station",
-      "tags": {
-        "colour": "#72E400",
-        "oneway": "yes",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242547",
-          "seq": 34
-        },
-        {
-          "relId": "242567",
-          "seq": 6
-        },
-        {
-          "relId": "338140",
-          "seq": 13
-        },
-        {
-          "relId": "424786",
-          "seq": 25
-        }
-      ]
-    },
-    {
-      "id": "183370154",
-      "name": "Shakihori Sports Park",
-      "lat": 36.1045367,
-      "lon": 128.9939758,
-      "type": "station",
-      "tags": {
-        "colour": "#C46200",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 27
-        },
-        {
-          "relId": "242569",
-          "seq": 5
-        },
-        {
-          "relId": "424885",
-          "seq": 52
-        },
-        {
-          "relId": "424997",
-          "seq": 5
-        }
-      ]
-    },
-    {
-      "id": "183370155",
-      "name": "Komayunden - Dōnmus Kōwen 冬允殿-動物公園",
-      "lat": 36.0944224,
-      "lon": 128.985047,
-      "type": "station",
-      "tags": {
-        "colour": "#00A2D3",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242546",
-          "seq": 19
-        },
-        {
-          "relId": "242566",
-          "seq": 26
-        },
-        {
-          "relId": "242569",
-          "seq": 6
-        },
-        {
-          "relId": "424883",
-          "seq": 19
-        },
-        {
-          "relId": "424884",
-          "seq": 44
-        },
-        {
-          "relId": "424885",
-          "seq": 51
-        },
-        {
-          "relId": "424997",
-          "seq": 6
-        }
-      ]
-    },
-    {
-      "id": "183370156",
-      "name": "Ekinðuka 虓પ્鵜",
-      "lat": 36.0389217,
-      "lon": 128.9728799,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "oneway": "yes",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242547",
-          "seq": 33
-        },
-        {
-          "relId": "242566",
-          "seq": 21
-        },
-        {
-          "relId": "338140",
-          "seq": 12
-        },
-        {
-          "relId": "424786",
-          "seq": 26
-        },
-        {
-          "relId": "424883",
-          "seq": 15
-        },
-        {
-          "relId": "424884",
-          "seq": 40
-        },
-        {
-          "relId": "424885",
-          "seq": 46
-        }
-      ]
-    },
-    {
-      "id": "183370157",
-      "name": "Amachi Kanlikoika 貽知官梨柳",
-      "lat": 36.0015092,
-      "lon": 128.9842821,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 16
-        },
-        {
-          "relId": "424883",
-          "seq": 10
-        },
-        {
-          "relId": "424884",
-          "seq": 35
-        },
-        {
-          "relId": "424885",
-          "seq": 41
-        }
-      ]
-    },
-    {
-      "id": "183370158",
-      "name": "Iyogateri",
-      "lat": 35.9723409,
-      "lon": 129.0397435,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 10
-        },
-        {
-          "relId": "242568",
-          "seq": 18
-        },
-        {
-          "relId": "424883",
-          "seq": 4
-        },
-        {
-          "relId": "424884",
-          "seq": 29
-        },
-        {
-          "relId": "424885",
-          "seq": 35
-        }
-      ]
-    },
-    {
-      "id": "183370159",
-      "name": "Patoshintsa 岩爪",
-      "lat": 35.9819947,
-      "lon": 129.0002583,
-      "type": "station",
-      "tags": {
-        "colour": "#72E400",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242567",
-          "seq": 19
-        }
-      ]
-    },
-    {
-      "id": "183370160",
-      "name": "Shin-Tsaikikori",
-      "lat": 35.9946652,
-      "lon": 129.0203242,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 10
-        },
-        {
-          "relId": "242566",
-          "seq": 13
-        },
-        {
-          "relId": "272126",
-          "seq": 5
-        },
-        {
-          "relId": "424883",
-          "seq": 7
-        },
-        {
-          "relId": "424884",
-          "seq": 32
-        },
-        {
-          "relId": "424885",
-          "seq": 38
-        }
-      ]
-    },
-    {
-      "id": "183370161",
-      "name": "Intsushitsa Kuyakujo",
-      "lat": 35.9944436,
-      "lon": 129.0070731,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 14
-        },
-        {
-          "relId": "242571",
-          "seq": 13
-        },
-        {
-          "relId": "424883",
-          "seq": 8
-        },
-        {
-          "relId": "424884",
-          "seq": 33
-        },
-        {
-          "relId": "424885",
-          "seq": 39
-        },
-        {
-          "relId": "424996",
-          "seq": 14
-        }
-      ]
-    },
-    {
-      "id": "183370162",
-      "name": "Yunpotsai Soisuma",
-      "lat": 35.9941335,
-      "lon": 128.9912617,
-      "type": "station",
-      "tags": {
-        "colour": "#72E400",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 15
-        },
-        {
-          "relId": "242567",
-          "seq": 20
-        },
-        {
-          "relId": "292343",
-          "seq": 9
-        },
-        {
-          "relId": "424883",
-          "seq": 9
-        },
-        {
-          "relId": "424884",
-          "seq": 34
-        },
-        {
-          "relId": "424885",
-          "seq": 40
-        }
-      ]
-    },
-    {
       "id": "183370163",
       "name": "Yahara",
       "lat": 35.9555887,
@@ -10670,114 +12143,6 @@
       ]
     },
     {
-      "id": "183370165",
-      "name": "Powanuki",
-      "lat": 35.972515,
-      "lon": 129.0020547,
-      "type": "station",
-      "tags": {
-        "colour": "#816cb1",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242567",
-          "seq": 18
-        },
-        {
-          "relId": "242570",
-          "seq": 96
-        }
-      ]
-    },
-    {
-      "id": "183370166",
-      "name": "Tanjānli",
-      "lat": 35.9670522,
-      "lon": 129.0089996,
-      "type": "station",
-      "tags": {
-        "colour": "#72E400",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242567",
-          "seq": 17
-        },
-        {
-          "relId": "242568",
-          "seq": 15
-        },
-        {
-          "relId": "242571",
-          "seq": 15
-        },
-        {
-          "relId": "424996",
-          "seq": 16
-        }
-      ]
-    },
-    {
-      "id": "183370173",
-      "name": "Nworisahta",
-      "lat": 35.9771068,
-      "lon": 129.0120966,
-      "type": "station",
-      "tags": {
-        "colour": "#816cb1",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242570",
-          "seq": 95
-        },
-        {
-          "relId": "242571",
-          "seq": 14
-        },
-        {
-          "relId": "424996",
-          "seq": 15
-        }
-      ]
-    },
-    {
-      "id": "183370181",
-      "name": "Ðaihate",
-      "lat": 35.9833947,
-      "lon": 129.0240074,
-      "type": "station",
-      "tags": {
-        "colour": "#816cb1",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 12
-        },
-        {
-          "relId": "242570",
-          "seq": 94
-        },
-        {
-          "relId": "424883",
-          "seq": 6
-        },
-        {
-          "relId": "424884",
-          "seq": 31
-        },
-        {
-          "relId": "424885",
-          "seq": 37
-        }
-      ]
-    },
-    {
       "id": "183370182",
       "name": "Matorigashesha",
       "lat": 35.9914785,
@@ -10791,56 +12156,6 @@
         {
           "relId": "242570",
           "seq": 93
-        }
-      ]
-    },
-    {
-      "id": "183370188",
-      "name": "Mewakate Kippai",
-      "lat": 35.9379222,
-      "lon": 129.0306988,
-      "type": "station",
-      "tags": {
-        "colour": "#f985bb",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242571",
-          "seq": 4
-        },
-        {
-          "relId": "242573",
-          "seq": 73
-        },
-        {
-          "relId": "292343",
-          "seq": 7
-        }
-      ]
-    },
-    {
-      "id": "183370190",
-      "name": "Mewakate - Yōneo Motu",
-      "lat": 35.9396765,
-      "lon": 129.0071826,
-      "type": "station",
-      "tags": {
-        "colour": "#f985bb",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242573",
-          "seq": 72
-        },
-        {
-          "relId": "292343",
-          "seq": 6
-        },
-        {
-          "relId": "424996",
-          "seq": 4
         }
       ]
     },
@@ -10933,27 +12248,6 @@
       ]
     },
     {
-      "id": "183370195",
-      "name": "Sainðaul National University 安作崎國立大學",
-      "lat": 36.0000284,
-      "lon": 128.9764571,
-      "type": "station",
-      "tags": {
-        "colour": "#f985bb",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242567",
-          "seq": 1
-        },
-        {
-          "relId": "242573",
-          "seq": 66
-        }
-      ]
-    },
-    {
       "id": "183726927",
       "name": "Niji-Kawaei 西珂夬栄",
       "lat": 36.0051624,
@@ -10972,32 +12266,6 @@
         {
           "relId": "338140",
           "seq": 23
-        }
-      ]
-    },
-    {
-      "id": "183726928",
-      "name": "Ristai-Nyūngu 立大入口",
-      "lat": 36.0056338,
-      "lon": 129.0790058,
-      "type": "station",
-      "tags": {
-        "colour": "#FFD912",
-        "oneway": "yes",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242547",
-          "seq": 28
-        },
-        {
-          "relId": "338140",
-          "seq": 22
-        },
-        {
-          "relId": "424786",
-          "seq": 21
         }
       ]
     },
@@ -11170,64 +12438,6 @@
       ]
     },
     {
-      "id": "186940230",
-      "name": "Kukuris Opera 國立歌劇院",
-      "lat": 36.0274492,
-      "lon": 129.0200269,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 21
-        },
-        {
-          "relId": "424869",
-          "seq": 11
-        },
-        {
-          "relId": "424886",
-          "seq": 21
-        },
-        {
-          "relId": "424887",
-          "seq": 21
-        }
-      ]
-    },
-    {
-      "id": "186940383",
-      "name": "Nagida Totsu 䲺橋",
-      "lat": 36.0301837,
-      "lon": 129.0091113,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 23
-        },
-        {
-          "relId": "424869",
-          "seq": 10
-        },
-        {
-          "relId": "424886",
-          "seq": 23
-        },
-        {
-          "relId": "424887",
-          "seq": 23
-        }
-      ]
-    },
-    {
       "id": "186953828",
       "name": "Kanlikoika Asamu",
       "lat": 35.9692653,
@@ -11256,69 +12466,6 @@
         {
           "relId": "242568",
           "seq": 16
-        }
-      ]
-    },
-    {
-      "id": "186955500",
-      "name": "Takejori Shimin Kōwen 館恵市民公園",
-      "lat": 35.9878423,
-      "lon": 129.1152538,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 4
-        },
-        {
-          "relId": "424886",
-          "seq": 4
-        }
-      ]
-    },
-    {
-      "id": "186955501",
-      "name": "Yamaiki Town 倉琳ઠ૮ેપ્",
-      "lat": 35.9828669,
-      "lon": 129.1162325,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 3
-        },
-        {
-          "relId": "424886",
-          "seq": 3
-        }
-      ]
-    },
-    {
-      "id": "186955502",
-      "name": "Shiki-Mokoba 北母槻",
-      "lat": 35.9779999,
-      "lon": 129.1161788,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 2
-        },
-        {
-          "relId": "424886",
-          "seq": 2
         }
       ]
     },
@@ -11995,65 +13142,6 @@
       ]
     },
     {
-      "id": "201033000",
-      "name": "Matori Nanmun",
-      "lat": 35.9869503,
-      "lon": 129.040683,
-      "type": "station",
-      "tags": {
-        "colour": "#C40062",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 20
-        }
-      ]
-    },
-    {
-      "id": "201033001",
-      "name": "Wasehai-Nuhajori",
-      "lat": 35.9871685,
-      "lon": 129.0308342,
-      "type": "station",
-      "tags": {
-        "colour": "#C40062",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 19
-        }
-      ]
-    },
-    {
-      "id": "201033004",
-      "name": "Shōryan Daishi",
-      "lat": 35.9846333,
-      "lon": 129.0483614,
-      "type": "station",
-      "tags": {
-        "colour": "#C40062",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 21
-        },
-        {
-          "relId": "242568",
-          "seq": 20
-        },
-        {
-          "relId": "272126",
-          "seq": 8
-        }
-      ]
-    },
-    {
       "id": "201033005",
       "name": "Mintōjai",
       "lat": 35.9846813,
@@ -12102,47 +13190,6 @@
       ]
     },
     {
-      "id": "201351276",
-      "name": "Oitsura 粕鵲",
-      "lat": 36.0528522,
-      "lon": 129.1276173,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "272491",
-          "seq": 4
-        },
-        {
-          "relId": "272492",
-          "seq": 11
-        },
-        {
-          "relId": "303223",
-          "seq": 5
-        },
-        {
-          "relId": "326968",
-          "seq": 6
-        },
-        {
-          "relId": "327143",
-          "seq": 80
-        },
-        {
-          "relId": "424869",
-          "seq": 21
-        },
-        {
-          "relId": "424887",
-          "seq": 15
-        }
-      ]
-    },
-    {
       "id": "201351277",
       "name": "Otsumi-Oitsura 南粕鵲",
       "lat": 36.0466922,
@@ -12171,177 +13218,6 @@
         {
           "relId": "303223",
           "seq": 3
-        }
-      ]
-    },
-    {
-      "id": "202909005",
-      "name": "Tayakure 貞師",
-      "lat": 35.9991904,
-      "lon": 129.1107283,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 17
-        },
-        {
-          "relId": "424886",
-          "seq": 17
-        }
-      ]
-    },
-    {
-      "id": "202909262",
-      "name": "Shiki-Kawaei 北珂夬栄",
-      "lat": 36.0166143,
-      "lon": 129.1038247,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 15
-        },
-        {
-          "relId": "424886",
-          "seq": 15
-        }
-      ]
-    },
-    {
-      "id": "202909263",
-      "name": "Akaimori 蛞生竹",
-      "lat": 36.0237994,
-      "lon": 129.1003928,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 14
-        },
-        {
-          "relId": "424886",
-          "seq": 14
-        }
-      ]
-    },
-    {
-      "id": "202909265",
-      "name": "Ōdahui Kōwen",
-      "lat": 36.0297562,
-      "lon": 129.0977251,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 13
-        },
-        {
-          "relId": "424886",
-          "seq": 13
-        }
-      ]
-    },
-    {
-      "id": "202909275",
-      "name": "Sumatake-Nehkehama",
-      "lat": 36.0294965,
-      "lon": 129.0819373,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 11
-        },
-        {
-          "relId": "424869",
-          "seq": 16
-        },
-        {
-          "relId": "424886",
-          "seq": 11
-        },
-        {
-          "relId": "424887",
-          "seq": 16
-        }
-      ]
-    },
-    {
-      "id": "202909276",
-      "name": "Otsumi-Hajafuki",
-      "lat": 36.0267897,
-      "lon": 129.0703483,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 12
-        },
-        {
-          "relId": "424869",
-          "seq": 15
-        },
-        {
-          "relId": "424886",
-          "seq": 12
-        },
-        {
-          "relId": "424887",
-          "seq": 17
-        }
-      ]
-    },
-    {
-      "id": "202909278",
-      "name": "Sumatake-Kyōmasa",
-      "lat": 36.0238921,
-      "lon": 129.057823,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 18
-        },
-        {
-          "relId": "424869",
-          "seq": 14
-        },
-        {
-          "relId": "424886",
-          "seq": 18
-        },
-        {
-          "relId": "424887",
-          "seq": 18
         }
       ]
     },
@@ -12444,35 +13320,6 @@
         {
           "relId": "242568",
           "seq": 14
-        }
-      ]
-    },
-    {
-      "id": "214014848",
-      "name": "Kanlikoika Yukashire",
-      "lat": 35.9740635,
-      "lon": 129.0274786,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 11
-        },
-        {
-          "relId": "424883",
-          "seq": 5
-        },
-        {
-          "relId": "424884",
-          "seq": 30
-        },
-        {
-          "relId": "424885",
-          "seq": 36
         }
       ]
     },
@@ -12639,85 +13486,6 @@
         {
           "relId": "272120",
           "seq": 9
-        }
-      ]
-    },
-    {
-      "id": "229641679",
-      "name": "Tsurunara",
-      "lat": 36.0026678,
-      "lon": 129.018252,
-      "type": "station",
-      "tags": {
-        "colour": "#C40062",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 9
-        }
-      ]
-    },
-    {
-      "id": "229641680",
-      "name": "Yauraki 葯洛",
-      "lat": 36.0096243,
-      "lon": 128.9468268,
-      "type": "station",
-      "tags": {
-        "colour": "#bcbf62",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242546",
-          "seq": 0
-        },
-        {
-          "relId": "242571",
-          "seq": 8
-        },
-        {
-          "relId": "242572",
-          "seq": 17
-        },
-        {
-          "relId": "424996",
-          "seq": 9
-        }
-      ]
-    },
-    {
-      "id": "229654732",
-      "name": "Ogiwata 槃芳",
-      "lat": 36.032931,
-      "lon": 128.956348,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 7
-        },
-        {
-          "relId": "338140",
-          "seq": 11
-        },
-        {
-          "relId": "424869",
-          "seq": 6
-        },
-        {
-          "relId": "424886",
-          "seq": 7
-        },
-        {
-          "relId": "424887",
-          "seq": 10
         }
       ]
     },
@@ -12979,98 +13747,6 @@
       ]
     },
     {
-      "id": "250139350",
-      "name": "Gamonate",
-      "lat": 36.1692838,
-      "lon": 128.9989669,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 9
-        },
-        {
-          "relId": "424883",
-          "seq": 3
-        },
-        {
-          "relId": "424884",
-          "seq": 28
-        },
-        {
-          "relId": "424885",
-          "seq": 34
-        }
-      ]
-    },
-    {
-      "id": "250139352",
-      "name": "Innotawa",
-      "lat": 36.158153,
-      "lon": 129.0042584,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 7
-        },
-        {
-          "relId": "424885",
-          "seq": 32
-        }
-      ]
-    },
-    {
-      "id": "250139353",
-      "name": "Nari-Surikato",
-      "lat": 36.1499658,
-      "lon": 129.0107852,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 8
-        },
-        {
-          "relId": "424885",
-          "seq": 33
-        }
-      ]
-    },
-    {
-      "id": "250346476",
-      "name": "Moriyose Nanmun",
-      "lat": 36.1948601,
-      "lon": 129.0061559,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 1
-        },
-        {
-          "relId": "424885",
-          "seq": 26
-        }
-      ]
-    },
-    {
       "id": "251115566",
       "name": "Tswankanami Airport",
       "lat": 35.9839966,
@@ -13119,62 +13795,6 @@
         {
           "relId": "272509",
           "seq": 83
-        }
-      ]
-    },
-    {
-      "id": "262194820",
-      "name": "Kubodanki",
-      "lat": 35.9469805,
-      "lon": 129.0246805,
-      "type": "station",
-      "tags": {
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242571",
-          "seq": 5
-        }
-      ]
-    },
-    {
-      "id": "262194821",
-      "name": "Shiki-Kubodanki",
-      "lat": 35.953631,
-      "lon": 129.0092435,
-      "type": "station",
-      "tags": {
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242571",
-          "seq": 6
-        }
-      ]
-    },
-    {
-      "id": "262195160",
-      "name": "Ominotori Hasenoki",
-      "lat": 36.0019575,
-      "lon": 128.997661,
-      "type": "station",
-      "tags": {
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242571",
-          "seq": 7
-        },
-        {
-          "relId": "292343",
-          "seq": 8
-        },
-        {
-          "relId": "424996",
-          "seq": 8
         }
       ]
     },
@@ -13710,182 +14330,6 @@
       ]
     },
     {
-      "id": "321304867",
-      "name": "Sunbui 栒芙依",
-      "lat": 36.0456139,
-      "lon": 129.1250563,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "424869",
-          "seq": 20
-        },
-        {
-          "relId": "424887",
-          "seq": 5
-        }
-      ]
-    },
-    {
-      "id": "321304869",
-      "name": "Kanasamaki 崔蒔",
-      "lat": 36.0357892,
-      "lon": 129.1178036,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "424869",
-          "seq": 19
-        },
-        {
-          "relId": "424887",
-          "seq": 4
-        }
-      ]
-    },
-    {
-      "id": "321304870",
-      "name": "Otsumi-Makintoshi Meidai-adae 南馬ᐢ貴氾・明大前",
-      "lat": 36.0343073,
-      "lon": 129.1050643,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "424869",
-          "seq": 18
-        },
-        {
-          "relId": "424887",
-          "seq": 3
-        }
-      ]
-    },
-    {
-      "id": "321305089",
-      "name": "Ārikkohanu Yunobu 鶴神由見夫",
-      "lat": 36.0316425,
-      "lon": 129.0905997,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242565",
-          "seq": 0
-        },
-        {
-          "relId": "424869",
-          "seq": 17
-        },
-        {
-          "relId": "424886",
-          "seq": 0
-        },
-        {
-          "relId": "424887",
-          "seq": 0
-        }
-      ]
-    },
-    {
-      "id": "321305792",
-      "name": "Obikasunde 吾比加嵶",
-      "lat": 36.0882855,
-      "lon": 129.113797,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "424869",
-          "seq": 24
-        },
-        {
-          "relId": "424887",
-          "seq": 6
-        }
-      ]
-    },
-    {
-      "id": "321305793",
-      "name": "Tsutsuro Uguttaya 笙呂茨貞",
-      "lat": 36.0750509,
-      "lon": 129.1211893,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "424869",
-          "seq": 22
-        },
-        {
-          "relId": "424887",
-          "seq": 7
-        }
-      ]
-    },
-    {
-      "id": "321305795",
-      "name": "Oitsura Daikōwen 粕鵲大公園",
-      "lat": 36.0647155,
-      "lon": 129.1267869,
-      "type": "station",
-      "tags": {
-        "colour": "#FF0000",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "424869",
-          "seq": 23
-        },
-        {
-          "relId": "424887",
-          "seq": 8
-        }
-      ]
-    },
-    {
-      "id": "322699571",
-      "name": "Chastano 椋見",
-      "lat": 36.2119695,
-      "lon": 129.0072974,
-      "type": "station",
-      "tags": {
-        "colour": "#009E4F",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242566",
-          "seq": 3
-        },
-        {
-          "relId": "424885",
-          "seq": 28
-        }
-      ]
-    },
-    {
       "id": "325484915",
       "name": "Miwase 水刈",
       "lat": 36.061908,
@@ -13919,54 +14363,6 @@
         {
           "relId": "425101",
           "seq": 50
-        }
-      ]
-    },
-    {
-      "id": "342508941",
-      "name": "Niji-Yōneo",
-      "lat": 35.9018943,
-      "lon": 128.9852016,
-      "type": "station",
-      "tags": {
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "424996",
-          "seq": 7
-        }
-      ]
-    },
-    {
-      "id": "342508942",
-      "name": "Yōneo Juwon",
-      "lat": 35.903123,
-      "lon": 128.9994884,
-      "type": "station",
-      "tags": {
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "424996",
-          "seq": 6
-        }
-      ]
-    },
-    {
-      "id": "342508943",
-      "name": "Uhtashiruul 妻和崎",
-      "lat": 35.913666,
-      "lon": 129.0083427,
-      "type": "station",
-      "tags": {
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "424996",
-          "seq": 5
         }
       ]
     },
@@ -14020,81 +14416,6 @@
       ]
     },
     {
-      "id": "368583211",
-      "name": "Shin-Tsumasui 新都馬水",
-      "lat": 36.0475969,
-      "lon": 128.8997451,
-      "type": "station",
-      "tags": {
-        "colour": "#C40062",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 1
-        }
-      ]
-    },
-    {
-      "id": "368583212",
-      "name": "Station TBD 未定驛",
-      "lat": 36.0379708,
-      "lon": 128.895913,
-      "type": "station",
-      "tags": {
-        "colour": "#C40062",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 0
-        }
-      ]
-    },
-    {
-      "id": "368583213",
-      "name": "Hadantoyo 琦砂",
-      "lat": 36.0140174,
-      "lon": 128.8999272,
-      "type": "station",
-      "tags": {
-        "colour": "#0099CC",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 5
-        },
-        {
-          "relId": "272137",
-          "seq": 0
-        }
-      ]
-    },
-    {
-      "id": "368583225",
-      "name": "Yuparaul 枕崎",
-      "lat": 36.0036411,
-      "lon": 128.9283378,
-      "type": "station",
-      "tags": {
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242571",
-          "seq": 3
-        },
-        {
-          "relId": "424996",
-          "seq": 3
-        }
-      ]
-    },
-    {
       "id": "368583226",
       "name": "Nihkyonta 濱角",
       "lat": 36.0289577,
@@ -14129,26 +14450,6 @@
         {
           "relId": "338140",
           "seq": 8
-        }
-      ]
-    },
-    {
-      "id": "368583228",
-      "name": "Takkurahama 琢玖羅島",
-      "lat": 36.0154162,
-      "lon": 128.9188659,
-      "type": "station",
-      "tags": {
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242571",
-          "seq": 0
-        },
-        {
-          "relId": "424996",
-          "seq": 0
         }
       ]
     },
@@ -14199,97 +14500,6 @@
       "lines": [
         {
           "relId": "424869",
-          "seq": 2
-        }
-      ]
-    },
-    {
-      "id": "368744269",
-      "name": "Takkurahama 琢玖羅島",
-      "lat": 36.0157828,
-      "lon": 128.92109,
-      "type": "station",
-      "tags": {
-        "colour": "#C40062",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 6
-        }
-      ]
-    },
-    {
-      "id": "369511437",
-      "name": "Nihkyonta Mirai 濱角未來",
-      "lat": 36.0289654,
-      "lon": 128.8943333,
-      "type": "station",
-      "tags": {
-        "colour": "#C40062",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 3
-        }
-      ]
-    },
-    {
-      "id": "369511438",
-      "name": "Yeisonzuta 八砅",
-      "lat": 36.0134968,
-      "lon": 128.9104534,
-      "type": "station",
-      "tags": {
-        "colour": "#C40062",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242548",
-          "seq": 4
-        }
-      ]
-    },
-    {
-      "id": "369511451",
-      "name": "Sahnaden 舩取",
-      "lat": 36.0065841,
-      "lon": 128.9113512,
-      "type": "station",
-      "tags": {
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242571",
-          "seq": 1
-        },
-        {
-          "relId": "424996",
-          "seq": 1
-        }
-      ]
-    },
-    {
-      "id": "369511452",
-      "name": "Station TBD 未定驛",
-      "lat": 36.0013843,
-      "lon": 128.9166551,
-      "type": "station",
-      "tags": {
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242571",
-          "seq": 2
-        },
-        {
-          "relId": "424996",
           "seq": 2
         }
       ]
