@@ -107,7 +107,7 @@
       padding:4px 9px!important;
       line-height:1.25!important;
     }
-    /* byakuzhi (kanji/non-latin): riga principale, più grande */
+    /* byakuzhi: riga principale, più grande */
     .lt-byz{
       display:block;
       font-size:13px;
@@ -122,7 +122,7 @@
       opacity:.75;
       margin-top:1px;
     }
-    /* quando c'è solo alfabeto, dimensione normale */
+    /* solo alfabeto: dimensione normale */
     .lt-only{
       display:block;
       font-size:11px;
@@ -345,41 +345,23 @@
 
   function clean(s){return s.replace(/[\uD800-\uDFFF]{2}/g,'').replace(/^[\u24C2-\u24FF\u2460-\u27BF\s]+/,'').trim();}
 
-  // ── Regex per riconoscere caratteri "non-alfabeto" (byakuzhi/kanji/gujarati/ecc.) ──
-  // Copre CJK unificato, estensioni, katakana, hiragana, hangul, gujarati, georgiano, e altri script non-latini
+  // ── Regex per riconoscere caratteri non-latini (byakuzhi/kanji/ecc.) ──
   const RE_NON_LATIN = /[\u0900-\u097F\u0A80-\u0AFF\u10A0-\u10FF\u1100-\u11FF\u3000-\u9FFF\uA000-\uAAFF\uAC00-\uD7AF\uF900-\uFAFF]/;
 
   /**
    * Separa un nome stazione in {byz, rom}.
-   * byz = parte in byakuzhi/kanji/script non-latino (o null)
-   * rom = parte in alfabeto a-z (o null)
-   *
-   * Pattern riconosciuti:
-   *   "Kanji 漢字"          → byz:"漢字"       rom:"Kanji"
-   *   "漢字 Kanji"          → byz:"漢字"       rom:"Kanji"
-   *   "Kanji"               → byz:null         rom:"Kanji"
-   *   "漢字"                → byz:"漢字"       rom:null
+   * Pattern: "Romaji 漢字", "漢字 Romaji", solo uno dei due.
    */
   function splitStationName(s) {
     if (!s) return { byz: null, rom: null };
-
-    // Token: dividi sullo spazio che separa blocchi di script diversi
-    // Strategia: cerca il confine tra sequenza latin e sequenza non-latin
     const trimmed = s.trim();
 
-    // Caso: tutto alfabeto (nessun carattere non-latino)
-    if (!RE_NON_LATIN.test(trimmed)) {
-      return { byz: null, rom: trimmed };
-    }
+    if (!RE_NON_LATIN.test(trimmed)) return { byz: null, rom: trimmed };
 
-    // Caso: tutto non-latino (nessuna lettera a-z A-Z né diacritici latini estesi comuni)
-    // Latin extended: \u00C0-\u024F
-    if (!/[A-Za-z\u00C0-\u024F\u0020-\u007E]/.test(trimmed.replace(/[\s\d\-–—·.,!?'"()\[\]]/g,''))) {
+    if (!/[A-Za-z\u00C0-\u024F\u0020-\u007E]/.test(trimmed.replace(/[\s\d\-\u2013\u2014\u00b7.,!?'"()\[\]]/g,''))) {
       return { byz: trimmed, rom: null };
     }
 
-    // Caso misto: troviamo dove finisce un blocco e inizia l'altro.
-    // Cerchiamo l'indice del primo carattere non-latino nel testo.
     let firstNonLatin = -1;
     for (let i = 0; i < trimmed.length; i++) {
       if (RE_NON_LATIN.test(trimmed[i])) { firstNonLatin = i; break; }
@@ -387,58 +369,50 @@
 
     let byzPart, romPart;
     if (firstNonLatin === 0) {
-      // byakuzhi in testa: "漢字 Kanji"
-      // Trova dove finisce il blocco non-latino
       let endByz = trimmed.length;
-      for (let i = 0; i < trimmed.length; i++) {
-        // La parte latina inizia quando troviamo una lettera latina dopo uno spazio
-        if (i > 0 && trimmed[i - 1] === ' ' && /[A-Za-z\u00C0-\u024F]/.test(trimmed[i])) {
-          endByz = i - 1;
-          break;
+      for (let i = 1; i < trimmed.length; i++) {
+        if (trimmed[i - 1] === ' ' && /[A-Za-z\u00C0-\u024F]/.test(trimmed[i])) {
+          endByz = i - 1; break;
         }
       }
       byzPart = trimmed.slice(0, endByz).trim();
       romPart = trimmed.slice(endByz).trim() || null;
     } else {
-      // alfabeto in testa: "Kanji 漢字" (il più comune nei dati)
-      // Trova il primo spazio che precede un blocco non-latino
       let splitAt = -1;
       for (let i = 1; i < trimmed.length; i++) {
         if (trimmed[i - 1] === ' ' && RE_NON_LATIN.test(trimmed[i])) {
-          splitAt = i - 1;
-          break;
+          splitAt = i - 1; break;
         }
       }
-      if (splitAt === -1) {
-        // fallback: tutto come rom
-        return { byz: null, rom: trimmed };
-      }
+      if (splitAt === -1) return { byz: null, rom: trimmed };
       romPart = trimmed.slice(0, splitAt).trim() || null;
       byzPart = trimmed.slice(splitAt).trim();
     }
 
-    // Pulizia finale: se byzPart non contiene effettivamente caratteri non-latini, scambia
-    if (byzPart && !RE_NON_LATIN.test(byzPart)) {
-      return { byz: null, rom: trimmed };
-    }
-
+    if (byzPart && !RE_NON_LATIN.test(byzPart)) return { byz: null, rom: trimmed };
     return { byz: byzPart || null, rom: romPart || null };
   }
 
   /**
-   * Genera l'HTML per il tooltip della stazione.
-   * Se c'è byakuzhi: byakuzhi grande sopra, alfabeto piccolo sotto.
-   * Se c'è solo alfabeto: un'unica riga normale.
+   * Crea un elemento DOM per il tooltip — Leaflet accetta HTMLElement
+   * in bindTooltip e lo inserisce direttamente, senza escape.
    */
-  function stationTooltipHtml(name) {
+  function makeStationTooltipEl(name, bold) {
     const { byz, rom } = splitStationName(name);
+    const wrap = document.createElement('div');
     if (byz && rom) {
-      return '<span class="lt-byz">' + byz + '</span><span class="lt-rom">' + rom + '</span>';
+      const b = document.createElement('span'); b.className = 'lt-byz'; b.textContent = byz;
+      const r = document.createElement('span'); r.className = 'lt-rom';  r.textContent = rom;
+      wrap.appendChild(b); wrap.appendChild(r);
+    } else if (byz) {
+      const b = document.createElement('span'); b.className = 'lt-byz'; b.textContent = byz;
+      wrap.appendChild(b);
+    } else {
+      const o = document.createElement('span'); o.className = 'lt-only'; o.textContent = rom || name;
+      wrap.appendChild(o);
     }
-    if (byz) {
-      return '<span class="lt-byz">' + byz + '</span>';
-    }
-    return '<span class="lt-only">' + (rom || name) + '</span>';
+    if (bold) wrap.classList.add('lt-bold');
+    return wrap;
   }
 
   const sbar=document.getElementById('sbar');
@@ -488,7 +462,7 @@
     });
   }
 
-  // ── STAZIONI ───────────────────────────────────────────────────
+  // ── STAZIONI ──────────────────────────────────────────────────
   const stLayer = L.layerGroup().addTo(map);
   const ST_BBOX = '35.85,128.70,36.18,129.10';
 
@@ -513,7 +487,7 @@
       iconAnchor:[5,5]
     });
     const m = L.marker([node.lat,node.lon],{icon,title:name,zIndexOffset:isMain?200:100});
-    if (name) m.bindTooltip(stationTooltipHtml(name),{sticky:true,className:'lt',interactive:false});
+    if (name) m.bindTooltip(makeStationTooltipEl(name, false),{sticky:true,className:'lt'});
     m.addTo(stLayer);
     m._stName = name;
     m._stMain = isMain;
@@ -529,20 +503,20 @@
       el.style.display='';
       dot.className = z >= 16 ? 'st-dot st-lg' : z >= 14 ? 'st-dot st-md' : 'st-dot st-sm';
       const wantPerm = z >= 14 && !!m._stName;
-      const boldCls = z >= 16 ? 'lt lt-bold' : 'lt';
+      const bold = z >= 16;
       if (wantPerm && !m._labelBound) {
         m.unbindTooltip();
-        m.bindTooltip(stationTooltipHtml(m._stName),{
+        m.bindTooltip(makeStationTooltipEl(m._stName, bold),{
           permanent:true,
           direction:'right',
           offset:[8,0],
-          className:boldCls
+          className:'lt'
         }).openTooltip();
         m._labelBound = true;
       } else if (!wantPerm && m._labelBound) {
         m.unbindTooltip();
         m._labelBound = false;
-        if (m._stName) m.bindTooltip(stationTooltipHtml(m._stName),{sticky:true,className:'lt',interactive:false});
+        if (m._stName) m.bindTooltip(makeStationTooltipEl(m._stName, false),{sticky:true,className:'lt'});
       }
     });
   }
