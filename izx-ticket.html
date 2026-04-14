@@ -87,27 +87,96 @@
     .svc-D{background:#926ACA;color:#fff;}
     .svc-E{background:#7c3aed;color:#fff;}
     .svc-F{background:#6b7280;color:#fff;}
+
     /* ── STOP PATTERN DIAGRAM ── */
     #stop-diagram{margin-top:var(--space-8);border-top:1px solid var(--border);padding-top:var(--space-6);display:none;}
     .diag-title{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:var(--space-6);}
     .diag-scroll{overflow-x:auto;padding-bottom:var(--space-4);}
     .diag-table{border-collapse:collapse;font-size:10px;white-space:nowrap;}
     .diag-table td{padding:0;border:none;}
+
+    /* Label column (service badge) */
     .diag-svc-col{width:58px;min-width:58px;padding-right:8px;text-align:right;vertical-align:middle;}
     .diag-svc-pill{display:inline-block;font-size:.65rem;font-weight:800;padding:2px 6px;border-radius:3px;letter-spacing:.04em;}
+
+    /* Track rows */
     .diag-track-row td{height:26px;vertical-align:middle;}
-    .diag-name-row td{vertical-align:top;padding-top:4px;}
-    .diag-sta-name{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);height:72px;font-size:9px;color:var(--text-muted);line-height:1;white-space:nowrap;display:flex;align-items:center;justify-content:flex-start;}
+
+    /*
+     * Station column cell — fixed width, everything centered.
+     * The name row and track row share the same column width (28px)
+     * so dots align exactly under the label.
+     */
+    .diag-sta-cell{
+      position:relative;
+      width:28px;
+      min-width:28px;
+      max-width:28px;
+      text-align:center;
+      vertical-align:bottom;
+      padding:0;
+    }
+
+    /* Name row: cell is bottom-aligned so label reads bottom-to-top */
+    .diag-name-row td{
+      vertical-align:bottom;
+      padding-bottom:6px;
+    }
+
+    /*
+     * The rotated text container.
+     * Key: display:block + margin:0 auto centers the block within the 28px cell.
+     * writing-mode + rotate turns it vertical.
+     * The origin of rotation must be center, so we use the default.
+     */
+    .diag-sta-name{
+      display:block;
+      margin:0 auto;
+      width:9px;            /* collapsed width after rotation = font-size ~9px */
+      height:72px;
+      writing-mode:vertical-rl;
+      text-orientation:mixed;
+      transform:rotate(180deg);
+      font-size:9px;
+      color:var(--text-muted);
+      line-height:1;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
     .diag-sta-name.is-od{color:var(--text);font-weight:700;}
-    .diag-sta-cell{position:relative;text-align:center;min-width:26px;}
-    .seg-l,.seg-r{position:absolute;top:50%;height:3px;width:50%;transform:translateY(-50%);}
-    .seg-l{left:0;}.seg-r{right:0;}
-    .dot-s{width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);position:relative;z-index:2;display:inline-block;vertical-align:middle;}
+
+    /* Track segments — absolutely positioned within the 28px cell */
+    .seg-l,.seg-r{
+      position:absolute;
+      top:50%;
+      height:3px;
+      width:50%;
+      transform:translateY(-50%);
+    }
+    .seg-l{left:0;}
+    .seg-r{right:0;}
+
+    /* Dots */
+    .dot-s{
+      width:10px;height:10px;
+      border-radius:50%;
+      border:2px solid var(--bg);
+      position:relative;z-index:2;
+      display:inline-block;vertical-align:middle;
+    }
     .dot-s.od{width:13px;height:13px;}
-    .dot-p{width:3px;height:10px;border-radius:2px;opacity:.5;position:relative;z-index:2;display:inline-block;vertical-align:middle;}
-    .diag-gap{opacity:.08;}
+    .dot-p{
+      width:3px;height:10px;
+      border-radius:2px;opacity:.5;
+      position:relative;z-index:2;
+      display:inline-block;vertical-align:middle;
+    }
+    .diag-gap{opacity:.07;}
+
     .diag-legend{display:flex;gap:var(--space-6);margin-top:var(--space-4);font-size:var(--text-xs);color:var(--text-muted);flex-wrap:wrap;}
     .diag-legend-item{display:flex;align-items:center;gap:6px;}
+
     .formula-box{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-4);margin-top:var(--space-8);font-size:var(--text-xs);color:var(--text-muted);line-height:1.9;}
     .formula-box strong{color:var(--text);}
     .formula-box code{font-family:monospace;background:var(--bg);padding:1px 5px;border-radius:3px;}
@@ -305,25 +374,12 @@
     N4:   {n:"Daishin",                     k:"\u5927\u9032",                  b:"nankai", km:658.561},
   };
 
-  /*
-   * CANONICAL_ORDER encodes the real geographic sequence of the line,
-   * with branch stations inserted at their physical merge points:
-   *
-   * K01 → K02 → K03 → [K31→K32→K33 C' bypass] → K04→K05→K06→K07
-   *   → K08 → K09 → [K101→K102→K120→K103→K104→K105→K106→K160 Saka]
-   *   → K10 → K11 → ... → K17 → N1→N2→N3→N4
-   *
-   * K10 is the merge point for both the Saka branch and the C' bypass
-   * (C' re-enters via K33 which is geographically just before K08,
-   *  but for linear display we put bypass stations after K03,
-   *  and they connect back to K08).
-   */
   const CANONICAL_ORDER = [
     "K01","K02","K03",
-    "K31","K32","K33",      // C' bypass (K03→K08 alternate)
+    "K31","K32","K33",
     "K04","K05","K06","K07",
     "K08","K09",
-    "K101","K102","K120","K103","K104","K105","K106","K160",  // Saka branch (→K10)
+    "K101","K102","K120","K103","K104","K105","K106","K160",
     "K10","K11","K12","K13","K14","K144","K15","K16","K116","K17",
     "N1","N2","N3","N4"
   ];
@@ -366,7 +422,6 @@
   const CLASS_C = {standard:1.00, blue_seat:1.55, yurani:2.40};
   const CLASS_L = {standard:"Standard", blue_seat:"Blue Seat", yurani:"Yurani"};
 
-  // For select menus — keep geographic grouping
   const SELECT_ORDER = [
     "K01","K02","K03","K04","K05","K06","K07","K08","K09","K10",
     "K11","K12","K13","K14","K144","K15","K16","K116","K17",
@@ -388,8 +443,8 @@
 
   function stKm(code, svcKey){
     if(code === 'K101' && MAIN_SVCS.has(svcKey)) code = 'K02';
-    if(svcKey === 'Cp')                return CP[code] !== undefined ? CP[code] : null;
-    if(SAKA_SVCS.has(svcKey))         return SK[code] !== undefined ? SK[code] : null;
+    if(svcKey === 'Cp')       return CP[code]  !== undefined ? CP[code]  : null;
+    if(SAKA_SVCS.has(svcKey)) return SK[code]  !== undefined ? SK[code]  : null;
     return ST[code] ? ST[code].km : null;
   }
 
@@ -410,7 +465,7 @@
   }
 
   function buildSelects(){
-    const sf = document.getElementById('sel-from');
+    const sf  = document.getElementById('sel-from');
     const st2 = document.getElementById('sel-to');
     let lastB = null;
     SELECT_ORDER.forEach(code => {
@@ -434,83 +489,50 @@
     sf.value='K01'; st2.value='K17';
   }
 
-  function fmt(n)   { return '\u0116\u202f'+n.toFixed(2); }
-  function fusd(n)  { return '(US$\u202f'+(n*USD_RATE).toFixed(2)+')'; }
+  function fmt(n)  { return '\u0116\u202f'+n.toFixed(2); }
+  function fusd(n) { return '(US$\u202f'+(n*USD_RATE).toFixed(2)+')'; }
 
   /* ================================================================
      STOP PATTERN DIAGRAM
   ================================================================ */
 
-  /*
-   * For each active service, return the set of station codes it
-   * traverses (stops at OR passes through) between from and to,
-   * using the service's own stops[] list as the spine.
-   *
-   * "Passes through" = a station in CANONICAL_ORDER that lies between
-   * two consecutive stops of the service within the O/D window.
-   * We detect these by checking CANONICAL_ORDER index between stops.
-   */
   function serviceRange(svcKey, from, to){
     const info = SVC[svcKey];
     const svcStopList = info.stops;
-    // Resolve K101 alias for main services
     const f = (from === 'K101' && MAIN_SVCS.has(svcKey)) ? 'K02' : from;
     const t = (to   === 'K101' && MAIN_SVCS.has(svcKey)) ? 'K02' : to;
-
     let fi = svcStopList.indexOf(f);
     let ti = svcStopList.indexOf(t);
     if(fi === -1 || ti === -1 || fi === ti) return {stops:new Set(), through:new Set()};
     if(fi > ti){ const tmp=fi; fi=ti; ti=tmp; }
-
-    const stopsInSlice = svcStopList.slice(fi, ti+1); // stations service stops at in range
+    const stopsInSlice = svcStopList.slice(fi, ti+1);
     const stopsSet = new Set(stopsInSlice);
-
-    // Find "pass-through" stations: in CANONICAL_ORDER between first and last stop,
-    // that this service traverses but doesn't stop at.
-    // We do this by finding the canonical span covered by the service's route segment.
     const canonFirst = CANONICAL_ORDER.indexOf(stopsInSlice[0]);
     const canonLast  = CANONICAL_ORDER.indexOf(stopsInSlice[stopsInSlice.length - 1]);
     const throughSet = new Set();
-
     if(canonFirst !== -1 && canonLast !== -1){
       const lo = Math.min(canonFirst, canonLast);
       const hi = Math.max(canonFirst, canonLast);
       for(let i = lo; i <= hi; i++){
         const code = CANONICAL_ORDER[i];
-        // Only include if this station is geographically on this service's route
-        // (i.e. not on a branch the service doesn't use)
-        if(!stopsSet.has(code)){
-          // Check: is this station on a branch not used by this service?
-          const s = ST[code];
-          if(!s) continue;
-          // C' bypass stations only shown for Cp
-          if((code==='K31'||code==='K32'||code==='K33') && svcKey!=='Cp') continue;
-          // Saka stations only shown for D/E/F
-          if(s.b==='saka' && !SAKA_SVCS.has(svcKey)) continue;
-          throughSet.add(code);
-        }
+        if(stopsSet.has(code)) continue;
+        const s = ST[code]; if(!s) continue;
+        if((code==='K31'||code==='K32'||code==='K33') && svcKey!=='Cp') continue;
+        if(s.b==='saka' && !SAKA_SVCS.has(svcKey)) continue;
+        throughSet.add(code);
       }
     }
-
     return {stops: stopsSet, through: throughSet};
   }
 
-  /*
-   * Build the canonical column list for the diagram:
-   * take CANONICAL_ORDER, keep only stations that appear
-   * (as stop or pass-through) in at least one active service.
-   * This gives a clean, gap-free, geographically correct sequence.
-   */
   function buildCanonicalCols(activeRows, from, to){
     const needed = new Set();
+    needed.add(from); needed.add(to);
     activeRows.forEach(({k}) => {
       const {stops, through} = serviceRange(k, from, to);
       stops.forEach(c => needed.add(c));
       through.forEach(c => needed.add(c));
     });
-    // Also always include origin and destination
-    needed.add(from); needed.add(to);
-    // Return in canonical order, filtered
     return CANONICAL_ORDER.filter(c => needed.has(c));
   }
 
@@ -518,46 +540,56 @@
     const wrap = document.getElementById('stop-diagram');
     const tbl  = document.getElementById('diag-table');
     tbl.innerHTML = '';
-
     if(!activeRows.length){ wrap.style.display='none'; return; }
     wrap.style.display = 'block';
 
     const cols = buildCanonicalCols(activeRows, from, to);
-    const originCode = from;
-    const destCode   = to;
+    const COL_W = 28; // px — must match CSS min/max-width on .diag-sta-cell
 
-    // ── Station name header row ──
+    /* ── Station name header row ──
+     * Each td is exactly COL_W px wide (enforced via inline style).
+     * The rotated span sits inside and is centered with margin:0 auto.
+     */
     const nameTr = document.createElement('tr');
     nameTr.className = 'diag-name-row';
+
+    // Empty label cell — same width as the service-badge column
     const emptyTd = document.createElement('td');
     emptyTd.className = 'diag-svc-col';
     nameTr.appendChild(emptyTd);
+
     cols.forEach(code => {
       const td = document.createElement('td');
-      td.className = 'diag-sta-cell';
-      const div = document.createElement('div');
-      const isOD = (code === originCode || code === destCode);
-      div.className = 'diag-sta-name' + (isOD ? ' is-od' : '');
+      // Force identical column width in both rows
+      td.style.cssText = `width:${COL_W}px;min-width:${COL_W}px;max-width:${COL_W}px;padding:0;text-align:center;vertical-align:bottom;padding-bottom:6px;`;
+
+      const isOD = (code === from || code === to);
       const s = ST[code];
       const label = s ? (code + ' ' + (s.n.length > 13 ? s.n.slice(0,12)+'\u2026' : s.n)) : code;
-      div.textContent = label;
-      td.appendChild(div);
+
+      // Rotated text wrapper — centered in the cell
+      const span = document.createElement('span');
+      span.className = 'diag-sta-name' + (isOD ? ' is-od' : '');
+      // display:block + margin:0 auto ensures the element is horizontally centered
+      // width matches the visual width of the rotated text (≈ font-size)
+      span.style.cssText = 'display:block;margin:0 auto;';
+      span.textContent = label;
+      td.appendChild(span);
       nameTr.appendChild(td);
     });
     tbl.appendChild(nameTr);
 
-    // ── One track row per active service ──
+    /* ── One track row per active service ── */
     activeRows.forEach(({k}) => {
       const info  = SVC[k];
       const color = info.color;
       const {stops: svcStops, through: svcThrough} = serviceRange(k, from, to);
-      // All stations this service covers in range
       const svcAll = new Set([...svcStops, ...svcThrough]);
 
       const tr = document.createElement('tr');
       tr.className = 'diag-track-row';
 
-      // Service label cell
+      // Service badge
       const labelTd = document.createElement('td');
       labelTd.className = 'diag-svc-col';
       const pill = document.createElement('span');
@@ -568,16 +600,16 @@
 
       cols.forEach((code, ci) => {
         const td = document.createElement('td');
-        td.className = 'diag-sta-cell';
+        // Same fixed width as the name cells
+        td.style.cssText = `width:${COL_W}px;min-width:${COL_W}px;max-width:${COL_W}px;height:26px;padding:0;position:relative;text-align:center;vertical-align:middle;`;
 
         const inRange = svcAll.has(code);
         const isStop  = svcStops.has(code);
-        const isOD    = (code === originCode || code === destCode);
+        const isOD    = (code === from || code === to);
         const isFirst = ci === 0;
         const isLast  = ci === cols.length - 1;
 
         if(inRange){
-          // Left track segment
           if(!isFirst){
             const sl = document.createElement('div');
             sl.className = 'seg-l';
@@ -585,7 +617,6 @@
             sl.style.opacity = '0.75';
             td.appendChild(sl);
           }
-          // Right track segment
           if(!isLast){
             const sr = document.createElement('div');
             sr.className = 'seg-r';
@@ -593,9 +624,8 @@
             sr.style.opacity = '0.75';
             td.appendChild(sr);
           }
-          // Dot or bar
           const inner = document.createElement('div');
-          inner.style.cssText = 'position:relative;z-index:3;display:flex;justify-content:center;align-items:center;';
+          inner.style.cssText = 'position:relative;z-index:3;display:flex;justify-content:center;align-items:center;height:100%;';
           if(isStop){
             const dot = document.createElement('span');
             dot.className = 'dot-s' + (isOD ? ' od' : '');
@@ -609,12 +639,7 @@
           }
           td.appendChild(inner);
         } else {
-          // Station not on this service's route — render faint gap line
           td.classList.add('diag-gap');
-          // Keep track line invisible but preserve column width
-          const placeholder = document.createElement('div');
-          placeholder.style.cssText = 'width:26px;height:26px;';
-          td.appendChild(placeholder);
         }
 
         tr.appendChild(td);
@@ -625,7 +650,7 @@
   }
 
   /* ================================================================
-     RENDER (fares + diagram)
+     RENDER
   ================================================================ */
 
   function render(from, to, classF, svcF){
@@ -635,8 +660,8 @@
     const metaEl  = document.getElementById('result-meta');
     const szNote  = document.getElementById('sz-note');
 
-    res.style.display='block';
-    cards.innerHTML='';
+    res.style.display = 'block';
+    cards.innerHTML = '';
     szNote.style.display = (from==='K101'||to==='K101') ? 'block' : 'none';
     routeEl.textContent = (ST[from]?ST[from].n:from)+' \u2192 '+(ST[to]?ST[to].n:to);
 
@@ -654,9 +679,9 @@
     });
 
     if(!rows.length){
-      metaEl.textContent='';
-      cards.innerHTML='<p class="no-service">No direct service available for this O/D pair.</p>';
-      document.getElementById('stop-diagram').style.display='none';
+      metaEl.textContent = '';
+      cards.innerHTML = '<p class="no-service">No direct service available for this O/D pair.</p>';
+      document.getElementById('stop-diagram').style.display = 'none';
       return;
     }
 
@@ -668,7 +693,7 @@
     rows.forEach(({k,km,prices}) => {
       const info = SVC[k];
       const card = document.createElement('div');
-      card.className='service-card';
+      card.className = 'service-card';
       const prows = clss.map(c => {
         const p = prices[c];
         const best = c===clss[0] && p===minP;
@@ -677,7 +702,7 @@
           <span class="price-val">${fmt(p)} <span class="price-usd">${fusd(p)}</span></span>
         </div>`;
       }).join('');
-      card.innerHTML=`
+      card.innerHTML = `
         <div class="service-card-header">
           <span class="svc-badge ${info.cls}">${k==='Cp'?'C\u2032':k}</span>
           <span class="svc-name">${info.name}</span>
@@ -694,9 +719,9 @@
   buildSelects();
 
   document.getElementById('btn-swap').addEventListener('click', () => {
-    const sf=document.getElementById('sel-from');
-    const st=document.getElementById('sel-to');
-    const tmp=sf.value; sf.value=st.value; st.value=tmp;
+    const sf = document.getElementById('sel-from');
+    const st = document.getElementById('sel-to');
+    const tmp = sf.value; sf.value = st.value; st.value = tmp;
   });
 
   document.getElementById('btn-search').addEventListener('click', () => {
