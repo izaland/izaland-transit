@@ -43,14 +43,12 @@
     .dropdown a.active{color:var(--accent);}
     [data-theme="dark"]  .logo-light{display:none;}
     [data-theme="light"] .logo-dark{display:none;}
-    /* PAGE */
     .page-header{padding:var(--space-8) var(--space-8) 0;max-width:920px;margin:0 auto;}
     .back-link{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-6);transition:color var(--transition);}
     .back-link:hover{color:var(--text);}
     .page-label{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:var(--space-2);}
     .page-title{font-family:var(--font-display);font-size:var(--text-xl);font-weight:800;letter-spacing:-.02em;margin-bottom:var(--space-3);}
     .page-desc{font-size:var(--text-sm);color:var(--text-muted);max-width:60ch;margin-bottom:var(--space-8);}
-    /* CARD */
     .sim-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:var(--space-8);max-width:920px;margin:0 auto var(--space-8);}
     .sim-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:var(--space-4);margin-bottom:var(--space-6);}
     .sim-swap{background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);cursor:pointer;font-size:var(--text-sm);transition:color var(--transition),background var(--transition);height:42px;display:flex;align-items:center;}
@@ -63,7 +61,6 @@
     .sim-options{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-6);}
     .sim-btn{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-md);padding:var(--space-3) var(--space-6);font-size:var(--text-sm);font-weight:700;cursor:pointer;transition:background var(--transition);width:100%;}
     .sim-btn:hover{background:var(--accent-hover);}
-    /* RESULTS */
     #results{display:none;margin-top:var(--space-8);border-top:1px solid var(--border);padding-top:var(--space-6);}
     .result-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-2);}
     .result-route{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;}
@@ -182,7 +179,7 @@
   <button class="sim-btn" id="btn-search">Search fares</button>
 
   <div id="results">
-    <div class="sz-note" id="sz-note">ⓘ <strong>Shutokwen-nai (SZ zone):</strong> Tickets from/to Sakamuso (K101) include the urban link to Sainðaul Central (K01) at no extra charge. Tariff is calculated from Niji-Sainðaul (K02).</div>
+    <div class="sz-note" id="sz-note">ⓘ <strong>Shutokwen-nai (SZ zone):</strong> Tickets from/to Sakamuso (K101) include the urban link to Sainðaul Central (K01) at no extra charge. Tariff distance is calculated from Niji-Sainðaul (K02) when travelling on main-line services.</div>
     <div class="result-header">
       <div class="result-route" id="result-route"></div>
       <div class="result-meta"  id="result-meta"></div>
@@ -231,89 +228,106 @@
   );
 
   /* ================================================================
-     FARE ENGINE
-     All data is embedded here — no fetch() needed.
+     FARE ENGINE — all data embedded, no fetch() needed
   ================================================================ */
 
   const FIXED_FEE = 4.50;
   const USD_RATE  = 0.832;
 
-  /* Station definitions */
   const ST = {
-    K01:{n:"Sain\u00f0aul Central",       k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e",  b:"main",   km:0},
-    K02:{n:"Niji-Sain\u00f0aul",           k:"\u897f\u4f5c\u5b89\u5d0e",      b:"main",   km:11.4},
-    K03:{n:"Asunahama Int'l Airport",    k:"\u5929\u5cf6\u570b\u969b\u7a7a\u6e2f", b:"main",km:35.4},
-    K04:{n:"Hashimakori-Juwon",          k:"\u793a\u4e07\u98ef\u4e2d\u592e",  b:"main",   km:84.85},
-    K05:{n:"Wodoriha IR",                k:"\u6f91\u9ad8 IR",               b:"main",   km:101.75},
-    K06:{n:"Shin-Eriraul",               k:"\u65b0\u7e70\u7f85\u5d0e",      b:"main",   km:122.97},
-    K07:{n:"Nappawa",                    k:"\u90a3\u854e\u8f2a",            b:"main",   km:144.68},
-    K08:{n:"Otsumi-Komishinan",          k:"\u5357\u53e4\u8fba\u5357",      b:"main",   km:185.39},
-    K09:{n:"Kamahoraya",                 k:"\u5bfa\u7a32\u91ce",            b:"main",   km:198.04},
-    K10:{n:"Shin-Kichatsura Teba",       k:"\u65b0\u4e80\u8336\u5915\u99ac",b:"main",   km:252.52},
-    K11:{n:"Shin-Kashioka",              k:"\u65b0\u7b20\u4ed8",            b:"main",   km:296.64},
-    K12:{n:"Panaireki",                  k:"\u82e5\u6d66",                  b:"main",   km:345.01},
-    K13:{n:"Hy\u014dmonan Resort",        k:"\u88cf\u8302\u5357\u904a\u5712",b:"main",   km:386.29},
-    K14:{n:"Shin-Imihatsorul",           k:"\u65b0\u7acb\u9bad\u57fc",      b:"main",   km:427.14},
-    K144:{n:"Tsirina Wents\u0101n",       k:"\u969c\u5185\u9280\u5c1a",      b:"main",   km:451.74},
-    K15:{n:"Naeba",                      k:"\u5185\u6ce2",                  b:"main",   km:465.21},
-    K16:{n:"Eyenniyul Juwon",            k:"\u7cf8\u4e94\u5d0e\u4e2d\u592e",b:"main",   km:499.04},
-    K116:{n:"Yaseura",                   k:"\u8db3\u751f\u7530",            b:"main",   km:526.31},
-    K17:{n:"Warohan",                    k:"\u6df1\u5f4c",                  b:"main",   km:545.0},
-    N1: {n:"Naraki-Attawi",              k:"",                              b:"nankai", km:573.54},
-    N2: {n:"Satsokoibo",                 k:"\u9752\u888b",                  b:"nankai", km:598.539},
-    N3: {n:"Shin-Nuskajui",              k:"\u65b0\u5e83\u58c1",            b:"nankai", km:638.102},
-    N4: {n:"Daishin",                    k:"\u5927\u9032",                  b:"nankai", km:658.561},
-    /* C' bypass: km along bypass from K01 */
-    K31:{n:"Pyanuza",       k:"", b:"cprime", cp:61.2},
-    K32:{n:"Nagayamatsu",   k:"", b:"cprime", cp:86.12},
-    K33:{n:"Keishunneul",   k:"", b:"cprime", cp:123.86},
-    /* Sakamuso branch: km from K101 */
-    K101:{n:"Sakamuso",          k:"\u671b\u5764",  b:"saka", sk:0},
-    K102:{n:"Showanul",          k:"\u66f8\u74e6\u5d0e",b:"saka",sk:6.969},
-    K120:{n:"Panatsawa",         k:"",               b:"saka", sk:22.449},
-    K103:{n:"Katayoshi Juwon",   k:"\u6cc9\u5cf0\u4e2d\u592e",b:"saka",sk:47.87},
-    K104:{n:"Illashiya",         k:"\u72d0\u68b2",   b:"saka", sk:70.243},
-    K105:{n:"Ch\u014dpatsu",     k:"",               b:"saka", sk:97.858},
-    K106:{n:"Kohtos\u014dre",    k:"",               b:"saka", sk:114.079},
-    K160:{n:"Ikahoro K\u014dwen",k:"",               b:"saka", sk:140.75},
+    K01:  {n:"Sain\u00f0aul Central",        k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e",  b:"main",   km:0},
+    K02:  {n:"Niji-Sain\u00f0aul",            k:"\u897f\u4f5c\u5b89\u5d0e",      b:"main",   km:11.4},
+    K03:  {n:"Asunahama Int'l Airport",     k:"\u5929\u5cf6\u570b\u969b\u7a7a\u6e2f",b:"main",km:35.4},
+    K04:  {n:"Hashimakori-Juwon",           k:"\u793a\u4e07\u98ef\u4e2d\u592e",  b:"main",   km:84.85},
+    K05:  {n:"Wodoriha IR",                 k:"\u6f91\u9ad8 IR",               b:"main",   km:101.75},
+    K06:  {n:"Shin-Eriraul",                k:"\u65b0\u7e70\u7f85\u5d0e",      b:"main",   km:122.97},
+    K07:  {n:"Nappawa",                     k:"\u90a3\u854e\u8f2a",            b:"main",   km:144.68},
+    K08:  {n:"Otsumi-Komishinan",           k:"\u5357\u53e4\u8fba\u5357",      b:"main",   km:185.39},
+    K09:  {n:"Kamahoraya",                  k:"\u5bfa\u7a32\u91ce",            b:"main",   km:198.04},
+    K10:  {n:"Shin-Kichatsura Teba",        k:"\u65b0\u4e80\u8336\u5915\u99ac",b:"main",   km:252.52},
+    K11:  {n:"Shin-Kashioka",               k:"\u65b0\u7b20\u4ed8",            b:"main",   km:296.64},
+    K12:  {n:"Panaireki",                   k:"\u82e5\u6d66",                  b:"main",   km:345.01},
+    K13:  {n:"Hy\u014dmonan Resort",         k:"\u88cf\u8302\u5357\u904a\u5712",b:"main",   km:386.29},
+    K14:  {n:"Shin-Imihatsorul",            k:"\u65b0\u7acb\u9bad\u57fc",      b:"main",   km:427.14},
+    K144: {n:"Tsirina Wents\u0101n",         k:"\u969c\u5185\u9280\u5c1a",      b:"main",   km:451.74},
+    K15:  {n:"Naeba",                       k:"\u5185\u6ce2",                  b:"main",   km:465.21},
+    K16:  {n:"Eyenniyul Juwon",             k:"\u7cf8\u4e94\u5d0e\u4e2d\u592e",b:"main",   km:499.04},
+    K116: {n:"Yaseura",                     k:"\u8db3\u751f\u7530",            b:"main",   km:526.31},
+    K17:  {n:"Warohan",                     k:"\u6df1\u5f4c",                  b:"main",   km:545.0},
+    N1:   {n:"Naraki-Attawi",               k:"",                              b:"nankai", km:573.54},
+    N2:   {n:"Satsokoibo",                  k:"\u9752\u888b",                  b:"nankai", km:598.539},
+    N3:   {n:"Shin-Nuskajui",               k:"\u65b0\u5e83\u58c1",            b:"nankai", km:638.102},
+    N4:   {n:"Daishin",                     k:"\u5927\u9032",                  b:"nankai", km:658.561},
+    K31:  {n:"Pyanuza",                     k:"",                              b:"cprime"},
+    K32:  {n:"Nagayamatsu",                 k:"",                              b:"cprime"},
+    K33:  {n:"Keishunneul",                 k:"",                              b:"cprime"},
+    K101: {n:"Sakamuso",                    k:"\u671b\u5764",                  b:"saka"},
+    K102: {n:"Showanul",                    k:"\u66f8\u74e6\u5d0e",            b:"saka"},
+    K120: {n:"Panatsawa",                   k:"",                              b:"saka"},
+    K103: {n:"Katayoshi Juwon",             k:"\u6cc9\u5cf0\u4e2d\u592e",      b:"saka"},
+    K104: {n:"Illashiya",                   k:"\u72d0\u68b2",                  b:"saka"},
+    K105: {n:"Ch\u014dpatsu",               k:"",                              b:"saka"},
+    K106: {n:"Kohtos\u014dre",              k:"",                              b:"saka"},
+    K160: {n:"Ikahoro K\u014dwen",          k:"",                              b:"saka"},
   };
 
   /* Cumulative km along C' route from K01 */
-  const CP = {K01:0,K02:11.4,K03:35.4,K31:61.2,K32:86.12,K33:123.86,K08:159.39,K09:172.04,K10:226.52,K11:270.64,K12:319.01};
+  const CP = {
+    K01:0, K02:11.4, K03:35.4,
+    K31:61.2, K32:86.12, K33:123.86,
+    K08:159.39, K09:172.04, K10:226.52, K11:270.64, K12:319.01
+  };
 
-  /* Cumulative km along Saka route from K101.
-     K104->K10 derived from od_matrix: K104->N4(D)=488.261, K10->N4(D)=406.041 => K104->K10=82.22 */
-  const SK = {K101:0,K102:6.969,K120:22.449,K103:47.87,K104:70.243,K105:97.858,K106:114.079,K160:140.75};
+  /*
+   * Cumulative km along Sakamuso route from K101.
+   *
+   * K101=0, then branch stations by km_sk.
+   * Junction: K104(70.243) -> K10.
+   * K104->K10 derived: od_matrix K104->N4 via D = 488.261, K10->N4 via D = 406.041
+   * => K104->K10 = 82.22 km => SK[K10] = 152.463
+   *
+   * SZ note: K101 tariff is frozen here at 0. For main-line services (A/B/C/Cp)
+   * a K101 origin is remapped to K02 (11.4 km) as the tariff anchor.
+   * For saka services (D/E/F) K101 stays at 0 — no remapping needed.
+   */
+  const SK = {
+    K101: 0,
+    K102: 6.969,
+    K120: 22.449,
+    K103: 47.87,
+    K104: 70.243,
+    K105: 97.858,
+    K106: 114.079,
+    K160: 140.75,
+  };
   SK.K10 = 70.243 + 82.22; // 152.463
   ['K11','K12','K13','K14','K144','K15','K16','K116','K17','N1','N2','N3','N4'].forEach(c => {
     SK[c] = SK.K10 + (ST[c].km - 252.52);
   });
 
-  /* Service definitions */
+  const MAIN_SVCS = new Set(['A','B','C','Cp']);
+  const SAKA_SVCS = new Set(['D','E','F']);
+
   const SVC = {
-    A: {coeff:1.15, name:"Nonstop Express",  cls:"svc-A",
-        stops:["K01","K02","K03","K08","K10","K12","K17","N1","N2","N3","N4"]},
-    B: {coeff:1.00, name:"Semi-rapido",       cls:"svc-B",
-        stops:["K01","K02","K03","K04","K05","K06","K07","K08","K09","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17","N1","N2","N3","N4"]},
-    C: {coeff:1.08, name:"Rapido",            cls:"svc-C",
-        stops:["K01","K02","K03","K06","K08","K09","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17"]},
-    Cp:{coeff:1.12, name:"Airport Bypass C\u2032", cls:"svc-Cp",
-        stops:["K01","K02","K03","K31","K32","K33","K08","K09","K10","K11","K12"]},
-    D: {coeff:1.08, name:"Sakamuso Rapido",   cls:"svc-D",
-        stops:["K101","K104","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17","N1","N2","N3","N4"]},
-    E: {coeff:1.10, name:"Sakamuso Express",  cls:"svc-E",
-        stops:["K101","K104","K160","K10","K12","K17","N1","N2","N3","N4"]},
-    F: {coeff:0.92, name:"Omnibus",           cls:"svc-F",
-        stops:["K101","K102","K120","K103","K104","K105","K106","K160","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17","N1","N2","N3","N4"]},
+    A:  {coeff:1.15, name:"Nonstop Express",      cls:"svc-A",
+         stops:["K01","K02","K03","K08","K10","K12","K17","N1","N2","N3","N4"]},
+    B:  {coeff:1.00, name:"Semi-rapido",           cls:"svc-B",
+         stops:["K01","K02","K03","K04","K05","K06","K07","K08","K09","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17","N1","N2","N3","N4"]},
+    C:  {coeff:1.08, name:"Rapido",                cls:"svc-C",
+         stops:["K01","K02","K03","K06","K08","K09","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17"]},
+    Cp: {coeff:1.12, name:"Airport Bypass C\u2032",cls:"svc-Cp",
+         stops:["K01","K02","K03","K31","K32","K33","K08","K09","K10","K11","K12"]},
+    D:  {coeff:1.08, name:"Sakamuso Rapido",       cls:"svc-D",
+         stops:["K101","K104","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17","N1","N2","N3","N4"]},
+    E:  {coeff:1.10, name:"Sakamuso Express",      cls:"svc-E",
+         stops:["K101","K104","K160","K10","K12","K17","N1","N2","N3","N4"]},
+    F:  {coeff:0.92, name:"Omnibus",               cls:"svc-F",
+         stops:["K101","K102","K120","K103","K104","K105","K106","K160","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17","N1","N2","N3","N4"]},
   };
 
   const CLASS_C = {standard:1.00, blue_seat:1.55, yurani:2.40};
   const CLASS_L = {standard:"Standard", blue_seat:"Blue Seat", yurani:"Yurani"};
 
-  /* SZ zone: K101 tariff anchor = K02 */
-  const SZ = "K101", SZ_ANC = "K02";
-
-  /* Station order for selects */
   const ORDER = [
     "K01","K02","K03","K04","K05","K06","K07","K08","K09","K10",
     "K11","K12","K13","K14","K144","K15","K16","K116","K17",
@@ -323,91 +337,104 @@
   ];
   const BL = {main:"Main Line",saka:"Sakamuso Branch",cprime:"C\u2032 Bypass",nankai:"Nankai ext."};
 
-  /* Fare formula */
   function progKm(d){
-    if(d<=0)return 0;
-    let c=Math.min(d,100)*0.195;
-    if(d>100)c+=Math.min(d-100,200)*0.165;
-    if(d>300)c+=(d-300)*0.14;
+    if(d<=0) return 0;
+    let c = Math.min(d,100)*0.195;
+    if(d>100) c += Math.min(d-100,200)*0.165;
+    if(d>300) c += (d-300)*0.14;
     return c;
   }
-  function price(km,sc,cc){
+  function calcPrice(km,sc,cc){
     return Math.round((FIXED_FEE+progKm(km))*sc*cc*100)/100;
   }
 
-  /* Get km for a station in a given service */
+  /*
+   * Get km position of a station within a service's coordinate system.
+   *
+   * SZ rule: K101 is remapped to K02 (11.4 km) ONLY for main-line services
+   * (A/B/C/Cp), where K101 is not a physical stop but a tariff-equivalent.
+   * For saka services (D/E/F), K101 is already in SK at position 0 — no remap.
+   */
   function stKm(code, svcKey){
-    if(svcKey==='Cp') return CP[code]!==undefined?CP[code]:null;
-    if(['D','E','F'].includes(svcKey)) return SK[code]!==undefined?SK[code]:null;
-    return ST[code]?ST[code].km:null;
+    // SZ anchor substitution: only for main-line services
+    if(code === 'K101' && MAIN_SVCS.has(svcKey)) code = 'K02';
+
+    if(svcKey === 'Cp')                return CP[code] !== undefined ? CP[code] : null;
+    if(SAKA_SVCS.has(svcKey))         return SK[code] !== undefined ? SK[code] : null;
+    return ST[code] ? ST[code].km : null; // main/nankai: absolute km from K01
   }
 
-  function tariffKm(from,to,svcKey){
-    const f=from===SZ?SZ_ANC:from;
-    const t=to===SZ?SZ_ANC:to;
-    const kf=stKm(f,svcKey), kt=stKm(t,svcKey);
-    if(kf===null||kt===null)return null;
-    return Math.abs(kt-kf);
+  function tariffKm(from, to, svcKey){
+    const kf = stKm(from, svcKey);
+    const kt = stKm(to,   svcKey);
+    if(kf === null || kt === null) return null;
+    return Math.abs(kt - kf);
   }
 
-  function serves(svcKey,from,to){
-    const s=SVC[svcKey].stops;
-    const fi=s.indexOf(from), ti=s.indexOf(to);
-    return fi!==-1&&ti!==-1&&fi!==ti;
+  /*
+   * Check whether a service has direct stops at both from and to.
+   * For main-line services, K101 is treated as equivalent to K02.
+   */
+  function serves(svcKey, from, to){
+    const stops = SVC[svcKey].stops;
+    const f = (from === 'K101' && MAIN_SVCS.has(svcKey)) ? 'K02' : from;
+    const t = (to   === 'K101' && MAIN_SVCS.has(svcKey)) ? 'K02' : to;
+    const fi = stops.indexOf(f);
+    const ti = stops.indexOf(t);
+    return fi !== -1 && ti !== -1 && fi !== ti;
   }
 
-  /* Build selects */
   function buildSelects(){
-    const sf=document.getElementById('sel-from');
-    const st=document.getElementById('sel-to');
-    let lastB=null;
-    ORDER.forEach(code=>{
-      const s=ST[code]; if(!s)return;
-      if(s.b!==lastB){
-        const la=BL[s.b]||s.b;
-        [sf,st].forEach(el=>{
-          const og=document.createElement('optgroup');
-          og.label=la; el._og=og; el.appendChild(og);
+    const sf = document.getElementById('sel-from');
+    const st = document.getElementById('sel-to');
+    let lastB = null;
+    ORDER.forEach(code => {
+      const s = ST[code]; if(!s) return;
+      if(s.b !== lastB){
+        [sf,st].forEach(el => {
+          const og = document.createElement('optgroup');
+          og.label = BL[s.b]||s.b;
+          el._og = og;
+          el.appendChild(og);
         });
-        lastB=s.b;
+        lastB = s.b;
       }
-      [sf,st].forEach(el=>{
-        const o=document.createElement('option');
-        o.value=code;
-        o.textContent=code+' '+s.n+(s.k?' \u00b7 '+s.k:'');
+      [sf,st].forEach(el => {
+        const o = document.createElement('option');
+        o.value = code;
+        o.textContent = code+' '+s.n+(s.k?' \u00b7 '+s.k:'');
         el._og.appendChild(o);
       });
     });
     sf.value='K01'; st.value='K17';
   }
 
-  function fmt(n){return '\u0116\u202f'+n.toFixed(2);}
-  function fusd(n){return '(US$\u202f'+(n*USD_RATE).toFixed(2)+')';}
+  function fmt(n)   { return '\u0116\u202f'+n.toFixed(2); }
+  function fusd(n)  { return '(US$\u202f'+(n*USD_RATE).toFixed(2)+')'; }
 
-  /* Render */
-  function render(from,to,classF,svcF){
-    const res=document.getElementById('results');
-    const cards=document.getElementById('service-cards');
-    const routeEl=document.getElementById('result-route');
-    const metaEl=document.getElementById('result-meta');
-    const szNote=document.getElementById('sz-note');
+  function render(from, to, classF, svcF){
+    const res    = document.getElementById('results');
+    const cards  = document.getElementById('service-cards');
+    const routeEl= document.getElementById('result-route');
+    const metaEl = document.getElementById('result-meta');
+    const szNote = document.getElementById('sz-note');
 
     res.style.display='block';
     cards.innerHTML='';
-    szNote.style.display=(from===SZ||to===SZ)?'block':'none';
-    routeEl.textContent=(ST[from]?ST[from].n:from)+' \u2192 '+(ST[to]?ST[to].n:to);
+    szNote.style.display = (from==='K101'||to==='K101') ? 'block' : 'none';
+    routeEl.textContent = (ST[from]?ST[from].n:from)+' \u2192 '+(ST[to]?ST[to].n:to);
 
-    const svcs=svcF==='all'?Object.keys(SVC):[svcF];
-    const clss=classF==='all'?['standard','blue_seat','yurani']:[classF];
-    const rows=[];
+    const svcs = svcF==='all' ? Object.keys(SVC) : [svcF];
+    const clss = classF==='all' ? ['standard','blue_seat','yurani'] : [classF];
+    const rows = [];
 
-    svcs.forEach(k=>{
-      if(!serves(k,from,to))return;
-      const km=tariffKm(from,to,k);
-      if(!km||km<=0)return;
-      const prices={};
-      clss.forEach(c=>{ prices[c]=price(km,SVC[k].coeff,CLASS_C[c]); });
-      rows.push({k,km,prices});
+    svcs.forEach(k => {
+      if(!serves(k,from,to)) return;
+      const km = tariffKm(from,to,k);
+      if(!km || km<=0) return;
+      const prices = {};
+      clss.forEach(c => { prices[c] = calcPrice(km, SVC[k].coeff, CLASS_C[c]); });
+      rows.push({k, km, prices});
     });
 
     if(!rows.length){
@@ -416,18 +443,18 @@
       return;
     }
 
-    const kms=[...new Set(rows.map(r=>r.km.toFixed(1)))];
-    metaEl.textContent=kms.length===1?kms[0]+' km':kms.join(' / ')+' km (varies by route)';
+    const kms = [...new Set(rows.map(r=>r.km.toFixed(1)))];
+    metaEl.textContent = kms.length===1 ? kms[0]+' km' : kms.join(' / ')+' km (varies by route)';
 
-    const minP=Math.min(...rows.map(r=>r.prices[clss[0]]||Infinity));
+    const minP = Math.min(...rows.map(r=>r.prices[clss[0]]||Infinity));
 
-    rows.forEach(({k,km,prices})=>{
-      const info=SVC[k];
-      const card=document.createElement('div');
+    rows.forEach(({k,km,prices}) => {
+      const info = SVC[k];
+      const card = document.createElement('div');
       card.className='service-card';
-      const prows=clss.map(c=>{
-        const p=prices[c];
-        const best=c===clss[0]&&p===minP;
+      const prows = clss.map(c => {
+        const p = prices[c];
+        const best = c===clss[0] && p===minP;
         return `<div class="price-row${best?' best-price':''}">
           <span class="price-class">${CLASS_L[c]}</span>
           <span class="price-val">${fmt(p)} <span class="price-usd">${fusd(p)}</span></span>
@@ -445,22 +472,21 @@
     });
   }
 
-  /* Init */
   buildSelects();
 
-  document.getElementById('btn-swap').addEventListener('click',()=>{
+  document.getElementById('btn-swap').addEventListener('click', () => {
     const sf=document.getElementById('sel-from');
     const st=document.getElementById('sel-to');
     const tmp=sf.value; sf.value=st.value; st.value=tmp;
   });
 
-  document.getElementById('btn-search').addEventListener('click',()=>{
-    const from=document.getElementById('sel-from').value;
-    const to=document.getElementById('sel-to').value;
-    const cls=document.getElementById('sel-class').value;
-    const svc=document.getElementById('sel-service').value;
-    if(from===to){alert('Please select two different stations.');return;}
-    render(from,to,cls,svc);
+  document.getElementById('btn-search').addEventListener('click', () => {
+    const from = document.getElementById('sel-from').value;
+    const to   = document.getElementById('sel-to').value;
+    const cls  = document.getElementById('sel-class').value;
+    const svc  = document.getElementById('sel-service').value;
+    if(from===to){ alert('Please select two different stations.'); return; }
+    render(from, to, cls, svc);
   });
 
 })();
