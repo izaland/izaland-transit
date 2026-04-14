@@ -1,0 +1,10 @@
+{
+  "meta": {
+    "network": "IZX Keishin Line",
+    "version": "1.0",
+    "generated": "2026-04-15",
+    "description": "Space-time diagram data. km_y = unified Y-axis position (km). offset_s = departure offset in seconds from t=0.",
+    "axes": {"x": "time_seconds from offset", "y": "km_y (unified progressive km)"}
+  },
+  "note": "See full file at data/timetable.json — pushed separately due to size"
+}
