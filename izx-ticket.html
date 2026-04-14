@@ -61,6 +61,7 @@
     .sim-options{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-6);}
     .sim-btn{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-md);padding:var(--space-3) var(--space-6);font-size:var(--text-sm);font-weight:700;cursor:pointer;transition:background var(--transition);width:100%;}
     .sim-btn:hover{background:var(--accent-hover);}
+    /* RESULTS */
     #results{display:none;margin-top:var(--space-8);border-top:1px solid var(--border);padding-top:var(--space-6);}
     .result-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-2);}
     .result-route{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;}
@@ -87,6 +88,36 @@
     .svc-D{background:#926ACA;color:#fff;}
     .svc-E{background:#7c3aed;color:#fff;}
     .svc-F{background:#6b7280;color:#fff;}
+    /* ── STOP PATTERN DIAGRAM ── */
+    #stop-diagram{margin-top:var(--space-8);border-top:1px solid var(--border);padding-top:var(--space-6);display:none;}
+    .diag-title{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:var(--space-6);}
+    .diag-scroll{overflow-x:auto;padding-bottom:var(--space-4);}
+    .diag-table{border-collapse:collapse;font-size:10px;white-space:nowrap;min-width:100%;}
+    .diag-table td,.diag-table th{padding:0;border:none;}
+    /* service label column */
+    .diag-svc-col{width:64px;min-width:64px;padding-right:10px;text-align:right;vertical-align:middle;}
+    .diag-svc-pill{display:inline-block;font-size:.65rem;font-weight:800;padding:2px 6px;border-radius:3px;letter-spacing:.04em;}
+    /* track row */
+    .diag-track-row td{height:28px;vertical-align:middle;}
+    /* station name row */
+    .diag-name-row{height:auto;}
+    .diag-name-row td{vertical-align:top;padding-top:4px;}
+    .diag-sta-name{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);height:70px;font-size:9px;color:var(--text-muted);line-height:1;white-space:nowrap;display:flex;align-items:center;justify-content:flex-start;}
+    .diag-sta-name.is-origin,.diag-sta-name.is-dest{color:var(--text);font-weight:700;}
+    /* station cells */
+    .diag-sta-cell{position:relative;text-align:center;min-width:28px;}
+    /* track line segments */
+    .seg-left,.seg-right{position:absolute;top:50%;height:3px;width:50%;transform:translateY(-50%);}
+    .seg-left{left:0;}
+    .seg-right{right:0;}
+    /* dots */
+    .dot-stop{width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);position:relative;z-index:2;display:inline-block;}
+    .dot-stop.is-origin,.dot-stop.is-dest{width:13px;height:13px;}
+    .dot-pass{width:3px;height:10px;border-radius:2px;opacity:.55;position:relative;z-index:2;display:inline-block;}
+    /* legend */
+    .diag-legend{display:flex;gap:var(--space-6);margin-top:var(--space-4);font-size:var(--text-xs);color:var(--text-muted);flex-wrap:wrap;}
+    .diag-legend-item{display:flex;align-items:center;gap:6px;}
+    /* formula box */
     .formula-box{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-4);margin-top:var(--space-8);font-size:var(--text-xs);color:var(--text-muted);line-height:1.9;}
     .formula-box strong{color:var(--text);}
     .formula-box code{font-family:monospace;background:var(--bg);padding:1px 5px;border-radius:3px;}
@@ -185,6 +216,19 @@
       <div class="result-meta"  id="result-meta"></div>
     </div>
     <div class="service-cards" id="service-cards"></div>
+
+    <!-- STOP PATTERN DIAGRAM -->
+    <div id="stop-diagram">
+      <div class="diag-title">Stop pattern</div>
+      <div class="diag-scroll">
+        <table class="diag-table" id="diag-table"></table>
+      </div>
+      <div class="diag-legend">
+        <div class="diag-legend-item"><span style="width:10px;height:10px;border-radius:50%;background:var(--text-muted);border:2px solid var(--bg);display:inline-block;"></span> Stops</div>
+        <div class="diag-legend-item"><span style="width:3px;height:10px;border-radius:2px;background:var(--text-muted);display:inline-block;"></span> Passes through</div>
+        <div class="diag-legend-item"><span style="width:13px;height:13px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);display:inline-block;"></span> Origin / Destination</div>
+      </div>
+    </div>
   </div>
 
   <div class="formula-box">
@@ -228,7 +272,7 @@
   );
 
   /* ================================================================
-     FARE ENGINE — all data embedded, no fetch() needed
+     FARE ENGINE
   ================================================================ */
 
   const FIXED_FEE = 4.50;
@@ -271,25 +315,12 @@
     K160: {n:"Ikahoro K\u014dwen",          k:"",                              b:"saka"},
   };
 
-  /* Cumulative km along C' route from K01 */
   const CP = {
     K01:0, K02:11.4, K03:35.4,
     K31:61.2, K32:86.12, K33:123.86,
     K08:159.39, K09:172.04, K10:226.52, K11:270.64, K12:319.01
   };
 
-  /*
-   * Cumulative km along Sakamuso route from K101.
-   *
-   * K101=0, then branch stations by km_sk.
-   * Junction: K104(70.243) -> K10.
-   * K104->K10 derived: od_matrix K104->N4 via D = 488.261, K10->N4 via D = 406.041
-   * => K104->K10 = 82.22 km => SK[K10] = 152.463
-   *
-   * SZ note: K101 tariff is frozen here at 0. For main-line services (A/B/C/Cp)
-   * a K101 origin is remapped to K02 (11.4 km) as the tariff anchor.
-   * For saka services (D/E/F) K101 stays at 0 — no remapping needed.
-   */
   const SK = {
     K101: 0,
     K102: 6.969,
@@ -300,7 +331,7 @@
     K106: 114.079,
     K160: 140.75,
   };
-  SK.K10 = 70.243 + 82.22; // 152.463
+  SK.K10 = 70.243 + 82.22;
   ['K11','K12','K13','K14','K144','K15','K16','K116','K17','N1','N2','N3','N4'].forEach(c => {
     SK[c] = SK.K10 + (ST[c].km - 252.52);
   });
@@ -309,19 +340,19 @@
   const SAKA_SVCS = new Set(['D','E','F']);
 
   const SVC = {
-    A:  {coeff:1.15, name:"Nonstop Express",      cls:"svc-A",
+    A:  {coeff:1.15, name:"Nonstop Express",      cls:"svc-A", color:"#002A91",
          stops:["K01","K02","K03","K08","K10","K12","K17","N1","N2","N3","N4"]},
-    B:  {coeff:1.00, name:"Semi-rapido",           cls:"svc-B",
+    B:  {coeff:1.00, name:"Semi-rapido",           cls:"svc-B", color:"#1B71CB",
          stops:["K01","K02","K03","K04","K05","K06","K07","K08","K09","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17","N1","N2","N3","N4"]},
-    C:  {coeff:1.08, name:"Rapido",                cls:"svc-C",
+    C:  {coeff:1.08, name:"Rapido",                cls:"svc-C", color:"#4a8fcc",
          stops:["K01","K02","K03","K06","K08","K09","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17"]},
-    Cp: {coeff:1.12, name:"Airport Bypass C\u2032",cls:"svc-Cp",
+    Cp: {coeff:1.12, name:"Airport Bypass C\u2032",cls:"svc-Cp", color:"#0e7ca6",
          stops:["K01","K02","K03","K31","K32","K33","K08","K09","K10","K11","K12"]},
-    D:  {coeff:1.08, name:"Sakamuso Rapido",       cls:"svc-D",
+    D:  {coeff:1.08, name:"Sakamuso Rapido",       cls:"svc-D", color:"#926ACA",
          stops:["K101","K104","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17","N1","N2","N3","N4"]},
-    E:  {coeff:1.10, name:"Sakamuso Express",      cls:"svc-E",
+    E:  {coeff:1.10, name:"Sakamuso Express",      cls:"svc-E", color:"#7c3aed",
          stops:["K101","K104","K160","K10","K12","K17","N1","N2","N3","N4"]},
-    F:  {coeff:0.92, name:"Omnibus",               cls:"svc-F",
+    F:  {coeff:0.92, name:"Omnibus",               cls:"svc-F", color:"#6b7280",
          stops:["K101","K102","K120","K103","K104","K105","K106","K160","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17","N1","N2","N3","N4"]},
   };
 
@@ -348,20 +379,11 @@
     return Math.round((FIXED_FEE+progKm(km))*sc*cc*100)/100;
   }
 
-  /*
-   * Get km position of a station within a service's coordinate system.
-   *
-   * SZ rule: K101 is remapped to K02 (11.4 km) ONLY for main-line services
-   * (A/B/C/Cp), where K101 is not a physical stop but a tariff-equivalent.
-   * For saka services (D/E/F), K101 is already in SK at position 0 — no remap.
-   */
   function stKm(code, svcKey){
-    // SZ anchor substitution: only for main-line services
     if(code === 'K101' && MAIN_SVCS.has(svcKey)) code = 'K02';
-
     if(svcKey === 'Cp')                return CP[code] !== undefined ? CP[code] : null;
     if(SAKA_SVCS.has(svcKey))         return SK[code] !== undefined ? SK[code] : null;
-    return ST[code] ? ST[code].km : null; // main/nankai: absolute km from K01
+    return ST[code] ? ST[code].km : null;
   }
 
   function tariffKm(from, to, svcKey){
@@ -371,10 +393,6 @@
     return Math.abs(kt - kf);
   }
 
-  /*
-   * Check whether a service has direct stops at both from and to.
-   * For main-line services, K101 is treated as equivalent to K02.
-   */
   function serves(svcKey, from, to){
     const stops = SVC[svcKey].stops;
     const f = (from === 'K101' && MAIN_SVCS.has(svcKey)) ? 'K02' : from;
@@ -412,6 +430,179 @@
   function fmt(n)   { return '\u0116\u202f'+n.toFixed(2); }
   function fusd(n)  { return '(US$\u202f'+(n*USD_RATE).toFixed(2)+')'; }
 
+  /* ================================================================
+     STOP PATTERN DIAGRAM
+  ================================================================ */
+
+  /*
+   * Returns the ordered list of stations that a service traverses
+   * between (and including) from and to.
+   * For saka services the canonical order is the stops[] array.
+   * For main/Cp services it's the same.
+   */
+  function stopsInRange(svcKey, from, to){
+    const info  = SVC[svcKey];
+    const allSt = info.stops;
+    const f = (from === 'K101' && MAIN_SVCS.has(svcKey)) ? 'K02' : from;
+    const t = (to   === 'K101' && MAIN_SVCS.has(svcKey)) ? 'K02' : to;
+    let fi = allSt.indexOf(f);
+    let ti = allSt.indexOf(t);
+    if(fi === -1 || ti === -1) return [];
+    if(fi > ti) [fi, ti] = [ti, fi]; // normalise direction
+    return allSt.slice(fi, ti + 1);
+  }
+
+  /*
+   * Given a list of active services and from/to, build the union of
+   * all stations that appear in any service's route between from/to.
+   * We keep them in a global canonical order to align columns.
+   *
+   * Strategy: for each svc, collect stopsInRange then merge into a
+   * ordered set preserving the per-service sequence. We use the
+   * longest list as the skeleton and insert missing ones in order.
+   */
+  function buildStationSequence(activeRows, from, to){
+    // Collect all stations per service
+    const perSvc = activeRows.map(({k}) => stopsInRange(k, from, to));
+
+    // Union: preserve order via insertion sort against first occurrence
+    const seen = new Set();
+    const merged = [];
+    // Pass 1: use all per-svc lists in order
+    perSvc.forEach(list => {
+      list.forEach(code => {
+        if(!seen.has(code)){ seen.add(code); merged.push(code); }
+      });
+    });
+    return merged;
+  }
+
+  function renderDiagram(activeRows, from, to){
+    const wrap = document.getElementById('stop-diagram');
+    const tbl  = document.getElementById('diag-table');
+    tbl.innerHTML = '';
+
+    if(!activeRows.length){ wrap.style.display='none'; return; }
+    wrap.style.display = 'block';
+
+    // Canonical list of stations to show as columns
+    const cols = buildStationSequence(activeRows, from, to);
+    const fromDisplay = (from === 'K101') ? 'K101' : from; // keep display code unchanged
+    const toDisplay   = (to   === 'K101') ? 'K101' : to;
+
+    // Which codes are origin/dest for visual highlight
+    const originCode = from;
+    const destCode   = to;
+
+    // ── Build rows ──
+
+    // Station name row (rotated text)
+    const nameTr = document.createElement('tr');
+    nameTr.className = 'diag-name-row';
+    // empty label cell
+    const emptyTh = document.createElement('td');
+    emptyTh.className = 'diag-svc-col';
+    nameTr.appendChild(emptyTh);
+
+    cols.forEach(code => {
+      const td = document.createElement('td');
+      td.className = 'diag-sta-cell';
+      const span = document.createElement('div');
+      span.className = 'diag-sta-name' +
+        (code === originCode ? ' is-origin' : '') +
+        (code === destCode   ? ' is-dest'   : '');
+      // Short label: station name abbreviated
+      const st = ST[code];
+      const label = st ? (code + ' ' + (st.n.length > 14 ? st.n.slice(0,13)+'\u2026' : st.n)) : code;
+      span.textContent = label;
+      td.appendChild(span);
+      nameTr.appendChild(td);
+    });
+    tbl.appendChild(nameTr);
+
+    // One track row per active service
+    activeRows.forEach(({k}) => {
+      const info = SVC[k];
+      const color = info.color;
+      const svcStops = new Set(info.stops);
+      const rangeStops = new Set(stopsInRange(k, from, to));
+
+      const tr = document.createElement('tr');
+      tr.className = 'diag-track-row';
+
+      // Service label
+      const labelTd = document.createElement('td');
+      labelTd.className = 'diag-svc-col';
+      labelTd.innerHTML = `<span class="diag-svc-pill svc-${k==='Cp'?'Cp':k}">${k==='Cp'?'C\u2032':k}</span>`;
+      tr.appendChild(labelTd);
+
+      cols.forEach((code, ci) => {
+        const td = document.createElement('td');
+        td.className = 'diag-sta-cell';
+        td.style.position = 'relative';
+        td.style.height = '28px';
+        td.style.verticalAlign = 'middle';
+        td.style.textAlign = 'center';
+
+        const inRange = rangeStops.has(code);
+        const isStop  = inRange && svcStops.has(code);
+        const isFirst = ci === 0;
+        const isLast  = ci === cols.length - 1;
+        const isOD    = (code === originCode || code === destCode);
+
+        if(inRange){
+          // Track line segments
+          const leftSeg = document.createElement('div');
+          leftSeg.className = 'seg-left';
+          leftSeg.style.background = color;
+          leftSeg.style.opacity = '0.8';
+          if(isFirst) leftSeg.style.width = '50%';
+          td.appendChild(leftSeg);
+
+          const rightSeg = document.createElement('div');
+          rightSeg.className = 'seg-right';
+          rightSeg.style.background = color;
+          rightSeg.style.opacity = '0.8';
+          if(isLast) rightSeg.style.width = '0';
+          td.appendChild(rightSeg);
+
+          // Dot
+          const inner = document.createElement('div');
+          inner.style.position = 'relative';
+          inner.style.zIndex = '3';
+          inner.style.display = 'flex';
+          inner.style.justifyContent = 'center';
+
+          if(isStop){
+            const dot = document.createElement('span');
+            dot.className = 'dot-stop' + (isOD ? ' is-origin' : '');
+            dot.style.background = color;
+            if(isOD) dot.style.background = 'var(--accent)';
+            inner.appendChild(dot);
+          } else {
+            // passes through
+            const bar = document.createElement('span');
+            bar.className = 'dot-pass';
+            bar.style.background = color;
+            inner.appendChild(bar);
+          }
+          td.appendChild(inner);
+        } else {
+          // not in this service's range — faint gap
+          td.style.opacity = '0.1';
+        }
+
+        tr.appendChild(td);
+      });
+
+      tbl.appendChild(tr);
+    });
+  }
+
+  /* ================================================================
+     RENDER (fares + diagram)
+  ================================================================ */
+
   function render(from, to, classF, svcF){
     const res    = document.getElementById('results');
     const cards  = document.getElementById('service-cards');
@@ -440,6 +631,7 @@
     if(!rows.length){
       metaEl.textContent='';
       cards.innerHTML='<p class="no-service">No direct service available for this O/D pair.</p>';
+      document.getElementById('stop-diagram').style.display='none';
       return;
     }
 
@@ -470,6 +662,9 @@
       `;
       cards.appendChild(card);
     });
+
+    // Render stop-pattern diagram
+    renderDiagram(rows, from, to);
   }
 
   buildSelects();
