@@ -61,7 +61,6 @@
     .sim-options{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-6);}
     .sim-btn{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-md);padding:var(--space-3) var(--space-6);font-size:var(--text-sm);font-weight:700;cursor:pointer;transition:background var(--transition);width:100%;}
     .sim-btn:hover{background:var(--accent-hover);}
-    /* RESULTS */
     #results{display:none;margin-top:var(--space-8);border-top:1px solid var(--border);padding-top:var(--space-6);}
     .result-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-2);}
     .result-route{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;}
@@ -92,32 +91,23 @@
     #stop-diagram{margin-top:var(--space-8);border-top:1px solid var(--border);padding-top:var(--space-6);display:none;}
     .diag-title{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:var(--space-6);}
     .diag-scroll{overflow-x:auto;padding-bottom:var(--space-4);}
-    .diag-table{border-collapse:collapse;font-size:10px;white-space:nowrap;min-width:100%;}
-    .diag-table td,.diag-table th{padding:0;border:none;}
-    /* service label column */
-    .diag-svc-col{width:64px;min-width:64px;padding-right:10px;text-align:right;vertical-align:middle;}
+    .diag-table{border-collapse:collapse;font-size:10px;white-space:nowrap;}
+    .diag-table td{padding:0;border:none;}
+    .diag-svc-col{width:58px;min-width:58px;padding-right:8px;text-align:right;vertical-align:middle;}
     .diag-svc-pill{display:inline-block;font-size:.65rem;font-weight:800;padding:2px 6px;border-radius:3px;letter-spacing:.04em;}
-    /* track row */
-    .diag-track-row td{height:28px;vertical-align:middle;}
-    /* station name row */
-    .diag-name-row{height:auto;}
+    .diag-track-row td{height:26px;vertical-align:middle;}
     .diag-name-row td{vertical-align:top;padding-top:4px;}
-    .diag-sta-name{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);height:70px;font-size:9px;color:var(--text-muted);line-height:1;white-space:nowrap;display:flex;align-items:center;justify-content:flex-start;}
-    .diag-sta-name.is-origin,.diag-sta-name.is-dest{color:var(--text);font-weight:700;}
-    /* station cells */
-    .diag-sta-cell{position:relative;text-align:center;min-width:28px;}
-    /* track line segments */
-    .seg-left,.seg-right{position:absolute;top:50%;height:3px;width:50%;transform:translateY(-50%);}
-    .seg-left{left:0;}
-    .seg-right{right:0;}
-    /* dots */
-    .dot-stop{width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);position:relative;z-index:2;display:inline-block;}
-    .dot-stop.is-origin,.dot-stop.is-dest{width:13px;height:13px;}
-    .dot-pass{width:3px;height:10px;border-radius:2px;opacity:.55;position:relative;z-index:2;display:inline-block;}
-    /* legend */
+    .diag-sta-name{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);height:72px;font-size:9px;color:var(--text-muted);line-height:1;white-space:nowrap;display:flex;align-items:center;justify-content:flex-start;}
+    .diag-sta-name.is-od{color:var(--text);font-weight:700;}
+    .diag-sta-cell{position:relative;text-align:center;min-width:26px;}
+    .seg-l,.seg-r{position:absolute;top:50%;height:3px;width:50%;transform:translateY(-50%);}
+    .seg-l{left:0;}.seg-r{right:0;}
+    .dot-s{width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);position:relative;z-index:2;display:inline-block;vertical-align:middle;}
+    .dot-s.od{width:13px;height:13px;}
+    .dot-p{width:3px;height:10px;border-radius:2px;opacity:.5;position:relative;z-index:2;display:inline-block;vertical-align:middle;}
+    .diag-gap{opacity:.08;}
     .diag-legend{display:flex;gap:var(--space-6);margin-top:var(--space-4);font-size:var(--text-xs);color:var(--text-muted);flex-wrap:wrap;}
     .diag-legend-item{display:flex;align-items:center;gap:6px;}
-    /* formula box */
     .formula-box{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-4);margin-top:var(--space-8);font-size:var(--text-xs);color:var(--text-muted);line-height:1.9;}
     .formula-box strong{color:var(--text);}
     .formula-box code{font-family:monospace;background:var(--bg);padding:1px 5px;border-radius:3px;}
@@ -234,14 +224,14 @@
   <div class="formula-box">
     <strong>Fare formula:</strong><br>
     <code>price = (Ė4.50 + progressive_km_rate) × service_coeff × class_coeff</code><br>
-    Distance tiers: <strong>Ė0.195/km</strong> (0–100 km) &middot; <strong>Ė0.165/km</strong> (101–300 km) &middot; <strong>Ė0.140/km</strong> (301+ km)<br>
-    Classes: Standard &times;1.00 &middot; Blue Seat &times;1.55 &middot; Yurani &times;2.40<br>
-    Currency: <strong>Ė (Etsi)</strong> &middot; 1 Ė = 0.832 USD
+    Distance tiers: <strong>Ė0.195/km</strong> (0–100 km) · <strong>Ė0.165/km</strong> (101–300 km) · <strong>Ė0.140/km</strong> (301+ km)<br>
+    Classes: Standard ×1.00 · Blue Seat ×1.55 · Yurani ×2.40<br>
+    Currency: <strong>Ė (Etsi)</strong> · 1 Ė = 0.832 USD
   </div>
 </div>
 
 <footer>
-  <p>Izaland Transit Portal &middot; <a href="https://opengeofiction.net" target="_blank" rel="noopener">OpenGeoFiction</a> &middot; IZX data v1.0</p>
+  <p>Izaland Transit Portal · <a href="https://opengeofiction.net" target="_blank" rel="noopener">OpenGeoFiction</a> · IZX data v1.0</p>
 </footer>
 
 <script>
@@ -282,12 +272,23 @@
     K01:  {n:"Sain\u00f0aul Central",        k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e",  b:"main",   km:0},
     K02:  {n:"Niji-Sain\u00f0aul",            k:"\u897f\u4f5c\u5b89\u5d0e",      b:"main",   km:11.4},
     K03:  {n:"Asunahama Int'l Airport",     k:"\u5929\u5cf6\u570b\u969b\u7a7a\u6e2f",b:"main",km:35.4},
+    K31:  {n:"Pyanuza",                     k:"",                              b:"cprime"},
+    K32:  {n:"Nagayamatsu",                 k:"",                              b:"cprime"},
+    K33:  {n:"Keishunneul",                 k:"",                              b:"cprime"},
     K04:  {n:"Hashimakori-Juwon",           k:"\u793a\u4e07\u98ef\u4e2d\u592e",  b:"main",   km:84.85},
     K05:  {n:"Wodoriha IR",                 k:"\u6f91\u9ad8 IR",               b:"main",   km:101.75},
     K06:  {n:"Shin-Eriraul",                k:"\u65b0\u7e70\u7f85\u5d0e",      b:"main",   km:122.97},
     K07:  {n:"Nappawa",                     k:"\u90a3\u854e\u8f2a",            b:"main",   km:144.68},
     K08:  {n:"Otsumi-Komishinan",           k:"\u5357\u53e4\u8fba\u5357",      b:"main",   km:185.39},
     K09:  {n:"Kamahoraya",                  k:"\u5bfa\u7a32\u91ce",            b:"main",   km:198.04},
+    K101: {n:"Sakamuso",                    k:"\u671b\u5764",                  b:"saka"},
+    K102: {n:"Showanul",                    k:"\u66f8\u74e6\u5d0e",            b:"saka"},
+    K120: {n:"Panatsawa",                   k:"",                              b:"saka"},
+    K103: {n:"Katayoshi Juwon",             k:"\u6cc9\u5cf0\u4e2d\u592e",      b:"saka"},
+    K104: {n:"Illashiya",                   k:"\u72d0\u68b2",                  b:"saka"},
+    K105: {n:"Ch\u014dpatsu",               k:"",                              b:"saka"},
+    K106: {n:"Kohtos\u014dre",              k:"",                              b:"saka"},
+    K160: {n:"Ikahoro K\u014dwen",          k:"",                              b:"saka"},
     K10:  {n:"Shin-Kichatsura Teba",        k:"\u65b0\u4e80\u8336\u5915\u99ac",b:"main",   km:252.52},
     K11:  {n:"Shin-Kashioka",               k:"\u65b0\u7b20\u4ed8",            b:"main",   km:296.64},
     K12:  {n:"Panaireki",                   k:"\u82e5\u6d66",                  b:"main",   km:345.01},
@@ -302,18 +303,30 @@
     N2:   {n:"Satsokoibo",                  k:"\u9752\u888b",                  b:"nankai", km:598.539},
     N3:   {n:"Shin-Nuskajui",               k:"\u65b0\u5e83\u58c1",            b:"nankai", km:638.102},
     N4:   {n:"Daishin",                     k:"\u5927\u9032",                  b:"nankai", km:658.561},
-    K31:  {n:"Pyanuza",                     k:"",                              b:"cprime"},
-    K32:  {n:"Nagayamatsu",                 k:"",                              b:"cprime"},
-    K33:  {n:"Keishunneul",                 k:"",                              b:"cprime"},
-    K101: {n:"Sakamuso",                    k:"\u671b\u5764",                  b:"saka"},
-    K102: {n:"Showanul",                    k:"\u66f8\u74e6\u5d0e",            b:"saka"},
-    K120: {n:"Panatsawa",                   k:"",                              b:"saka"},
-    K103: {n:"Katayoshi Juwon",             k:"\u6cc9\u5cf0\u4e2d\u592e",      b:"saka"},
-    K104: {n:"Illashiya",                   k:"\u72d0\u68b2",                  b:"saka"},
-    K105: {n:"Ch\u014dpatsu",               k:"",                              b:"saka"},
-    K106: {n:"Kohtos\u014dre",              k:"",                              b:"saka"},
-    K160: {n:"Ikahoro K\u014dwen",          k:"",                              b:"saka"},
   };
+
+  /*
+   * CANONICAL_ORDER encodes the real geographic sequence of the line,
+   * with branch stations inserted at their physical merge points:
+   *
+   * K01 → K02 → K03 → [K31→K32→K33 C' bypass] → K04→K05→K06→K07
+   *   → K08 → K09 → [K101→K102→K120→K103→K104→K105→K106→K160 Saka]
+   *   → K10 → K11 → ... → K17 → N1→N2→N3→N4
+   *
+   * K10 is the merge point for both the Saka branch and the C' bypass
+   * (C' re-enters via K33 which is geographically just before K08,
+   *  but for linear display we put bypass stations after K03,
+   *  and they connect back to K08).
+   */
+  const CANONICAL_ORDER = [
+    "K01","K02","K03",
+    "K31","K32","K33",      // C' bypass (K03→K08 alternate)
+    "K04","K05","K06","K07",
+    "K08","K09",
+    "K101","K102","K120","K103","K104","K105","K106","K160",  // Saka branch (→K10)
+    "K10","K11","K12","K13","K14","K144","K15","K16","K116","K17",
+    "N1","N2","N3","N4"
+  ];
 
   const CP = {
     K01:0, K02:11.4, K03:35.4,
@@ -322,14 +335,8 @@
   };
 
   const SK = {
-    K101: 0,
-    K102: 6.969,
-    K120: 22.449,
-    K103: 47.87,
-    K104: 70.243,
-    K105: 97.858,
-    K106: 114.079,
-    K160: 140.75,
+    K101: 0, K102: 6.969, K120: 22.449, K103: 47.87,
+    K104: 70.243, K105: 97.858, K106: 114.079, K160: 140.75,
   };
   SK.K10 = 70.243 + 82.22;
   ['K11','K12','K13','K14','K144','K15','K16','K116','K17','N1','N2','N3','N4'].forEach(c => {
@@ -359,12 +366,12 @@
   const CLASS_C = {standard:1.00, blue_seat:1.55, yurani:2.40};
   const CLASS_L = {standard:"Standard", blue_seat:"Blue Seat", yurani:"Yurani"};
 
-  const ORDER = [
+  // For select menus — keep geographic grouping
+  const SELECT_ORDER = [
     "K01","K02","K03","K04","K05","K06","K07","K08","K09","K10",
     "K11","K12","K13","K14","K144","K15","K16","K116","K17",
     "N1","N2","N3","N4",
     "K101","K102","K120","K103","K104","K105","K106","K160",
-    "K31","K32","K33"
   ];
   const BL = {main:"Main Line",saka:"Sakamuso Branch",cprime:"C\u2032 Bypass",nankai:"Nankai ext."};
 
@@ -404,12 +411,12 @@
 
   function buildSelects(){
     const sf = document.getElementById('sel-from');
-    const st = document.getElementById('sel-to');
+    const st2 = document.getElementById('sel-to');
     let lastB = null;
-    ORDER.forEach(code => {
+    SELECT_ORDER.forEach(code => {
       const s = ST[code]; if(!s) return;
       if(s.b !== lastB){
-        [sf,st].forEach(el => {
+        [sf,st2].forEach(el => {
           const og = document.createElement('optgroup');
           og.label = BL[s.b]||s.b;
           el._og = og;
@@ -417,14 +424,14 @@
         });
         lastB = s.b;
       }
-      [sf,st].forEach(el => {
+      [sf,st2].forEach(el => {
         const o = document.createElement('option');
         o.value = code;
         o.textContent = code+' '+s.n+(s.k?' \u00b7 '+s.k:'');
         el._og.appendChild(o);
       });
     });
-    sf.value='K01'; st.value='K17';
+    sf.value='K01'; st2.value='K17';
   }
 
   function fmt(n)   { return '\u0116\u202f'+n.toFixed(2); }
@@ -435,46 +442,76 @@
   ================================================================ */
 
   /*
-   * Returns the ordered list of stations that a service traverses
-   * between (and including) from and to.
-   * For saka services the canonical order is the stops[] array.
-   * For main/Cp services it's the same.
+   * For each active service, return the set of station codes it
+   * traverses (stops at OR passes through) between from and to,
+   * using the service's own stops[] list as the spine.
+   *
+   * "Passes through" = a station in CANONICAL_ORDER that lies between
+   * two consecutive stops of the service within the O/D window.
+   * We detect these by checking CANONICAL_ORDER index between stops.
    */
-  function stopsInRange(svcKey, from, to){
-    const info  = SVC[svcKey];
-    const allSt = info.stops;
+  function serviceRange(svcKey, from, to){
+    const info = SVC[svcKey];
+    const svcStopList = info.stops;
+    // Resolve K101 alias for main services
     const f = (from === 'K101' && MAIN_SVCS.has(svcKey)) ? 'K02' : from;
     const t = (to   === 'K101' && MAIN_SVCS.has(svcKey)) ? 'K02' : to;
-    let fi = allSt.indexOf(f);
-    let ti = allSt.indexOf(t);
-    if(fi === -1 || ti === -1) return [];
-    if(fi > ti) [fi, ti] = [ti, fi]; // normalise direction
-    return allSt.slice(fi, ti + 1);
+
+    let fi = svcStopList.indexOf(f);
+    let ti = svcStopList.indexOf(t);
+    if(fi === -1 || ti === -1 || fi === ti) return {stops:new Set(), through:new Set()};
+    if(fi > ti){ const tmp=fi; fi=ti; ti=tmp; }
+
+    const stopsInSlice = svcStopList.slice(fi, ti+1); // stations service stops at in range
+    const stopsSet = new Set(stopsInSlice);
+
+    // Find "pass-through" stations: in CANONICAL_ORDER between first and last stop,
+    // that this service traverses but doesn't stop at.
+    // We do this by finding the canonical span covered by the service's route segment.
+    const canonFirst = CANONICAL_ORDER.indexOf(stopsInSlice[0]);
+    const canonLast  = CANONICAL_ORDER.indexOf(stopsInSlice[stopsInSlice.length - 1]);
+    const throughSet = new Set();
+
+    if(canonFirst !== -1 && canonLast !== -1){
+      const lo = Math.min(canonFirst, canonLast);
+      const hi = Math.max(canonFirst, canonLast);
+      for(let i = lo; i <= hi; i++){
+        const code = CANONICAL_ORDER[i];
+        // Only include if this station is geographically on this service's route
+        // (i.e. not on a branch the service doesn't use)
+        if(!stopsSet.has(code)){
+          // Check: is this station on a branch not used by this service?
+          const s = ST[code];
+          if(!s) continue;
+          // C' bypass stations only shown for Cp
+          if((code==='K31'||code==='K32'||code==='K33') && svcKey!=='Cp') continue;
+          // Saka stations only shown for D/E/F
+          if(s.b==='saka' && !SAKA_SVCS.has(svcKey)) continue;
+          throughSet.add(code);
+        }
+      }
+    }
+
+    return {stops: stopsSet, through: throughSet};
   }
 
   /*
-   * Given a list of active services and from/to, build the union of
-   * all stations that appear in any service's route between from/to.
-   * We keep them in a global canonical order to align columns.
-   *
-   * Strategy: for each svc, collect stopsInRange then merge into a
-   * ordered set preserving the per-service sequence. We use the
-   * longest list as the skeleton and insert missing ones in order.
+   * Build the canonical column list for the diagram:
+   * take CANONICAL_ORDER, keep only stations that appear
+   * (as stop or pass-through) in at least one active service.
+   * This gives a clean, gap-free, geographically correct sequence.
    */
-  function buildStationSequence(activeRows, from, to){
-    // Collect all stations per service
-    const perSvc = activeRows.map(({k}) => stopsInRange(k, from, to));
-
-    // Union: preserve order via insertion sort against first occurrence
-    const seen = new Set();
-    const merged = [];
-    // Pass 1: use all per-svc lists in order
-    perSvc.forEach(list => {
-      list.forEach(code => {
-        if(!seen.has(code)){ seen.add(code); merged.push(code); }
-      });
+  function buildCanonicalCols(activeRows, from, to){
+    const needed = new Set();
+    activeRows.forEach(({k}) => {
+      const {stops, through} = serviceRange(k, from, to);
+      stops.forEach(c => needed.add(c));
+      through.forEach(c => needed.add(c));
     });
-    return merged;
+    // Also always include origin and destination
+    needed.add(from); needed.add(to);
+    // Return in canonical order, filtered
+    return CANONICAL_ORDER.filter(c => needed.has(c));
   }
 
   function renderDiagram(activeRows, from, to){
@@ -485,111 +522,99 @@
     if(!activeRows.length){ wrap.style.display='none'; return; }
     wrap.style.display = 'block';
 
-    // Canonical list of stations to show as columns
-    const cols = buildStationSequence(activeRows, from, to);
-    const fromDisplay = (from === 'K101') ? 'K101' : from; // keep display code unchanged
-    const toDisplay   = (to   === 'K101') ? 'K101' : to;
-
-    // Which codes are origin/dest for visual highlight
+    const cols = buildCanonicalCols(activeRows, from, to);
     const originCode = from;
     const destCode   = to;
 
-    // ── Build rows ──
-
-    // Station name row (rotated text)
+    // ── Station name header row ──
     const nameTr = document.createElement('tr');
     nameTr.className = 'diag-name-row';
-    // empty label cell
-    const emptyTh = document.createElement('td');
-    emptyTh.className = 'diag-svc-col';
-    nameTr.appendChild(emptyTh);
-
+    const emptyTd = document.createElement('td');
+    emptyTd.className = 'diag-svc-col';
+    nameTr.appendChild(emptyTd);
     cols.forEach(code => {
       const td = document.createElement('td');
       td.className = 'diag-sta-cell';
-      const span = document.createElement('div');
-      span.className = 'diag-sta-name' +
-        (code === originCode ? ' is-origin' : '') +
-        (code === destCode   ? ' is-dest'   : '');
-      // Short label: station name abbreviated
-      const st = ST[code];
-      const label = st ? (code + ' ' + (st.n.length > 14 ? st.n.slice(0,13)+'\u2026' : st.n)) : code;
-      span.textContent = label;
-      td.appendChild(span);
+      const div = document.createElement('div');
+      const isOD = (code === originCode || code === destCode);
+      div.className = 'diag-sta-name' + (isOD ? ' is-od' : '');
+      const s = ST[code];
+      const label = s ? (code + ' ' + (s.n.length > 13 ? s.n.slice(0,12)+'\u2026' : s.n)) : code;
+      div.textContent = label;
+      td.appendChild(div);
       nameTr.appendChild(td);
     });
     tbl.appendChild(nameTr);
 
-    // One track row per active service
+    // ── One track row per active service ──
     activeRows.forEach(({k}) => {
-      const info = SVC[k];
+      const info  = SVC[k];
       const color = info.color;
-      const svcStops = new Set(info.stops);
-      const rangeStops = new Set(stopsInRange(k, from, to));
+      const {stops: svcStops, through: svcThrough} = serviceRange(k, from, to);
+      // All stations this service covers in range
+      const svcAll = new Set([...svcStops, ...svcThrough]);
 
       const tr = document.createElement('tr');
       tr.className = 'diag-track-row';
 
-      // Service label
+      // Service label cell
       const labelTd = document.createElement('td');
       labelTd.className = 'diag-svc-col';
-      labelTd.innerHTML = `<span class="diag-svc-pill svc-${k==='Cp'?'Cp':k}">${k==='Cp'?'C\u2032':k}</span>`;
+      const pill = document.createElement('span');
+      pill.className = 'diag-svc-pill svc-' + (k === 'Cp' ? 'Cp' : k);
+      pill.textContent = k === 'Cp' ? 'C\u2032' : k;
+      labelTd.appendChild(pill);
       tr.appendChild(labelTd);
 
       cols.forEach((code, ci) => {
         const td = document.createElement('td');
         td.className = 'diag-sta-cell';
-        td.style.position = 'relative';
-        td.style.height = '28px';
-        td.style.verticalAlign = 'middle';
-        td.style.textAlign = 'center';
 
-        const inRange = rangeStops.has(code);
-        const isStop  = inRange && svcStops.has(code);
+        const inRange = svcAll.has(code);
+        const isStop  = svcStops.has(code);
+        const isOD    = (code === originCode || code === destCode);
         const isFirst = ci === 0;
         const isLast  = ci === cols.length - 1;
-        const isOD    = (code === originCode || code === destCode);
 
         if(inRange){
-          // Track line segments
-          const leftSeg = document.createElement('div');
-          leftSeg.className = 'seg-left';
-          leftSeg.style.background = color;
-          leftSeg.style.opacity = '0.8';
-          if(isFirst) leftSeg.style.width = '50%';
-          td.appendChild(leftSeg);
-
-          const rightSeg = document.createElement('div');
-          rightSeg.className = 'seg-right';
-          rightSeg.style.background = color;
-          rightSeg.style.opacity = '0.8';
-          if(isLast) rightSeg.style.width = '0';
-          td.appendChild(rightSeg);
-
-          // Dot
+          // Left track segment
+          if(!isFirst){
+            const sl = document.createElement('div');
+            sl.className = 'seg-l';
+            sl.style.background = color;
+            sl.style.opacity = '0.75';
+            td.appendChild(sl);
+          }
+          // Right track segment
+          if(!isLast){
+            const sr = document.createElement('div');
+            sr.className = 'seg-r';
+            sr.style.background = color;
+            sr.style.opacity = '0.75';
+            td.appendChild(sr);
+          }
+          // Dot or bar
           const inner = document.createElement('div');
-          inner.style.position = 'relative';
-          inner.style.zIndex = '3';
-          inner.style.display = 'flex';
-          inner.style.justifyContent = 'center';
-
+          inner.style.cssText = 'position:relative;z-index:3;display:flex;justify-content:center;align-items:center;';
           if(isStop){
             const dot = document.createElement('span');
-            dot.className = 'dot-stop' + (isOD ? ' is-origin' : '');
-            dot.style.background = color;
-            if(isOD) dot.style.background = 'var(--accent)';
+            dot.className = 'dot-s' + (isOD ? ' od' : '');
+            dot.style.background = isOD ? 'var(--accent)' : color;
             inner.appendChild(dot);
           } else {
-            // passes through
             const bar = document.createElement('span');
-            bar.className = 'dot-pass';
+            bar.className = 'dot-p';
             bar.style.background = color;
             inner.appendChild(bar);
           }
           td.appendChild(inner);
         } else {
-          // not in this service's range — faint gap
-          td.style.opacity = '0.1';
+          // Station not on this service's route — render faint gap line
+          td.classList.add('diag-gap');
+          // Keep track line invisible but preserve column width
+          const placeholder = document.createElement('div');
+          placeholder.style.cssText = 'width:26px;height:26px;';
+          td.appendChild(placeholder);
         }
 
         tr.appendChild(td);
@@ -604,11 +629,11 @@
   ================================================================ */
 
   function render(from, to, classF, svcF){
-    const res    = document.getElementById('results');
-    const cards  = document.getElementById('service-cards');
-    const routeEl= document.getElementById('result-route');
-    const metaEl = document.getElementById('result-meta');
-    const szNote = document.getElementById('sz-note');
+    const res     = document.getElementById('results');
+    const cards   = document.getElementById('service-cards');
+    const routeEl = document.getElementById('result-route');
+    const metaEl  = document.getElementById('result-meta');
+    const szNote  = document.getElementById('sz-note');
 
     res.style.display='block';
     cards.innerHTML='';
@@ -663,7 +688,6 @@
       cards.appendChild(card);
     });
 
-    // Render stop-pattern diagram
     renderDiagram(rows, from, to);
   }
 
