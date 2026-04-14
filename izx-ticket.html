@@ -94,89 +94,48 @@
     .diag-scroll{overflow-x:auto;padding-bottom:var(--space-4);}
     .diag-table{border-collapse:collapse;font-size:10px;white-space:nowrap;}
     .diag-table td{padding:0;border:none;}
-
-    /* Label column (service badge) */
     .diag-svc-col{width:58px;min-width:58px;padding-right:8px;text-align:right;vertical-align:middle;}
     .diag-svc-pill{display:inline-block;font-size:.65rem;font-weight:800;padding:2px 6px;border-radius:3px;letter-spacing:.04em;}
-
-    /* Track rows */
     .diag-track-row td{height:26px;vertical-align:middle;}
-
-    /*
-     * Station column cell — fixed width, everything centered.
-     * The name row and track row share the same column width (28px)
-     * so dots align exactly under the label.
-     */
-    .diag-sta-cell{
-      position:relative;
-      width:28px;
-      min-width:28px;
-      max-width:28px;
-      text-align:center;
-      vertical-align:bottom;
-      padding:0;
-    }
-
-    /* Name row: cell is bottom-aligned so label reads bottom-to-top */
-    .diag-name-row td{
-      vertical-align:bottom;
-      padding-bottom:6px;
-    }
-
-    /*
-     * The rotated text container.
-     * Key: display:block + margin:0 auto centers the block within the 28px cell.
-     * writing-mode + rotate turns it vertical.
-     * The origin of rotation must be center, so we use the default.
-     */
+    .diag-name-row td{vertical-align:bottom;padding-bottom:6px;}
     .diag-sta-name{
-      display:block;
-      margin:0 auto;
-      width:9px;            /* collapsed width after rotation = font-size ~9px */
-      height:72px;
-      writing-mode:vertical-rl;
-      text-orientation:mixed;
+      display:block;margin:0 auto;
+      width:9px;height:72px;
+      writing-mode:vertical-rl;text-orientation:mixed;
       transform:rotate(180deg);
-      font-size:9px;
-      color:var(--text-muted);
-      line-height:1;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      font-size:9px;color:var(--text-muted);
+      line-height:1;white-space:nowrap;
+      overflow:hidden;text-overflow:ellipsis;
     }
     .diag-sta-name.is-od{color:var(--text);font-weight:700;}
-
-    /* Track segments — absolutely positioned within the 28px cell */
     .seg-l,.seg-r{
-      position:absolute;
-      top:50%;
-      height:3px;
-      width:50%;
+      position:absolute;top:50%;height:3px;width:50%;
       transform:translateY(-50%);
     }
-    .seg-l{left:0;}
-    .seg-r{right:0;}
-
-    /* Dots */
+    .seg-l{left:0;}.seg-r{right:0;}
     .dot-s{
-      width:10px;height:10px;
-      border-radius:50%;
+      width:10px;height:10px;border-radius:50%;
       border:2px solid var(--bg);
       position:relative;z-index:2;
       display:inline-block;vertical-align:middle;
     }
     .dot-s.od{width:13px;height:13px;}
     .dot-p{
-      width:3px;height:10px;
-      border-radius:2px;opacity:.5;
+      width:3px;height:10px;border-radius:2px;opacity:.5;
       position:relative;z-index:2;
       display:inline-block;vertical-align:middle;
     }
-    .diag-gap{opacity:.07;}
+    /* bypass: segment present but not on this service's route — shown as thin grey line */
+    .seg-bypass-l,.seg-bypass-r{
+      position:absolute;top:50%;height:2px;width:50%;
+      transform:translateY(-50%);
+      background:var(--border);
+      opacity:.9;
+    }
+    .seg-bypass-l{left:0;}.seg-bypass-r{right:0;}
 
     .diag-legend{display:flex;gap:var(--space-6);margin-top:var(--space-4);font-size:var(--text-xs);color:var(--text-muted);flex-wrap:wrap;}
     .diag-legend-item{display:flex;align-items:center;gap:6px;}
-
     .formula-box{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-4);margin-top:var(--space-8);font-size:var(--text-xs);color:var(--text-muted);line-height:1.9;}
     .formula-box strong{color:var(--text);}
     .formula-box code{font-family:monospace;background:var(--bg);padding:1px 5px;border-radius:3px;}
@@ -276,7 +235,6 @@
     </div>
     <div class="service-cards" id="service-cards"></div>
 
-    <!-- STOP PATTERN DIAGRAM -->
     <div id="stop-diagram">
       <div class="diag-title">Stop pattern</div>
       <div class="diag-scroll">
@@ -317,7 +275,6 @@
       : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
   });
 
-  /* ---- Nav dropdowns ---- */
   document.querySelectorAll('.nav-item').forEach(item => {
     item.querySelector(':scope > button').addEventListener('click', e => {
       e.stopPropagation();
@@ -391,8 +348,8 @@
   };
 
   const SK = {
-    K101: 0, K102: 6.969, K120: 22.449, K103: 47.87,
-    K104: 70.243, K105: 97.858, K106: 114.079, K160: 140.75,
+    K101:0, K102:6.969, K120:22.449, K103:47.87,
+    K104:70.243, K105:97.858, K106:114.079, K160:140.75,
   };
   SK.K10 = 70.243 + 82.22;
   ['K11','K12','K13','K14','K144','K15','K16','K116','K17','N1','N2','N3','N4'].forEach(c => {
@@ -543,35 +500,23 @@
     if(!activeRows.length){ wrap.style.display='none'; return; }
     wrap.style.display = 'block';
 
-    const cols = buildCanonicalCols(activeRows, from, to);
-    const COL_W = 28; // px — must match CSS min/max-width on .diag-sta-cell
+    const cols  = buildCanonicalCols(activeRows, from, to);
+    const COL_W = 28;
 
-    /* ── Station name header row ──
-     * Each td is exactly COL_W px wide (enforced via inline style).
-     * The rotated span sits inside and is centered with margin:0 auto.
-     */
+    /* ── Name header row ── */
     const nameTr = document.createElement('tr');
     nameTr.className = 'diag-name-row';
-
-    // Empty label cell — same width as the service-badge column
     const emptyTd = document.createElement('td');
     emptyTd.className = 'diag-svc-col';
     nameTr.appendChild(emptyTd);
-
     cols.forEach(code => {
       const td = document.createElement('td');
-      // Force identical column width in both rows
       td.style.cssText = `width:${COL_W}px;min-width:${COL_W}px;max-width:${COL_W}px;padding:0;text-align:center;vertical-align:bottom;padding-bottom:6px;`;
-
       const isOD = (code === from || code === to);
       const s = ST[code];
-      const label = s ? (code + ' ' + (s.n.length > 13 ? s.n.slice(0,12)+'\u2026' : s.n)) : code;
-
-      // Rotated text wrapper — centered in the cell
+      const label = s ? (code+' '+(s.n.length>13 ? s.n.slice(0,12)+'\u2026' : s.n)) : code;
       const span = document.createElement('span');
-      span.className = 'diag-sta-name' + (isOD ? ' is-od' : '');
-      // display:block + margin:0 auto ensures the element is horizontally centered
-      // width matches the visual width of the rotated text (≈ font-size)
+      span.className = 'diag-sta-name'+(isOD?' is-od':'');
       span.style.cssText = 'display:block;margin:0 auto;';
       span.textContent = label;
       td.appendChild(span);
@@ -579,28 +524,39 @@
     });
     tbl.appendChild(nameTr);
 
-    /* ── One track row per active service ── */
+    /* ── One track row per service ── */
     activeRows.forEach(({k}) => {
       const info  = SVC[k];
       const color = info.color;
       const {stops: svcStops, through: svcThrough} = serviceRange(k, from, to);
       const svcAll = new Set([...svcStops, ...svcThrough]);
 
+      /*
+       * Compute the column-index span for this service within the cols array.
+       * Any col between firstColIdx and lastColIdx (inclusive) that is NOT
+       * in svcAll will receive a grey bypass line instead of empty space.
+       */
+      let firstColIdx = Infinity, lastColIdx = -Infinity;
+      cols.forEach((code, ci) => {
+        if(svcAll.has(code)){
+          if(ci < firstColIdx) firstColIdx = ci;
+          if(ci > lastColIdx)  lastColIdx  = ci;
+        }
+      });
+
       const tr = document.createElement('tr');
       tr.className = 'diag-track-row';
 
-      // Service badge
       const labelTd = document.createElement('td');
       labelTd.className = 'diag-svc-col';
       const pill = document.createElement('span');
-      pill.className = 'diag-svc-pill svc-' + (k === 'Cp' ? 'Cp' : k);
-      pill.textContent = k === 'Cp' ? 'C\u2032' : k;
+      pill.className = 'diag-svc-pill svc-'+(k==='Cp'?'Cp':k);
+      pill.textContent = k==='Cp' ? 'C\u2032' : k;
       labelTd.appendChild(pill);
       tr.appendChild(labelTd);
 
       cols.forEach((code, ci) => {
         const td = document.createElement('td');
-        // Same fixed width as the name cells
         td.style.cssText = `width:${COL_W}px;min-width:${COL_W}px;max-width:${COL_W}px;height:26px;padding:0;position:relative;text-align:center;vertical-align:middle;`;
 
         const inRange = svcAll.has(code);
@@ -609,26 +565,28 @@
         const isFirst = ci === 0;
         const isLast  = ci === cols.length - 1;
 
+        // Is this column geometrically within the service's span but not on its route?
+        const isBypass = !inRange && ci > firstColIdx && ci < lastColIdx;
+
         if(inRange){
+          // Colored track segments
           if(!isFirst){
             const sl = document.createElement('div');
             sl.className = 'seg-l';
-            sl.style.background = color;
-            sl.style.opacity = '0.75';
+            sl.style.cssText = `background:${color};opacity:0.75;`;
             td.appendChild(sl);
           }
           if(!isLast){
             const sr = document.createElement('div');
             sr.className = 'seg-r';
-            sr.style.background = color;
-            sr.style.opacity = '0.75';
+            sr.style.cssText = `background:${color};opacity:0.75;`;
             td.appendChild(sr);
           }
           const inner = document.createElement('div');
           inner.style.cssText = 'position:relative;z-index:3;display:flex;justify-content:center;align-items:center;height:100%;';
           if(isStop){
             const dot = document.createElement('span');
-            dot.className = 'dot-s' + (isOD ? ' od' : '');
+            dot.className = 'dot-s'+(isOD?' od':'');
             dot.style.background = isOD ? 'var(--accent)' : color;
             inner.appendChild(dot);
           } else {
@@ -638,9 +596,18 @@
             inner.appendChild(bar);
           }
           td.appendChild(inner);
-        } else {
-          td.classList.add('diag-gap');
+
+        } else if(isBypass){
+          // Grey continuous line — service skips this branch but the track exists
+          const bl = document.createElement('div');
+          bl.className = 'seg-bypass-l';
+          td.appendChild(bl);
+          const br = document.createElement('div');
+          br.className = 'seg-bypass-r';
+          td.appendChild(br);
+
         }
+        // else: outside the service span entirely — leave cell blank
 
         tr.appendChild(td);
       });
