@@ -1,1 +1,238 @@
-<!-- IZX Keishin Grafico di Marcia — see repo -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IZX Keishin — Grafico di Marcia</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0d1117;color:#dde6f0;font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
+  #header{padding:14px 20px;background:#161b27;border-bottom:1px solid #21293d;display:flex;align-items:center;gap:16px}
+  #header h1{font-size:1.1rem;font-weight:600;color:#6aa8f0}
+  #header p{font-size:0.8rem;color:#6b7fa0}
+  #controls{padding:10px 20px;background:#111827;border-bottom:1px solid #1e2a3a;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .svc-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;padding:4px 10px;border-radius:20px;border:1px solid #2a3a50;font-size:0.82rem;transition:all .2s}
+  .svc-toggle:hover{border-color:#4a6080}
+  .svc-toggle.off{opacity:0.35}
+  .svc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  #canvas-wrap{overflow:auto;padding:16px 20px;cursor:grab}
+  #canvas-wrap:active{cursor:grabbing}
+  svg text{font-family:'Segoe UI',system-ui,sans-serif}
+  .train-line{stroke-width:2.5;fill:none;stroke-linecap:round;transition:opacity .2s}
+  .stop-dot{stroke:none;transition:opacity .2s}
+  .grid-h{stroke:#21293d;stroke-width:0.8;fill:none}
+  .grid-h.sak{stroke:#0e4a5a}
+  .grid-h.nankai{stroke:#2a1a4a}
+  .grid-v{stroke:#21293d;stroke-width:0.6;fill:none;stroke-dasharray:3,4}
+  #tooltip{position:fixed;background:#1c2a3e;border:1px solid #2a4060;border-radius:6px;padding:8px 12px;font-size:0.8rem;pointer-events:none;display:none;z-index:100;max-width:240px;line-height:1.6}
+  .zone-label{font-size:9px;fill:#2a4060;font-style:italic}
+  .sta-label{font-size:10px;fill:#6b7fa0}
+  .sta-label.sak{fill:#0e7ca6}
+  .sta-label.nankai{fill:#7a4ab0}
+  .time-label{font-size:9px;fill:#3d5570}
+</style>
+</head>
+<body>
+<div id="header">
+  <div>
+    <h1>IZX Keishin Line — Grafico di Marcia</h1>
+    <p>Asse X = tempo (min) · Asse Y = progressiva km · Clicca sui servizi per mostrare/nascondere · Hover sui punti per dettagli</p>
+  </div>
+</div>
+<div id="controls"></div>
+<div id="canvas-wrap"><svg id="diagram"></svg></div>
+<div id="tooltip"></div>
+<script>
+const SVCS=[
+  {id:'A',name:'Nonstop Express',color:'#6aa8f0',style:'solid',
+   stops:['K01','K02','K03','K08','K10','K12','K17'],
+   dwell:{K01:300,K02:90,K03:120,K08:120,K10:120,K12:120,K17:300},offset:0},
+  {id:'B',name:'Semi-rapido',color:'#2563b0',style:'solid',
+   stops:['K01','K02','K03','K04','K05','K06','K07','K08','K09','K10','K11','K12','K13','K14','K144','K15','K16','K116','K17'],
+   dwell:{K01:300,K02:90,K03:120,K04:180,K05:90,K06:90,K07:180,K08:120,K09:210,K10:120,K11:210,K12:120,K13:90,K14:90,K144:90,K15:90,K16:90,K116:90,K17:300},offset:300},
+  {id:'C',name:'Rapido (Wodoriha)',color:'#26a269',style:'solid',
+   stops:['K01','K02','K03','K06','K08','K09','K10','K11','K12'],
+   dwell:{K01:300,K02:90,K03:120,K06:90,K08:120,K09:90,K10:120,K11:90,K12:300},offset:480},
+  {id:"C'",name:'Rapido (Nagayamatsu)',color:'#57c27a',style:'dashed',
+   stops:['K01','K02','K03','K31','K32','K33','K08','K09','K10','K11','K12'],
+   dwell:{K01:300,K02:90,K03:120,K31:90,K32:90,K33:90,K08:120,K09:90,K10:120,K11:90,K12:300},offset:660},
+  {id:'E',name:'Espresso',color:'#e5a50a',style:'solid',
+   stops:['K101','K104','K10','K12','K17','N4'],
+   dwell:{K101:300,K104:90,K10:120,K12:120,K17:180,N4:300},offset:0},
+  {id:'F',name:'Locale',color:'#d04010',style:'dashed',
+   stops:['K101','K102','K120','K103','K104','K105','K106','K160','K10','K11','K12','K13','K14','K144','K15','K16','K116','K17','N1','N2','N3','N4'],
+   dwell:{K101:300,K102:90,K120:90,K103:90,K104:90,K105:90,K106:90,K160:90,K10:120,K11:90,K12:90,K13:90,K14:90,K144:90,K15:90,K16:90,K116:90,K17:180,N1:90,N2:90,N3:90,N4:300},offset:180},
+];
+
+const K10_Y=252.52;
+const MAIN_Y={K01:0,K02:11.4,K03:35.4,K04:84.85,K05:101.75,K06:122.97,K07:144.68,K08:185.39,K09:198.04,K10:252.52,K11:296.64,K12:345.01,K13:386.29,K14:427.14,K144:451.74,K15:465.21,K16:499.04,K116:526.31,K17:545.0,N1:573.54,N2:598.539,N3:638.102,N4:658.561};
+const SAK_KM={K101:0,K102:6.969,K120:22.449,K103:47.870,K104:70.243,K105:97.858,K106:114.079,K160:140.750};
+const SAK_Y={};Object.keys(SAK_KM).forEach(k=>SAK_Y[k]=K10_Y-(172.922-SAK_KM[k]));
+const bt=159.39-35.4,bg=185.39-35.4;
+const CP_Y={K31:35.4+(61.2-35.4)/bt*bg,K32:35.4+(86.12-35.4)/bt*bg,K33:35.4+(123.86-35.4)/bt*bg};
+const ALL_Y={...MAIN_Y,...SAK_Y,...CP_Y};
+const STA={K01:'Sainðaul Central',K02:'Niji-Sainðaul',K03:'Asunahama Intl',K04:'Hashimakori-Juwon',K05:'Wodoriha IR',K06:'Shin-Eriraul',K07:'Nappawa',K08:'Otsumi-Komishinan',K09:'Kamahoraya',K10:'Shin-Kichatsura Teba',K11:'Shin-Kashioka',K12:'Panaireki',K13:'Hyōmonan',K14:'Shin-Imihatsorul',K144:'Tsirina Wentsān',K15:'Naeba',K16:'Eyenniyul Juwon',K116:'Yaseura',K17:'Warohan',N1:'Naraki-Attawi',N2:'Satsokoibo',N3:'Shin-Nuskajui',N4:'Daishin',K101:'Sakamuso',K102:'Showanul',K120:'Panatsawa',K103:'Katayoshi Juwon',K104:'Illashiya',K105:'Chōpatsu',K106:'Kohtosōre',K160:'Ikahoro Kōwen',K31:'Pyanuza',K32:'Nagayamatsu',K33:'Keishunneul'};
+
+const SZ=[
+  {a:0,b:11.4,v:150},{a:11.4,b:35.4,v:200},{a:35.4,b:198.04,v:260},
+  {a:198.04,b:499.04,v:300},{a:499.04,b:545,v:250},
+  {a:545,b:555,v:180},{a:555,b:573.54,v:250},{a:573.54,b:658.561,v:300},
+];
+Object.entries({K101:0,K102:6.969,K120:22.449,K103:47.870,K104:70.243,K105:97.858,K106:114.079,K160:140.750}).forEach(([k,km])=>{
+  const ya=K10_Y-(172.922-km),yb=K10_Y-(172.922-(SAK_KM[Object.keys(SAK_KM)[Object.keys(SAK_KM).indexOf(k)+1]]||172.922));
+  const v=km<6.969?150:km<22.449?200:km<70.243?250:320;
+  SZ.push({a:ya,b:Math.min(yb,K10_Y),v});
+});
+function getV(yf,yt){const m=(yf+yt)/2;for(const z of SZ)if(z.a<=m&&m<z.b)return z.v;return 260;}
+
+const aA=0.72,aD=0.80;
+function segT(dk,vmax){
+  const d=dk*1000,vm=vmax/3.6,da=vm*vm/(2*aA),dd=vm*vm/(2*aD);
+  if(da+dd>d){const vp=Math.sqrt(d/(1/(2*aA)+1/(2*aD)));return vp/aA+vp/aD;}
+  return vm/aA+vm/aD+(d-da-dd)/vm;
+}
+const CPR={K03:35.4,K31:61.2,K32:86.12,K33:123.86,K08:159.39};
+function buildEvs(svc){
+  const{stops,dwell,offset,id}=svc;const bp=id==="C'";
+  let t=offset;const evs=[];
+  evs.push({s:stops[0],arr:null,dep:Math.round(t+(dwell[stops[0]]||90)),y:ALL_Y[stops[0]]});
+  t+=dwell[stops[0]]||90;
+  for(let i=1;i<stops.length;i++){
+    const p=stops[i-1],c=stops[i];const yp=ALL_Y[p],yc=ALL_Y[c];
+    let dist,v;
+    if(bp&&CPR[p]!==undefined&&CPR[c]!==undefined){dist=Math.abs(CPR[c]-CPR[p]);v=280;}
+    else{dist=Math.abs(yc-yp);v=getV(yp,yc);}
+    t+=segT(dist,v);
+    const arr=Math.round(t),dep=Math.round(t+(dwell[c]||90));
+    evs.push({s:c,arr,dep,y:yc});t+=dwell[c]||90;
+  }
+  return evs;
+}
+
+const ML={t:30,r:55,b:20,l:90},WPM=5.5,HPK=0.85,MT=215,MY=670;
+const sw=ML.l+MT*WPM+ML.r,sh=ML.t+MY*HPK+ML.b;
+function tx(s){return ML.l+(s/60)*WPM;}
+function ty(k){return ML.t+k*HPK;}
+
+const svg=document.getElementById('diagram');
+svg.setAttribute('width',sw);svg.setAttribute('height',sh);
+svg.setAttribute('viewBox',`0 0 ${sw} ${sh}`);
+
+// Zone bg
+[[SAK_Y.K101,SAK_Y.K102,'#0a1520'],[SAK_Y.K102,SAK_Y.K120,'#0c1828'],[SAK_Y.K120,SAK_Y.K104,'#0a1a30'],[SAK_Y.K104,K10_Y,'#08152e'],
+ [0,11.4,'#0a1520'],[11.4,35.4,'#0c1828'],[35.4,198.04,'#0a1a2a'],[198.04,499.04,'#08152a'],[499.04,545,'#0c1828'],
+ [545,555,'#100a18'],[555,573.54,'#0c1020'],[573.54,658.561,'#08152a']
+].forEach(([ya,yb,col])=>{
+  const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  r.setAttribute('x',0);r.setAttribute('width',sw);
+  r.setAttribute('y',ty(ya));r.setAttribute('height',(yb-ya)*HPK);
+  r.setAttribute('fill',col);svg.appendChild(r);
+});
+
+// Grid V
+for(let t=0;t<=MT;t+=10){
+  const x=tx(t*60);
+  const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+  l.setAttribute('x1',x);l.setAttribute('x2',x);l.setAttribute('y1',ML.t);l.setAttribute('y2',sh-ML.b);
+  l.setAttribute('class','grid-v');svg.appendChild(l);
+  const lb=document.createElementNS('http://www.w3.org/2000/svg','text');
+  lb.setAttribute('x',x);lb.setAttribute('y',ML.t-6);lb.setAttribute('text-anchor','middle');lb.setAttribute('class','time-label');
+  lb.textContent=t+"'";svg.appendChild(lb);
+}
+
+// Stazioni
+const SAK_S=new Set(Object.keys(SAK_Y)),NAN_S=new Set(['N1','N2','N3','N4']),BYP_S=new Set(['K31','K32','K33']);
+Object.entries(ALL_Y).sort((a,b)=>a[1]-b[1]).forEach(([code,ky])=>{
+  if(BYP_S.has(code))return;
+  const y=ty(ky);
+  const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+  l.setAttribute('x1',ML.l);l.setAttribute('x2',sw-ML.r);l.setAttribute('y1',y);l.setAttribute('y2',y);
+  l.setAttribute('class','grid-h'+(SAK_S.has(code)?' sak':NAN_S.has(code)?' nankai':''));svg.appendChild(l);
+  const lb=document.createElementNS('http://www.w3.org/2000/svg','text');
+  lb.setAttribute('x',ML.l-6);lb.setAttribute('y',y+3.5);lb.setAttribute('text-anchor','end');
+  lb.setAttribute('class','sta-label'+(SAK_S.has(code)?' sak':NAN_S.has(code)?' nankai':''));
+  lb.textContent=code;svg.appendChild(lb);
+});
+
+// Separatori K10/K17
+[[K10_Y,'#0e7ca6'],[545,'#5a4080']].forEach(([ky,col])=>{
+  const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+  l.setAttribute('x1',ML.l);l.setAttribute('x2',sw-ML.r);l.setAttribute('y1',ty(ky));l.setAttribute('y2',ty(ky));
+  l.setAttribute('stroke',col);l.setAttribute('stroke-width','1.2');l.setAttribute('stroke-dasharray','5,3');l.setAttribute('opacity','0.7');
+  svg.appendChild(l);
+});
+
+// Velocità labels destra
+[[( SAK_Y.K101+SAK_Y.K102)/2,'150 km/h'],[(SAK_Y.K102+SAK_Y.K120)/2,'200'],[(SAK_Y.K120+SAK_Y.K104)/2,'250'],[(SAK_Y.K104+K10_Y)/2,'320⚡'],
+ [(0+11.4)/2,'150'],[(11.4+35.4)/2,'200'],[(35.4+198.04)/2,'260'],[(198.04+499.04)/2,'300'],[(499.04+545)/2,'250'],
+ [(545+555)/2,'180'],[(555+573.54)/2,'250'],[(573.54+658.561)/2,'300']
+].forEach(([ky,v])=>{
+  const lb=document.createElementNS('http://www.w3.org/2000/svg','text');
+  lb.setAttribute('x',sw-3);lb.setAttribute('y',ty(ky)+3);lb.setAttribute('text-anchor','end');lb.setAttribute('class','zone-label');
+  lb.textContent=v;svg.appendChild(lb);
+});
+
+// Sezione labels
+[['Sakamuso',SAK_Y.K101,K10_Y,'#0e7ca6'],['Main Line',0,545,'#6b7fa0'],['Nankai',545,658.561,'#7a4ab0']].forEach(([txt,ya,yb,col])=>{
+  const mid=(ya+yb)/2;
+  const lb=document.createElementNS('http://www.w3.org/2000/svg','text');
+  lb.setAttribute('x',10);lb.setAttribute('y',ty(mid));lb.setAttribute('text-anchor','middle');
+  lb.setAttribute('transform',`rotate(-90,10,${ty(mid)})`);
+  lb.setAttribute('fill',col);lb.setAttribute('font-size','9');lb.setAttribute('font-style','italic');lb.setAttribute('opacity','0.75');
+  lb.textContent=txt;svg.appendChild(lb);
+});
+
+// Tracce
+const vis={},lineEl={},dotEl={};
+const ttp=document.getElementById('tooltip');
+
+SVCS.forEach(svc=>{
+  vis[svc.id]=true;const evs=buildEvs(svc);
+  let d='';
+  evs.forEach((ev,i)=>{
+    const xa=tx(ev.arr??ev.dep),xd=tx(ev.dep),y=ty(ev.y);
+    if(i===0){d+=`M${xd},${y}`;}
+    else{d+=` L${xa},${y}`;if(ev.arr!==null&&ev.dep!==ev.arr)d+=` L${xd},${y}`;}
+  });
+  const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d',d);path.setAttribute('stroke',svc.color);path.setAttribute('class','train-line');
+  if(svc.style==='dashed')path.setAttribute('stroke-dasharray','8,4');
+  svg.appendChild(path);lineEl[svc.id]=path;dotEl[svc.id]=[];
+
+  evs.forEach(ev=>{
+    if(ev.arr===null)return;
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',tx(ev.arr));c.setAttribute('cy',ty(ev.y));c.setAttribute('r','4.5');
+    c.setAttribute('fill',svc.color);c.setAttribute('class','stop-dot');c.style.cursor='pointer';
+    c.addEventListener('mouseenter',e=>{
+      const a=Math.floor(ev.arr/60)+"'"+(ev.arr%60).toString().padStart(2,'0');
+      const dp=Math.floor(ev.dep/60)+"'"+(ev.dep%60).toString().padStart(2,'0');
+      ttp.innerHTML=`<div style="font-weight:700;color:${svc.color}">${svc.id} — ${svc.name}</div><div style="color:#aac4e0">${ev.s}  ${STA[ev.s]||''}</div><div style="color:#6aa8f0">Arr +${a} · Dep +${dp}</div>`;
+      ttp.style.display='block';ttp.style.left=(e.clientX+14)+'px';ttp.style.top=(e.clientY-10)+'px';
+    });
+    c.addEventListener('mousemove',e=>{ttp.style.left=(e.clientX+14)+'px';ttp.style.top=(e.clientY-10)+'px';});
+    c.addEventListener('mouseleave',()=>ttp.style.display='none');
+    svg.appendChild(c);dotEl[svc.id].push(c);
+  });
+});
+
+// Controlli
+const ctrl=document.getElementById('controls');
+SVCS.forEach(svc=>{
+  const btn=document.createElement('div');btn.className='svc-toggle';
+  btn.innerHTML=`<div class="svc-dot" style="background:${svc.color}"></div><strong>${svc.id}</strong><span style="color:#6b7fa0;margin-left:4px">${svc.name}</span>`;
+  btn.addEventListener('click',()=>{
+    vis[svc.id]=!vis[svc.id];btn.classList.toggle('off',!vis[svc.id]);
+    const v=vis[svc.id];lineEl[svc.id].style.opacity=v?1:0;dotEl[svc.id].forEach(d=>d.style.opacity=v?1:0);
+  });
+  ctrl.appendChild(btn);
+});
+
+// Pan
+let pan=false,px=0,py=0;const wrap=document.getElementById('canvas-wrap');
+wrap.addEventListener('mousedown',e=>{pan=true;px=e.clientX+wrap.scrollLeft;py=e.clientY+wrap.scrollTop;});
+document.addEventListener('mousemove',e=>{if(!pan)return;wrap.scrollLeft=px-e.clientX;wrap.scrollTop=py-e.clientY;});
+document.addEventListener('mouseup',()=>pan=false);
+</script>
+</body>
+</html>
