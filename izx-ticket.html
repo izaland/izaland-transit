@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IZX Ticket Simulator — Izaland Transit</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --font-body:'Satoshi','Inter',sans-serif;
+      --font-display:'Cabinet Grotesk','Satoshi',sans-serif;
+      --text-xs:clamp(0.75rem,0.7rem + 0.25vw,0.875rem);
+      --text-sm:clamp(0.875rem,0.8rem + 0.35vw,1rem);
+      --text-base:clamp(1rem,0.95rem + 0.25vw,1.125rem);
+      --text-lg:clamp(1.125rem,1rem + 0.75vw,1.5rem);
+      --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+      --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;
+      --space-6:1.5rem;--space-8:2rem;--space-12:3rem;
+      --radius-sm:.375rem;--radius-md:.5rem;--radius-lg:.75rem;--radius-xl:1rem;
+      --transition:180ms cubic-bezier(0.16,1,0.3,1);
+    }
+    [data-theme="dark"]{--bg:#0f1117;--surface:#161b27;--surface-2:#1c2235;--border:#2a3147;--text:#e2e8f0;--text-muted:#94a3b8;--text-faint:#4a5568;--accent:#3b82f6;--accent-hover:#2563eb;--accent-glow:rgba(59,130,246,0.15);}
+    [data-theme="light"]{--bg:#f8fafc;--surface:#ffffff;--surface-2:#f1f5f9;--border:#e2e8f0;--text:#1e293b;--text-muted:#64748b;--text-faint:#cbd5e1;--accent:#2563eb;--accent-hover:#1d4ed8;--accent-glow:rgba(37,99,235,0.1);}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{-webkit-font-smoothing:antialiased;}
+    body{min-height:100dvh;font-family:var(--font-body);color:var(--text);background:var(--bg);line-height:1.6;}
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-8);background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
+    .nav-logo{display:flex;align-items:center;gap:var(--space-3);text-decoration:none;color:var(--text);}
+    .nav-links{display:flex;gap:var(--space-6);align-items:center;}
+    .nav-links>a{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;font-weight:500;transition:color var(--transition);}
+    .nav-links a:hover{color:var(--text);}
+    .nav-links a.active{color:var(--accent);}
+    .theme-btn{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:var(--radius-md);padding:var(--space-2);cursor:pointer;display:flex;transition:color var(--transition),border-color var(--transition);}
+    .theme-btn:hover{color:var(--text);border-color:var(--text-muted);}
+    .nav-item{position:relative;}
+    .nav-item>button{background:none;border:none;font-size:var(--text-sm);color:var(--text-muted);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0;transition:color var(--transition);}
+    .nav-item>button:hover{color:var(--text);}
+    .nav-item.active>button{color:var(--accent);}
+    .nav-item>button svg{transition:transform var(--transition);}
+    .nav-item.open>button svg{transform:rotate(180deg);}
+    .dropdown{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-4px);min-width:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-2);box-shadow:0 8px 24px oklch(0 0 0 / 0.18);opacity:0;pointer-events:none;transition:opacity var(--transition),transform var(--transition);}
+    .nav-item.open .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+    .dropdown a{display:block;padding:var(--space-2) var(--space-3);font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;border-radius:var(--radius-md);font-weight:500;transition:background var(--transition),color var(--transition);white-space:nowrap;}
+    .dropdown a:hover{background:var(--surface-2);color:var(--text);}
+    .dropdown a.active{color:var(--accent);}
+    .dropdown-label{display:block;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);padding:var(--space-2) var(--space-3) var(--space-1);}
+    /* PAGE */
+    .page-header{padding:var(--space-8) var(--space-8) 0;max-width:900px;margin:0 auto;}
+    .back-link{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-6);transition:color var(--transition);}
+    .back-link:hover{color:var(--text);}
+    .page-label{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:var(--space-2);}
+    .page-title{font-family:var(--font-display);font-size:var(--text-xl);font-weight:800;letter-spacing:-.02em;margin-bottom:var(--space-3);}
+    .page-desc{font-size:var(--text-sm);color:var(--text-muted);max-width:60ch;margin-bottom:var(--space-8);}
+    /* SIMULATOR CARD */
+    .sim-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:var(--space-8);max-width:900px;margin:0 auto var(--space-8);}
+    .sim-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:var(--space-4);margin-bottom:var(--space-6);}
+    .sim-swap{background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);cursor:pointer;font-size:var(--text-sm);transition:color var(--transition),background var(--transition);align-self:end;height:42px;display:flex;align-items:center;}
+    .sim-swap:hover{color:var(--text);background:var(--border);}
+    .field-group{display:flex;flex-direction:column;gap:var(--space-2);}
+    .field-label{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);}
+    .field-select,
+    .field-input{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);font-size:var(--text-sm);font-family:var(--font-body);width:100%;transition:border-color var(--transition);height:42px;}
+    .field-select:focus,
+    .field-input:focus{outline:none;border-color:var(--accent);}
+    .field-select option{background:var(--surface-2);}
+    .sim-options{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-6);}
+    .sim-btn{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-md);padding:var(--space-3) var(--space-6);font-size:var(--text-sm);font-weight:700;cursor:pointer;transition:background var(--transition);width:100%;}
+    .sim-btn:hover{background:var(--accent-hover);}
+    /* RESULTS */
+    #results{display:none;margin-top:var(--space-8);border-top:1px solid var(--border);padding-top:var(--space-6);}
+    .result-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-2);}
+    .result-route{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;}
+    .result-km{font-size:var(--text-sm);color:var(--text-muted);}
+    .service-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--space-4);}
+    .service-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-4);}
+    .service-card-header{display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3);}
+    .svc-badge{font-size:.7rem;font-weight:800;padding:2px 7px;border-radius:4px;letter-spacing:.04em;}
+    .svc-name{font-size:var(--text-xs);color:var(--text-muted);}
+    .price-rows{display:flex;flex-direction:column;gap:var(--space-1);}
+    .price-row{display:flex;justify-content:space-between;align-items:center;padding:var(--space-1) 0;border-bottom:1px solid var(--border);font-size:var(--text-xs);}
+    .price-row:last-child{border-bottom:none;}
+    .price-class{color:var(--text-muted);}
+    .price-val{font-weight:700;font-variant-numeric:tabular-nums;}
+    .price-usd{font-size:.7rem;color:var(--text-faint);margin-left:4px;}
+    .no-service{color:var(--text-faint);font-size:var(--text-xs);font-style:italic;padding:var(--space-3) 0;text-align:center;}
+    .sz-note{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);font-size:var(--text-xs);color:#93c5fd;margin-bottom:var(--space-4);display:none;}
+    /* HIGHLIGHTED BEST */
+    .best-price .price-val{color:#34d399;}
+    /* SWATCH colors per service */
+    .svc-A{background:#002A91;color:#fff;}
+    .svc-B{background:#1B71CB;color:#fff;}
+    .svc-C{background:#4a8fcc;color:#fff;}
+    .svc-Cp{background:#0e7ca6;color:#fff;}
+    .svc-D{background:#926ACA;color:#fff;}
+    .svc-E{background:#7c3aed;color:#fff;}
+    .svc-F{background:#6b7280;color:#fff;}
+    /* FORMULA BOX */
+    .formula-box{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-4);margin-top:var(--space-8);font-size:var(--text-xs);color:var(--text-muted);}
+    .formula-box strong{color:var(--text);}
+    .formula-box code{font-family:monospace;background:var(--bg);padding:1px 5px;border-radius:3px;}
+    footer{border-top:1px solid var(--border);padding:var(--space-8);text-align:center;font-size:var(--text-sm);color:var(--text-muted);margin-top:var(--space-12);}
+    footer a{color:var(--accent);text-decoration:none;}
+    @media(max-width:640px){
+      .sim-row{grid-template-columns:1fr;}
+      .sim-swap{width:100%;justify-content:center;}
+      .sim-options{grid-template-columns:1fr;}
+      nav{padding:var(--space-3) var(--space-4);}
+      .page-header,.sim-card{padding-left:var(--space-4);padding-right:var(--space-4);}
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img class="logo-dark"  src="frontend/Izarail Urban Networks dark.svg"   alt="Izarail Urban Networks" height="40" loading="eager">
+      <img class="logo-light" src="frontend/Izarail Urban Networks bright.svg" alt="Izarail Urban Networks" height="40" loading="eager">
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <div class="nav-item active">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Railways</button>
+        <div class="dropdown">
+          <a href="izarail.html">Izarail</a>
+          <a href="metro.html">Metro</a>
+          <a href="izx.html">IZX</a>
+          <a href="commuter.html">Commuter Rail</a>
+          <a href="other-rail.html">Other Rail</a>
+          <a href="#map">Map</a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Aviation</button>
+        <div class="dropdown">
+          <a href="airports.html">Airports</a>
+          <a href="airlines.html">Airlines</a>
+        </div>
+      </div>
+      <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <a href="izx.html" class="back-link">← Back to IZX</a>
+    <div class="page-label">IZX Keishin · Ticket Simulator</div>
+    <h1 class="page-title">Fare Calculator</h1>
+    <p class="page-desc">Look up prices for any origin–destination pair on the IZX Keishin Line. Select your stations, class, and see all available service options.</p>
+  </div>
+
+  <div class="sim-card">
+    <div class="sim-row">
+      <div class="field-group">
+        <label class="field-label" for="sel-from">From</label>
+        <select id="sel-from" class="field-select"></select>
+      </div>
+      <button class="sim-swap" id="btn-swap" title="Swap stations">⇄</button>
+      <div class="field-group">
+        <label class="field-label" for="sel-to">To</label>
+        <select id="sel-to" class="field-select"></select>
+      </div>
+    </div>
+
+    <div class="sim-options">
+      <div class="field-group">
+        <label class="field-label" for="sel-class">Class</label>
+        <select id="sel-class" class="field-select">
+          <option value="all">All classes</option>
+          <option value="standard">Standard</option>
+          <option value="blue_seat">Blue Seat (1st class)</option>
+          <option value="yurani">Yurani (Executive)</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="sel-service">Service</label>
+        <select id="sel-service" class="field-select">
+          <option value="all">All services</option>
+          <option value="A">A — Nonstop Express</option>
+          <option value="B">B — Semi-rapido</option>
+          <option value="C">C — Rapido</option>
+          <option value="Cp">C′ — Airport Bypass</option>
+          <option value="D">D — Sakamuso Rapido</option>
+          <option value="E">E — Sakamuso Express</option>
+          <option value="F">F — Omnibus</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="sim-btn" id="btn-search">Search fares</button>
+
+    <div id="results">
+      <div class="sz-note" id="sz-note">ⓘ <strong>Shutokwen-nai (SZ zone):</strong> Tickets from Sakamuso (K101) include travel to/from Sainðaul Central (K01) at no extra charge. Tariff is calculated from Niji-Sainðaul (K02).</div>
+      <div class="result-header">
+        <div class="result-route" id="result-route"></div>
+        <div class="result-km" id="result-km"></div>
+      </div>
+      <div class="service-cards" id="service-cards"></div>
+    </div>
+
+    <div class="formula-box">
+      <strong>Fare formula:</strong><br>
+      <code>price = (Ė4.50 + progressive_km_rate) × service_coeff × class_coeff</code><br>
+      Distance tiers: <strong>Ė0.195/km</strong> (0–100 km) · <strong>Ė0.165/km</strong> (101–300 km) · <strong>Ė0.140/km</strong> (301+ km)<br>
+      Currency: <strong>Ė (Etsi)</strong> · 1 Ė = 0.832 USD
+    </div>
+  </div>
+
+  <footer>
+    <p>Izaland Transit Portal · <a href="https://opengeofiction.net" target="_blank" rel="noopener">OpenGeoFiction</a> · IZX data v1.0</p>
+  </footer>
+
+  <script>
+  (function(){
+    // ── Theme toggle ──
+    const themeBtn=document.querySelector('[data-theme-toggle]');
+    const root=document.documentElement;
+    let theme=root.getAttribute('data-theme')||'dark';
+    themeBtn&&themeBtn.addEventListener('click',()=>{
+      theme=theme==='dark'?'light':'dark';
+      root.setAttribute('data-theme',theme);
+      themeBtn.innerHTML=theme==='dark'
+        ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+        :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+    });
+
+    // ── Nav dropdowns ──
+    document.querySelectorAll('.nav-item').forEach(item=>{
+      const btn=item.querySelector(':scope > button');
+      if(!btn)return;
+      btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const isOpen=item.classList.contains('open');
+        document.querySelectorAll('.nav-item.open').forEach(o=>o.classList.remove('open'));
+        if(!isOpen)item.classList.add('open');
+      });
+    });
+    document.addEventListener('click',()=>{
+      document.querySelectorAll('.nav-item.open').forEach(o=>o.classList.remove('open'));
+    });
+
+    // ── Fare data (embedded, no fetch needed) ──
+    const FARE_URL = 'data/izx_keishin_tariffe_v1.json';
+
+    const SVC_INFO = {
+      A:  {label:'A',  name:'Nonstop Express',    cls:'svc-A'},
+      B:  {label:'B',  name:'Semi-rapido',         cls:'svc-B'},
+      C:  {label:'C',  name:'Rapido',              cls:'svc-C'},
+      Cp: {label:'C′', name:'Airport Bypass',      cls:'svc-Cp'},
+      D:  {label:'D',  name:'Sakamuso Rapido',     cls:'svc-D'},
+      E:  {label:'E',  name:'Sakamuso Express',    cls:'svc-E'},
+      F:  {label:'F',  name:'Omnibus',             cls:'svc-F'},
+    };
+    const CLASS_LABELS = {
+      standard: 'Standard',
+      blue_seat: 'Blue Seat',
+      yurani: 'Yurani',
+    };
+    const SZ_ORIGIN = 'K101';
+    const USD_RATE = 0.832;
+
+    let DATA = null;
+
+    // Ordered station list for selects (main → saka → cprime → nankai)
+    const STATION_ORDER = [
+      'K01','K02','K03','K04','K05','K06','K07','K08','K09','K10',
+      'K11','K12','K13','K14','K144','K15','K16','K116','K17',
+      'N1','N2','N3','N4',
+      'K101','K102','K120','K103','K104','K105','K106','K160',
+      'K31','K32','K33'
+    ];
+    const BRANCH_LABELS = {
+      main:'Main Line',saka:'Sakamuso Branch',cprime:"C' Bypass",nankai:'Nankai ext.'
+    };
+
+    function fmt(n){ return 'Ė\u202f'+n.toFixed(2); }
+    function fmtUSD(n){ return '(US$\u202f'+(n*USD_RATE).toFixed(2)+')'; }
+
+    function buildSelects(stazioni){
+      const selF=document.getElementById('sel-from');
+      const selT=document.getElementById('sel-to');
+      let lastBranch=null;
+      STATION_ORDER.forEach(code=>{
+        const st=stazioni[code];
+        if(!st)return;
+        const branch=st.ramo;
+        if(branch!==lastBranch){
+          [selF,selT].forEach(sel=>{
+            const og=document.createElement('optgroup');
+            og.label=BRANCH_LABELS[branch]||branch;
+            sel._lastGroup=og;
+            sel.appendChild(og);
+          });
+          lastBranch=branch;
+        }
+        [selF,selT].forEach(sel=>{
+          const opt=document.createElement('option');
+          opt.value=code;
+          opt.textContent=code+' '+st.nome+(st.kanji?' · '+st.kanji:'');
+          sel._lastGroup.appendChild(opt);
+        });
+      });
+      // Default: from K01, to K17
+      selF.value='K01';
+      selT.value='K17';
+    }
+
+    function lookup(od, fromCode, toCode){
+      // Try both directions
+      return od.find(e=>e.orig===fromCode&&e.dest===toCode)
+          || od.find(e=>e.orig===toCode&&e.dest===fromCode);
+    }
+
+    function renderResults(fromCode, toCode, classFilter, svcFilter){
+      const od = DATA.od_matrix;
+      const stazioni = DATA.stazioni;
+
+      // SZ note
+      const isSZ = (fromCode===SZ_ORIGIN||toCode===SZ_ORIGIN);
+      document.getElementById('sz-note').style.display = isSZ ? 'block' : 'none';
+
+      const entry = lookup(od, fromCode, toCode);
+      const resDiv = document.getElementById('results');
+      const cardsDiv = document.getElementById('service-cards');
+      const routeEl = document.getElementById('result-route');
+      const kmEl = document.getElementById('result-km');
+
+      resDiv.style.display = 'block';
+      cardsDiv.innerHTML = '';
+
+      if(!entry){
+        routeEl.textContent = stazioni[fromCode]?.nome + ' → ' + stazioni[toCode]?.nome;
+        kmEl.textContent = '';
+        cardsDiv.innerHTML = '<p class="no-service">No direct service found for this O/D pair.</p>';
+        return;
+      }
+
+      routeEl.textContent = stazioni[fromCode]?.nome + ' → ' + stazioni[toCode]?.nome;
+
+      // Filter services
+      let options = entry.opzioni;
+      if(svcFilter!=='all') options = options.filter(o=>o.servizio===svcFilter);
+      if(!options.length){
+        kmEl.textContent = '';
+        cardsDiv.innerHTML = '<p class="no-service">No service matches your filter.</p>';
+        return;
+      }
+
+      // km from first option
+      kmEl.textContent = options[0].km.toFixed(1)+' km';
+
+      // Find cheapest standard price across all shown services
+      let minStd = Infinity;
+      options.forEach(o=>{ if(o.prezzi.standard < minStd) minStd=o.prezzi.standard; });
+
+      options.forEach(opt=>{
+        const info = SVC_INFO[opt.servizio]||{label:opt.servizio,name:opt.servizio,cls:'svc-B'};
+        const card = document.createElement('div');
+        card.className='service-card';
+
+        const classes = classFilter==='all'
+          ? ['standard','blue_seat','yurani']
+          : [classFilter];
+
+        let priceRowsHTML = classes.map(cls=>{
+          const p = opt.prezzi[cls];
+          if(p===undefined)return '';
+          const isBest = cls==='standard' && p===minStd;
+          return `<div class="price-row${isBest?' best-price':''}">
+            <span class="price-class">${CLASS_LABELS[cls]}</span>
+            <span class="price-val">${fmt(p)} <span class="price-usd">${fmtUSD(p)}</span></span>
+          </div>`;
+        }).join('');
+
+        card.innerHTML = `
+          <div class="service-card-header">
+            <span class="svc-badge ${info.cls}">${info.label}</span>
+            <span class="svc-name">${info.name}</span>
+          </div>
+          <div class="price-rows">${priceRowsHTML}</div>
+          <div style="font-size:.65rem;color:var(--text-faint);margin-top:var(--space-2);">${opt.km.toFixed(1)} km</div>
+        `;
+        cardsDiv.appendChild(card);
+      });
+    }
+
+    // ── Init ──
+    fetch(FARE_URL)
+      .then(r=>r.json())
+      .then(d=>{
+        DATA=d;
+        buildSelects(d.stazioni);
+
+        document.getElementById('btn-swap').addEventListener('click',()=>{
+          const sf=document.getElementById('sel-from');
+          const st=document.getElementById('sel-to');
+          const tmp=sf.value; sf.value=st.value; st.value=tmp;
+        });
+
+        document.getElementById('btn-search').addEventListener('click',()=>{
+          const from=document.getElementById('sel-from').value;
+          const to=document.getElementById('sel-to').value;
+          const cls=document.getElementById('sel-class').value;
+          const svc=document.getElementById('sel-service').value;
+          if(from===to){
+            alert('Please select two different stations.');
+            return;
+          }
+          renderResults(from,to,cls,svc);
+        });
+      })
+      .catch(()=>{
+        document.querySelector('.sim-btn').textContent='⚠ Could not load fare data';
+        document.querySelector('.sim-btn').disabled=true;
+      });
+  })();
+  </script>
+</body>
+</html>
