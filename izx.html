@@ -41,12 +41,13 @@
     .nav-item.active>button{color:var(--accent);}
     .nav-item>button svg{transition:transform var(--transition);}
     .nav-item.open>button svg{transform:rotate(180deg);}
-    .dropdown{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-4px);min-width:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-2);box-shadow:0 8px 24px oklch(0 0 0 / 0.18);opacity:0;pointer-events:none;transition:opacity var(--transition),transform var(--transition);}
+    .dropdown{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-4px);min-width:190px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-2);box-shadow:0 8px 24px oklch(0 0 0 / 0.18);opacity:0;pointer-events:none;transition:opacity var(--transition),transform var(--transition);}
     .nav-item.open .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
     .dropdown a{display:block;padding:var(--space-2) var(--space-3);font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;border-radius:var(--radius-md);font-weight:500;transition:background var(--transition),color var(--transition);white-space:nowrap;}
     .dropdown a:hover{background:var(--surface-2);color:var(--text);}
     .dropdown a.active{color:var(--accent);}
     .dropdown-label{display:block;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);padding:var(--space-2) var(--space-3) var(--space-1);}
+    .dropdown-divider{height:1px;background:var(--border);margin:var(--space-1) var(--space-2);}
     .page-header{padding:var(--space-8) var(--space-8) 0;max-width:1400px;margin:0 auto;}
     .back-link{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-6);transition:color var(--transition);}
     .back-link:hover{color:var(--text);}
@@ -110,6 +111,17 @@
     .svc-key{display:flex;flex-wrap:wrap;gap:var(--space-3) var(--space-6);margin-bottom:var(--space-4);font-size:var(--text-xs);}
     .svc-key-item{display:flex;align-items:center;gap:var(--space-2);}
     .svc-key-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+    /* ── Keishin quick-links ── */
+    .keishin-tools{max-width:1400px;margin:0 auto var(--space-8);padding:0 var(--space-8);}
+    .keishin-tools-title{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:var(--space-4);}
+    .keishin-tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr));gap:var(--space-4);}
+    .tool-card{display:flex;flex-direction:column;gap:var(--space-2);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:var(--space-6);text-decoration:none;color:var(--text);transition:border-color var(--transition),background var(--transition),transform var(--transition);}
+    .tool-card:hover{border-color:var(--accent);background:var(--surface-2);transform:translateY(-2px);}
+    .tool-card-icon{font-size:1.6rem;line-height:1;}
+    .tool-card-label{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);}
+    .tool-card-title{font-family:var(--font-display);font-size:var(--text-base);font-weight:700;}
+    .tool-card-desc{font-size:var(--text-xs);color:var(--text-muted);line-height:1.5;}
   </style>
 </head>
 <body>
@@ -130,6 +142,11 @@
           <a href="commuter.html">Commuter Rail</a>
           <a href="other-rail.html">Other Rail</a>
           <a href="#map">Map</a>
+          <div class="dropdown-divider"></div>
+          <span class="dropdown-label">IZX Keishin</span>
+          <a href="keishin-timetable.html">📅 Timetable</a>
+          <a href="marcia.html">📊 Train graph</a>
+          <a href="izx-ticket.html">🎫 Tickets &amp; Fares</a>
         </div>
       </div>
 
@@ -466,7 +483,7 @@
         </tr>
         <tr>
           <td class="kt-code">K106</td>
-          <td class="kt-name">Kohtosōre</td>
+          <td class="kt-name">Kohtosōre</td>
           <td class="kt-kanji"></td>
           <td class="kt-dist"></td><td class="kt-dist"></td><td class="kt-dist"></td>
           <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
@@ -800,6 +817,34 @@
     </table>
   </div>
   <!-- ── END KEISHIN SECTION ── -->
+
+  <!-- ═══════════════════════════════════════════════
+       KEISHIN QUICK-ACCESS TOOLS
+  ════════════════════════════════════════════════ -->
+  <div class="keishin-tools">
+    <div class="keishin-tools-title">IZX Keishin — Tools &amp; References</div>
+    <div class="keishin-tools-grid">
+      <a href="keishin-timetable.html" class="tool-card">
+        <div class="tool-card-icon">📅</div>
+        <div class="tool-card-label">Timetable</div>
+        <div class="tool-card-title">Full Service Timetable</div>
+        <div class="tool-card-desc">All 8 services (A, B, C, C', E, F lim, F ext, G) in both directions — departure times for every station.</div>
+      </a>
+      <a href="marcia.html" class="tool-card">
+        <div class="tool-card-icon">📊</div>
+        <div class="tool-card-label">Operations</div>
+        <div class="tool-card-title">Train Graph (Marcia)</div>
+        <div class="tool-card-desc">Space–time diagram showing all service movements, overtake points and dwell buffers along the Keishin corridor.</div>
+      </a>
+      <a href="izx-ticket.html" class="tool-card">
+        <div class="tool-card-icon">🎫</div>
+        <div class="tool-card-label">Fares</div>
+        <div class="tool-card-title">Tickets &amp; Fares</div>
+        <div class="tool-card-desc">Fare calculator, seat supplements and IZWay card acceptance for all IZX Keishin services.</div>
+      </a>
+    </div>
+  </div>
+  <!-- ── END KEISHIN TOOLS ── -->
 
   <div class="info-grid">
     <div class="info-card">
