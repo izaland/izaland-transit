@@ -544,72 +544,212 @@
     });
   }
 
+  const HUB_R = "R01";
+const HUB_K = "K01";
+
+function isInterline(from, to){
+  return lineOf(from) !== lineOf(to);
+}
+
+function getDiscount(km){
+  if(km < 200) return 0.05;
+  if(km < 400) return 0.08;
+  if(km < 700) return 0.10;
+  if(km < 1000) return 0.12;
+  return 0.15;
+}
+
+function calcSegment(from, to, svcKey, classKey){
+  if(!serves(svcKey,from,to)) return null;
+  const km = tariffKm(from,to,svcKey);
+  if(!km || km <= 0) return null;
+
+  return {
+    km,
+    price: calcPrice(km, ALL_SVC[svcKey].coeff, CLASS_C[classKey])
+  };
+}
+
+  
+
   /* ================================================================
      RENDER
   ================================================================ */
 
-  function render(from, to, classF, svcF){
-    const res     = document.getElementById('results');
-    const cards   = document.getElementById('service-cards');
-    const routeEl = document.getElementById('result-route');
-    const metaEl  = document.getElementById('result-meta');
-    const szNote  = document.getElementById('sz-note');
+function render(from, to, classF, svcF){
 
-    res.style.display = 'block';
-    cards.innerHTML = '';
+  const res     = document.getElementById('results');
+  const cards   = document.getElementById('service-cards');
+  const routeEl = document.getElementById('result-route');
+  const metaEl  = document.getElementById('result-meta');
+  const szNote  = document.getElementById('sz-note');
+
+  res.style.display = 'block';
+  cards.innerHTML = '';
+
+  routeEl.textContent =
+    (ALL_ST[from]?ALL_ST[from].n:from)+' → '+
+    (ALL_ST[to]?ALL_ST[to].n:to);
+
+  const clss = classF==='all' ? ['standard','blue_seat','yurani'] : [classF];
+
+  const results = [];
+
+  /* =========================================================
+     CASE 1 — DIRECT (come prima)
+  ========================================================= */
+
+  if(!isInterline(from, to)){
+
     szNote.style.display = (from==='K101'||to==='K101') ? 'block' : 'none';
-    routeEl.textContent = (ALL_ST[from]?ALL_ST[from].n:from)+' \u2192 '+(ALL_ST[to]?ALL_ST[to].n:to);
 
     const svcs = svcF==='all' ? Object.keys(ALL_SVC) : [svcF];
-    const clss = classF==='all' ? ['standard','blue_seat','yurani'] : [classF];
-    const rows = [];
 
     svcs.forEach(k => {
       if(!serves(k,from,to)) return;
+
       const km = tariffKm(from,to,k);
       if(!km || km<=0) return;
-      const prices = {};
-      clss.forEach(c => { prices[c] = calcPrice(km, ALL_SVC[k].coeff, CLASS_C[c]); });
-      rows.push({k, km, prices});
+
+      clss.forEach(c => {
+        const price = calcPrice(km, ALL_SVC[k].coeff, CLASS_C[c]);
+
+        results.push({
+          type: 'direct',
+          label: k,
+          svc: k,
+          class: c,
+          km,
+          price
+        });
+      });
     });
 
-    if(!rows.length){
-      metaEl.textContent = '';
-      cards.innerHTML = '<p class="no-service">No direct service available for this O/D pair.</p>';
-      document.getElementById('stop-diagram').style.display = 'none';
-      return;
-    }
-
-    const kms = [...new Set(rows.map(r=>r.km.toFixed(1)))];
-    metaEl.textContent = kms.length===1 ? kms[0]+' km' : kms.join(' / ')+' km (varies by route)';
-    const minP = Math.min(...rows.map(r=>r.prices[clss[0]]||Infinity));
-
-    rows.forEach(({k,km,prices}) => {
-      const info = ALL_SVC[k];
-      const card = document.createElement('div');
-      card.className = 'service-card';
-      const prows = clss.map(c => {
-        const p = prices[c];
-        const best = c===clss[0] && p===minP;
-        return `<div class="price-row${best?' best-price':''}">
-          <span class="price-class">${CLASS_L[c]}</span>
-          <span class="price-val">${fmt(p)} <span class="price-usd">${fusd(p)}</span></span>
-        </div>`;
-      }).join('');
-      card.innerHTML = `
-        <div class="service-card-header">
-          <span class="svc-badge ${info.cls}">${k==='Cp'?'C\u2032':k}</span>
-          <span class="svc-name">${info.name}</span>
-        </div>
-        <div class="price-rows">${prows}</div>
-        <div class="card-km">${km.toFixed(1)} km &middot; coeff &times;${info.coeff.toFixed(2)}</div>
-      `;
-      cards.appendChild(card);
-    });
-
-    renderDiagram(rows, from, to);
   }
 
+  /* =========================================================
+     CASE 2 — INTERLINE (NUOVO 🔥)
+  ========================================================= */
+
+  else{
+
+    szNote.style.display = 'block';
+    szNote.innerHTML =
+      "ⓘ Transfer at Sainðaul Central (R01/K01). Combined fare applied.";
+
+    const rySvcs = Object.keys(RY_SVC);
+    const keSvcs = Object.keys(KE_SVC);
+
+    const fromIsRY = lineOf(from) === 'RY';
+
+    clss.forEach(c => {
+
+      rySvcs.forEach(rSvc => {
+        keSvcs.forEach(kSvc => {
+
+          let seg1, seg2;
+
+          if(fromIsRY){
+            seg1 = calcSegment(from, HUB_R, rSvc, c);
+            seg2 = calcSegment(HUB_K, to, kSvc, c);
+          } else {
+            seg1 = calcSegment(from, HUB_K, kSvc, c);
+            seg2 = calcSegment(HUB_R, to, rSvc, c);
+          }
+
+          if(!seg1 || !seg2) return;
+
+          const totalKm = seg1.km + seg2.km;
+          const basePrice = seg1.price + seg2.price;
+
+          const discount = getDiscount(totalKm);
+          const finalPrice = basePrice * (1 - discount);
+
+          results.push({
+            type: 'combo',
+            label: fromIsRY ? (rSvc + '+' + kSvc) : (kSvc + '+' + rSvc),
+            svc1: fromIsRY ? rSvc : kSvc,
+            svc2: fromIsRY ? kSvc : rSvc,
+            class: c,
+            km: totalKm,
+            price: Math.round(finalPrice*100)/100
+          });
+
+        });
+      });
+
+    });
+
+  }
+
+  /* =========================================================
+     RENDER
+  ========================================================= */
+
+  if(!results.length){
+    metaEl.textContent = '';
+    cards.innerHTML = '<p class="no-service">No valid route found.</p>';
+    document.getElementById('stop-diagram').style.display = 'none';
+    return;
+  }
+
+  const kms = [...new Set(results.map(r=>r.km.toFixed(1)))];
+  metaEl.textContent =
+    kms.length===1 ? kms[0]+' km' : kms.join(' / ')+' km';
+
+  const minP = Math.min(...results.map(r=>r.price));
+
+  results.forEach(r => {
+
+    const info = r.type === 'direct'
+      ? ALL_SVC[r.svc]
+      : null;
+
+    const card = document.createElement('div');
+    card.className = 'service-card';
+
+    const isBest = r.price === minP;
+
+    const title = r.type === 'direct'
+      ? `${r.label}`
+      : `${r.label}`;
+
+    const subtitle = r.type === 'direct'
+      ? info.name
+      : `Transfer combo`;
+
+    card.innerHTML = `
+      <div class="service-card-header">
+        <span class="svc-badge">${title}</span>
+        <span class="svc-name">${subtitle}</span>
+      </div>
+
+      <div class="price-rows">
+        <div class="price-row ${isBest?'best-price':''}">
+          <span class="price-class">${CLASS_L[r.class]}</span>
+          <span class="price-val">
+            ${fmt(r.price)} <span class="price-usd">${fusd(r.price)}</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="card-km">
+        ${r.km.toFixed(1)} km
+        ${r.type==='combo' ? ' · combined fare' : ''}
+      </div>
+    `;
+
+    cards.appendChild(card);
+  });
+
+  /* opzionale: disabilita diagramma su combinati */
+  if(results[0].type === 'combo'){
+    document.getElementById('stop-diagram').style.display = 'none';
+  } else {
+    renderDiagram(results.map(r=>({k:r.svc})), from, to);
+  }
+
+}
   buildSelects();
 
   document.getElementById('btn-swap').addEventListener('click', () => {
