@@ -53,14 +53,12 @@ const KE_CANONICAL_ORDER = [
   "N1","N2","N3","N4"
 ];
 
-/* C-prime bypass km positions */
 const KE_CP = {
   K01:0, K02:11.4, K03:35.4,
   K31:61.2, K32:86.12, K33:123.86,
   K08:159.39, K09:172.04, K10:226.52, K11:270.64, K12:319.01
 };
 
-/* Sakamuso branch km positions */
 const KE_SK = (function(){
   const sk = {
     K101:0, K102:6.969, K120:22.449, K103:47.87,
@@ -116,7 +114,7 @@ const RY_ST = {
   R18:  {n:"Rekefura-K\u014dwen",     k:"\u9577\u798f\u7530\u516c\u5712", b:"main", km:533.96},
   R19:  {n:"Chunnitai",               k:"\u79cb\u68ee",                   b:"main", km:568.60},
   R20:  {n:"Shin-Pekonai",            k:"\u65b0\u725b\u6ca2",             b:"main", km:586.14},
-  R21:  {n:"Sannupuri",               k:"\u4e fe\u5c71",                  b:"main", km:628.75},
+  R21:  {n:"Sannupuri",               k:"\u4e7e\u5c71",                   b:"main", km:628.75},
 };
 
 const RY_CANONICAL_ORDER = [
