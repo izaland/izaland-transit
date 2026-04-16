@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IZX Ticket Simulator — Izaland Transit</title>
+  <title>IZX Fare Calculator — Izaland Transit</title>
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
   <style>
     :root{
@@ -80,6 +80,7 @@
     .no-service{color:var(--text-faint);font-size:var(--text-xs);font-style:italic;padding:var(--space-4) 0;text-align:center;}
     .sz-note{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);font-size:var(--text-xs);color:#93c5fd;margin-bottom:var(--space-4);display:none;}
     .best-price .price-val{color:#34d399;}
+    /* ── Keishin service badges ── */
     .svc-A{background:#002A91;color:#fff;}
     .svc-B{background:#1B71CB;color:#fff;}
     .svc-C{background:#4a8fcc;color:#fff;}
@@ -87,6 +88,13 @@
     .svc-D{background:#926ACA;color:#fff;}
     .svc-E{background:#7c3aed;color:#fff;}
     .svc-F{background:#6b7280;color:#fff;}
+    /* ── Ryānkai service badges ── */
+    .svc-L{background:#6b7280;color:#fff;}
+    .svc-K{background:#EA7501;color:#fff;}
+    .svc-J{background:#C9211E;color:#fff;}
+    .svc-G{background:#148466;color:#fff;}
+    .svc-I{background:#1F6A39;color:#fff;}
+    .svc-H{background:#50938A;color:#fff;}
 
     /* ── STOP PATTERN DIAGRAM ── */
     #stop-diagram{margin-top:var(--space-8);border-top:1px solid var(--border);padding-top:var(--space-6);display:none;}
@@ -108,32 +116,13 @@
       overflow:hidden;text-overflow:ellipsis;
     }
     .diag-sta-name.is-od{color:var(--text);font-weight:700;}
-    .seg-l,.seg-r{
-      position:absolute;top:50%;height:3px;width:50%;
-      transform:translateY(-50%);
-    }
+    .seg-l,.seg-r{position:absolute;top:50%;height:3px;width:50%;transform:translateY(-50%);}
     .seg-l{left:0;}.seg-r{right:0;}
-    .dot-s{
-      width:10px;height:10px;border-radius:50%;
-      border:2px solid var(--bg);
-      position:relative;z-index:2;
-      display:inline-block;vertical-align:middle;
-    }
+    .dot-s{width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);position:relative;z-index:2;display:inline-block;vertical-align:middle;}
     .dot-s.od{width:13px;height:13px;}
-    .dot-p{
-      width:3px;height:10px;border-radius:2px;opacity:.5;
-      position:relative;z-index:2;
-      display:inline-block;vertical-align:middle;
-    }
-    /* bypass: segment present but not on this service's route — shown as thin grey line */
-    .seg-bypass-l,.seg-bypass-r{
-      position:absolute;top:50%;height:2px;width:50%;
-      transform:translateY(-50%);
-      background:var(--border);
-      opacity:.9;
-    }
+    .dot-p{width:3px;height:10px;border-radius:2px;opacity:.5;position:relative;z-index:2;display:inline-block;vertical-align:middle;}
+    .seg-bypass-l,.seg-bypass-r{position:absolute;top:50%;height:2px;width:50%;transform:translateY(-50%);background:var(--border);opacity:.9;}
     .seg-bypass-l{left:0;}.seg-bypass-r{right:0;}
-
     .diag-legend{display:flex;gap:var(--space-6);margin-top:var(--space-4);font-size:var(--text-xs);color:var(--text-muted);flex-wrap:wrap;}
     .diag-legend-item{display:flex;align-items:center;gap:6px;}
     .formula-box{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-4);margin-top:var(--space-8);font-size:var(--text-xs);color:var(--text-muted);line-height:1.9;}
@@ -182,9 +171,9 @@
 
 <div class="page-header">
   <a href="izx.html" class="back-link">← Back to IZX</a>
-  <div class="page-label">IZX Keishin · Ticket Simulator</div>
+  <div class="page-label">IZX · Fare Calculator</div>
   <h1 class="page-title">Fare Calculator</h1>
-  <p class="page-desc">Look up prices for any origin–destination pair on the IZX Keishin Line. Prices are computed live from the official tariff formula.</p>
+  <p class="page-desc">Look up prices for any origin–destination pair on the IZX Keishin or Ryānkai lines. Prices are computed live from the official tariff formula.</p>
 </div>
 
 <div class="sim-card">
@@ -214,13 +203,23 @@
       <label class="field-label" for="sel-service">Service</label>
       <select id="sel-service" class="field-select">
         <option value="all">All services</option>
-        <option value="A">A — Nonstop Express</option>
-        <option value="B">B — Semi-rapido</option>
-        <option value="C">C — Rapido</option>
-        <option value="Cp">C′ — Airport Bypass</option>
-        <option value="D">D — Sakamuso Rapido</option>
-        <option value="E">E — Sakamuso Express</option>
-        <option value="F">F — Omnibus</option>
+        <optgroup label="IZX Keishin">
+          <option value="A">A — Nonstop Express</option>
+          <option value="B">B — Semi-rapido</option>
+          <option value="C">C — Rapido</option>
+          <option value="Cp">C′ — Airport Bypass</option>
+          <option value="D">D — Sakamuso Rapido</option>
+          <option value="E">E — Sakamuso Express</option>
+          <option value="F">F — Omnibus</option>
+        </optgroup>
+        <optgroup label="IZX Ryānkai">
+          <option value="L">L — Omnibus</option>
+          <option value="K">K — Rapido AV</option>
+          <option value="J">J — Rapido AV</option>
+          <option value="G">G — Flagship AV</option>
+          <option value="I">I — Flagship AV</option>
+          <option value="H">H — Flagship AV</option>
+        </optgroup>
       </select>
     </div>
   </div>
@@ -250,17 +249,18 @@
 
   <div class="formula-box">
     <strong>Fare formula:</strong><br>
-    <code>price = (Ė4.50 + progressive_km_rate) × service_coeff × class_coeff</code><br>
-    Distance tiers: <strong>Ė0.195/km</strong> (0–100 km) · <strong>Ė0.165/km</strong> (101–300 km) · <strong>Ė0.140/km</strong> (301+ km)<br>
+    <code>price = (Ė 4.50 + progressive_km_rate) × service_coeff × class_coeff</code><br>
+    Distance tiers: <strong>Ė 0.195/km</strong> (0–100 km) · <strong>Ė 0.165/km</strong> (101–300 km) · <strong>Ė 0.140/km</strong> (301+ km)<br>
     Classes: Standard ×1.00 · Blue Seat ×1.55 · Yurani ×2.40<br>
     Currency: <strong>Ė (Etsi)</strong> · 1 Ė = 0.832 USD
   </div>
 </div>
 
 <footer>
-  <p>Izaland Transit Portal · <a href="https://opengeofiction.net" target="_blank" rel="noopener">OpenGeoFiction</a> · IZX data v1.0</p>
+  <p>Izaland Transit Portal · <a href="https://opengeofiction.net" target="_blank" rel="noopener">OpenGeoFiction</a> · IZX data v2.0</p>
 </footer>
 
+<script src="izx-data.js"></script>
 <script>
 (function(){
 
@@ -288,104 +288,35 @@
   );
 
   /* ================================================================
-     FARE ENGINE
+     FARE ENGINE — data sourced from izx-data.js (KE_ / RY_ prefixes)
   ================================================================ */
 
   const FIXED_FEE = 4.50;
   const USD_RATE  = 0.832;
 
-  const ST = {
-    K01:  {n:"Sain\u00f0aul Central",        k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e",  b:"main",   km:0},
-    K02:  {n:"Niji-Sain\u00f0aul",            k:"\u897f\u4f5c\u5b89\u5d0e",      b:"main",   km:11.4},
-    K03:  {n:"Asunahama Int'l Airport",     k:"\u5929\u5cf6\u570b\u969b\u7a7a\u6e2f",b:"main",km:35.4},
-    K31:  {n:"Pyanuza",                     k:"",                              b:"cprime"},
-    K32:  {n:"Nagayamatsu",                 k:"",                              b:"cprime"},
-    K33:  {n:"Keishunneul",                 k:"",                              b:"cprime"},
-    K04:  {n:"Hashimakori-Juwon",           k:"\u793a\u4e07\u98ef\u4e2d\u592e",  b:"main",   km:84.85},
-    K05:  {n:"Wodoriha IR",                 k:"\u6f91\u9ad8 IR",               b:"main",   km:101.75},
-    K06:  {n:"Shin-Eriraul",                k:"\u65b0\u7e70\u7f85\u5d0e",      b:"main",   km:122.97},
-    K07:  {n:"Nappawa",                     k:"\u90a3\u854e\u8f2a",            b:"main",   km:144.68},
-    K08:  {n:"Otsumi-Komishinan",           k:"\u5357\u53e4\u8fba\u5357",      b:"main",   km:185.39},
-    K09:  {n:"Kamahoraya",                  k:"\u5bfa\u7a32\u91ce",            b:"main",   km:198.04},
-    K101: {n:"Sakamuso",                    k:"\u671b\u5764",                  b:"saka"},
-    K102: {n:"Showanul",                    k:"\u66f8\u74e6\u5d0e",            b:"saka"},
-    K120: {n:"Panatsawa",                   k:"",                              b:"saka"},
-    K103: {n:"Katayoshi Juwon",             k:"\u6cc9\u5cf0\u4e2d\u592e",      b:"saka"},
-    K104: {n:"Illashiya",                   k:"\u72d0\u68b2",                  b:"saka"},
-    K105: {n:"Ch\u014dpatsu",               k:"",                              b:"saka"},
-    K106: {n:"Kohtos\u014dre",              k:"",                              b:"saka"},
-    K160: {n:"Ikahoro K\u014dwen",          k:"",                              b:"saka"},
-    K10:  {n:"Shin-Kichatsura Teba",        k:"\u65b0\u4e80\u8336\u5915\u99ac",b:"main",   km:252.52},
-    K11:  {n:"Shin-Kashioka",               k:"\u65b0\u7b20\u4ed8",            b:"main",   km:296.64},
-    K12:  {n:"Panaireki",                   k:"\u82e5\u6d66",                  b:"main",   km:345.01},
-    K13:  {n:"Hy\u014dmonan Resort",         k:"\u88cf\u8302\u5357\u904a\u5712",b:"main",   km:386.29},
-    K14:  {n:"Shin-Imihatsorul",            k:"\u65b0\u7acb\u9bad\u57fc",      b:"main",   km:427.14},
-    K144: {n:"Tsirina Wents\u0101n",         k:"\u969c\u5185\u9280\u5c1a",      b:"main",   km:451.74},
-    K15:  {n:"Naeba",                       k:"\u5185\u6ce2",                  b:"main",   km:465.21},
-    K16:  {n:"Eyenniyul Juwon",             k:"\u7cf8\u4e94\u5d0e\u4e2d\u592e",b:"main",   km:499.04},
-    K116: {n:"Yaseura",                     k:"\u8db3\u751f\u7530",            b:"main",   km:526.31},
-    K17:  {n:"Warohan",                     k:"\u6df1\u5f4c",                  b:"main",   km:545.0},
-    N1:   {n:"Naraki-Attawi",               k:"",                              b:"nankai", km:573.54},
-    N2:   {n:"Satsokoibo",                  k:"\u9752\u888b",                  b:"nankai", km:598.539},
-    N3:   {n:"Shin-Nuskajui",               k:"\u65b0\u5e83\u58c1",            b:"nankai", km:638.102},
-    N4:   {n:"Daishin",                     k:"\u5927\u9032",                  b:"nankai", km:658.561},
-  };
+  /* Unified station + service lookups */
+  const ALL_ST  = Object.assign({}, KE_ST,  RY_ST);
+  const ALL_SVC = Object.assign({}, KE_SVC, RY_SVC);
 
-  const CANONICAL_ORDER = [
-    "K01","K02","K03",
-    "K31","K32","K33",
-    "K04","K05","K06","K07",
-    "K08","K09",
-    "K101","K102","K120","K103","K104","K105","K106","K160",
-    "K10","K11","K12","K13","K14","K144","K15","K16","K116","K17",
-    "N1","N2","N3","N4"
-  ];
+  const KE_MAIN_SVCS = new Set(['A','B','C','Cp']);
+  const KE_SAKA_SVCS = new Set(['D','E','F']);
+  const RY_SVCS      = new Set(['L','K','J','G','I','H']);
 
-  const CP = {
-    K01:0, K02:11.4, K03:35.4,
-    K31:61.2, K32:86.12, K33:123.86,
-    K08:159.39, K09:172.04, K10:226.52, K11:270.64, K12:319.01
-  };
-
-  const SK = {
-    K101:0, K102:6.969, K120:22.449, K103:47.87,
-    K104:70.243, K105:97.858, K106:114.079, K160:140.75,
-  };
-  SK.K10 = 70.243 + 82.22;
-  ['K11','K12','K13','K14','K144','K15','K16','K116','K17','N1','N2','N3','N4'].forEach(c => {
-    SK[c] = SK.K10 + (ST[c].km - 252.52);
-  });
-
-  const MAIN_SVCS = new Set(['A','B','C','Cp']);
-  const SAKA_SVCS = new Set(['D','E','F']);
-
-  const SVC = {
-    A:  {coeff:1.15, name:"Nonstop Express",      cls:"svc-A", color:"#002A91",
-         stops:["K01","K02","K03","K08","K10","K12","K17","N1","N2","N3","N4"]},
-    B:  {coeff:1.00, name:"Semi-rapido",           cls:"svc-B", color:"#1B71CB",
-         stops:["K01","K02","K03","K04","K05","K06","K07","K08","K09","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17","N1","N2","N3","N4"]},
-    C:  {coeff:1.08, name:"Rapido",                cls:"svc-C", color:"#4a8fcc",
-         stops:["K01","K02","K03","K06","K08","K09","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17"]},
-    Cp: {coeff:1.12, name:"Airport Bypass C\u2032",cls:"svc-Cp", color:"#0e7ca6",
-         stops:["K01","K02","K03","K31","K32","K33","K08","K09","K10","K11","K12"]},
-    D:  {coeff:1.08, name:"Sakamuso Rapido",       cls:"svc-D", color:"#926ACA",
-         stops:["K101","K104","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17","N1","N2","N3","N4"]},
-    E:  {coeff:1.10, name:"Sakamuso Express",      cls:"svc-E", color:"#7c3aed",
-         stops:["K101","K104","K160","K10","K12","K17","N1","N2","N3","N4"]},
-    F:  {coeff:0.92, name:"Omnibus",               cls:"svc-F", color:"#6b7280",
-         stops:["K101","K102","K120","K103","K104","K105","K106","K160","K10","K11","K12","K13","K14","K144","K15","K16","K116","K17","N1","N2","N3","N4"]},
-  };
-
-  const CLASS_C = {standard:1.00, blue_seat:1.55, yurani:2.40};
-  const CLASS_L = {standard:"Standard", blue_seat:"Blue Seat", yurani:"Yurani"};
-
-  const SELECT_ORDER = [
+  /* KE select order */
+  const KE_SELECT_ORDER = [
     "K01","K02","K03","K04","K05","K06","K07","K08","K09","K10",
     "K11","K12","K13","K14","K144","K15","K16","K116","K17",
     "N1","N2","N3","N4",
     "K101","K102","K120","K103","K104","K105","K106","K160",
   ];
-  const BL = {main:"Main Line",saka:"Sakamuso Branch",cprime:"C\u2032 Bypass",nankai:"Nankai ext."};
+  /* RY select order */
+  const RY_SELECT_ORDER = [
+    "R01","R02","R03","R04","R05","R06","R61","R07","R08","R81",
+    "R09","R10","R11","R12","R13","R14","R15","R16","R17","R18",
+    "R19","R20","R21",
+  ];
+
+  const KE_BL = {main:"Main Line",saka:"Sakamuso Branch",cprime:"C\u2032 Bypass",nankai:"Nankai ext."};
 
   function progKm(d){
     if(d<=0) return 0;
@@ -399,10 +330,13 @@
   }
 
   function stKm(code, svcKey){
-    if(code === 'K101' && MAIN_SVCS.has(svcKey)) code = 'K02';
-    if(svcKey === 'Cp')       return CP[code]  !== undefined ? CP[code]  : null;
-    if(SAKA_SVCS.has(svcKey)) return SK[code]  !== undefined ? SK[code]  : null;
-    return ST[code] ? ST[code].km : null;
+    if(RY_SVCS.has(svcKey)){
+      return RY_ST[code] ? RY_ST[code].km : null;
+    }
+    if(code === 'K101' && KE_MAIN_SVCS.has(svcKey)) code = 'K02';
+    if(svcKey === 'Cp')            return KE_CP[code]  !== undefined ? KE_CP[code]  : null;
+    if(KE_SAKA_SVCS.has(svcKey))  return KE_SK[code]  !== undefined ? KE_SK[code]  : null;
+    return KE_ST[code] ? KE_ST[code].km : null;
   }
 
   function tariffKm(from, to, svcKey){
@@ -413,38 +347,63 @@
   }
 
   function serves(svcKey, from, to){
-    const stops = SVC[svcKey].stops;
-    const f = (from === 'K101' && MAIN_SVCS.has(svcKey)) ? 'K02' : from;
-    const t = (to   === 'K101' && MAIN_SVCS.has(svcKey)) ? 'K02' : to;
+    const stops = ALL_SVC[svcKey].stops;
+    const f = (from === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : from;
+    const t = (to   === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : to;
     const fi = stops.indexOf(f);
     const ti = stops.indexOf(t);
     return fi !== -1 && ti !== -1 && fi !== ti;
   }
 
+  /* ---- Build station selects ---- */
   function buildSelects(){
     const sf  = document.getElementById('sel-from');
     const st2 = document.getElementById('sel-to');
-    let lastB = null;
-    SELECT_ORDER.forEach(code => {
-      const s = ST[code]; if(!s) return;
-      if(s.b !== lastB){
-        [sf,st2].forEach(el => {
-          const og = document.createElement('optgroup');
-          og.label = BL[s.b]||s.b;
-          el._og = og;
-          el.appendChild(og);
+
+    function addGroup(label, order, stData){
+      const ogs = [document.createElement('optgroup'), document.createElement('optgroup')];
+      ogs.forEach(og => og.label = label);
+      order.forEach(code => {
+        const s = stData[code]; if(!s) return;
+        [sf, st2].forEach((el, i) => {
+          const o = document.createElement('option');
+          o.value = code;
+          o.textContent = code+' '+s.n+(s.k?' \u00b7 '+s.k:'');
+          ogs[i].appendChild(o);
         });
+      });
+      sf.appendChild(ogs[0]);
+      st2.appendChild(ogs[1]);
+    }
+
+    /* Keishin: split by branch label */
+    let lastB = null;
+    let ogs = [null, null];
+    KE_SELECT_ORDER.forEach(code => {
+      const s = KE_ST[code]; if(!s) return;
+      const bl = KE_BL[s.b] || s.b;
+      if(s.b !== lastB){
+        ogs = [document.createElement('optgroup'), document.createElement('optgroup')];
+        ogs.forEach(og => { og.label = 'Keishin — '+bl; });
+        sf.appendChild(ogs[0]); st2.appendChild(ogs[1]);
         lastB = s.b;
       }
-      [sf,st2].forEach(el => {
+      [sf, st2].forEach((el, i) => {
         const o = document.createElement('option');
         o.value = code;
         o.textContent = code+' '+s.n+(s.k?' \u00b7 '+s.k:'');
-        el._og.appendChild(o);
+        ogs[i].appendChild(o);
       });
     });
+
+    /* Ryānkai: single group */
+    addGroup('Ry\u0101nkai — Main Line', RY_SELECT_ORDER, RY_ST);
+
     sf.value='K01'; st2.value='K17';
   }
+
+  const CLASS_C = {standard:1.00, blue_seat:1.55, yurani:2.40};
+  const CLASS_L = {standard:"Standard", blue_seat:"Blue Seat", yurani:"Yurani"};
 
   function fmt(n)  { return '\u0116\u202f'+n.toFixed(2); }
   function fusd(n) { return '(US$\u202f'+(n*USD_RATE).toFixed(2)+')'; }
@@ -453,29 +412,36 @@
      STOP PATTERN DIAGRAM
   ================================================================ */
 
+  function lineOf(code){ return RY_ST[code] ? 'RY' : 'KE'; }
+
+  function canonicalOrderFor(code){
+    return lineOf(code) === 'RY' ? RY_CANONICAL_ORDER : KE_CANONICAL_ORDER;
+  }
+
   function serviceRange(svcKey, from, to){
-    const info = SVC[svcKey];
+    const info = ALL_SVC[svcKey];
     const svcStopList = info.stops;
-    const f = (from === 'K101' && MAIN_SVCS.has(svcKey)) ? 'K02' : from;
-    const t = (to   === 'K101' && MAIN_SVCS.has(svcKey)) ? 'K02' : to;
+    const f = (from === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : from;
+    const t = (to   === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : to;
     let fi = svcStopList.indexOf(f);
     let ti = svcStopList.indexOf(t);
     if(fi === -1 || ti === -1 || fi === ti) return {stops:new Set(), through:new Set()};
     if(fi > ti){ const tmp=fi; fi=ti; ti=tmp; }
     const stopsInSlice = svcStopList.slice(fi, ti+1);
     const stopsSet = new Set(stopsInSlice);
-    const canonFirst = CANONICAL_ORDER.indexOf(stopsInSlice[0]);
-    const canonLast  = CANONICAL_ORDER.indexOf(stopsInSlice[stopsInSlice.length - 1]);
+    const CORD = canonicalOrderFor(stopsInSlice[0]);
+    const canonFirst = CORD.indexOf(stopsInSlice[0]);
+    const canonLast  = CORD.indexOf(stopsInSlice[stopsInSlice.length - 1]);
     const throughSet = new Set();
     if(canonFirst !== -1 && canonLast !== -1){
       const lo = Math.min(canonFirst, canonLast);
       const hi = Math.max(canonFirst, canonLast);
       for(let i = lo; i <= hi; i++){
-        const code = CANONICAL_ORDER[i];
+        const code = CORD[i];
         if(stopsSet.has(code)) continue;
-        const s = ST[code]; if(!s) continue;
+        const s = ALL_ST[code]; if(!s) continue;
         if((code==='K31'||code==='K32'||code==='K33') && svcKey!=='Cp') continue;
-        if(s.b==='saka' && !SAKA_SVCS.has(svcKey)) continue;
+        if(s.b==='saka' && !KE_SAKA_SVCS.has(svcKey)) continue;
         throughSet.add(code);
       }
     }
@@ -490,7 +456,8 @@
       stops.forEach(c => needed.add(c));
       through.forEach(c => needed.add(c));
     });
-    return CANONICAL_ORDER.filter(c => needed.has(c));
+    const CORD = canonicalOrderFor(from);
+    return CORD.filter(c => needed.has(c));
   }
 
   function renderDiagram(activeRows, from, to){
@@ -503,7 +470,6 @@
     const cols  = buildCanonicalCols(activeRows, from, to);
     const COL_W = 28;
 
-    /* ── Name header row ── */
     const nameTr = document.createElement('tr');
     nameTr.className = 'diag-name-row';
     const emptyTd = document.createElement('td');
@@ -513,7 +479,7 @@
       const td = document.createElement('td');
       td.style.cssText = `width:${COL_W}px;min-width:${COL_W}px;max-width:${COL_W}px;padding:0;text-align:center;vertical-align:bottom;padding-bottom:6px;`;
       const isOD = (code === from || code === to);
-      const s = ST[code];
+      const s = ALL_ST[code];
       const label = s ? (code+' '+(s.n.length>13 ? s.n.slice(0,12)+'\u2026' : s.n)) : code;
       const span = document.createElement('span');
       span.className = 'diag-sta-name'+(isOD?' is-od':'');
@@ -524,18 +490,12 @@
     });
     tbl.appendChild(nameTr);
 
-    /* ── One track row per service ── */
     activeRows.forEach(({k}) => {
-      const info  = SVC[k];
+      const info  = ALL_SVC[k];
       const color = info.color;
       const {stops: svcStops, through: svcThrough} = serviceRange(k, from, to);
       const svcAll = new Set([...svcStops, ...svcThrough]);
 
-      /*
-       * Compute the column-index span for this service within the cols array.
-       * Any col between firstColIdx and lastColIdx (inclusive) that is NOT
-       * in svcAll will receive a grey bypass line instead of empty space.
-       */
       let firstColIdx = Infinity, lastColIdx = -Infinity;
       cols.forEach((code, ci) => {
         if(svcAll.has(code)){
@@ -546,7 +506,6 @@
 
       const tr = document.createElement('tr');
       tr.className = 'diag-track-row';
-
       const labelTd = document.createElement('td');
       labelTd.className = 'diag-svc-col';
       const pill = document.createElement('span');
@@ -558,60 +517,29 @@
       cols.forEach((code, ci) => {
         const td = document.createElement('td');
         td.style.cssText = `width:${COL_W}px;min-width:${COL_W}px;max-width:${COL_W}px;height:26px;padding:0;position:relative;text-align:center;vertical-align:middle;`;
-
         const inRange = svcAll.has(code);
         const isStop  = svcStops.has(code);
         const isOD    = (code === from || code === to);
         const isFirst = ci === 0;
         const isLast  = ci === cols.length - 1;
-
-        // Is this column geometrically within the service's span but not on its route?
         const isBypass = !inRange && ci > firstColIdx && ci < lastColIdx;
-
         if(inRange){
-          // Colored track segments
-          if(!isFirst){
-            const sl = document.createElement('div');
-            sl.className = 'seg-l';
-            sl.style.cssText = `background:${color};opacity:0.75;`;
-            td.appendChild(sl);
-          }
-          if(!isLast){
-            const sr = document.createElement('div');
-            sr.className = 'seg-r';
-            sr.style.cssText = `background:${color};opacity:0.75;`;
-            td.appendChild(sr);
-          }
-          const inner = document.createElement('div');
-          inner.style.cssText = 'position:relative;z-index:3;display:flex;justify-content:center;align-items:center;height:100%;';
+          if(!isFirst){ const sl=document.createElement('div'); sl.className='seg-l'; sl.style.cssText=`background:${color};opacity:0.75;`; td.appendChild(sl); }
+          if(!isLast){  const sr=document.createElement('div'); sr.className='seg-r'; sr.style.cssText=`background:${color};opacity:0.75;`; td.appendChild(sr); }
+          const inner=document.createElement('div');
+          inner.style.cssText='position:relative;z-index:3;display:flex;justify-content:center;align-items:center;height:100%;';
           if(isStop){
-            const dot = document.createElement('span');
-            dot.className = 'dot-s'+(isOD?' od':'');
-            dot.style.background = isOD ? 'var(--accent)' : color;
-            inner.appendChild(dot);
+            const dot=document.createElement('span'); dot.className='dot-s'+(isOD?' od':''); dot.style.background=isOD?'var(--accent)':color; inner.appendChild(dot);
           } else {
-            const bar = document.createElement('span');
-            bar.className = 'dot-p';
-            bar.style.background = color;
-            inner.appendChild(bar);
+            const bar=document.createElement('span'); bar.className='dot-p'; bar.style.background=color; inner.appendChild(bar);
           }
           td.appendChild(inner);
-
         } else if(isBypass){
-          // Grey continuous line — service skips this branch but the track exists
-          const bl = document.createElement('div');
-          bl.className = 'seg-bypass-l';
-          td.appendChild(bl);
-          const br = document.createElement('div');
-          br.className = 'seg-bypass-r';
-          td.appendChild(br);
-
+          const bl=document.createElement('div'); bl.className='seg-bypass-l'; td.appendChild(bl);
+          const br=document.createElement('div'); br.className='seg-bypass-r'; td.appendChild(br);
         }
-        // else: outside the service span entirely — leave cell blank
-
         tr.appendChild(td);
       });
-
       tbl.appendChild(tr);
     });
   }
@@ -630,9 +558,9 @@
     res.style.display = 'block';
     cards.innerHTML = '';
     szNote.style.display = (from==='K101'||to==='K101') ? 'block' : 'none';
-    routeEl.textContent = (ST[from]?ST[from].n:from)+' \u2192 '+(ST[to]?ST[to].n:to);
+    routeEl.textContent = (ALL_ST[from]?ALL_ST[from].n:from)+' \u2192 '+(ALL_ST[to]?ALL_ST[to].n:to);
 
-    const svcs = svcF==='all' ? Object.keys(SVC) : [svcF];
+    const svcs = svcF==='all' ? Object.keys(ALL_SVC) : [svcF];
     const clss = classF==='all' ? ['standard','blue_seat','yurani'] : [classF];
     const rows = [];
 
@@ -641,7 +569,7 @@
       const km = tariffKm(from,to,k);
       if(!km || km<=0) return;
       const prices = {};
-      clss.forEach(c => { prices[c] = calcPrice(km, SVC[k].coeff, CLASS_C[c]); });
+      clss.forEach(c => { prices[c] = calcPrice(km, ALL_SVC[k].coeff, CLASS_C[c]); });
       rows.push({k, km, prices});
     });
 
@@ -654,11 +582,10 @@
 
     const kms = [...new Set(rows.map(r=>r.km.toFixed(1)))];
     metaEl.textContent = kms.length===1 ? kms[0]+' km' : kms.join(' / ')+' km (varies by route)';
-
     const minP = Math.min(...rows.map(r=>r.prices[clss[0]]||Infinity));
 
     rows.forEach(({k,km,prices}) => {
-      const info = SVC[k];
+      const info = ALL_SVC[k];
       const card = document.createElement('div');
       card.className = 'service-card';
       const prows = clss.map(c => {
