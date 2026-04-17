@@ -137,3 +137,39 @@ const RY_SVC = {
   H: {coeff:1.15, name:"Flagship AV", cls:"svc-H", color:"#50938A",
       stops:["R01","R02","R06","R10","R14","R15","R16","R17","R18","R19","R20","R21"]},
 };
+
+/* ----------------------------------------------------------------
+   EIRA LINE
+---------------------------------------------------------------- */
+const EI_ST = {
+  E01: {n:"Sain\u00f0aul Central",        k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e",  b:"main", km:0},
+  E02: {n:"Kawayatsu",                    k:"\u5609\u592c\u82eb",               b:"main", km:19.16},
+  E03: {n:"Shin-Abiro Kung\u014dsan",     k:"\u65b0\u736f\u8def\u30fb\u52f3\u525b\u5c71", b:"main", km:65.43},
+  E04: {n:"Sahnajima Juwon",              k:"\u5f4c\u6e67\u4e2d\u592e",         b:"main", km:98.41},
+  E05: {n:"Shirukami",                    k:"\u8352\u991f",                      b:"main", km:126.78},
+  E06: {n:"Shin-Tsawazame W.-M.",         k:"\u65b0\u68ee\u5b97\u7de9\u7548\u5143", b:"main", km:158.76},
+  E07: {n:"Arasano",                      k:"\u9727\u898b",                      b:"main", km:190.00},
+  E08: {n:"Reilusahna Juwon",             k:"\u6e05\u6d66\u4e2d\u592e",         b:"main", km:250.86},
+  E09: {n:"Shin-Mikotosamo",              k:"\u65b0\u5150\u5c71",               b:"main", km:279.77},
+  E10: {n:"Natsuhiro-Kw\u014dpas",        k:"\u82dd\u6577\u30fb\u5149\u516b",   b:"main", km:308.06},
+  E11: {n:"(Infill Station)",             k:"\u2014",                            b:"main", km:null},
+  E12: {n:"Nagareki",                     k:"\u6cbc\u6d66",                      b:"main", km:375.49},
+};
+
+const EI_CANONICAL_ORDER = [
+  "E01","E02","E03","E04","E05","E06","E07",
+  "E08","E09","E10","E11","E12"
+];
+
+const EI_SVC = {
+  N:  {coeff:1.00, name:"Nazionale",          cls:"svc-N",  color:"#32CD32",
+       stops:["E01","E02","E03","E04","E05","E06","E07","E08","E09","E10","E12"]},
+  M:  {coeff:1.08, name:"Minarajaki Express", cls:"svc-M",  color:"#228B22",
+       stops:["E01","E04","E05","E08","E12"]},
+  MF: {coeff:1.15, name:"Minarajaki Fast",    cls:"svc-MF", color:"#6A0DAD",
+       stops:["E01","E08","E12"]},
+  MI: {coeff:1.12, name:"Minarajaki Intercity",cls:"svc-MI",color:"#B8860B",
+       stops:["E01","E04","E05","E08","E12"]},
+  MS: {coeff:1.20, name:"Minarajaki Super",   cls:"svc-MS", color:"#00BFFF",
+       stops:["E01","E04","E05","E08","E12"]},
+};
