@@ -444,6 +444,125 @@ function doSearch(){
   // auto-search on station change
   document.getElementById('sel-station').addEventListener('change',doSearch);
   document.getElementById('sel-dir').addEventListener('change',doSearch);
+    // Build station lookup map
+const stationMap = {};
+SCHEDULE.stations.forEach(s => { stationMap[s.code] = s; });
+
+// Build service color map
+const serviceColors = {};
+SCHEDULE.trips.forEach(t => { serviceColors[t.service] = t.color; });
+
+// Populate station <select>
+(function(){
+  const sel = document.getElementById('sel-station');
+  SCHEDULE.stations.forEach(s => {
+    const o = document.createElement('option');
+    o.value = s.code;
+    o.textContent = s.code + ' — ' + s.name + (s.kanji ? ' ' + s.kanji : '');
+    sel.appendChild(o);
+  });
+})();
+
+// Populate service filter chips
+(function(){
+  const row = document.getElementById('filter-row');
+  const services = SCHEDULE.meta.services;
+  services.forEach(svc => {
+    const chip = document.createElement('label');
+    chip.className = 'filter-chip';
+    chip.innerHTML = `<input type="checkbox" checked data-svc="${svc}"> <span style="color:${serviceColors[svc]||'#fff'};margin-right:4px">■</span> ${svc}`;
+    row.appendChild(chip);
+  });
+})();
+
+function toMinutes(t) {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function fmtTime(t) {
+  const [h, m] = t.split(':').map(Number);
+  const rh = h >= 24 ? h - 24 : h;
+  return String(rh).padStart(2,'0') + ':' + String(m).padStart(2,'0') + (h >= 24 ? '★' : '');
+}
+
+function doSearch() {
+  const code = document.getElementById('sel-station').value;
+  const dir  = document.getElementById('sel-dir').value;
+  const from = document.getElementById('sel-from').value || '00:00';
+  const fromMin = toMinutes(from);
+
+  const checkedSvcs = new Set(
+    [...document.querySelectorAll('#filter-row input[type=checkbox]:checked')].map(i => i.dataset.svc)
+  );
+
+  const panel = document.getElementById('results-panel');
+
+  if (!code) {
+    panel.innerHTML = '<div class="no-results"><div class="no-results-icon">🔍</div><p>Select a station in order to view the timetable.</p></div>';
+    return;
+  }
+
+  const station = stationMap[code];
+  const matches = SCHEDULE.trips.filter(trip => {
+    if (!trip.stops[code]) return false;
+    if (dir && trip.direction !== dir) return false;
+    if (!checkedSvcs.has(trip.service)) return false;
+    const depTime = trip.stops[code].dep || trip.stops[code].arr;
+    if (toMinutes(depTime) < fromMin) return false;
+    return true;
+  });
+
+  matches.sort((a,b) => {
+    const ta = toMinutes(a.stops[code].dep || a.stops[code].arr);
+    const tb = toMinutes(b.stops[code].dep || b.stops[code].arr);
+    return ta - tb;
+  });
+
+  if (matches.length === 0) {
+    panel.innerHTML = `<div class="no-results"><div class="no-results-icon">🚫</div><p>No services found for the selected filters.</p></div>`;
+    return;
+  }
+
+  const stnName = station ? `${station.code} ${station.name}${station.kanji ? ' ' + station.kanji : ''}` : code;
+  let html = `<div class="results-header"><span class="results-title">${stnName}</span><span class="results-count">${matches.length} service${matches.length!==1?'s':''}</span></div>`;
+  html += '<div class="results-table-wrap"><table class="tt">';
+  html += '<thead><tr><th class="left">Service</th><th>Dir</th><th>Arr</th><th>Dep</th><th class="left">Terminus</th></tr></thead><tbody>';
+
+  matches.forEach(trip => {
+    const stop = trip.stops[code];
+    const terminus = stationMap[trip.terminus] ? stationMap[trip.terminus].name : trip.terminus;
+    const dirClass = trip.direction === 'SB' ? 'dir-sb' : 'dir-nb';
+    html += `<tr>
+      <td class="left"><span class="svc-badge" style="background:${trip.color}">${trip.service}</span> ${trip.name}</td>
+      <td><span class="dir-badge ${dirClass}">${trip.direction}</span></td>
+      <td class="time-cell">${stop.arr ? fmtTime(stop.arr) : '—'}</td>
+      <td class="time-cell">${stop.dep ? fmtTime(stop.dep) : '—'}</td>
+      <td class="left terminus-small">${trip.terminus} ${terminus}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  panel.innerHTML = html;
+}
+
+// Theme toggle
+document.querySelector('[data-theme-toggle]').addEventListener('click', () => {
+  const html = document.documentElement;
+  html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+});
+
+// Nav dropdowns
+document.querySelectorAll('.nav-item > button').forEach(btn => {
+  btn.addEventListener('click', e => {
+    const item = btn.parentElement;
+    item.classList.toggle('open');
+    e.stopPropagation();
+  });
+});
+document.addEventListener('click', () => {
+  document.querySelectorAll('.nav-item.open').forEach(i => i.classList.remove('open'));
+});
   </script>
 </body>
 </html>
