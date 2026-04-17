@@ -95,6 +95,12 @@
     .svc-G{background:#148466;color:#fff;}
     .svc-I{background:#1F6A39;color:#fff;}
     .svc-H{background:#50938A;color:#fff;}
+    /* ── Eira service badges ── */
+    .svc-N{background:#32CD32;color:#fff;}
+    .svc-M{background:#228B22;color:#fff;}
+    .svc-MF{background:#6A0DAD;color:#fff;}
+    .svc-MI{background:#B8860B;color:#fff;}
+    .svc-MS{background:#00BFFF;color:#000;}
     /* ── combo badge (two pills side by side) ── */
     .combo-badges{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
     .combo-sep{font-size:.65rem;color:var(--text-faint);}
@@ -176,7 +182,7 @@
   <a href="izx.html" class="back-link">← Back to IZX</a>
   <div class="page-label">IZX · Fare Calculator</div>
   <h1 class="page-title">Fare Calculator</h1>
-  <p class="page-desc">Look up prices for any origin–destination pair on the IZX Keishin or Ryānkai lines. Prices are computed live from the official tariff formula.</p>
+  <p class="page-desc">Look up prices for any origin–destination pair on the IZX Keishin, Ryānkai, or Eira lines. Prices are computed live from the official tariff formula.</p>
 </div>
 
 <div class="sim-card">
@@ -222,6 +228,13 @@
           <option value="G">G — Flagship AV</option>
           <option value="I">I — Flagship AV</option>
           <option value="H">H — Flagship AV</option>
+        </optgroup>
+        <optgroup label="IZX Eira">
+          <option value="N">N — Nazionale</option>
+          <option value="M">M — Minarajaki Express</option>
+          <option value="MF">MF — Minarajaki Fast</option>
+          <option value="MI">MI — Minarajaki Intercity</option>
+          <option value="MS">MS — Minarajaki Super</option>
         </optgroup>
       </select>
     </div>
@@ -291,19 +304,20 @@
   );
 
   /* ================================================================
-     FARE ENGINE — data sourced from izx-data.js (KE_ / RY_ prefixes)
+     FARE ENGINE — data sourced from izx-data.js (KE_ / RY_ / EI_ prefixes)
   ================================================================ */
 
   const FIXED_FEE = 4.50;
   const USD_RATE  = 0.832;
 
   /* Unified station + service lookups */
-  const ALL_ST  = Object.assign({}, KE_ST,  RY_ST);
-  const ALL_SVC = Object.assign({}, KE_SVC, RY_SVC);
+  const ALL_ST  = Object.assign({}, KE_ST,  RY_ST,  EI_ST);
+  const ALL_SVC = Object.assign({}, KE_SVC, RY_SVC, EI_SVC);
 
   const KE_MAIN_SVCS = new Set(['A','B','C','Cp']);
   const KE_SAKA_SVCS = new Set(['D','E','F']);
   const RY_SVCS      = new Set(['L','K','J','G','I','H']);
+  const EI_SVCS      = new Set(['N','M','MF','MI','MS']);
 
   /* KE select order */
   const KE_SELECT_ORDER = [
@@ -317,6 +331,10 @@
     "R01","R02","R03","R04","R05","R06","R61","R07","R08","R81",
     "R09","R10","R11","R12","R13","R14","R15","R16","R17","R18",
     "R19","R20","R21",
+  ];
+  /* EI select order */
+  const EI_SELECT_ORDER = [
+    "E01","E02","E03","E04","E05","E06","E07","E08","E09","E10","E12",
   ];
 
   const KE_BL = {main:"Main Line",saka:"Sakamuso Branch",cprime:"C\u2032 Bypass",nankai:"Nankai ext."};
@@ -335,6 +353,9 @@
   function stKm(code, svcKey){
     if(RY_SVCS.has(svcKey)){
       return RY_ST[code] ? RY_ST[code].km : null;
+    }
+    if(EI_SVCS.has(svcKey)){
+      return EI_ST[code] ? EI_ST[code].km : null;
     }
     if(code === 'K101' && KE_MAIN_SVCS.has(svcKey)) code = 'K02';
     if(svcKey === 'Cp')            return KE_CP[code]  !== undefined ? KE_CP[code]  : null;
@@ -402,6 +423,9 @@
     /* Ryānkai: single group */
     addGroup('Ry\u0101nkai — Main Line', RY_SELECT_ORDER, RY_ST);
 
+    /* Eira: single group */
+    addGroup('Eira — Main Line', EI_SELECT_ORDER, EI_ST);
+
     sf.value='K01'; st2.value='K17';
   }
 
@@ -415,10 +439,13 @@
      STOP PATTERN DIAGRAM
   ================================================================ */
 
-  function lineOf(code){ return RY_ST[code] ? 'RY' : 'KE'; }
+  function lineOf(code){ return RY_ST[code] ? 'RY' : EI_ST[code] ? 'EI' : 'KE'; }
 
   function canonicalOrderFor(code){
-    return lineOf(code) === 'RY' ? RY_CANONICAL_ORDER : KE_CANONICAL_ORDER;
+    const line = lineOf(code);
+    if(line === 'RY') return RY_CANONICAL_ORDER;
+    if(line === 'EI') return EI_CANONICAL_ORDER;
+    return KE_CANONICAL_ORDER;
   }
 
   function serviceRange(svcKey, from, to){
@@ -549,6 +576,7 @@
 
   const HUB_R = "R01";
   const HUB_K = "K01";
+  const HUB_E = "E01";
 
   function isInterline(from, to){
     return lineOf(from) !== lineOf(to);
@@ -588,7 +616,7 @@
     cards.innerHTML = '';
 
     routeEl.textContent =
-      (ALL_ST[from]?ALL_ST[from].n:from)+' → '+
+      (ALL_ST[from]?ALL_ST[from].n:from)+' \u2192 '+
       (ALL_ST[to]?ALL_ST[to].n:to);
 
     const clss = classF==='all' ? ['standard','blue_seat','yurani'] : [classF];
@@ -626,52 +654,61 @@
     else{
 
       szNote.style.display = 'block';
-      szNote.innerHTML =
-        "ⓘ Transfer at Sainðaul Central (R01/K01). Combined fare applied.";
+      const fromLine = lineOf(from);
+      const toLine   = lineOf(to);
 
-      const rySvcs = Object.keys(RY_SVC);
-      const keSvcs = Object.keys(KE_SVC);
-      const fromIsRY = lineOf(from) === 'RY';
+      let hub1, hub2, svcs1, svcs2;
+      if(fromLine === 'RY' && toLine === 'KE'){
+        hub1 = HUB_R; hub2 = HUB_K;
+        svcs1 = Object.keys(RY_SVC); svcs2 = Object.keys(KE_SVC);
+        szNote.innerHTML = "\u24d8 Transfer at Sain\u00f0aul Central (R01/K01). Combined fare applied.";
+      } else if(fromLine === 'KE' && toLine === 'RY'){
+        hub1 = HUB_K; hub2 = HUB_R;
+        svcs1 = Object.keys(KE_SVC); svcs2 = Object.keys(RY_SVC);
+        szNote.innerHTML = "\u24d8 Transfer at Sain\u00f0aul Central (K01/R01). Combined fare applied.";
+      } else if(fromLine === 'EI' && toLine === 'KE'){
+        hub1 = HUB_E; hub2 = HUB_K;
+        svcs1 = Object.keys(EI_SVC); svcs2 = Object.keys(KE_SVC);
+        szNote.innerHTML = "\u24d8 Transfer at Sain\u00f0aul Central (E01/K01). Combined fare applied.";
+      } else if(fromLine === 'KE' && toLine === 'EI'){
+        hub1 = HUB_K; hub2 = HUB_E;
+        svcs1 = Object.keys(KE_SVC); svcs2 = Object.keys(EI_SVC);
+        szNote.innerHTML = "\u24d8 Transfer at Sain\u00f0aul Central (K01/E01). Combined fare applied.";
+      } else if(fromLine === 'EI' && toLine === 'RY'){
+        hub1 = HUB_E; hub2 = HUB_R;
+        svcs1 = Object.keys(EI_SVC); svcs2 = Object.keys(RY_SVC);
+        szNote.innerHTML = "\u24d8 Transfer at Sain\u00f0aul Central (E01/R01). Combined fare applied.";
+      } else if(fromLine === 'RY' && toLine === 'EI'){
+        hub1 = HUB_R; hub2 = HUB_E;
+        svcs1 = Object.keys(RY_SVC); svcs2 = Object.keys(EI_SVC);
+        szNote.innerHTML = "\u24d8 Transfer at Sain\u00f0aul Central (R01/E01). Combined fare applied.";
+      }
 
-      rySvcs.forEach(rSvc => {
-        keSvcs.forEach(kSvc => {
-
-          /* check validity with standard class (km is class-independent) */
-          const testSeg1 = fromIsRY
-            ? calcSegment(from, HUB_R, rSvc, 'standard')
-            : calcSegment(from, HUB_K, kSvc, 'standard');
-          const testSeg2 = fromIsRY
-            ? calcSegment(HUB_K, to, kSvc, 'standard')
-            : calcSegment(HUB_R, to, rSvc, 'standard');
-
+      svcs1.forEach(s1 => {
+        svcs2.forEach(s2 => {
+          const testSeg1 = calcSegment(from, hub1, s1, 'standard');
+          const testSeg2 = calcSegment(hub2, to,   s2, 'standard');
           if(!testSeg1 || !testSeg2) return;
 
           const totalKm = testSeg1.km + testSeg2.km;
           const discount = getDiscount(totalKm);
-          const comboLabel = fromIsRY ? (rSvc+'+'+kSvc) : (kSvc+'+'+rSvc);
+          const comboLabel = s1+'+'+s2;
 
           clss.forEach(c => {
-            const seg1 = fromIsRY
-              ? calcSegment(from, HUB_R, rSvc, c)
-              : calcSegment(from, HUB_K, kSvc, c);
-            const seg2 = fromIsRY
-              ? calcSegment(HUB_K, to, kSvc, c)
-              : calcSegment(HUB_R, to, rSvc, c);
-
+            const seg1 = calcSegment(from, hub1, s1, c);
+            const seg2 = calcSegment(hub2, to,   s2, c);
             const basePrice = seg1.price + seg2.price;
             const finalPrice = Math.round(basePrice * (1 - discount) * 100) / 100;
-
             results.push({
               type: 'combo',
               label: comboLabel,
-              svc1: fromIsRY ? rSvc : kSvc,
-              svc2: fromIsRY ? kSvc : rSvc,
+              svc1: s1,
+              svc2: s2,
               class: c,
               km: totalKm,
               price: finalPrice
             });
           });
-
         });
       });
 
