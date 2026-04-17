@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IZX Keishin Timetable — Izaland Transit</title>
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+  <script src="izx-data.js"></script>
   <style>
     :root{
       --font-body:'Satoshi','Inter',sans-serif;
@@ -285,6 +286,12 @@ const SCHEDULE = {"meta": {"line": "IZX Keishin", "generated": "2026-04-16", "se
   });
   sel.appendChild(grpSaka);
 
+    // Costruisce la mappa stazione-code → oggetto stazione
+const stationMap = {};
+for (const st of SCHEDULE.stations) {
+  stationMap[st.code] = st;
+}
+
   // --- Gruppo Ryānkai ---
   const grpRY=document.createElement('optgroup');
   grpRY.label='IZX Ryānkai';
@@ -379,7 +386,8 @@ function doSearch(){
 
   // ... resto della logica Keishin invariata
 
-    const st=stationMap[stCode];
+  const stCode = code;
+  const panel = document.getElementById('results-panel');
     const matches=[];
 
     SCHEDULE.trips.forEach(trip=>{
