@@ -95,6 +95,9 @@
     .svc-G{background:#148466;color:#fff;}
     .svc-I{background:#1F6A39;color:#fff;}
     .svc-H{background:#50938A;color:#fff;}
+    /* ── combo badge (two pills side by side) ── */
+    .combo-badges{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+    .combo-sep{font-size:.65rem;color:var(--text-faint);}
 
     /* ── STOP PATTERN DIAGRAM ── */
     #stop-diagram{margin-top:var(--space-8);border-top:1px solid var(--border);padding-top:var(--space-6);display:none;}
@@ -545,211 +548,220 @@
   }
 
   const HUB_R = "R01";
-const HUB_K = "K01";
+  const HUB_K = "K01";
 
-function isInterline(from, to){
-  return lineOf(from) !== lineOf(to);
-}
+  function isInterline(from, to){
+    return lineOf(from) !== lineOf(to);
+  }
 
-function getDiscount(km){
-  if(km < 200) return 0.05;
-  if(km < 400) return 0.08;
-  if(km < 700) return 0.10;
-  if(km < 1000) return 0.12;
-  return 0.15;
-}
+  function getDiscount(km){
+    if(km < 200) return 0.05;
+    if(km < 400) return 0.08;
+    if(km < 700) return 0.10;
+    if(km < 1000) return 0.12;
+    return 0.15;
+  }
 
-function calcSegment(from, to, svcKey, classKey){
-  if(!serves(svcKey,from,to)) return null;
-  const km = tariffKm(from,to,svcKey);
-  if(!km || km <= 0) return null;
-
-  return {
-    km,
-    price: calcPrice(km, ALL_SVC[svcKey].coeff, CLASS_C[classKey])
-  };
-}
-
-  
+  function calcSegment(from, to, svcKey, classKey){
+    if(!serves(svcKey,from,to)) return null;
+    const km = tariffKm(from,to,svcKey);
+    if(!km || km <= 0) return null;
+    return {
+      km,
+      price: calcPrice(km, ALL_SVC[svcKey].coeff, CLASS_C[classKey])
+    };
+  }
 
   /* ================================================================
      RENDER
   ================================================================ */
 
-function render(from, to, classF, svcF){
+  function render(from, to, classF, svcF){
 
-  const res     = document.getElementById('results');
-  const cards   = document.getElementById('service-cards');
-  const routeEl = document.getElementById('result-route');
-  const metaEl  = document.getElementById('result-meta');
-  const szNote  = document.getElementById('sz-note');
+    const res     = document.getElementById('results');
+    const cards   = document.getElementById('service-cards');
+    const routeEl = document.getElementById('result-route');
+    const metaEl  = document.getElementById('result-meta');
+    const szNote  = document.getElementById('sz-note');
 
-  res.style.display = 'block';
-  cards.innerHTML = '';
+    res.style.display = 'block';
+    cards.innerHTML = '';
 
-  routeEl.textContent =
-    (ALL_ST[from]?ALL_ST[from].n:from)+' → '+
-    (ALL_ST[to]?ALL_ST[to].n:to);
+    routeEl.textContent =
+      (ALL_ST[from]?ALL_ST[from].n:from)+' → '+
+      (ALL_ST[to]?ALL_ST[to].n:to);
 
-  const clss = classF==='all' ? ['standard','blue_seat','yurani'] : [classF];
+    const clss = classF==='all' ? ['standard','blue_seat','yurani'] : [classF];
 
-  const results = [];
+    /* results: one entry per (label × class) */
+    const results = [];
 
-  /* =========================================================
-     CASE 1 — DIRECT (come prima)
-  ========================================================= */
+    /* =========================================================
+       CASE 1 — DIRECT
+    ========================================================= */
 
-  if(!isInterline(from, to)){
+    if(!isInterline(from, to)){
 
-    szNote.style.display = (from==='K101'||to==='K101') ? 'block' : 'none';
+      szNote.style.display = (from==='K101'||to==='K101') ? 'block' : 'none';
 
-    const svcs = svcF==='all' ? Object.keys(ALL_SVC) : [svcF];
+      const svcs = svcF==='all' ? Object.keys(ALL_SVC) : [svcF];
 
-    svcs.forEach(k => {
-      if(!serves(k,from,to)) return;
+      svcs.forEach(k => {
+        if(!serves(k,from,to)) return;
+        const km = tariffKm(from,to,k);
+        if(!km || km<=0) return;
 
-      const km = tariffKm(from,to,k);
-      if(!km || km<=0) return;
-
-      clss.forEach(c => {
-        const price = calcPrice(km, ALL_SVC[k].coeff, CLASS_C[c]);
-
-        results.push({
-          type: 'direct',
-          label: k,
-          svc: k,
-          class: c,
-          km,
-          price
+        clss.forEach(c => {
+          const price = calcPrice(km, ALL_SVC[k].coeff, CLASS_C[c]);
+          results.push({ type:'direct', label:k, svc:k, class:c, km, price });
         });
       });
-    });
 
-  }
+    }
 
-  /* =========================================================
-     CASE 2 — INTERLINE (NUOVO 🔥)
-  ========================================================= */
+    /* =========================================================
+       CASE 2 — INTERLINE
+    ========================================================= */
 
-  else{
+    else{
 
-    szNote.style.display = 'block';
-    szNote.innerHTML =
-      "ⓘ Transfer at Sainðaul Central (R01/K01). Combined fare applied.";
+      szNote.style.display = 'block';
+      szNote.innerHTML =
+        "ⓘ Transfer at Sainðaul Central (R01/K01). Combined fare applied.";
 
-    const rySvcs = Object.keys(RY_SVC);
-    const keSvcs = Object.keys(KE_SVC);
-
-    const fromIsRY = lineOf(from) === 'RY';
-
-    clss.forEach(c => {
+      const rySvcs = Object.keys(RY_SVC);
+      const keSvcs = Object.keys(KE_SVC);
+      const fromIsRY = lineOf(from) === 'RY';
 
       rySvcs.forEach(rSvc => {
         keSvcs.forEach(kSvc => {
 
-          let seg1, seg2;
+          /* check validity with standard class (km is class-independent) */
+          const testSeg1 = fromIsRY
+            ? calcSegment(from, HUB_R, rSvc, 'standard')
+            : calcSegment(from, HUB_K, kSvc, 'standard');
+          const testSeg2 = fromIsRY
+            ? calcSegment(HUB_K, to, kSvc, 'standard')
+            : calcSegment(HUB_R, to, rSvc, 'standard');
 
-          if(fromIsRY){
-            seg1 = calcSegment(from, HUB_R, rSvc, c);
-            seg2 = calcSegment(HUB_K, to, kSvc, c);
-          } else {
-            seg1 = calcSegment(from, HUB_K, kSvc, c);
-            seg2 = calcSegment(HUB_R, to, rSvc, c);
-          }
+          if(!testSeg1 || !testSeg2) return;
 
-          if(!seg1 || !seg2) return;
-
-          const totalKm = seg1.km + seg2.km;
-          const basePrice = seg1.price + seg2.price;
-
+          const totalKm = testSeg1.km + testSeg2.km;
           const discount = getDiscount(totalKm);
-          const finalPrice = basePrice * (1 - discount);
+          const comboLabel = fromIsRY ? (rSvc+'+'+kSvc) : (kSvc+'+'+rSvc);
 
-          results.push({
-            type: 'combo',
-            label: fromIsRY ? (rSvc + '+' + kSvc) : (kSvc + '+' + rSvc),
-            svc1: fromIsRY ? rSvc : kSvc,
-            svc2: fromIsRY ? kSvc : rSvc,
-            class: c,
-            km: totalKm,
-            price: Math.round(finalPrice*100)/100
+          clss.forEach(c => {
+            const seg1 = fromIsRY
+              ? calcSegment(from, HUB_R, rSvc, c)
+              : calcSegment(from, HUB_K, kSvc, c);
+            const seg2 = fromIsRY
+              ? calcSegment(HUB_K, to, kSvc, c)
+              : calcSegment(HUB_R, to, rSvc, c);
+
+            const basePrice = seg1.price + seg2.price;
+            const finalPrice = Math.round(basePrice * (1 - discount) * 100) / 100;
+
+            results.push({
+              type: 'combo',
+              label: comboLabel,
+              svc1: fromIsRY ? rSvc : kSvc,
+              svc2: fromIsRY ? kSvc : rSvc,
+              class: c,
+              km: totalKm,
+              price: finalPrice
+            });
           });
 
         });
       });
 
+    }
+
+    /* =========================================================
+       GROUP by label — one card per service / service-pair
+    ========================================================= */
+
+    if(!results.length){
+      metaEl.textContent = '';
+      cards.innerHTML = '<p class="no-service">No valid route found.</p>';
+      document.getElementById('stop-diagram').style.display = 'none';
+      return;
+    }
+
+    /* preserve insertion order of labels */
+    const labelOrder = [];
+    const grouped = {};
+    results.forEach(r => {
+      if(!grouped[r.label]){
+        grouped[r.label] = [];
+        labelOrder.push(r.label);
+      }
+      grouped[r.label].push(r);
     });
 
+    const kms = [...new Set(results.map(r=>r.km.toFixed(1)))];
+    metaEl.textContent =
+      kms.length===1 ? kms[0]+' km' : kms.join(' / ')+' km';
+
+    const minP = Math.min(...results.map(r=>r.price));
+
+    labelOrder.forEach(label => {
+      const rows = grouped[label];
+      const first = rows[0];
+      const isCombo = first.type === 'combo';
+
+      const card = document.createElement('div');
+      card.className = 'service-card';
+
+      /* ── header ── */
+      let headerHTML;
+      if(isCombo){
+        const p1 = first.svc1==='Cp' ? 'C\u2032' : first.svc1;
+        const p2 = first.svc2==='Cp' ? 'C\u2032' : first.svc2;
+        headerHTML = `
+          <div class="combo-badges">
+            <span class="svc-badge svc-${first.svc1==='Cp'?'Cp':first.svc1}">${p1}</span>
+            <span class="combo-sep">+</span>
+            <span class="svc-badge svc-${first.svc2==='Cp'?'Cp':first.svc2}">${p2}</span>
+          </div>
+          <span class="svc-name">Transfer combo</span>`;
+      } else {
+        const info = ALL_SVC[first.svc];
+        const pill = first.svc==='Cp' ? 'C\u2032' : first.svc;
+        headerHTML = `
+          <span class="svc-badge svc-${first.svc==='Cp'?'Cp':first.svc}">${pill}</span>
+          <span class="svc-name">${info.name}</span>`;
+      }
+
+      /* ── price rows (one per class) ── */
+      const priceRowsHTML = rows.map(r => {
+        const isBest = r.price === minP;
+        return `
+          <div class="price-row${isBest?' best-price':''}">
+            <span class="price-class">${CLASS_L[r.class]}</span>
+            <span class="price-val">${fmt(r.price)} <span class="price-usd">${fusd(r.price)}</span></span>
+          </div>`;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="service-card-header">${headerHTML}</div>
+        <div class="price-rows">${priceRowsHTML}</div>
+        <div class="card-km">${first.km.toFixed(1)} km${isCombo?' · combined fare':''}</div>`;
+
+      cards.appendChild(card);
+    });
+
+    /* stop diagram — only for direct routes */
+    if(results[0].type === 'combo'){
+      document.getElementById('stop-diagram').style.display = 'none';
+    } else {
+      /* deduplicate services for diagram */
+      const diagSvcs = [...new Set(results.map(r=>r.svc))];
+      renderDiagram(diagSvcs.map(k=>({k})), from, to);
+    }
+
   }
 
-  /* =========================================================
-     RENDER
-  ========================================================= */
-
-  if(!results.length){
-    metaEl.textContent = '';
-    cards.innerHTML = '<p class="no-service">No valid route found.</p>';
-    document.getElementById('stop-diagram').style.display = 'none';
-    return;
-  }
-
-  const kms = [...new Set(results.map(r=>r.km.toFixed(1)))];
-  metaEl.textContent =
-    kms.length===1 ? kms[0]+' km' : kms.join(' / ')+' km';
-
-  const minP = Math.min(...results.map(r=>r.price));
-
-  results.forEach(r => {
-
-    const info = r.type === 'direct'
-      ? ALL_SVC[r.svc]
-      : null;
-
-    const card = document.createElement('div');
-    card.className = 'service-card';
-
-    const isBest = r.price === minP;
-
-    const title = r.type === 'direct'
-      ? `${r.label}`
-      : `${r.label}`;
-
-    const subtitle = r.type === 'direct'
-      ? info.name
-      : `Transfer combo`;
-
-    card.innerHTML = `
-      <div class="service-card-header">
-        <span class="svc-badge">${title}</span>
-        <span class="svc-name">${subtitle}</span>
-      </div>
-
-      <div class="price-rows">
-        <div class="price-row ${isBest?'best-price':''}">
-          <span class="price-class">${CLASS_L[r.class]}</span>
-          <span class="price-val">
-            ${fmt(r.price)} <span class="price-usd">${fusd(r.price)}</span>
-          </span>
-        </div>
-      </div>
-
-      <div class="card-km">
-        ${r.km.toFixed(1)} km
-        ${r.type==='combo' ? ' · combined fare' : ''}
-      </div>
-    `;
-
-    cards.appendChild(card);
-  });
-
-  /* opzionale: disabilita diagramma su combinati */
-  if(results[0].type === 'combo'){
-    document.getElementById('stop-diagram').style.display = 'none';
-  } else {
-    renderDiagram(results.map(r=>({k:r.svc})), from, to);
-  }
-
-}
   buildSelects();
 
   document.getElementById('btn-swap').addEventListener('click', () => {
