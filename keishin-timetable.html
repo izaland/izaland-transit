@@ -70,6 +70,10 @@
     .filter-chip{display:flex;align-items:center;gap:var(--space-2);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:var(--space-1) var(--space-3);font-size:var(--text-xs);font-weight:600;cursor:pointer;transition:background var(--transition),border-color var(--transition);user-select:none;}
     .filter-chip input{accent-color:var(--accent);}
     .filter-chip:hover{border-color:var(--text-muted);}
+    .filter-table{width:100%;border-collapse:collapse;margin-top:var(--space-4);}
+.filter-table td{padding:var(--space-1) var(--space-3) var(--space-1) 0;vertical-align:top;}
+.filter-table td:first-child{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);white-space:nowrap;padding-top:6px;width:120px;}
+.filter-group{display:flex;flex-wrap:wrap;gap:var(--space-2);}
 
     /* RESULTS */
     .results-panel{max-width:900px;margin:0 auto var(--space-12);padding:0 var(--space-8);}
@@ -150,11 +154,19 @@
           <select id="sel-station"><option value="">— seleziona stazione —</option></select>
         </div>
         <div class="search-field" style="max-width:160px;">
-          <label for="sel-dir">Direzione</label>
+          <label for="sel-dir">Direction</label>
           <select id="sel-dir">
-            <option value="">Entrambe</option>
-            <option value="SB">→ SB (verso Warohan/Daishin)</option>
-            <option value="NB">← NB (verso Sainðaul/Sakamuso)</option>
+            <option value="">Both</option>
+             <optgroup label="IZX Keishin">
+            <option value="SB_K17">→ SB (Warohan/Daishin bound)</option>
+            <option value="NB_K01">← NB (Sainðaul/Sakamuso bound)</option>
+                 </optgroup>
+            <optgroup label="IZX Ryānkai">
+    <option value="SB_R21">→ Sannupuri (R21) bound</option>
+    <option value="NB_R01">← Sainðaul Central (R01) bound</option>
+    <option value="SB_FUDO">→ Fudoasamo (not active) bound </option>
+    <option value="SB_KIIK">→ Kiikori (not active) bound</option>
+  </optgroup>
           </select>
         </div>
         <div class="search-field" style="max-width:130px;">
@@ -170,7 +182,7 @@
   <div class="results-panel" id="results-panel">
     <div class="no-results">
       <div class="no-results-icon">🔍</div>
-      <p>Seleziona una stazione per visualizzare gli orari.</p>
+      <p>Select a station in order to view the timetable.</p>
     </div>
   </div>
 
@@ -211,8 +223,12 @@ const SCHEDULE = {"meta": {"line": "IZX Keishin", "generated": "2026-04-16", "se
 
   // ── timetable logic ───────────────────────────────────────────────────────────
   const SVC_COLORS={
+    // IZX Keishin
     "A":"#002A91","B":"#1B71CB","C":"#729FCF","C'":"#5B8AB0",
-    "E":"#926ACA","F lim":"#BC68CC","F ext":"#BC68CC","G":"#7B3D01"
+    "E":"#926ACA","F lim":"#BC68CC","F ext":"#BC68CC",
+    // IZX Ryānkai
+    "L":"#A7084B","K":"#EA7501","J":"#C9211E",
+    "G":"#148466","I":"#1F6A39","H":"#50938A"
   };
 
   // populate station select
@@ -220,43 +236,121 @@ const SCHEDULE = {"meta": {"line": "IZX Keishin", "generated": "2026-04-16", "se
   SCHEDULE.stations.forEach(s=>{stationMap[s.code]=s;});
 
   // order stations logically
-  const STATION_ORDER=[
+  const KEISHIN_ORDER=[
     "K01","K02","K03","K31","K32","K33","K04","K05","K06","K07","K08","K09","K10",
-    "K101","K102","K120","K103","K104","K105","K106","K160",
     "K101b","K11","K12","K13","K14","K144","K15","K16","K116","K17",
     "N1","N2","N3","N4"
   ];
+  const SAKAMUSO_ORDER=[
+    "K101","K102","K120","K103","K104","K105","K106","K160"
+  ];
+  const RYANKAI_ORDER=[
+    "R01","R02","R03","R04","R05","R06","R61","R07","R08","R81",
+    "R09","R10","R11","R12","R13","R14","R15","R16","R17","R18","R19","R20","R21"
+  ];
+  const RY_STATIONS={
+    "R01":"Sainðaul Central","R02":"Asaji Torimoshi","R03":"Shin-Enikezya",
+    "R04":"Nari-Odanuri","R05":"Todakuri-Tojirushi","R06":"Isadashi",
+    "R61":"Shin-Gomatsuki","R07":"Beikejo","R08":"Rinnajin","R81":"Aihasa",
+    "R09":"Humabe Resort","R10":"Furesāri","R11":"Kahenji-Nukkistama",
+    "R12":"Ōdakaida-Ranku","R13":"Riyatoma","R14":"Kōsa-Hannan",
+    "R15":"Shin-Makkenoke","R16":"Soritsun Kōwen","R17":"Hentsari-Donan",
+    "R18":"Rekefura-Kōwen","R19":"Chunnitai","R20":"Shin-Pekonai","R21":"Sannupuri"
+  };
 
   const sel=document.getElementById('sel-station');
-  STATION_ORDER.forEach(code=>{
-    const s=stationMap[code];
-    if(!s)return;
+
+  function makeOpt(code, name, kanji){
     const opt=document.createElement('option');
     opt.value=code;
-    opt.textContent=`${code} — ${s.name}${s.kanji?' ('+s.kanji+')':''}`;
-    sel.appendChild(opt);
+    opt.textContent=`${code} — ${name}${kanji?' ('+kanji+')':''}`;
+    return opt;
+  }
+
+  // --- Gruppo Keishin main line ---
+  const grpMain=document.createElement('optgroup');
+  grpMain.label='IZX Keishin — Main Line';
+  KEISHIN_ORDER.forEach(code=>{
+    const s=stationMap[code];
+    if(!s)return;
+    grpMain.appendChild(makeOpt(code, s.name, s.kanji));
   });
+  sel.appendChild(grpMain);
+
+  // --- Gruppo Sakamuso branch ---
+  const grpSaka=document.createElement('optgroup');
+  grpSaka.label='IZX Keishin — Sakamuso Branch';
+  SAKAMUSO_ORDER.forEach(code=>{
+    const s=stationMap[code];
+    if(!s)return;
+    grpSaka.appendChild(makeOpt(code, s.name, s.kanji));
+  });
+  sel.appendChild(grpSaka);
+
+  // --- Gruppo Ryānkai ---
+  const grpRY=document.createElement('optgroup');
+  grpRY.label='IZX Ryānkai';
+  RYANKAI_ORDER.forEach(code=>{
+    const name=RY_STATIONS[code];
+    if(!name)return;
+    grpRY.appendChild(makeOpt(code, name, ''));
+  });
+  sel.appendChild(grpRY);
 
   // service filter chips
-  const SERVICES=["A","B","C","C'","E","F lim","F ext","G"];
-  const activeServices=new Set(SERVICES);
-  const fr=document.getElementById('filter-row');
-  SERVICES.forEach(sv=>{
-    const chip=document.createElement('label');
-    chip.className='filter-chip';
-    const cb=document.createElement('input');
-    cb.type='checkbox'; cb.checked=true;
-    cb.addEventListener('change',()=>{
-      if(cb.checked)activeServices.add(sv); else activeServices.delete(sv);
+const SERVICE_GROUPS = [
+  {
+    label: 'IZX Keishin',
+    services: ["A","B","C","C'","E","F lim","F ext","G"]
+  },
+  {
+    label: 'IZX Ryānkai',
+    services: ["L","K","J","G","I","H"]
+  }
+];
+
+const allServices = SERVICE_GROUPS.flatMap(g => g.services);
+const activeServices = new Set(allServices);
+
+const fr = document.getElementById('filter-row');
+const table = document.createElement('table');
+table.className = 'filter-table';
+
+SERVICE_GROUPS.forEach(group => {
+  const tr = document.createElement('tr');
+
+  const tdLabel = document.createElement('td');
+  tdLabel.textContent = group.label;
+  tr.appendChild(tdLabel);
+
+  const tdChips = document.createElement('td');
+  const chipGroup = document.createElement('div');
+  chipGroup.className = 'filter-group';
+
+  group.services.forEach(sv => {
+    const chip = document.createElement('label');
+    chip.className = 'filter-chip';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = true;
+    cb.addEventListener('change', () => {
+      if(cb.checked) activeServices.add(sv);
+      else activeServices.delete(sv);
     });
+    const badge = document.createElement('span');
+    badge.className = 'svc-badge';
+    badge.style.background = SVC_COLORS[sv] || '#555';
+    badge.textContent = sv;
     chip.appendChild(cb);
-    const badge=document.createElement('span');
-    badge.className='svc-badge';
-    badge.style.background=SVC_COLORS[sv]||'#555';
-    badge.textContent=sv;
     chip.appendChild(badge);
-    fr.appendChild(chip);
+    chipGroup.appendChild(chip);
   });
+
+  tdChips.appendChild(chipGroup);
+  tr.appendChild(tdChips);
+  table.appendChild(tr);
+});
+
+fr.appendChild(table);
 
   function timeToMin(s){
     const [h,m]=s.split(':').map(Number); return h*60+m;
@@ -268,17 +362,24 @@ const SCHEDULE = {"meta": {"line": "IZX Keishin", "generated": "2026-04-16", "se
     return s;
   }
 
-  function doSearch(){
-    const stCode=document.getElementById('sel-station').value;
-    const dir=document.getElementById('sel-dir').value;
-    const fromTime=document.getElementById('sel-from').value||'00:00';
-    const fromMin=timeToMin(fromTime);
-    const panel=document.getElementById('results-panel');
+function doSearch(){
+  const code = document.getElementById('sel-station').value;
+  if(!code){ 
+    document.getElementById('results-panel').innerHTML=
+      `<div class="no-results"><div class="no-results-icon">🔍</div><p>Select a station to show the timetable.</p></div>`;
+    return;
+  }
 
-    if(!stCode){
-      panel.innerHTML='<div class="no-results"><div class="no-results-icon">⚠️</div><p>Seleziona una stazione.</p></div>';
-      return;
-    }
+  // Stazioni Ryānkai — orari non ancora disponibili
+  if(code.startsWith('R')){
+    document.getElementById('results-panel').innerHTML=
+      `<div class="no-results"><div class="no-results-icon">🚧</div>
+      <p><strong>IZX Ryānkai</strong> —Timetable not available yet.<br>
+      <span style="font-size:.85em;color:var(--text-faint);">Questa sezione è in costruzione.</span></p></div>`;
+    return;
+  }
+
+  // ... resto della logica Keishin invariata
 
     const st=stationMap[stCode];
     const matches=[];
