@@ -95,6 +95,7 @@
     .tt-row{cursor:pointer;}
     .tt-row:hover td{background:var(--surface-2);}
     .svc-badge{display:inline-block;padding:2px 8px;border-radius:99px;font-weight:700;font-size:.7rem;color:#fff;white-space:nowrap;}
+    .svc-badge-group{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
     .line-badge{display:inline-block;padding:1px 6px;border-radius:4px;font-weight:700;font-size:.65rem;color:#fff;margin-right:4px;}
     .time-cell{font-variant-numeric:tabular-nums;font-weight:600;}
     .dir-badge{font-size:.65rem;padding:1px 6px;border-radius:4px;font-weight:600;}
@@ -117,6 +118,8 @@
     .trip-stop--current .trip-stop-name{color:var(--accent);font-weight:700;}
     .trip-stop-name{font-size:.8rem;padding-left:var(--space-3);}
     .stop-kanji{font-size:.7rem;color:var(--text-muted);margin-left:4px;}
+    .trip-stop-branch{margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px dashed var(--border);}
+    .trip-stop-branch-title{font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--space-2);}
     .no-results{text-align:center;padding:var(--space-12);color:var(--text-muted);}
     .no-results-icon{font-size:2.5rem;margin-bottom:var(--space-4);}
 
@@ -362,8 +365,6 @@ function doSearch() {
       toTime:   "29:00",
       services: svcs,
     });
-    // per stazioni condivise (es. K01=R01=Sainðaul Central) cerca anche nella linea corretta
-    // se la stazione selezionata appartiene a un'altra linea, salta
     results.push(...trips);
   }
 
@@ -414,9 +415,27 @@ function renderResults(trips, stCode, lineId) {
     const dep = stopData?.dep ?? "—";
     const arr = stopData?.arr ?? "—";
     const lineDef = IZX_LINES[trip.lineId];
-    const termName = lineDef?.ST[trip.terminus]?.n ?? trip.terminus;
     const dirCls   = trip.direction === "SB" ? "dir-sb" : "dir-nb";
     const dirLabel = trip.direction === "SB" ? "→ SB" : "← NB";
+
+    let svcHtml;
+    let terminusHtml;
+
+    if (trip._paired && trip._twin) {
+      const twin = trip._twin;
+      const termAName = lineDef?.ST[trip.terminus]?.n ?? trip.terminus;
+      const termBName = lineDef?.ST[twin.terminus]?.n ?? twin.terminus;
+      svcHtml = `
+        <div class="svc-badge-group">
+          <span class="svc-badge" style="background:${trip.color}">${trip.svcId} · ${trip.name}</span>
+          <span class="svc-badge" style="background:${twin.color}">${twin.svcId} · ${twin.name}</span>
+        </div>`;
+      terminusHtml = `<span class="terminus-small">${trip.terminus} ${termAName} / ${twin.terminus} ${termBName}</span>`;
+    } else {
+      const termName = lineDef?.ST[trip.terminus]?.n ?? trip.terminus;
+      svcHtml = `<span class="svc-badge" style="background:${trip.color}">${trip.svcId} · ${trip.name}</span>`;
+      terminusHtml = `<span class="terminus-small">${trip.terminus} ${termName}</span>`;
+    }
 
     html += `
       <tr class="tt-row" onclick="toggleDetail(${idx}, this)">
@@ -424,13 +443,11 @@ function renderResults(trips, stCode, lineId) {
         <td class="left">
           <span class="line-badge" style="background:${lineDef?.color ?? '#666'}">${trip.lineId}</span>
         </td>
-        <td class="left">
-          <span class="svc-badge" style="background:${trip.color}">${trip.svcId} · ${trip.name}</span>
-        </td>
+        <td class="left">${svcHtml}</td>
         <td><span class="dir-badge ${dirCls}">${dirLabel}</span></td>
         <td class="time-cell">${dep}</td>
         <td class="time-cell" style="color:var(--text-muted)">${arr}</td>
-        <td class="left"><span class="terminus-small">${trip.terminus} ${termName}</span></td>
+        <td class="left">${terminusHtml}</td>
       </tr>
       <tr class="trip-detail-row" id="detail-${idx}" style="display:none">
         <td colspan="7">${buildStopList(trip, stCode)}</td>
@@ -441,7 +458,7 @@ function renderResults(trips, stCode, lineId) {
   panel.innerHTML = html;
 }
 
-function buildStopList(trip, currentStop) {
+function renderSingleStopList(trip, currentStop) {
   const lineDef = IZX_LINES[trip.lineId];
   let html = `<div class="trip-stops">`;
   for (const [code, times] of Object.entries(trip.stops)) {
@@ -465,6 +482,18 @@ function buildStopList(trip, currentStop) {
   }
   html += `</div>`;
   return html;
+}
+
+function buildStopList(trip, currentStop) {
+  if (trip._paired && trip._twin) {
+    return `
+      ${renderSingleStopList(trip, currentStop)}
+      <div class="trip-stop-branch">
+        <div class="trip-stop-branch-title">Paired branch · ${trip._twin.svcId} ${trip._twin.name}</div>
+        ${renderSingleStopList(trip._twin, currentStop)}
+      </div>`;
+  }
+  return renderSingleStopList(trip, currentStop);
 }
 
 function toggleDetail(idx, rowEl) {
