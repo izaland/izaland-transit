@@ -138,6 +138,81 @@ const RY_SVC = {
       stops:["R01","R02","R06","R10","R14","R15","R16","R17","R18","R19","R20","R21"]},
 };
 
+/* ---- SEIBU NAERYUKU BRANCH (SA / SK / BL) ---- */
+const SA_ST = {
+  SA01:  {n:"Chun\u00f0ouni-Naoza",  k:"\u9baa\u7a2e - \u6912\u6f5f", b:"sa"},
+  SA02:  {n:"Poridake",               k:"\u767b\u9928",                   b:"sa"},
+  SA101: {n:"Hakosakki",              k:"\u5143\u7aef",                   b:"sa_j"},
+  SA03:  {n:"Pakkutanma",             k:"\u8d64\u8c37",                   b:"sa_j"},
+  SA04:  {n:"Yamagata",               k:"\u5009\u6cc9",                   b:"sa_j"},
+  SA05:  {n:"Tentosamo",              k:"\u72ac\u5c71",                   b:"sa_j"},
+  SA06:  {n:"Fudoasamo",              k:"\u76bf\u5c71",                   b:"sa_j"},
+  SK01:  {n:"Sum\u0101ra",            k:"",                               b:"sk"},
+  SK02:  {n:"Tohpatogu",              k:"",                               b:"sk"},
+  SK03:  {n:"Soranaka",               k:"",                               b:"sk"},
+  SK04:  {n:"Tsobunetoka",            k:"",                               b:"sk"},
+  SK05:  {n:"Kiikori",                k:"",                               b:"sk"},
+  BL01:  {n:"Gunporainen",            k:"",                               b:"bl"},
+  BL02:  {n:"Yamatsuka / Banzilluun", k:"",                               b:"bl"},
+  BL03:  {n:"Behringstein",           k:"",                               b:"bl"},
+  BL04:  {n:"Pyhritz-Keltenberg",     k:"",                               b:"bl"},
+  BL05:  {n:"Burgenau HBF",           k:"",                               b:"bl"},
+};
+const SA_CANONICAL_ORDER = [
+  "SA01","SA02",
+  "SA101","SA03","SA04","SA05","SA06",
+  "SK01","SK02","SK03","SK04","SK05",
+  "BL01","BL02","BL03","BL04","BL05"
+];
+
+/* ---- DŌNPUKU BRANCH (DP / DN) ---- */
+const DP_ST = {
+  DP01:{n:"Makkenoke",  k:"",b:"dp"}, DP02:{n:"Tanjiku",    k:"",b:"dp"},
+  DP03:{n:"Hidankoibo", k:"",b:"dp"}, DP04:{n:"Mitakagi",   k:"",b:"dp"},
+  DP05:{n:"Sonzhin",    k:"",b:"dp"}, DP06:{n:"Kakuitama",  k:"",b:"dp"},
+  DP07:{n:"Togumua",    k:"",b:"dp"},
+  DN01:{n:"Usemihaki",  k:"",b:"dn"}, DN02:{n:"Tsusamo",    k:"",b:"dn"},
+  DN03:{n:"Taobin",     k:"",b:"dn"}, DN04:{n:"Haoji",      k:"",b:"dn"},
+  DN05:{n:"Kyuoi-Maka", k:"",b:"dn"},
+};
+const DP_CANONICAL_ORDER = [
+  "DP01","DP02","DP03","DP04","DP05","DP06","DP07",
+  "DN01","DN02","DN03","DN04","DN05"
+];
+
+/* ---- INTERNATIONAL EXTENSION (G, future) ---- */
+const RY_INT_ST = {
+  R22:{n:"Shiki-Sannupuri",k:"\u5317\u4e7e\u5c71",b:"int"},
+  R23:{n:"Sebaskai",       k:"\u5352\u570b",       b:"int"},
+  SZ1:{n:"Shirariushnay",  k:"",                   b:"sz"},
+  SZ2:{n:"Hataranta",      k:"\u57fc\u6e1a",       b:"sz"},
+  SZ3:{n:"Eulerhafen C.",  k:"",                   b:"sz"},
+};
+
+/* ---- RY_TT — offset in secondi da R01 (include 60s dwell per fermata) ---- */
+const RY_TT = {
+  L:{R01:0,R02:366,R03:772,R04:1136,R05:1855,R06:2689,R61:3277,R07:3570,R08:3983,R81:4245,R09:5214,R10:6176,R11:6864,R12:7232,R13:8380},
+  K:{R01:0,R02:366,R03:712,R06:1909,R08:2723,R10:3776,R13:4960,R14:5579,SA01:5800,SA02:6220,SK01:6520,SK02:6880,SK03:7240,SK04:7600,SK05:7960,BL01:8500,BL02:8980,BL03:9460,BL04:9940,BL05:10480},
+  J:{R01:0,R02:366,R03:712,R06:1909,R08:2723,R10:3776,R13:4960,R14:5579,SA01:5800,SA02:6220,SA101:6460,SA03:6700,SA04:7000,SA05:7300,SA06:7600},
+  G:{R01:0,R02:306,R06:1789,R08:2603,R81:2805,R10:3716,R13:4900,R14:5519,R15:5899,R16:6273,R17:6651,R18:7039,R19:7455,R20:7696,R21:8194,R22:8734,R23:9394,SZ1:10054,SZ2:10594,SZ3:11134},
+  I:{R01:0,R02:306,R06:1789,R10:3596,R13:4780,R15:5719,DP01:6079,DP02:6499,DP03:6919,DP04:7339,DP05:7759,DP06:8179,DP07:8599,DN01:9079,DN02:9559,DN03:10039,DN04:10519,DN05:10999},
+  H:{R01:0,R02:306,R06:1789,R10:3596,R14:5339,R15:5719,R16:6093,R17:6471,R18:6859,R19:7275,R20:7516,R21:8014},
+};
+
+/* ---- RY_FREQ — treni/ora per direzione ---- */
+const RY_FREQ = {
+  L:{offpeak:1,peak:2},
+  K:{offpeak:2,peak:2},
+  J:{offpeak:2,peak:2},
+  G:{offpeak:1,peak:1},
+  I:{offpeak:1,peak:1},
+  H:{offpeak:1,peak:1},
+};
+const RY_PEAK_WINDOWS = [
+  {start:"07:30",end:"09:00"},
+  {start:"17:00",end:"19:30"},
+];
+
 /* ----------------------------------------------------------------
    EIRA LINE
 ---------------------------------------------------------------- */
