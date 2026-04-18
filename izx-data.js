@@ -131,7 +131,7 @@ const RY_SVC = {
   J: {coeff:1.08, name:"Nansai",   cls:"svc-J", color:"#C9211E",
       stops:["R01","R02","R06","R10","R13"]},
   G: {coeff:1.15, name:"Daihuku", cls:"svc-G", color:"#148466",
-      stops:["R01","R02","R06","R13","R14","R15","R16","R17","R18","R19","R20","R21]},
+      stops:["R01","R02","R06","R13","R14","R15","R16","R17","R18","R19","R20","R21"]},
   I: {coeff:1.15, name:"Daidōn", cls:"svc-I", color:"#1F6A39",
       stops:["R01","R02","R06","R13","R14","R15"]},
   H: {coeff:1.15, name:"Kinbuku", cls:"svc-H", color:"#50938A",
@@ -332,7 +332,7 @@ const IZX_LINES = {
       H: [{terminus:"R21",  weight:1}],
       L: [{terminus:"R21",  weight:1}],
     },
-    OFFSETS: {L:0, K:0, J:30, G:0, I:20, H:40},
+    OFFSETS: {L:0, K:0, J:30, G:10, I:20, H:40},
   },
 
   /* EI: placeholder — aggiungere EI_TT, EI_FREQ, EI_PEAK quando pronti */
