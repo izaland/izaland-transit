@@ -417,7 +417,9 @@ const SCHEDULE = {"meta": {"line": "IZX Keishin", "generated": "2026-04-16", "se
         :'<span class="dir-badge dir-nb">← NB</span>';
 
       // Build stop list for expanded view
-      const stopOrder=Object.entries(trip.stops)
+const svcKey = trip.service === "C'" ? "Cp" : trip.service;
+const svcStops = KE_SVC[svcKey]?.stops || null;
+        .filter(([sc])=> !svcStops || svcStops.includes(sc))
         .sort((a,b)=>timeToMin(a[1].arr)-timeToMin(b[1].arr));
       let stopsHtml='<div class="trip-stops">';
       stopOrder.forEach(([sc,times],si)=>{
