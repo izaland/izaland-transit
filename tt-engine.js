@@ -89,6 +89,7 @@ const TTEngine = (() => {
 
       if (maxDep >= fromSec && minDep <= toSec) {
         trips.push({
+          _uid:      `${lineId}:${svcId}:${dir}:${cursor}`,
           lineId,
           svcId,
           name:      svc.name,
@@ -105,6 +106,47 @@ const TTEngine = (() => {
     }
 
     return trips;
+  }
+
+  /* ---- raggruppa coppie dichiarate con svc.pair (es. K+J) ---- */
+  function groupPairs(trips) {
+    const out  = [];
+    const used = new Set();
+
+    for (const trip of trips) {
+      if (used.has(trip._uid)) continue;
+
+      const svc       = IZX_LINES[trip.lineId]?.SVC?.[trip.svcId];
+      const pairSvcId = svc?.pair;
+
+      if (pairSvcId) {
+        const depKey = t => Object.values(t.stops)[0].dep;
+        const twin   = trips.find(t =>
+          !used.has(t._uid)          &&
+          t.lineId    === trip.lineId    &&
+          t.svcId     === pairSvcId      &&
+          t.direction === trip.direction &&
+          depKey(t)   === depKey(trip)
+        );
+
+        if (twin) {
+          out.push({
+            ...trip,
+            _paired:         true,
+            _twin:           twin,
+            terminusDisplay: `${trip.terminus} / ${twin.terminus}`,
+            nameDisplay:     `${trip.svcId}+${twin.svcId}`,
+          });
+          used.add(trip._uid);
+          used.add(twin._uid);
+          continue;
+        }
+      }
+
+      out.push(trip);
+      used.add(trip._uid);
+    }
+    return out;
   }
 
   /* ---- API pubblica ---- */
@@ -174,7 +216,7 @@ const TTEngine = (() => {
       return getKey(a) - getKey(b);
     });
 
-    return results;
+    return groupPairs(results);
   }
 
   /**
