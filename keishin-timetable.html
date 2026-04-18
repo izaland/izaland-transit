@@ -143,8 +143,8 @@
     <a href="izx.html" class="back-link">← IZX Overview</a>
     <div class="page-label">IZX Keishin · 京深線</div>
     <h1 class="page-title">Complete Timetable</h1>
-    <p class="page-desc">Cerca per stazione: seleziona una fermata e visualizza tutti i passaggi del giorno, filtrabili per servizio e direzione.<br>
-    Orari calcolati cinematicamente. Servizio giornaliero 06:00–23:30. Tutte le partenze sono da <strong>K01 Sainðaul Central</strong> o <strong>K101 Sakamuso</strong>.</p>
+    <p class="page-desc">Search by station: select a stop and view all the day's services, filterable by service and direction.<br>
+   Timetables calculated cinematically. Daily service 06:00–23:30. All departures are from <strong>K01 Sainðaul Central</strong> or <strong>K101 Sakamuso</strong>.</p>
   </div>
 
   <div class="search-panel">
@@ -172,7 +172,7 @@
           <label for="sel-from">Da orario</label>
           <input type="time" id="sel-from" value="06:00">
         </div>
-        <button class="search-btn" onclick="doSearch()">Cerca</button>
+        <button class="search-btn" onclick="doSearch()">Search</button>
       </div>
       <div class="filter-row" id="filter-row"></div>
     </div>
@@ -186,7 +186,7 @@
   </div>
 
   <footer>
-    <p>Izaland Transit Portal · <a href="izx.html">IZX Overview</a> · Orari generati cinematicamente</p>
+    <p>Izaland Transit Portal · <a href="izx.html">IZX Overview</a> · Timetable cinematically generated</p>
   </footer>
 
 <script>
@@ -372,16 +372,16 @@ const SCHEDULE = {"meta": {"line": "IZX Keishin", "generated": "2026-04-16", "se
     }
     let html=`<div class="results-header">
       <div class="results-title">${st.name}${st.kanji?' <span style="font-weight:400;color:var(--text-muted)">'+st.kanji+'</span>':''} — ${st.code}</div>
-      <div class="results-count">${matches.length} passaggi</div>
+      <div class="results-count">${matches.length} journeys</div>
     </div>
     <div class="results-table-wrap">
     <table class="tt">
       <thead><tr>
-        <th class="left">Servizio</th>
+        <th class="left">Service</th>
         <th>Dir.</th>
-        <th>Arrivo</th>
-        <th>Partenza</th>
-        <th class="left">Provenienza</th>
+        <th>Arrival</th>
+        <th>Departure</th>
+        <th class="left">Origin</th>
         <th class="left">Terminus</th>
       </tr></thead>
       <tbody>`;
