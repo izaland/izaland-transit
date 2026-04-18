@@ -365,6 +365,42 @@ const SCHEDULE = {"meta": {"line": "IZX Keishin", "generated": "2026-04-16", "se
     arrow.style.transition='transform 200ms ease';
   }
 
+    function buildTrainNumbers(trips){
+    // prefissi e range base per ogni servizio
+    const PREFIX = {
+      "A":  {prefix:"A",  sb:100, nb:101},
+      "B":  {prefix:"B",  sb:200, nb:201},
+      "C":  {prefix:"C",  sb:300, nb:301},
+      "C'": {prefix:"C",  sb:400, nb:401},
+      "D":  {prefix:"D",  sb:500, nb:501},
+      "E":  {prefix:"E",  sb:600, nb:601},
+      "F ext":{prefix:"F",sb:700, nb:701},
+      "F lim":{prefix:"F",sb:800, nb:801},
+    };
+    const counters = {};
+    const trainNumbers = new Map();
+
+    // ordina tutti i trip per orario di partenza dalla prima fermata
+    const sorted = [...trips].sort((a,b)=>{
+      const ta = Object.values(a.stops)[0]?.dep || "00:00";
+      const tb = Object.values(b.stops)[0]?.dep || "00:00";
+      return timeToMin(ta)-timeToMin(tb);
+    });
+
+    sorted.forEach(trip=>{
+      const cfg = PREFIX[trip.service];
+      if(!cfg) return;
+      const key = trip.service + "_" + trip.direction;
+      if(!counters[key]){
+        counters[key] = trip.direction==="SB" ? cfg.sb : cfg.nb;
+      }
+      trainNumbers.set(trip, cfg.prefix + String(counters[key]).padStart(3,"0"));
+      counters[key] += 2; // pari→pari, dispari→dispari
+    });
+
+    return trainNumbers;
+  }
+
   function doSearch(){
     const code=document.getElementById('sel-station').value;
     if(!code){
@@ -411,6 +447,7 @@ const SCHEDULE = {"meta": {"line": "IZX Keishin", "generated": "2026-04-16", "se
         <th class="left">Terminus</th>
       </tr></thead>
       <tbody>`;
+        const trainNums = buildTrainNumbers(SCHEDULE.trips);
     matches.forEach(({trip,stop},i)=>{
       const dirBadge=trip.direction==='SB'
         ?'<span class="dir-badge dir-sb">→ SB</span>'
@@ -441,7 +478,7 @@ const svcStops = KE_SVC[svcKey]?.stops || null;
       stopsHtml+='</div>';
 
       html+=`<tr class="tt-row" onclick="toggleTrip('trip-${i}',this)">
-        <td class="left"><span class="svc-badge" style="background:${SVC_COLORS[trip.service]||'#555'}">${trip.service}</span> <span style="font-size:.7rem;color:var(--text-muted)">${trip.name}</span></td>
+        <td class="left"><span class="svc-badge" style="background:${SVC_COLORS[trip.service]||'#555'}">${trip.service}</span> <span style="font-size:.7rem;color:var(--text-muted)">${trainNums.get(trip)||''}</span></td>
         <td>${dirBadge}</td>
         <td class="time-cell">${fmt24(stop.arr)}</td>
         <td class="time-cell">${fmt24(stop.dep)}</td>
