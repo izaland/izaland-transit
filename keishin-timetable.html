@@ -419,6 +419,7 @@ const SCHEDULE = {"meta": {"line": "IZX Keishin", "generated": "2026-04-16", "se
       // Build stop list for expanded view
 const svcKey = trip.service === "C'" ? "Cp" : trip.service;
 const svcStops = KE_SVC[svcKey]?.stops || null;
+      const stopOrder=Object.entries(trip.stops)
         .filter(([sc])=> !svcStops || svcStops.includes(sc))
         .sort((a,b)=>timeToMin(a[1].arr)-timeToMin(b[1].arr));
       let stopsHtml='<div class="trip-stops">';
