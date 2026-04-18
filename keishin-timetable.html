@@ -101,6 +101,23 @@
     footer{border-top:1px solid var(--border);padding:var(--space-8);text-align:center;font-size:var(--text-sm);color:var(--text-muted);}
     footer a{color:var(--accent);text-decoration:none;}
     @media(max-width:768px){nav{padding:var(--space-3) var(--space-4);}.page-header,.search-panel,.results-panel{padding-left:var(--space-4);padding-right:var(--space-4);}}
+      .tt-row{cursor:pointer;}
+    .tt-row:hover td{background:var(--surface-2);}
+    .expand-cell{width:32px;text-align:center;}
+    .expand-arrow{font-size:.65rem;color:var(--text-faint);display:inline-block;}
+    .trip-detail-row td{padding:0;background:var(--surface-2);border-bottom:2px solid var(--border);}
+    .trip-stops{padding:var(--space-4) var(--space-6);display:flex;flex-direction:column;gap:0;}
+    .trip-stop{display:grid;grid-template-columns:64px 24px 1fr;align-items:center;min-height:36px;position:relative;}
+    .trip-stop:not(:last-child)::after{content:'';position:absolute;left:calc(64px + 11px);top:50%;width:2px;height:100%;background:var(--border);transform:translateX(-50%);}
+    .trip-stop-times{display:flex;flex-direction:column;align-items:flex-end;font-variant-numeric:tabular-nums;font-size:.72rem;gap:1px;padding-right:var(--space-2);}
+    .ts-arr{color:var(--text-muted);}
+    .ts-dep{color:var(--text);font-weight:600;}
+    .trip-stop-dot{display:flex;justify-content:center;align-items:center;position:relative;z-index:1;}
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--border);border:2px solid var(--surface-2);}
+    .dot--current{background:var(--accent);border-color:var(--accent);width:12px;height:12px;}
+    .trip-stop--current .trip-stop-name{color:var(--accent);font-weight:700;}
+    .trip-stop-name{font-size:.8rem;padding-left:var(--space-3);}
+    .stop-kanji{font-size:.7rem;color:var(--text-muted);margin-left:4px;}
   </style>
 </head>
 <body>
@@ -339,6 +356,15 @@ const SCHEDULE = {"meta": {"line": "IZX Keishin", "generated": "2026-04-16", "se
     return s;
   }
 
+  function toggleTrip(id, row){
+    const detail=document.getElementById(id);
+    const arrow=row.querySelector('.expand-arrow');
+    const open=detail.style.display!=='none';
+    detail.style.display=open?'none':'table-row';
+    arrow.style.transform=open?'':'rotate(90deg)';
+    arrow.style.transition='transform 200ms ease';
+  }
+
   function doSearch(){
     const code=document.getElementById('sel-station').value;
     if(!code){
@@ -385,17 +411,43 @@ const SCHEDULE = {"meta": {"line": "IZX Keishin", "generated": "2026-04-16", "se
         <th class="left">Terminus</th>
       </tr></thead>
       <tbody>`;
-    matches.forEach(({trip,stop})=>{
+    matches.forEach(({trip,stop},i)=>{
       const dirBadge=trip.direction==='SB'
         ?'<span class="dir-badge dir-sb">→ SB</span>'
         :'<span class="dir-badge dir-nb">← NB</span>';
-      html+=`<tr>
+
+      // Build stop list for expanded view
+      const stopOrder=Object.entries(trip.stops)
+        .sort((a,b)=>timeToMin(a[1].arr)-timeToMin(b[1].arr));
+      let stopsHtml='<div class="trip-stops">';
+      stopOrder.forEach(([sc,times],si)=>{
+        const stn=stationMap[sc];
+        const sname=stn?stn.name:sc;
+        const isFirst=si===0;
+        const isLast=si===stopOrder.length-1;
+        const isCurrent=sc===code;
+        stopsHtml+=`<div class="trip-stop${isCurrent?' trip-stop--current':''}">
+          <div class="trip-stop-times">
+            <span class="ts-arr">${(!isFirst)?fmt24(times.arr):''}</span>
+            <span class="ts-dep">${(!isLast)?fmt24(times.dep):''}</span>
+          </div>
+          <div class="trip-stop-dot"><span class="dot${isCurrent?' dot--current':''}"></span></div>
+          <div class="trip-stop-name">${sname}${stn&&stn.kanji?'<span class="stop-kanji"> '+stn.kanji+'</span>':''}</div>
+        </div>`;
+      });
+      stopsHtml+='</div>';
+
+      html+=`<tr class="tt-row" onclick="toggleTrip('trip-${i}',this)">
         <td class="left"><span class="svc-badge" style="background:${SVC_COLORS[trip.service]||'#555'}">${trip.service}</span> <span style="font-size:.7rem;color:var(--text-muted)">${trip.name}</span></td>
         <td>${dirBadge}</td>
         <td class="time-cell">${fmt24(stop.arr)}</td>
         <td class="time-cell">${fmt24(stop.dep)}</td>
-        <td class="left terminus-small">${stationMap[trip.origin]?.name || trip.origin}</td>
-        <td class="left terminus-small">${stationMap[trip.terminus]?.name || trip.terminus}</td>
+        <td class="left terminus-small">${stationMap[trip.origin]?.name||trip.origin}</td>
+        <td class="left terminus-small">${stationMap[trip.terminus]?.name||trip.terminus}</td>
+        <td class="expand-cell"><span class="expand-arrow">▶</span></td>
+      </tr>
+      <tr class="trip-detail-row" id="trip-${i}" style="display:none">
+        <td colspan="7">${stopsHtml}</td>
       </tr>`;
     });
     html+=`</tbody></table></div>`;
