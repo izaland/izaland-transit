@@ -394,8 +394,8 @@ const SCHEDULE = {"meta": {"line": "IZX Keishin", "generated": "2026-04-16", "se
         <td>${dirBadge}</td>
         <td class="time-cell">${fmt24(stop.arr)}</td>
         <td class="time-cell">${fmt24(stop.dep)}</td>
-        <td class="left terminus-small">${trip.origin}</td>
-        <td class="left terminus-small">${trip.terminus}</td>
+        <td class="left terminus-small">${stationMap[trip.origin]?.name || trip.origin}</td>
+        <td class="left terminus-small">${stationMap[trip.terminus]?.name || trip.terminus}</td>
       </tr>`;
     });
     html+=`</tbody></table></div>`;
