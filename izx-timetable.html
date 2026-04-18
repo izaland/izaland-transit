@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IZX Timetable — Izaland Transit</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+  <script src="izx-data.js"></script>
+  <script src="tt-engine.js"></script>
+  <style>
+    :root{
+      --font-body:'Satoshi','Inter',sans-serif;
+      --font-display:'Cabinet Grotesk','Satoshi',sans-serif;
+      --text-xs:clamp(0.75rem,0.7rem+0.25vw,0.875rem);
+      --text-sm:clamp(0.875rem,0.8rem+0.35vw,1rem);
+      --text-base:clamp(1rem,0.95rem+0.25vw,1.125rem);
+      --text-lg:clamp(1.125rem,1rem+0.75vw,1.5rem);
+      --text-xl:clamp(1.5rem,1.2rem+1.25vw,2.25rem);
+      --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;
+      --space-6:1.5rem;--space-8:2rem;--space-12:3rem;
+      --radius-sm:.375rem;--radius-md:.5rem;--radius-lg:.75rem;--radius-xl:1rem;
+      --transition:180ms cubic-bezier(0.16,1,0.3,1);
+    }
+    [data-theme="dark"]{--bg:#0f1117;--surface:#161b27;--surface-2:#1c2235;--border:#2a3147;--text:#e2e8f0;--text-muted:#94a3b8;--text-faint:#4a5568;--accent:#3b82f6;--accent-hover:#2563eb;--accent-glow:rgba(59,130,246,0.15);}
+    [data-theme="light"]{--bg:#f8fafc;--surface:#ffffff;--surface-2:#f1f5f9;--border:#e2e8f0;--text:#1e293b;--text-muted:#64748b;--text-faint:#cbd5e1;--accent:#2563eb;--accent-hover:#1d4ed8;--accent-glow:rgba(37,99,235,0.1);}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{-webkit-font-smoothing:antialiased;}
+    body{min-height:100dvh;font-family:var(--font-body);color:var(--text);background:var(--bg);line-height:1.6;}
+
+    /* NAV */
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-8);background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
+    .nav-logo{display:flex;align-items:center;gap:var(--space-3);text-decoration:none;color:var(--text);}
+    .nav-links{display:flex;gap:var(--space-6);align-items:center;}
+    .nav-links>a{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;font-weight:500;transition:color var(--transition);}
+    .nav-links a:hover{color:var(--text);}
+    .nav-links a.active{color:var(--accent);}
+    .nav-item{position:relative;}
+    .nav-item>button{background:none;border:none;font-size:var(--text-sm);color:var(--text-muted);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0;transition:color var(--transition);}
+    .nav-item>button:hover,.nav-item.active>button{color:var(--text);}
+    .nav-item.active>button{color:var(--accent);}
+    .nav-item>button svg{transition:transform var(--transition);}
+    .nav-item.open>button svg{transform:rotate(180deg);}
+    .dropdown{position:absolute;top:calc(100%+10px);left:50%;transform:translateX(-50%) translateY(-4px);min-width:190px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-2);box-shadow:0 8px 24px oklch(0 0 0/.18);opacity:0;pointer-events:none;transition:opacity var(--transition),transform var(--transition);}
+    .nav-item.open .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+    .dropdown a{display:block;padding:var(--space-2) var(--space-3);font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;border-radius:var(--radius-md);font-weight:500;transition:background var(--transition),color var(--transition);white-space:nowrap;}
+    .dropdown a:hover{background:var(--surface-2);color:var(--text);}
+    .dropdown a.active{color:var(--accent);}
+    .dropdown-label{display:block;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);padding:var(--space-2) var(--space-3) var(--space-1);}
+    .dropdown-divider{height:1px;background:var(--border);margin:var(--space-1) var(--space-2);}
+    .theme-btn{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:var(--radius-md);padding:var(--space-2);cursor:pointer;display:flex;transition:color var(--transition),border-color var(--transition);}
+    .theme-btn:hover{color:var(--text);border-color:var(--text-muted);}
+
+    /* HEADER */
+    .page-header{padding:var(--space-8) var(--space-8) 0;max-width:960px;margin:0 auto;}
+    .back-link{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-6);transition:color var(--transition);}
+    .back-link:hover{color:var(--text);}
+    .page-label{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:var(--space-2);}
+    .page-title{font-family:var(--font-display);font-size:var(--text-xl);font-weight:800;letter-spacing:-.02em;margin-bottom:var(--space-3);}
+    .page-desc{font-size:var(--text-sm);color:var(--text-muted);max-width:60ch;margin-bottom:var(--space-8);}
+
+    /* SEARCH */
+    .search-panel{max-width:960px;margin:0 auto var(--space-8);padding:0 var(--space-8);}
+    .search-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:var(--space-6);}
+    .search-row{display:flex;gap:var(--space-4);flex-wrap:wrap;align-items:flex-end;}
+    .search-field{display:flex;flex-direction:column;gap:var(--space-2);flex:1;min-width:180px;}
+    .search-field label{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);}
+    .search-field select,.search-field input{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-3);font-size:var(--text-sm);color:var(--text);font-family:var(--font-body);transition:border-color var(--transition);outline:none;}
+    .search-field select:focus,.search-field input:focus{border-color:var(--accent);}
+    .search-btn{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-md);padding:var(--space-3) var(--space-6);font-size:var(--text-sm);font-weight:700;cursor:pointer;transition:background var(--transition);white-space:nowrap;height:42px;align-self:flex-end;}
+    .search-btn:hover{background:var(--accent-hover);}
+
+    /* LINE CHIPS */
+    .line-chips{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-4);}
+    .line-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;font-size:var(--text-xs);font-weight:700;cursor:pointer;border:2px solid transparent;transition:opacity var(--transition),border-color var(--transition);color:#fff;opacity:0.45;user-select:none;}
+    .line-chip.active{opacity:1;border-color:rgba(255,255,255,0.4);}
+    .line-chip-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.7);}
+
+    /* SVC FILTER */
+    .svc-filter{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-3);}
+    .svc-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:.68rem;font-weight:700;cursor:pointer;border:2px solid transparent;color:#fff;opacity:0.4;user-select:none;transition:opacity var(--transition);}
+    .svc-chip.active{opacity:1;border-color:rgba(255,255,255,0.35);}
+
+    /* RESULTS */
+    .results-panel{max-width:960px;margin:0 auto var(--space-12);padding:0 var(--space-8);}
+    .results-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-4);}
+    .results-title{font-family:var(--font-display);font-size:var(--text-base);font-weight:700;}
+    .results-count{font-size:var(--text-xs);color:var(--text-muted);}
+    .results-table-wrap{overflow-x:auto;}
+    table.tt{width:100%;border-collapse:collapse;font-size:var(--text-xs);background:var(--surface);border-radius:var(--radius-xl);overflow:hidden;border:1px solid var(--border);}
+    table.tt th{background:var(--surface-2);color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:var(--space-3);text-align:center;border-bottom:2px solid var(--border);}
+    table.tt th.left{text-align:left;}
+    table.tt td{padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--border);text-align:center;vertical-align:middle;}
+    table.tt td.left{text-align:left;}
+    table.tt tr:last-child td{border-bottom:none;}
+    .tt-row{cursor:pointer;}
+    .tt-row:hover td{background:var(--surface-2);}
+    .svc-badge{display:inline-block;padding:2px 8px;border-radius:99px;font-weight:700;font-size:.7rem;color:#fff;white-space:nowrap;}
+    .line-badge{display:inline-block;padding:1px 6px;border-radius:4px;font-weight:700;font-size:.65rem;color:#fff;margin-right:4px;}
+    .time-cell{font-variant-numeric:tabular-nums;font-weight:600;}
+    .dir-badge{font-size:.65rem;padding:1px 6px;border-radius:4px;font-weight:600;}
+    .dir-sb{background:rgba(59,130,246,.15);color:#60a5fa;}
+    .dir-nb{background:rgba(245,158,11,.15);color:#fbbf24;}
+    .terminus-small{font-size:.65rem;color:var(--text-muted);}
+    .expand-cell{width:32px;text-align:center;}
+    .expand-arrow{font-size:.65rem;color:var(--text-faint);display:inline-block;transition:transform var(--transition);}
+    .expanded .expand-arrow{transform:rotate(90deg);}
+    .trip-detail-row td{padding:0;background:var(--surface-2);border-bottom:2px solid var(--border);}
+    .trip-stops{padding:var(--space-4) var(--space-6);display:flex;flex-direction:column;}
+    .trip-stop{display:grid;grid-template-columns:64px 24px 1fr;align-items:center;min-height:36px;position:relative;}
+    .trip-stop:not(:last-child)::after{content:'';position:absolute;left:calc(64px + 11px);top:50%;width:2px;height:100%;background:var(--border);transform:translateX(-50%);}
+    .trip-stop-times{display:flex;flex-direction:column;align-items:flex-end;font-variant-numeric:tabular-nums;font-size:.72rem;gap:1px;padding-right:var(--space-2);}
+    .ts-arr{color:var(--text-muted);}
+    .ts-dep{color:var(--text);font-weight:600;}
+    .trip-stop-dot{display:flex;justify-content:center;align-items:center;position:relative;z-index:1;}
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--border);border:2px solid var(--surface-2);}
+    .dot--current{background:var(--accent);border-color:var(--accent);width:12px;height:12px;}
+    .trip-stop--current .trip-stop-name{color:var(--accent);font-weight:700;}
+    .trip-stop-name{font-size:.8rem;padding-left:var(--space-3);}
+    .stop-kanji{font-size:.7rem;color:var(--text-muted);margin-left:4px;}
+    .no-results{text-align:center;padding:var(--space-12);color:var(--text-muted);}
+    .no-results-icon{font-size:2.5rem;margin-bottom:var(--space-4);}
+
+    footer{border-top:1px solid var(--border);padding:var(--space-8);text-align:center;font-size:var(--text-sm);color:var(--text-muted);}
+    footer a{color:var(--accent);text-decoration:none;}
+    @media(max-width:768px){
+      nav{padding:var(--space-3) var(--space-4);}
+      .page-header,.search-panel,.results-panel{padding-left:var(--space-4);padding-right:var(--space-4);}
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img class="logo-dark"  src="frontend/Izarail Urban Networks dark.svg"   alt="Izarail Urban Networks" height="40" loading="eager">
+      <img class="logo-light" src="frontend/Izarail Urban Networks bright.svg" alt="Izarail Urban Networks" height="40" loading="eager">
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <div class="nav-item active">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Railways</button>
+        <div class="dropdown">
+          <a href="izarail.html">Izarail</a>
+          <a href="metro.html">Metro</a>
+          <a href="izx.html">IZX</a>
+          <a href="commuter.html">Commuter Rail</a>
+          <a href="other-rail.html">Other Rail</a>
+          <div class="dropdown-divider"></div>
+          <span class="dropdown-label">IZX</span>
+          <a href="izx-timetable.html" class="active">📅 Timetable</a>
+          <a href="marcia.html">📊 Train graph</a>
+          <a href="izx-ticket.html">🎫 Tickets &amp; Fares</a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Aviation</button>
+        <div class="dropdown">
+          <a href="airports.html">Airports</a>
+          <a href="airlines.html">Airlines</a>
+        </div>
+      </div>
+      <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <a href="izx.html" class="back-link">← IZX Overview</a>
+    <div class="page-label">IZX Network</div>
+    <h1 class="page-title">Timetable Search</h1>
+    <p class="page-desc">Search across all IZX lines. Select a station to view all services of the day, filterable by line, service type and direction.</p>
+  </div>
+
+  <div class="search-panel">
+    <div class="search-card">
+      <div class="search-row">
+        <div class="search-field">
+          <label for="sel-station">Station</label>
+          <select id="sel-station"><option value="">— select station —</option></select>
+        </div>
+        <div class="search-field" style="max-width:160px;">
+          <label for="sel-dir">Direction</label>
+          <select id="sel-dir">
+            <option value="">Both</option>
+            <option value="SB">→ Southbound</option>
+            <option value="NB">← Northbound</option>
+          </select>
+        </div>
+        <div class="search-field" style="max-width:130px;">
+          <label for="sel-from">From time</label>
+          <input type="time" id="sel-from" value="06:00">
+        </div>
+        <button class="search-btn" onclick="doSearch()">Search</button>
+      </div>
+
+      <!-- Line filter chips -->
+      <div class="line-chips" id="line-chips"></div>
+
+      <!-- Service filter chips (populated after line selection) -->
+      <div class="svc-filter" id="svc-filter"></div>
+    </div>
+  </div>
+
+  <div class="results-panel" id="results-panel">
+    <div class="no-results">
+      <div class="no-results-icon">🔍</div>
+      <p>Select a station to view the timetable.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>Izaland Transit Portal · <a href="izx.html">IZX Overview</a> · Timetable dynamically generated</p>
+  </footer>
+
+<script>
+/* ================================================================
+   UI STATE
+================================================================ */
+let activeLines   = new Set(Object.keys(IZX_LINES));   // tutte attive di default
+let activeSvcs    = new Set();                          // vuoto = tutte
+let lastResults   = [];
+
+/* ================================================================
+   INIT — popola dropdown stazioni e line chips
+================================================================ */
+(function init() {
+  // Logo dark/light
+  const isDark = () => document.documentElement.dataset.theme === "dark";
+  document.querySelectorAll(".logo-dark").forEach(el  => el.style.display = isDark() ? "" : "none");
+  document.querySelectorAll(".logo-light").forEach(el => el.style.display = isDark() ? "none" : "");
+
+  // Theme toggle
+  document.querySelectorAll("[data-theme-toggle]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.documentElement.dataset.theme = isDark() ? "light" : "dark";
+      document.querySelectorAll(".logo-dark").forEach(el  => el.style.display = isDark() ? "" : "none");
+      document.querySelectorAll(".logo-light").forEach(el => el.style.display = isDark() ? "none" : "");
+    });
+  });
+
+  // Nav dropdowns
+  document.querySelectorAll(".nav-item").forEach(item => {
+    item.querySelector("button")?.addEventListener("click", e => {
+      e.stopPropagation();
+      document.querySelectorAll(".nav-item").forEach(i => { if (i !== item) i.classList.remove("open"); });
+      item.classList.toggle("open");
+    });
+  });
+  document.addEventListener("click", () => document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("open")));
+
+  // Popola stazioni raggruppate per linea
+  const sel = document.getElementById("sel-station");
+  for (const [lineId, line] of Object.entries(IZX_LINES)) {
+    const grp = document.createElement("optgroup");
+    grp.label = line.label;
+    for (const code of line.CANONICAL) {
+      const st = line.ST[code];
+      if (!st) continue;
+      const opt = document.createElement("option");
+      opt.value = `${lineId}:${code}`;
+      opt.textContent = `${code} ${st.n}${st.k ? " · " + st.k : ""}`;
+      grp.appendChild(opt);
+    }
+    sel.appendChild(grp);
+  }
+
+  // Line chips
+  const chipsEl = document.getElementById("line-chips");
+  for (const [lineId, line] of Object.entries(IZX_LINES)) {
+    const chip = document.createElement("span");
+    chip.className = "line-chip active";
+    chip.dataset.line = lineId;
+    chip.style.background = line.color;
+    chip.innerHTML = `<span class="line-chip-dot"></span>${line.shortLabel}`;
+    chip.addEventListener("click", () => toggleLine(lineId, chip));
+    chipsEl.appendChild(chip);
+  }
+})();
+
+/* ================================================================
+   TOGGLE LINE / SVC
+================================================================ */
+function toggleLine(lineId, chipEl) {
+  if (activeLines.has(lineId)) {
+    if (activeLines.size === 1) return; // almeno una linea sempre attiva
+    activeLines.delete(lineId);
+    chipEl.classList.remove("active");
+  } else {
+    activeLines.add(lineId);
+    chipEl.classList.add("active");
+  }
+  rebuildSvcChips();
+  if (lastResults.length) doSearch();
+}
+
+function rebuildSvcChips() {
+  const el = document.getElementById("svc-filter");
+  el.innerHTML = "";
+  activeSvcs.clear();
+  for (const lineId of activeLines) {
+    const line = IZX_LINES[lineId];
+    for (const [svcId, svc] of Object.entries(line.SVC)) {
+      const chip = document.createElement("span");
+      chip.className = "svc-chip active";
+      chip.dataset.line = lineId;
+      chip.dataset.svc  = svcId;
+      chip.style.background = svc.color;
+      chip.textContent = `${lineId} ${svcId} · ${svc.name}`;
+      chip.addEventListener("click", () => toggleSvc(lineId, svcId, chip));
+      el.appendChild(chip);
+    }
+  }
+}
+
+function toggleSvc(lineId, svcId, chipEl) {
+  const key = `${lineId}:${svcId}`;
+  if (activeSvcs.has(key)) {
+    activeSvcs.delete(key);
+    chipEl.classList.remove("active");
+  } else {
+    activeSvcs.add(key);
+    chipEl.classList.add("active");
+  }
+  if (lastResults.length) doSearch();
+}
+
+/* ================================================================
+   SEARCH
+================================================================ */
+function doSearch() {
+  const selVal  = document.getElementById("sel-station").value;
+  const dir     = document.getElementById("sel-dir").value;
+  const fromTime= document.getElementById("sel-from").value || "06:00";
+
+  if (!selVal) {
+    document.getElementById("results-panel").innerHTML =
+      `<div class="no-results"><div class="no-results-icon">🔍</div><p>Select a station to view the timetable.</p></div>`;
+    return;
+  }
+
+  const [lineId, stCode] = selVal.split(":");
+
+  // costruisci filtro servizi attivi per linea
+  const svcFilter = {};
+  for (const lineId2 of activeLines) {
+    const line = IZX_LINES[lineId2];
+    const svcs = Object.keys(line.SVC).filter(s => {
+      if (activeSvcs.size === 0) return true;
+      return activeSvcs.has(`${lineId2}:${s}`);
+    });
+    if (svcs.length) svcFilter[lineId2] = svcs;
+  }
+
+  // esegui query per ogni linea attiva
+  let results = [];
+  for (const [lid, svcs] of Object.entries(svcFilter)) {
+    const trips = TTEngine.query({
+      lines:    lid,
+      station:  stCode,
+      direction: dir || "",
+      fromTime,
+      toTime:   "29:00",
+      services: svcs,
+    });
+    // per stazioni condivise (es. K01=R01=Sainðaul Central) cerca anche nella linea corretta
+    // se la stazione selezionata appartiene a un'altra linea, salta
+    results.push(...trips);
+  }
+
+  // ordina per orario di partenza alla stazione
+  results.sort((a, b) => {
+    const tA = a.stops[stCode] ? TTEngine.hmToSec(a.stops[stCode].dep) : 999999;
+    const tB = b.stops[stCode] ? TTEngine.hmToSec(b.stops[stCode].dep) : 999999;
+    return tA - tB;
+  });
+
+  lastResults = results;
+  renderResults(results, stCode, lineId);
+}
+
+/* ================================================================
+   RENDER
+================================================================ */
+function renderResults(trips, stCode, lineId) {
+  const panel = document.getElementById("results-panel");
+  if (!trips.length) {
+    panel.innerHTML = `<div class="no-results"><div class="no-results-icon">🚃</div><p>No services found for the selected filters.</p></div>`;
+    return;
+  }
+
+  const line = IZX_LINES[lineId];
+  const stName = line?.ST[stCode]?.n ?? stCode;
+
+  let html = `
+    <div class="results-header">
+      <div class="results-title">Departures from <strong>${stCode} ${stName}</strong></div>
+      <div class="results-count">${trips.length} service${trips.length !== 1 ? "s" : ""}</div>
+    </div>
+    <div class="results-table-wrap">
+    <table class="tt">
+      <thead><tr>
+        <th class="expand-cell"></th>
+        <th class="left">Line</th>
+        <th class="left">Service</th>
+        <th>Dir</th>
+        <th>Dep</th>
+        <th>Arr</th>
+        <th class="left">Terminus</th>
+      </tr></thead>
+      <tbody id="tt-body">`;
+
+  trips.forEach((trip, idx) => {
+    const stopData = trip.stops[stCode];
+    const dep = stopData?.dep ?? "—";
+    const arr = stopData?.arr ?? "—";
+    const lineDef = IZX_LINES[trip.lineId];
+    const termName = lineDef?.ST[trip.terminus]?.n ?? trip.terminus;
+    const dirCls   = trip.direction === "SB" ? "dir-sb" : "dir-nb";
+    const dirLabel = trip.direction === "SB" ? "→ SB" : "← NB";
+
+    html += `
+      <tr class="tt-row" onclick="toggleDetail(${idx}, this)">
+        <td class="expand-cell"><span class="expand-arrow">▶</span></td>
+        <td class="left">
+          <span class="line-badge" style="background:${lineDef?.color ?? '#666'}">${trip.lineId}</span>
+        </td>
+        <td class="left">
+          <span class="svc-badge" style="background:${trip.color}">${trip.svcId} · ${trip.name}</span>
+        </td>
+        <td><span class="dir-badge ${dirCls}">${dirLabel}</span></td>
+        <td class="time-cell">${dep}</td>
+        <td class="time-cell" style="color:var(--text-muted)">${arr}</td>
+        <td class="left"><span class="terminus-small">${trip.terminus} ${termName}</span></td>
+      </tr>
+      <tr class="trip-detail-row" id="detail-${idx}" style="display:none">
+        <td colspan="7">${buildStopList(trip, stCode)}</td>
+      </tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  panel.innerHTML = html;
+}
+
+function buildStopList(trip, currentStop) {
+  const lineDef = IZX_LINES[trip.lineId];
+  let html = `<div class="trip-stops">`;
+  for (const [code, times] of Object.entries(trip.stops)) {
+    const isCurrent = code === currentStop;
+    const st = lineDef?.ST[code];
+    const name  = st?.n ?? code;
+    const kanji = st?.k ?? "";
+    html += `
+      <div class="trip-stop${isCurrent ? " trip-stop--current" : ""}">
+        <div class="trip-stop-times">
+          <span class="ts-arr">${times.arr}</span>
+          <span class="ts-dep">${times.dep}</span>
+        </div>
+        <div class="trip-stop-dot">
+          <div class="dot${isCurrent ? " dot--current" : ""}"></div>
+        </div>
+        <div class="trip-stop-name">
+          ${name}${kanji ? `<span class="stop-kanji">${kanji}</span>` : ""}
+        </div>
+      </div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function toggleDetail(idx, rowEl) {
+  const detail = document.getElementById(`detail-${idx}`);
+  const isOpen = detail.style.display !== "none";
+  detail.style.display = isOpen ? "none" : "table-row";
+  rowEl.classList.toggle("expanded", !isOpen);
+}
+</script>
+</body>
+</html>
