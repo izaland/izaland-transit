@@ -248,3 +248,93 @@ const EI_SVC = {
   MS: {coeff:1.20, name:"Minarajaki Super",   cls:"svc-MS", color:"#00BFFF",
        stops:["E01","E04","E05","E08","E12"]},
 };
+
+/* ================================================================
+   KE_TT — offset in secondi dall'origine per ogni servizio
+   (calibrati dal SCHEDULE hardcoded: A/B/C/Cp da dati reali,
+    D/E/F calcolati geometricamente a 210 km/h base)
+================================================================ */
+const KE_TT = {
+  A:  {K01:0,K02:360,K03:960,K08:3540,K10:4680,K12:4800,K17:8340,N1:9120,N2:9600,N3:10200,N4:10800},
+  B:  {K01:0,K02:360,K03:960,K04:2040,K05:2400,K06:2880,K07:3540,K08:4200,K09:4560,K10:5340,K101b:5400,K11:5700,K12:6480,K13:7140,K14:7800,K144:8280,K15:8880,K16:9480,K116:10020,K17:10440},
+  C:  {K01:0,K02:360,K03:960,K06:2640,K08:3720,K09:4080,K10:4860,K11:4920,K12:5700,K13:6360,K14:7020,K144:7500,K15:8100,K16:8700,K116:9240,K17:9600},
+  Cp: {K01:0,K02:360,K03:960,K31:1560,K32:2040,K33:2700,K08:3360,K09:3660,K10:4500,K11:4560,K12:5340},
+  D:  {K101:0,K104:1175,K10:3659,K11:4420,K12:5247,K13:5963,K14:6671,K144:7121,K15:7395,K16:7992,K116:8485,K17:8842,N1:9355,N2:9812,N3:10500,N4:10884},
+  E:  {K101:0,K104:1155,K160:2314,K10:3655,K12:5156,K17:8333,N1:8838,N2:9287,N3:9964,N4:10343},
+  F:  {K101:0,K102:190,K120:538,K103:1072,K104:1549,K105:2123,K106:2486,K160:3043,K10:4635,K11:5517,K12:6478,K13:7307,K14:8129,K144:8647,K15:8958,K16:9648,K116:10216,K17:10625,N1:11216,N2:11742,N3:12539,N4:12981},
+};
+
+/* ================================================================
+   KE_FREQ — treni/ora per direzione
+   KE_PEAK_WINDOWS — finestre di punta
+================================================================ */
+const KE_FREQ = {
+  A:  {offpeak:3, peak:3},
+  B:  {offpeak:2, peak:2},
+  C:  {offpeak:1, peak:1},
+  Cp: {offpeak:1, peak:1},
+  D:  {offpeak:1, peak:2},
+  E:  {offpeak:1, peak:1},
+  F:  {offpeak:1, peak:2},
+};
+const KE_PEAK_WINDOWS = [
+  {start:"07:00", end:"09:30"},
+  {start:"17:00", end:"20:00"},
+];
+
+/* ================================================================
+   IZX_LINES — registro centrale di tutte le linee IZX
+   Il tt-engine usa questo oggetto come unica fonte di verità.
+   Per aggiungere una nuova linea: basta aggiungere un blocco qui.
+================================================================ */
+const IZX_LINES = {
+  KE: {
+    id:        "KE",
+    label:     "IZX Keishin",
+    shortLabel:"Keishin",
+    color:     "#002A91",
+    textColor: "#ffffff",
+    ST:        KE_ST,
+    CANONICAL: KE_CANONICAL_ORDER,
+    SVC:       KE_SVC,
+    TT:        KE_TT,
+    FREQ:      KE_FREQ,
+    PEAK:      KE_PEAK_WINDOWS,
+    /* Varianti di terminus: quali servizi vanno fino a N4 vs K17 */
+    TERMINUS_SPLIT: {
+      A: [{terminus:"K17", weight:2}, {terminus:"N4", weight:1}],
+      B: [{terminus:"K17", weight:2}, {terminus:"N4", weight:1}],
+      D: [{terminus:"N4", weight:1}],
+      E: [{terminus:"N4", weight:1}],
+      F: [{terminus:"N4", weight:1}],
+    },
+    /* Offset di partenza per distribuire i servizi nell'ora (minuti) */
+    OFFSETS: {A:0, B:10, C:30, Cp:0, D:15, E:45, F:0},
+  },
+
+  RY: {
+    id:        "RY",
+    label:     "IZX Ry\u0101nkai",
+    shortLabel:"Ry\u0101nkai",
+    color:     "#148466",
+    textColor: "#ffffff",
+    ST:        RY_ST,
+    CANONICAL: RY_CANONICAL_ORDER,
+    SVC:       RY_SVC,
+    TT:        RY_TT,
+    FREQ:      RY_FREQ,
+    PEAK:      RY_PEAK_WINDOWS,
+    TERMINUS_SPLIT: {
+      K: [{terminus:"BL05", weight:1}, {terminus:"R21", weight:1}],
+      J: [{terminus:"SA06", weight:1}],
+      G: [{terminus:"R21",  weight:1}],  /* ext internaz. futura */
+      I: [{terminus:"DN05", weight:1}],
+      H: [{terminus:"R21",  weight:1}],
+      L: [{terminus:"R21",  weight:1}],
+    },
+    OFFSETS: {L:0, K:0, J:30, G:0, I:20, H:40},
+  },
+
+  /* EI: placeholder — aggiungere EI_TT, EI_FREQ, EI_PEAK quando pronti */
+  // EI: { id:"EI", label:"IZX Eira", ... },
+};
