@@ -19,6 +19,14 @@ const TTEngine = (() => {
   function isPeak(sec, peakWindows) {
     return peakWindows.some(w => sec >= hmToSec(w.start) && sec < hmToSec(w.end));
   }
+  function stopIsActive(code, conditionalStops, tripIndex, peakNow) {
+    if (!conditionalStops?.[code]) return true;
+    const rule = conditionalStops[code];
+    if (rule.rule === "peak") return peakNow;
+    if (rule.rule === "alternate") return (tripIndex + (rule.phase ?? 0)) % 2 === 0;
+    if (rule.rule === "always") return true;
+    return true;
+  }
 
   /* ---- genera tutte le corse di un servizio in una direzione ---- */
   function generateTripsForService(lineId, svcId, dir, fromSec, toSec) {
@@ -51,15 +59,16 @@ const TTEngine = (() => {
     let   cursor = SERVICE_START + offset;
 
     while (cursor <= SERVICE_END) {
-      const freq_ph  = isPeak(cursor, peaks) ? freq.peak : freq.offpeak;
-      const interval = Math.round(3600 / freq_ph);
+      const tripIndex = trips.length;
+      const peakNow   = isPeak(cursor, peaks);
+      const freq_ph   = peakNow ? freq.peak : freq.offpeak;
+      const interval  = Math.round(3600 / freq_ph);
 
       // scegli terminus con round-robin sui pesi
       let terminus = stops[stops.length - 1];
       if (splits && splits.length > 0) {
         const totalWeight = splits.reduce((a, b) => a + b.weight, 0);
-        const tripIndex   = trips.length;
-        let   acc = 0;
+        let acc = 0;
         const slot = tripIndex % totalWeight;
         for (const sp of splits) {
           acc += sp.weight;
@@ -69,7 +78,10 @@ const TTEngine = (() => {
 
       // costruisci le fermate del trip fino al terminus scelto
       const tripStops = {};
+      const conditionalStops = svc.conditionalStops || null;
       for (const st of stops) {
+        if (!stopIsActive(st, conditionalStops, tripIndex, peakNow) && st !== terminus) continue;
+
         const rawOffset = dir === "NB"
           ? (totalDuration - tt[st])
           : tt[st];
