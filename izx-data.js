@@ -350,7 +350,7 @@ const IZX_LINES = {
       H: [{terminus:"R21",  weight:1}],
       L: [{terminus:"R21",  weight:1}],
     },
-    OFFSETS: {L:0, K:5, J:30, G:10, I:20, H:40},
+    OFFSETS: {L:0, K:5, J:35, G:10, I:20, H:40},
   },
 
   /* EI: placeholder — aggiungere EI_TT, EI_FREQ, EI_PEAK quando pronti */
