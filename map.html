@@ -1,1 +1,625 @@
-{new_html}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transit Map — Saïnðaul</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    :root{
+      --font-body:'Satoshi','Inter',sans-serif;
+      --font-display:'Cabinet Grotesk','Satoshi',sans-serif;
+      --text-xs:clamp(0.75rem,0.7rem + 0.25vw,0.875rem);
+      --text-sm:clamp(0.875rem,0.8rem + 0.35vw,1rem);
+      --text-base:clamp(1rem,0.95rem + 0.25vw,1.125rem);
+      --sp1:.25rem;--sp2:.5rem;--sp3:.75rem;--sp4:1rem;--sp6:1.5rem;--sp8:2rem;
+      --r-sm:.375rem;--r-md:.5rem;--r-lg:.75rem;--r-full:9999px;
+      --tx:180ms cubic-bezier(0.16,1,0.3,1);
+    }
+    [data-theme="dark"]{
+      --bg:#0f1117;--sf:#161b27;--sf2:#1c2235;
+      --bd:#2a3147;--tx-c:#e2e8f0;--tx-m:#94a3b8;--tx-f:#4a5568;
+      --ac:#3b82f6;
+    }
+    [data-theme="light"]{
+      --bg:#f8fafc;--sf:#ffffff;--sf2:#f1f5f9;
+      --bd:#e2e8f0;--tx-c:#1e293b;--tx-m:#64748b;--tx-f:#cbd5e1;
+      --ac:#2563eb;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{-webkit-font-smoothing:antialiased;}
+    body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--tx-c);background:var(--bg);display:flex;flex-direction:column;}
+    img{display:block;max-width:100%;height:auto;}
+    /* NAV */
+    nav{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:var(--sp4) var(--sp8);background:var(--bg);border-bottom:1px solid var(--bd);backdrop-filter:blur(12px);}
+    .nav-logo{display:flex;align-items:center;gap:var(--sp3);text-decoration:none;color:var(--tx-c);}
+    .nav-logo img{height:40px;width:auto;}
+    .logo-dark{display:block!important;}
+    .logo-light{display:none!important;}
+    [data-theme="light"] .logo-dark{display:none!important;}
+    [data-theme="light"] .logo-light{display:block!important;}
+    .nav-links{display:flex;gap:var(--sp6);align-items:center;}
+    .nav-links>a{font-size:var(--text-sm);color:var(--tx-m);text-decoration:none;font-weight:500;transition:color var(--tx);}
+    .nav-links>a:hover,.nav-links>a.active{color:var(--tx-c);}
+    .nav-links>a.active{color:var(--ac);}
+    .theme-btn{background:none;border:1px solid var(--bd);color:var(--tx-m);border-radius:var(--r-md);padding:var(--sp2);cursor:pointer;display:flex;transition:color var(--tx),border-color var(--tx);}
+    .theme-btn:hover{color:var(--tx-c);border-color:var(--tx-m);}
+    .nav-dd{position:relative;}
+    .nav-dd>button{background:none;border:none;font-size:var(--text-sm);color:var(--tx-m);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0;transition:color var(--tx);}
+    .nav-dd>button:hover,.nav-dd.active>button{color:var(--tx-c);}
+    .nav-dd.active>button{color:var(--ac);}
+    .nav-dd>button svg{transition:transform var(--tx);}
+    .nav-dd.open>button svg{transform:rotate(180deg);}
+    .dd{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-4px);min-width:160px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-lg);padding:var(--sp2);box-shadow:0 8px 24px oklch(0 0 0/.18);opacity:0;pointer-events:none;transition:opacity var(--tx),transform var(--tx);}
+    .nav-dd.open .dd{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+    .dd a{display:block;padding:var(--sp2) var(--sp3);font-size:var(--text-sm);color:var(--tx-m);text-decoration:none;border-radius:var(--r-md);font-weight:500;transition:background var(--tx),color var(--tx);white-space:nowrap;}
+    .dd a:hover{background:var(--sf2);color:var(--tx-c);}
+    .dd a.active{color:var(--ac);}
+    .dd-lbl{display:block;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-f);padding:var(--sp2) var(--sp3) var(--sp1);}
+    /* NESTED DROPDOWN (Map) */
+    .nav-item--sub{position:relative;}
+    .nav-item--sub>button{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;padding:var(--sp2) var(--sp3);font-size:var(--text-sm);color:var(--tx-m);font-weight:500;cursor:pointer;border-radius:var(--r-md);transition:background var(--tx),color var(--tx);gap:var(--sp2);}
+    .nav-item--sub>button:hover{background:var(--sf2);color:var(--tx-c);}
+    .nav-item--sub.open>button{color:var(--tx-c);}
+    .nav-item--sub>button svg{transition:transform var(--tx);flex-shrink:0;}
+    .nav-item--sub.open>button svg{transform:rotate(180deg);}
+    .dropdown--sub{position:absolute;top:0;left:calc(100% + 6px);min-width:160px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-lg);padding:var(--sp2);box-shadow:0 8px 24px oklch(0 0 0/.18);opacity:0;pointer-events:none;transition:opacity var(--tx),transform var(--tx);transform:translateX(-4px);}
+    .nav-item--sub.open .dropdown--sub{opacity:1;pointer-events:auto;transform:translateX(0);}
+    /* MAP */
+    .map-wrap{flex:1;display:flex;min-height:0;position:relative;}
+    #map{flex:1;min-height:600px;}
+    /* TILE FILTERS */
+    .leaflet-tile-pane{transition:filter .3s ease;}
+    .tile-dim    .leaflet-tile-pane{filter:brightness(0.45) saturate(0.6);}
+    .tile-dark   .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(0.85) saturate(0.8);}
+    /* SIDEBAR */
+    .sb{width:272px;flex-shrink:0;background:var(--sf);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;z-index:500;}
+    .sb-head{padding:var(--sp4) var(--sp4) var(--sp3);border-bottom:1px solid var(--bd);}
+    .sb-title{font-family:var(--font-display);font-size:var(--text-base);font-weight:800;margin-bottom:2px;}
+    .sb-sub{font-size:var(--text-xs);color:var(--tx-m);}
+    .sb-body{overflow-y:auto;flex:1;padding:var(--sp2);}
+    .lg{margin-bottom:var(--sp3);}
+    .lg-title{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-f);padding:var(--sp2) var(--sp2) var(--sp1);}
+    .li{display:flex;align-items:center;gap:var(--sp3);padding:5px var(--sp2);border-radius:var(--r-md);cursor:pointer;transition:background var(--tx);user-select:none;}
+    .li:hover{background:var(--sf2);}
+    .li-sw{width:26px;height:5px;border-radius:3px;flex-shrink:0;transition:opacity var(--tx);}
+    .li-name{font-size:var(--text-xs);color:var(--tx-m);flex:1;line-height:1.3;}
+    .li-ref{font-size:var(--text-xs);font-weight:700;color:var(--tx-f);width:26px;text-align:right;flex-shrink:0;}
+    .li.off .li-sw{opacity:.2;}
+    .li.off .li-name,.li.off .li-ref{opacity:.35;}
+    .base-sel{padding:var(--sp3);border-top:1px solid var(--bd);}
+    .base-sel-t{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-f);margin-bottom:var(--sp2);}
+    .base-btns{display:flex;gap:var(--sp2);flex-wrap:wrap;}
+    .base-btn{flex:1;padding:var(--sp2);font-size:var(--text-xs);font-weight:600;border:1px solid var(--bd);border-radius:var(--r-md);background:var(--sf2);color:var(--tx-m);cursor:pointer;transition:background var(--tx),color var(--tx),border-color var(--tx);}
+    .base-btn.on{background:var(--ac);color:white;border-color:var(--ac);}
+    /* LOADING */
+    #ld{position:absolute;inset:0;z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);gap:var(--sp3);transition:opacity .5s;}
+    #ld.done{opacity:0;pointer-events:none;}
+    .spin{width:36px;height:36px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .ld-txt{font-size:var(--text-sm);color:var(--tx-m);}
+    #sbar{position:absolute;bottom:var(--sp4);left:50%;transform:translateX(-50%);z-index:600;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-full);padding:var(--sp2) var(--sp4);font-size:var(--text-xs);color:var(--tx-m);pointer-events:none;transition:opacity .4s;white-space:nowrap;box-shadow:0 4px 16px oklch(0 0 0/.25);}
+    #sbar.h{opacity:0;}
+    /* ── Tooltip base ── */
+    .lt{
+      background:var(--sf)!important;
+      border:1px solid var(--bd)!important;
+      color:var(--tx-c)!important;
+      font-family:var(--font-body)!important;
+      border-radius:var(--r-sm)!important;
+      padding:4px 9px!important;
+      line-height:1.25!important;
+    }
+    .lt-byz{
+      display:block;
+      font-size:13px;
+      font-weight:700;
+      letter-spacing:.02em;
+    }
+    .lt-rom{
+      display:block;
+      font-size:10px;
+      font-weight:400;
+      opacity:.75;
+      margin-top:1px;
+    }
+    .lt-only{
+      display:block;
+      font-size:11px;
+      font-weight:500;
+    }
+    @media(max-width:768px){
+      nav{padding:var(--sp3) var(--sp4);}
+      .nav-links{gap:var(--sp3);}
+      .map-wrap{flex-direction:column-reverse;}
+      .sb{width:100%;max-height:185px;border-left:none;border-top:1px solid var(--bd);}
+      .sb-head{padding:var(--sp3) var(--sp3) var(--sp2);}
+      .sb-body{display:flex;overflow-x:auto;overflow-y:hidden;padding:var(--sp2) var(--sp3);gap:4px;}
+      .lg{display:contents;}
+      .lg-title{display:none;}
+      .li{flex-direction:column;align-items:flex-start;gap:2px;padding:var(--sp2);min-width:60px;max-width:70px;}
+      .li-sw{width:100%;height:4px;}
+      .li-ref{width:auto;}
+    }
+    /* stazioni */
+    .st-dot{border-radius:50%;box-sizing:border-box;transition:width .15s,height .15s;}
+    .st-dot.st-micro{width:3px;height:3px;border:none;}
+    .st-dot.st-sm{width:6px;height:6px;border:1.5px solid #888;}
+    .st-dot.st-md{width:9px;height:9px;border:2px solid #888;}
+    .st-dot.st-lg{width:12px;height:12px;border:2.5px solid #888;}
+    .lt-bold .lt-byz{font-weight:800!important;}
+    .lt-bold .lt-only{font-weight:700!important;}
+    [data-theme="dark"]  .st-dot{background:#161b27;border-color:#94a3b8!important;}
+    [data-theme="light"] .st-dot{background:#ffffff;border-color:#475569!important;}
+    [data-theme="dark"]  .st-dot.st-micro{background:#94a3b8;}
+    [data-theme="light"] .st-dot.st-micro{background:#475569;}
+  </style>
+</head>
+
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img class="logo-dark"  src="frontend/Izarail Urban Networks dark.svg"   alt="Izarail Urban Networks" height="40" loading="eager">
+      <img class="logo-light" src="frontend/Izarail Urban Networks bright.svg" alt="Izarail Urban Networks" height="40" loading="eager">
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <div class="nav-dd active">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Railways</button>
+        <div class="dd">
+          <a href="izarail.html">Izarail</a>
+          <a href="metro.html">Metro</a>
+          <a href="izx.html">IZX</a>
+          <a href="commuter.html">Commuter Rail</a>
+          <a href="other-rail.html">Other Rail</a>
+          <div class="nav-item--sub">
+            <button>Map <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="dropdown--sub">
+              <span class="dd-lbl">City maps</span>
+              <a href="map.html" class="active">Saï&#x00F0;aul</a>
+              <a href="map-warohan.html">Warohan</a>
+              <a href="map-panaireki.html">Panaireki</a>
+              <a href="map-sannupuri.html">Sannupuri</a>
+              <a href="map-kichatsura.html">Kichatsura</a>
+              <a href="map-riyatoma.html">Riyatoma</a>
+              <a href="map-makkenoke.html">Makkenoke</a>
+              <a href="map-daishin.html">Daishin</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-dd">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Aviation</button>
+        <div class="dd">
+          <a href="airports.html">Airports</a>
+          <a href="airlines.html">Airlines</a>
+        </div>
+      </div>
+      <div class="nav-dd">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Other</button>
+        <div class="dd"><span class="dd-lbl">Coming soon</span></div>
+      </div>
+      <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="map-wrap">
+    <div id="map"></div>
+    <div id="ld">
+      <div class="spin"></div>
+      <div class="ld-txt" id="ld-txt">Loading transit data…</div>
+    </div>
+    <div id="sbar" class="h"></div>
+    <div class="sb">
+      <div class="sb-head">
+        <div class="sb-title">Transit Lines</div>
+        <div class="sb-sub">Saï nðaul metropolitan area</div>
+      </div>
+      <div class="sb-body" id="legend"></div>
+      <div class="base-sel">
+        <div class="base-sel-t">Base map</div>
+        <div class="base-btns">
+          <button class="base-btn on" data-layer="standard">Standard</button>
+          <button class="base-btn"    data-layer="topo">Topo</button>
+          <button class="base-btn"    data-layer="dark">Dark</button>
+          <button class="base-btn"    data-layer="blank">Blank</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+  // ── METADATA: colours, display names, sidebar order ──────────────────────
+  const RM = {
+    // ── Metro – Sainðaul ──────────────────────────────────────────────────
+    "242546": { "group": "Metro", "name": "🂼 Line 8", "ref": "8", "colour": "#00A2D3" },
+    "242547": { "group": "Metro", "name": "🂼 Line 4 (local for Kawaei 珂夬栄方面各駅停車)", "ref": "4", "colour": "#FFD912" },
+    "242548": { "group": "Metro", "name": "🂼 Line 9 (for Shōryan Daishi)", "ref": "9", "colour": "#C40062" },
+    "242549": { "group": "Metro", "name": "🂼 Line 1 (local for Enikezya Forum)", "ref": "1", "colour": "#FE7F00" },
+    "242565": { "group": "Metro", "name": "🂼 Line 2 (for Mokoba)", "ref": "2", "colour": "#FF0000" },
+    "242566": { "group": "Metro", "name": "🂼 Line 3 (local to Iyogateri)", "ref": "3", "colour": "#009E4F" },
+    "242567": { "group": "Metro", "name": "🂼 Line 14", "ref": "14", "colour": "#72E400" },
+    "242569": { "group": "Metro", "name": "🂼 Line 10 to Shakihori", "ref": "10", "colour": "#C46200" },
+    "242570": { "group": "Metro", "name": "🂼 Line 16", "ref": "16", "colour": "#816cb1" },
+    "242571": { "group": "Metro", "name": "🂼 Line 12 (for Mewakate-Kippai)", "ref": "12", "colour": "#86ebeb" },
+    "242573": { "group": "Metro", "name": "🂼 Line 17 (for Tswakanami Airport)", "ref": "17", "colour": "#f985bb" },
+    "242576": { "group": "Metro", "name": "🂼 Line 7", "ref": "7", "colour": "#00a0bc" },
+    "242577": { "group": "Metro", "name": "🂼 Line 5 (local service for Jisahara)", "ref": "5", "colour": "#9e6a51" },
+    "242578": { "group": "Metro", "name": "🂼 Line 6 (for Saibu Panatsawa)", "ref": "6", "colour": "#3465a4" },
+    "242579": { "group": "Metro", "name": "🂼 Line 11", "ref": "11", "colour": "#c5e1a5" },
+    "242580": { "group": "Metro", "name": "🂼 Line 15", "ref": "15", "colour": "#db287a" },
+    "242593": { "group": "Metro", "name": "🂼 Line 13", "ref": "13", "colour": "#36873c" },
+    "292343": { "group": "Metro", "name": "🂼 Line 18", "ref": "18", "colour": "#999999" },
+    "424786": { "group": "Metro", "name": "🂼 Line 4 (rapid for Kawaei 珂夬栄方面快速)", "ref": "4", "colour": "#FFD912" },
+    "424869": { "group": "Metro", "name": "🂼 Line 2 (for Hintomaui)", "ref": "2", "colour": "#FF0000" },
+    "424884": { "group": "Metro", "name": "🂼 Line 3 (rapid to Ansan Shakuiadae)", "ref": "3", "colour": "#009E4F" },
+    "424885": { "group": "Metro", "name": "🂼 Line 3 (local to Ansan Shakuiadae)", "ref": "3", "colour": "#009E4F" },
+    "424886": { "group": "Metro", "name": "🂼 Line 2 (for Naezoto – Mokoba origin)", "ref": "2", "colour": "#FF0000" },
+    "424887": { "group": "Metro", "name": "🂼 Line 2 (for Naezoto – Hintomaui origin)", "ref": "2", "colour": "#FF0000" },
+    "424931": { "group": "Metro", "name": "🂼 Line 1 (local for Ikashumai Sports Center)", "ref": "1", "colour": "#FE7F00" },
+    "424996": { "group": "Metro", "name": "🂼 Line 12 (for Niji-Yōneo)", "ref": "12", "colour": "#86ebeb" },
+    "424997": { "group": "Metro", "name": "🂼 Line 10 to Uhāra-Motu", "ref": "10", "colour": "#C46200" },
+    "425101": { "group": "Metro", "name": "🂼 Line 6 (for Nari-Gotsurindai)", "ref": "6", "colour": "#3465a4" },
+    // ── Riyatoma Metro ────────────────────────────────────────────────────
+    "325848": { "group": "Riyatoma Metro", "name": "🂼 Riyatoma Line 2", "ref": "R2", "colour": "#00d659" },
+    "325857": { "group": "Riyatoma Metro", "name": "🂼 Riyatoma Line 4", "ref": "R4", "colour": "#d9534f" },
+    "325858": { "group": "Riyatoma Metro", "name": "🂼 Riyatoma Line 3", "ref": "R3", "colour": "#428bca" },
+    "526355": { "group": "Riyatoma Metro", "name": "🂼 Riyatoma Line 5", "ref": "R5", "colour": "#7F00FF" },
+    // ── Izarail commuter / express ─────────────────────────────────────────
+    "272434": { "group": "Izarail", "name": "🆂 Airport Express (to Sabullan)", "ref": "AX", "colour": "#CC99FF" },
+    "272491": { "group": "Izarail", "name": "🆂 Chikaoi Line", "ref": "CO", "colour": "#FF3333" },
+    "272493": { "group": "Izarail", "name": "🆂 Kidai Line 磯大線", "ref": "KD", "colour": "#A7CF7E" },
+    "272510": { "group": "Izarail", "name": "🆂 Seishaku Line (to Igattarun)", "ref": "SK", "colour": "#7AE3E3" },
+    "272511": { "group": "Izarail", "name": "🆂 Gaekwan-Dōnbu Line 外環東部線", "ref": "GD", "colour": "#B16B48" },
+    "272674": { "group": "Izarail", "name": "🆂 Kwōkei Line (suburban, for Yamagoka) 荒京線", "ref": "CKW", "colour": "#99FFFF" },
+    "325613": { "group": "Izarail", "name": "🆂 Nakitsahe Line", "ref": "RC", "colour": "#e0d040" },
+    "325633": { "group": "Izarail", "name": "🆂 Shippanu Line", "ref": "RD", "colour": "#1690FF" },
+    "325731": { "group": "Izarail", "name": "🆂 Riyatoma Airport Express", "ref": "RAX", "colour": "#7900f3" },
+    "326968": { "group": "Izarail", "name": "🆂 Kawasabu Line (to Niji-Kawayatsu)", "ref": "CKS", "colour": "#339966" },
+    "326969": { "group": "Izarail", "name": "🆂 Shirause Line (to Usehari)", "ref": "SU", "colour": "#B16B48" },
+    "327143": { "group": "Izarail", "name": "🆂 Kawasabu Line (to Sabullan)", "ref": "CKS", "colour": "#339966" },
+    "327149": { "group": "Izarail", "name": "🆂 Airport Express (to SUL)", "ref": "AX", "colour": "#CC99FF" },
+    "414569": { "group": "Izarail", "name": "🆂 Airport Express (Illashiya › SUL)", "ref": "AX", "colour": "#CC99FF" },
+    "414570": { "group": "Izarail", "name": "🆂 Airport Express (Onnojaris › SUL)", "ref": "AX", "colour": "#CC99FF" },
+    "414674": { "group": "Izarail", "name": "🆂 Todakuri Line", "ref": "TD", "colour": "#2d83a2" },
+    // ── Thru services ──────────────────────────────────────────────────────
+    "303222": { "group": "Thru services", "name": "Shinsabu Hidano Line Thru Service", "ref": "", "colour": "#BC8F8F" },
+    "303223": { "group": "Thru services", "name": "Shinsabu Oitsura Line Thru Service", "ref": "", "colour": "#FFFACD" },
+    "303227": { "group": "Thru services", "name": "Shikisabu dyenches thru service", "ref": "", "colour": "#D2B48C" },
+    "303270": { "group": "Thru services", "name": "Line 5 Shosen Line Thru service", "ref": "", "colour": "#D2B48C" },
+    // ── Other systems ──────────────────────────────────────────────────────
+    "187662": { "group": "Other systems", "name": "IZX Keishin Line IZX京深高速鉄道線", "ref": "IZX1", "colour": "#0000CD" },
+    "242568": { "group": "Other systems", "name": "Portflyer", "ref": "PF", "colour": "#b9a5bd" },
+    "242572": { "group": "Other systems", "name": "Linhai Monorail", "ref": "LH", "colour": "#bcbf62" },
+    "242613": { "group": "Other systems", "name": "Portliner", "ref": "PL", "colour": "#e2bfa7" },
+    "272574": { "group": "Other systems", "name": "IZX Eira Line IZX永羅高速線", "ref": "IZX3", "colour": "#45B86B" },
+    "278441": { "group": "Other systems", "name": "IZX Nankai Line IZX南海線", "ref": "NKI", "colour": "#990000" },
+    "283140": { "group": "Other systems", "name": "Kayan Railway Sakamo Line 嘉鞍高速鉄道Sakamo線", "ref": "KY03", "colour": "#990000" },
+    "283141": { "group": "Other systems", "name": "Kayan Railway Main Line 嘉鞍高速鉄道本線", "ref": "KY02", "colour": "#993300" },
+    "288171": { "group": "Other systems", "name": "IZX Seibu Naeryuku Line IZX西部内陸線", "ref": "IZSN", "colour": "#8B0000" },
+    "288508": { "group": "Other systems", "name": "IZX Ryānkai Line 両海IZX", "ref": "RK", "colour": "#008000" },
+    "289147": { "group": "Other systems", "name": "IZX Naeryuku Tanshuku Line IZX内陸短縮線", "ref": "NT", "colour": "#6600CC" },
+    "302747": { "group": "Other systems", "name": "Nijikutō Main Line 西海本線", "ref": "NKT", "colour": "#333333" },
+    "303201": { "group": "Other systems", "name": "🂻 Hoze-Oyehatton Line (for Kadokamahiwa)", "ref": "OH", "colour": "#CD5C5C" },
+    "326613": { "group": "Other systems", "name": "Chishi Rapid Line 歯師快速線", "ref": "CSR", "colour": "#bfff00" },
+    "326860": { "group": "Other systems", "name": "CL Shirukami 荒釜号", "ref": "CL10", "colour": "#778899" },
+    "330825": { "group": "Other systems", "name": "Peison Main Line 平尊本線", "ref": "IR35", "colour": "#4B0082" },
+    "414197": { "group": "Other systems", "name": "Tandan-Nanpuku Line 丹淡南北線", "ref": "TDN", "colour": "#FF8C00" },
+    "449777": { "group": "Other systems", "name": "Minarajaki SUL–PSM", "ref": "MNR", "colour": "#888888" },
+    "470427": { "group": "Other systems", "name": "Metropolitan Fast Commuter 首都圏廣域高速鉄道", "ref": "MTX1", "colour": "#0000CD" },
+    "540826": { "group": "Other systems", "name": "Suikō Line 水高線", "ref": "SUK", "colour": "#333333" },
+    "541404": { "group": "Other systems", "name": "IZX Komokata Sūnkwan Line IZX其泉縦貫線", "ref": "KU", "colour": "#0000CD" }
+  };
+
+  // Sidebar display order per group
+  const GROUPS = {
+    'Metro':          [242567,242593,242571,424996,242579,424997,242569,242548,242546,242576,242578,242577,242547,424786,242566,424884,424885,242565,424869,424886,424887,242549,424931,242573,242570,242580,292343],
+    'Riyatoma Metro': [325858,325848,325857,526355],
+    'Izarail':        [272434,272491,272493,272510,272511,272674,325613,325633,325731,326968,327143,326969,327149,414569,414570,414674],
+    'Thru services':  [303222,303223,303227,303270],
+    'Other systems':  [187662,272574,278441,288171,288508,289147,541404,303201,242613,283141,283140,242568,242572,302747,326613,326860,330825,414197,449777,470427,540826]
+  };
+
+  // ── TILE FILTER ──────────────────────────────────────────────
+  function applyTileFilter(layer) {
+    const mapEl = document.getElementById('map');
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    mapEl.classList.remove('tile-dim', 'tile-dark');
+    if (layer === 'dark') {
+      mapEl.classList.add('tile-dark');
+    } else if (layer !== 'blank' && dark) {
+      mapEl.classList.add('tile-dim');
+    }
+  }
+
+  (function(){
+    const t=document.querySelector('[data-theme-toggle]'),h=document.documentElement;
+    let d=h.getAttribute('data-theme')||'dark';
+    if(!t)return;
+    t.addEventListener('click',()=>{
+      d=d==='dark'?'light':'dark';
+      h.setAttribute('data-theme',d);
+      const activeLayer = document.querySelector('.base-btn.on')?.dataset.layer || 'standard';
+      applyTileFilter(activeLayer);
+      const blankBtn=document.querySelector('.base-btn[data-layer="blank"]');
+      if(blankBtn&&blankBtn.classList.contains('on')){
+        map.removeLayer(tiles.blank);
+        tiles.blank=makeBlank();
+        tiles.blank.addTo(map);
+      }
+      t.innerHTML=d==='dark'
+        ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+        :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+    });
+  })();
+
+  document.querySelectorAll('.nav-dd').forEach(d=>{
+    const btn=d.querySelector(':scope>button');
+    if(!btn)return;
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const open=d.classList.contains('open');
+      document.querySelectorAll('.nav-dd.open').forEach(o=>o.classList.remove('open'));
+      document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
+      if(!open)d.classList.add('open');
+    });
+  });
+  document.querySelectorAll('.nav-item--sub').forEach(sub=>{
+    const btn=sub.querySelector(':scope>button');
+    if(!btn)return;
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const open=sub.classList.contains('open');
+      document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
+      if(!open)sub.classList.add('open');
+    });
+  });
+  document.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-dd.open').forEach(o=>o.classList.remove('open'));
+    document.querySelectorAll('.nav-item--sub.open').forEach(o=>o.classList.remove('open'));
+  });
+
+  const map=L.map('map',{center:[36.0118,128.8961],zoom:12,maxZoom:19});
+
+  const blankCanvas=L.GridLayer.extend({
+    createTile:function(){ const t=document.createElement('canvas'); t.width=256; t.height=256; return t; }
+  });
+  function makeBlank(){
+    const dark=document.documentElement.getAttribute('data-theme')==='dark';
+    const cv=new blankCanvas({maxZoom:19,attribution:''});
+    cv.on('tileload',function(e){
+      const ctx=e.tile.getContext('2d');
+      ctx.fillStyle=dark?'#0f1117':'#f8fafc';
+      ctx.fillRect(0,0,256,256);
+    });
+    return cv;
+  }
+
+  const tiles={
+    standard:L.tileLayer('https://tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png',
+      {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
+    topo:L.tileLayer('https://tile.opengeofiction.net/ogf-topo/{z}/{x}/{y}.png',
+      {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
+    dark:L.tileLayer('https://tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png',
+      {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
+    blank:makeBlank()
+  };
+  tiles.standard.addTo(map);
+  applyTileFilter('standard');
+
+  document.querySelectorAll('.base-btn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.base-btn').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      const w=b.dataset.layer;
+      Object.entries(tiles).forEach(([k,l])=>{if(k===w)l.addTo(map);else map.removeLayer(l);});
+      applyTileFilter(w);
+    });
+  });
+
+  function clean(s){return s.replace(/[\uD800-\uDFFF]{2}/g,'').replace(/^[\u24C2-\u24FF\u2460-\u27BF\s]+/,'').trim();}
+
+  const RE_NON_LATIN = /[\u0900-\u097F\u0A80-\u0AFF\u10A0-\u10FF\u1100-\u11FF\u3000-\u9FFF\uA000-\uAAFF\uAC00-\uD7AF\uF900-\uFAFF]/;
+
+  function splitStationName(s) {
+    if (!s) return { byz: null, rom: null };
+    const trimmed = s.trim();
+    if (!RE_NON_LATIN.test(trimmed)) return { byz: null, rom: trimmed };
+    if (!/[A-Za-z\u00C0-\u024F\u0020-\u007E]/.test(trimmed.replace(/[\s\d\-\u2013\u2014\u00b7.,!?'"()\[\]]/g,''))) {
+      return { byz: trimmed, rom: null };
+    }
+    let firstNonLatin = -1;
+    for (let i = 0; i < trimmed.length; i++) {
+      if (RE_NON_LATIN.test(trimmed[i])) { firstNonLatin = i; break; }
+    }
+    let byzPart, romPart;
+    if (firstNonLatin === 0) {
+      let endByz = trimmed.length;
+      for (let i = 1; i < trimmed.length; i++) {
+        if (trimmed[i - 1] === ' ' && /[A-Za-z\u00C0-\u024F]/.test(trimmed[i])) { endByz = i - 1; break; }
+      }
+      byzPart = trimmed.slice(0, endByz).trim();
+      romPart = trimmed.slice(endByz).trim() || null;
+    } else {
+      let splitAt = -1;
+      for (let i = 1; i < trimmed.length; i++) {
+        if (trimmed[i - 1] === ' ' && RE_NON_LATIN.test(trimmed[i])) { splitAt = i - 1; break; }
+      }
+      if (splitAt === -1) return { byz: null, rom: trimmed };
+      romPart = trimmed.slice(0, splitAt).trim() || null;
+      byzPart = trimmed.slice(splitAt).trim();
+    }
+    if (byzPart && !RE_NON_LATIN.test(byzPart)) return { byz: null, rom: trimmed };
+    return { byz: byzPart || null, rom: romPart || null };
+  }
+
+  function makeStationTooltipEl(name, bold) {
+    const { byz, rom } = splitStationName(name);
+    const wrap = document.createElement('div');
+    if (byz && rom) {
+      const b = document.createElement('span'); b.className = 'lt-byz'; b.textContent = byz;
+      const r = document.createElement('span'); r.className = 'lt-rom';  r.textContent = rom;
+      wrap.appendChild(b); wrap.appendChild(r);
+    } else if (byz) {
+      const b = document.createElement('span'); b.className = 'lt-byz'; b.textContent = byz;
+      wrap.appendChild(b);
+    } else {
+      const o = document.createElement('span'); o.className = 'lt-only'; o.textContent = rom || name;
+      wrap.appendChild(o);
+    }
+    if (bold) wrap.classList.add('lt-bold');
+    return wrap;
+  }
+
+  const sbar=document.getElementById('sbar');
+  function status(msg,ms=3000){sbar.textContent=msg;sbar.classList.remove('h');clearTimeout(sbar._t);sbar._t=setTimeout(()=>sbar.classList.add('h'),ms);}
+
+  // ── RENDER FROM lines.json geometry ─────────────────────────────────────
+  const layers={},vis={};
+
+  function renderFromJson(id, segments) {
+    const m = RM[id] || {};
+    const col = m.colour || '#888888';
+    const thru = m.group === 'Thru services';
+    const grp = L.layerGroup();
+    segments.forEach(seg => {
+      if (!seg || seg.length < 2) return;
+      const opts = {
+        color: col,
+        weight: m.group === 'Metro' ? 4 : 3,
+        opacity: thru ? .65 : .9,
+        smoothFactor: 1.5
+      };
+      if (thru) opts.dashArray = '7 4';
+      L.polyline(seg, opts)
+        .bindTooltip(clean(m.name || id) + (m.ref ? ' · ' + m.ref : ''), { sticky: true, className: 'lt' })
+        .addTo(grp);
+    });
+    grp.addTo(map);
+    layers[id] = grp;
+    vis[id] = true;
+  }
+
+  function buildEffectiveGroups(allIds) {
+    const knownIds = new Set(Object.values(GROUPS).flat().map(String));
+    const extra = allIds.filter(id => !knownIds.has(id));
+    const effective = { ...GROUPS };
+    if (extra.length) effective['Other'] = extra.map(Number);
+    return effective;
+  }
+
+  function buildLegend(effectiveGroups) {
+    const el = document.getElementById('legend'); el.innerHTML = '';
+    Object.entries(effectiveGroups).forEach(([g, ids]) => {
+      const present = ids.filter(rid => layers[String(rid)]);
+      if (!present.length) return;
+      const w = document.createElement('div'); w.className = 'lg';
+      w.innerHTML = '<div class="lg-title">' + g + '</div>';
+      present.forEach(rid => {
+        const m = RM[String(rid)] || {}, c = m.colour || '#888', n = clean(m.name || String(rid));
+        const item = document.createElement('div'); item.className = 'li'; item.dataset.rid = rid;
+        item.innerHTML = '<span class="li-sw" style="background:' + c + '"></span><span class="li-name">' + n + '</span><span class="li-ref">' + (m.ref || '') + '</span>';
+        item.addEventListener('click', () => {
+          const id = String(rid);
+          if (vis[id]) { map.removeLayer(layers[id]); vis[id] = false; item.classList.add('off'); }
+          else { layers[id]?.addTo(map); vis[id] = true; item.classList.remove('off'); }
+        });
+        w.appendChild(item);
+      });
+      el.appendChild(w);
+    });
+  }
+
+  // ── STATIONS (still from Overpass — node data not in lines.json) ─────────
+  const stLayer = L.layerGroup().addTo(map);
+  const OV = 'https://overpass.opengeofiction.net/api/interpreter';
+  const ST_BBOX = '35.85,128.70,36.18,129.10';
+
+  async function loadStations() {
+    const q = '[out:json][timeout:30];node["railway"~"station|stop"](' + ST_BBOX + ');out body;';
+    const r = await fetch(OV, {
+      method: 'POST',
+      body: 'data=' + encodeURIComponent(q),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    });
+    const data = await r.json();
+    data.elements.forEach(renderStation);
+  }
+
+  function renderStation(node) {
+    const name = node.tags?.name || node.tags?.['name:en'] || '';
+    const isMain = node.tags?.railway === 'station';
+    const icon = L.divIcon({
+      className: '',
+      html: '<div class="st-dot st-sm"></div>',
+      iconSize: [10, 10],
+      iconAnchor: [5, 5]
+    });
+    const m = L.marker([node.lat, node.lon], { icon, title: name, zIndexOffset: isMain ? 200 : 100 });
+    m.addTo(stLayer);
+    m._stName = name;
+    m._stMain = isMain;
+    m._labelBound = false;
+    if (name) m.bindTooltip(makeStationTooltipEl(name, false), { sticky: true, className: 'lt' });
+  }
+
+  function updateStations() {
+    const z = map.getZoom();
+    stLayer.eachLayer(m => {
+      const el = m.getElement(); if (!el) return;
+      const dot = el.querySelector('.st-dot'); if (!dot) return;
+      if (z < 10) { el.style.display = 'none'; return; }
+      el.style.display = '';
+      dot.className = z >= 16 ? 'st-dot st-lg'
+                    : z >= 14 ? 'st-dot st-md'
+                    : z >= 12 ? 'st-dot st-sm'
+                    :           'st-dot st-micro';
+      const wantPerm = z >= 14 && !!m._stName;
+      const bold = z >= 16;
+      if (wantPerm && !m._labelBound) {
+        m.unbindTooltip();
+        m.bindTooltip(makeStationTooltipEl(m._stName, bold), {
+          permanent: true,
+          direction: 'right',
+          offset: [8, 0],
+          className: 'lt'
+        }).openTooltip();
+        m._labelBound = true;
+      } else if (!wantPerm && m._labelBound) {
+        m.unbindTooltip();
+        m._labelBound = false;
+        if (m._stName) m.bindTooltip(makeStationTooltipEl(m._stName, false), { sticky: true, className: 'lt' });
+      }
+    });
+  }
+  map.on('zoomend', updateStations);
+
+  // ── MAIN ─────────────────────────────────────────────────────────────────
+  async function main() {
+    const ld = document.getElementById('ld'), lt = document.getElementById('ld-txt');
+    lt.textContent = 'Loading transit data…';
+    const resp = await fetch('data/lines.json');
+    const json = await resp.json();
+    const linesData = json.lines || {};
+    const allIds = Object.keys(linesData);
+    const effectiveGroups = buildEffectiveGroups(allIds);
+    allIds.forEach(id => {
+      const segments = linesData[id];
+      if (segments && segments.length) renderFromJson(id, segments);
+    });
+    lt.textContent = 'Loading stations…';
+    await loadStations();
+    ld.classList.add('done');
+    setTimeout(() => ld.remove(), 600);
+    buildLegend(effectiveGroups);
+    updateStations();
+    status(allIds.length + ' transit lines loaded');
+  }
+  main();
+  </script>
+</body>
+</html>
