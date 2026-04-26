@@ -3,7 +3,7 @@
     "187662": {
       "id": "187662",
       "name": "IZX Keishin Line (IZX京深高速鉄道線)",
-      "short": "IZX KS",
+      "short": "187662",
       "colour": "blue",
       "operator": "Izarail",
       "network": "",
@@ -21,7 +21,7 @@
     "278441": {
       "id": "278441",
       "name": "IZX Nankai Line IZX南海線",
-      "short": "IZX NK",
+      "short": "278441",
       "colour": "#990000",
       "operator": "Izarail",
       "network": "Izaland HSR Network",
@@ -30,7 +30,7 @@
     "288171": {
       "id": "288171",
       "name": "IZX Seibu Naeryuku Line IZX西部内陸線 (northbound)",
-      "short": "IZX SN",
+      "short": "IZSN",
       "colour": "darkred",
       "operator": "Izarail",
       "network": "IZX",
@@ -39,11 +39,29 @@
     "288508": {
       "id": "288508",
       "name": "IZX Ryānkai Line 両海IZX",
-      "short": "IZX RK",
+      "short": "RK",
       "colour": "green",
       "operator": "IZX (Izarail)",
       "network": "IZX",
       "type": "train"
+    },
+    "289147": {
+      "id": "289147",
+      "name": "IZX Naeryuku Tanshuku Line (IZX内陸短縮線)",
+      "short": "289147",
+      "colour": "#6600CC",
+      "operator": "IZX (Izarail)",
+      "network": "",
+      "type": "train"
+    },
+    "541404": {
+      "id": "541404",
+      "name": "IZX Komokata Sūnkwan Line (IZX其泉縦貫線)",
+      "short": "KU",
+      "colour": "blue",
+      "operator": "Izarail",
+      "network": "",
+      "type": "railway"
     },
     "242546": {
       "id": "242546",
@@ -272,7 +290,7 @@
     },
     "272137": {
       "id": "272137",
-      "name": "新東西連絡経路鐵道",
+      "name": "新東西連絡経路事業(2022)",
       "short": "SD01",
       "colour": "#0099CC",
       "operator": "",
@@ -399,7 +417,7 @@
     "292343": {
       "id": "292343",
       "name": "🅼 Line 18 (for ??)",
-      "short": "18",
+      "short": "292343",
       "colour": "#999999",
       "operator": "Sainðaul Metro",
       "network": "Sainðaul Metro",
@@ -408,7 +426,7 @@
     "302747": {
       "id": "302747",
       "name": "Nijikutō Main Line 西海本線",
-      "short": "NJM",
+      "short": "302747",
       "colour": "black",
       "operator": "Izarail",
       "network": "",
@@ -426,7 +444,7 @@
     "303222": {
       "id": "303222",
       "name": "Shinsabu Hidano Line Thru Service",
-      "short": "SSHT",
+      "short": "303222",
       "colour": "#BC8F8F",
       "operator": "",
       "network": "",
@@ -435,7 +453,7 @@
     "303223": {
       "id": "303223",
       "name": "Shinsabu Oitsura Line Thru Service",
-      "short": "SSOT",
+      "short": "303223",
       "colour": "#FFFACD",
       "operator": "Shinsabu Railway",
       "network": "Sainðaul Metro",
@@ -444,7 +462,7 @@
     "303227": {
       "id": "303227",
       "name": "Shikisabu dyenches thru service",
-      "short": "SKST",
+      "short": "303227",
       "colour": "#D2B48C",
       "operator": "",
       "network": "",
@@ -525,7 +543,7 @@
     "394413": {
       "id": "394413",
       "name": "Saindzaul - Remiville",
-      "short": "SLRM",
+      "short": "394413",
       "colour": "#888888",
       "operator": "Izarail",
       "network": "",
@@ -588,7 +606,7 @@
     "424786": {
       "id": "424786",
       "name": "🅼 Line 4 (rapid service for Kawaei 珂夬栄方面快速)",
-      "short": "4",
+      "short": "4RP",
       "colour": "#FFD912",
       "operator": "Sainðaul Metro",
       "network": "Sainðaul Metro",
@@ -705,7 +723,7 @@
     "449777": {
       "id": "449777",
       "name": "Minarajaki SUL - PSM",
-      "short": "MNJ",
+      "short": "449777",
       "colour": "#888888",
       "operator": "Izarail",
       "network": "",
@@ -741,7 +759,7 @@
     "326613": {
       "id": "326613",
       "name": "Chishi Rapid Line 歯師快速線 (師包方面)",
-      "short": "IR CS",
+      "short": "CSR",
       "colour": "#bfff00",
       "operator": "Izarail",
       "network": "Capital Suburban Network",
@@ -750,7 +768,7 @@
     "325613": {
       "id": "325613",
       "name": "🆂 Nakitsahe Line",
-      "short": "IR NT",
+      "short": "RC",
       "colour": "#e0d040",
       "operator": "Izarail",
       "network": "Riyatoma Suburban Railway Service",
@@ -759,7 +777,7 @@
     "325633": {
       "id": "325633",
       "name": "🆂 Shippanu Line",
-      "short": "IZ SP",
+      "short": "RD",
       "colour": "#1690FF",
       "operator": "Izarail",
       "network": "Riyatoma Suburban Railway Service",
@@ -777,7 +795,7 @@
     "325848": {
       "id": "325848",
       "name": "Riyatoma Metro Line 2",
-      "short": "RY2",
+      "short": "R2",
       "colour": "#00d659",
       "operator": "Riyatoma Urban Transit Corporation",
       "network": "",
@@ -786,7 +804,7 @@
     "325857": {
       "id": "325857",
       "name": "Riyatoma Metro Line 4",
-      "short": "RY4",
+      "short": "R4",
       "colour": "#d9534f",
       "operator": "Riyatoma Urban Transit Corporation",
       "network": "",
@@ -795,7 +813,7 @@
     "325858": {
       "id": "325858",
       "name": "Riyatoma Metro Line 3",
-      "short": "RY3",
+      "short": "R3",
       "colour": "#428bca",
       "operator": "Riyatoma Urban Transit Corporation",
       "network": "",
@@ -804,7 +822,7 @@
     "526355": {
       "id": "526355",
       "name": "Riyatoma Metro Line 5",
-      "short": "RY5",
+      "short": "R5",
       "colour": "violet",
       "operator": "Riyatoma Urban Transit Corporation",
       "network": "",
@@ -1270,6 +1288,10 @@
         {
           "relId": "187662",
           "seq": 5
+        },
+        {
+          "relId": "289147",
+          "seq": 7
         }
       ]
     },
@@ -2003,6 +2025,265 @@
         {
           "relId": "187662",
           "seq": 15
+        }
+      ]
+    },
+    {
+      "id": "137536624",
+      "name": "Nagayamatsu",
+      "lat": 36.1084386,
+      "lon": 128.1455921,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "541404",
+          "seq": 63
+        }
+      ]
+    },
+    {
+      "id": "154265027",
+      "name": "Illashiya 狐棲",
+      "lat": 35.7343291,
+      "lon": 128.30502,
+      "type": "station",
+      "tags": {
+        "public_transport": "station",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "289147",
+          "seq": 5
+        },
+        {
+          "relId": "414143",
+          "seq": 0
+        },
+        {
+          "relId": "414569",
+          "seq": 1
+        }
+      ]
+    },
+    {
+      "id": "167670124",
+      "name": "Showanul 書瓦崎",
+      "lat": 35.9327057,
+      "lon": 128.8017276,
+      "type": "station",
+      "tags": {
+        "public_transport": "station",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "272493",
+          "seq": 10
+        },
+        {
+          "relId": "272510",
+          "seq": 17
+        },
+        {
+          "relId": "289147",
+          "seq": 1
+        },
+        {
+          "relId": "414143",
+          "seq": 20
+        },
+        {
+          "relId": "414197",
+          "seq": 38
+        },
+        {
+          "relId": "414569",
+          "seq": 4
+        },
+        {
+          "relId": "414570",
+          "seq": 6
+        },
+        {
+          "relId": "470427",
+          "seq": 1
+        }
+      ]
+    },
+    {
+      "id": "176874425",
+      "name": "Sakamuso 沛坤",
+      "lat": 35.9809918,
+      "lon": 128.8326329,
+      "type": "station",
+      "tags": {
+        "colour": "#db287a",
+        "public_transport": "station",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242576",
+          "seq": 27
+        },
+        {
+          "relId": "242580",
+          "seq": 22
+        },
+        {
+          "relId": "242613",
+          "seq": 1
+        },
+        {
+          "relId": "272136",
+          "seq": 23
+        },
+        {
+          "relId": "272493",
+          "seq": 11
+        },
+        {
+          "relId": "272510",
+          "seq": 12
+        },
+        {
+          "relId": "289147",
+          "seq": 0
+        },
+        {
+          "relId": "470427",
+          "seq": 0
+        }
+      ]
+    },
+    {
+      "id": "180099415",
+      "name": "Chopatsu",
+      "lat": 35.7701629,
+      "lon": 127.9050656,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "289147",
+          "seq": 4
+        }
+      ]
+    },
+    {
+      "id": "180338437",
+      "name": "Pyanuza",
+      "lat": 36.0472621,
+      "lon": 128.3928551,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "272493",
+          "seq": 1
+        },
+        {
+          "relId": "541404",
+          "seq": 62
+        }
+      ]
+    },
+    {
+      "id": "253073702",
+      "name": "Shin-Keishunneul",
+      "lat": 36.2647249,
+      "lon": 127.8594447,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "541404",
+          "seq": 64
+        }
+      ]
+    },
+    {
+      "id": "259962168",
+      "name": "Panatsawa 若林",
+      "lat": 35.8745398,
+      "lon": 128.6530979,
+      "type": "station",
+      "tags": {
+        "colour": "#3465a4",
+        "public_transport": "station",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "242578",
+          "seq": 27
+        },
+        {
+          "relId": "289147",
+          "seq": 3
+        },
+        {
+          "relId": "425101",
+          "seq": 52
+        }
+      ]
+    },
+    {
+      "id": "260084991",
+      "name": "Katayoshi Juwon 泉峰中央",
+      "lat": 35.8626581,
+      "lon": 128.3959916,
+      "type": "station",
+      "tags": {
+        "public_transport": "station",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "289147",
+          "seq": 6
+        }
+      ]
+    },
+    {
+      "id": "429187790",
+      "name": "Kohtosōre",
+      "lat": 35.7651159,
+      "lon": 127.7478999,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "289147",
+          "seq": 2
+        }
+      ]
+    },
+    {
+      "id": "429187791",
+      "name": "Ikahoro Kōwen",
+      "lat": 35.6001762,
+      "lon": 127.5343786,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "289147",
+          "seq": 8
         }
       ]
     },
@@ -3103,47 +3384,6 @@
         {
           "relId": "414570",
           "seq": 7
-        }
-      ]
-    },
-    {
-      "id": "167670124",
-      "name": "Showanul",
-      "lat": 35.9327057,
-      "lon": 128.8017276,
-      "type": "station",
-      "tags": {
-        "public_transport": "station",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "272493",
-          "seq": 10
-        },
-        {
-          "relId": "272510",
-          "seq": 17
-        },
-        {
-          "relId": "414143",
-          "seq": 20
-        },
-        {
-          "relId": "414197",
-          "seq": 38
-        },
-        {
-          "relId": "414569",
-          "seq": 4
-        },
-        {
-          "relId": "414570",
-          "seq": 6
-        },
-        {
-          "relId": "470427",
-          "seq": 1
         }
       ]
     },
@@ -4665,64 +4905,6 @@
         {
           "relId": "272493",
           "seq": 9
-        }
-      ]
-    },
-    {
-      "id": "176874425",
-      "name": "Sakamuso 沛坤",
-      "lat": 35.9809918,
-      "lon": 128.8326329,
-      "type": "station",
-      "tags": {
-        "colour": "#db287a",
-        "public_transport": "station",
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "242576",
-          "seq": 27
-        },
-        {
-          "relId": "242580",
-          "seq": 22
-        },
-        {
-          "relId": "242613",
-          "seq": 1
-        },
-        {
-          "relId": "272136",
-          "seq": 23
-        },
-        {
-          "relId": "272493",
-          "seq": 11
-        },
-        {
-          "relId": "272510",
-          "seq": 12
-        },
-        {
-          "relId": "470427",
-          "seq": 0
-        }
-      ]
-    },
-    {
-      "id": "180338437",
-      "name": "Pyanuza",
-      "lat": 36.0472621,
-      "lon": 128.3928551,
-      "type": "station",
-      "tags": {
-        "railway": "station"
-      },
-      "lines": [
-        {
-          "relId": "272493",
-          "seq": 1
         }
       ]
     },
