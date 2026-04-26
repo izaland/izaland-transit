@@ -827,6 +827,24 @@
       "operator": "Riyatoma Urban Transit Corporation",
       "network": "",
       "type": "subway"
+    },
+    "330825": {
+      "id": "330825",
+      "name": "Peison Main Line 平尊本線",
+      "short": "IR35",
+      "colour": "indigo",
+      "operator": "Izarail",
+      "network": "",
+      "type": "railway"
+    },
+    "540826": {
+      "id": "540826",
+      "name": "Suikō Line 水高線",
+      "short": "SUK",
+      "colour": "black",
+      "operator": "Izarail",
+      "network": "",
+      "type": "railway"
     }
   },
   "stations": [
@@ -14293,6 +14311,360 @@
         {
           "relId": "325857",
           "seq": 0
+        }
+      ]
+    },
+    {
+      "id": "263802925",
+      "name": "Sonzhin Juwon 尊臣中央",
+      "lat": 39.2062787,
+      "lon": 131.3368951,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "330825",
+          "seq": 9
+        }
+      ]
+    },
+    {
+      "id": "287657456",
+      "name": "Sanagai 士手伊",
+      "lat": 38.9000627,
+      "lon": 130.1078599,
+      "type": "station",
+      "tags": {
+        "public_transport": "station",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "330825",
+          "seq": 8
+        }
+      ]
+    },
+    {
+      "id": "287684519",
+      "name": "Sayoya 木谷",
+      "lat": 38.8334379,
+      "lon": 130.1128302,
+      "type": "station",
+      "tags": {
+        "public_transport": "station",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "330825",
+          "seq": 7
+        }
+      ]
+    },
+    {
+      "id": "299870167",
+      "name": "Niji-Hidankoibo",
+      "lat": 38.7843332,
+      "lon": 130.0532908,
+      "type": "station",
+      "tags": {
+        "public_transport": "station",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "330825",
+          "seq": 4
+        }
+      ]
+    },
+    {
+      "id": "299870168",
+      "name": "Shin-Hidankoibo",
+      "lat": 38.7921706,
+      "lon": 130.0851995,
+      "type": "station",
+      "tags": {
+        "public_transport": "station",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "330825",
+          "seq": 6
+        }
+      ]
+    },
+    {
+      "id": "370930573",
+      "name": "Shinkamara 新寺田",
+      "lat": 38.783647,
+      "lon": 130.0712023,
+      "type": "station",
+      "tags": {
+        "public_transport": "station",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "330825",
+          "seq": 5
+        }
+      ]
+    },
+    {
+      "id": "376892616",
+      "name": "Mahara Bunki",
+      "lat": 38.7545244,
+      "lon": 129.9320264,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "330825",
+          "seq": 3
+        }
+      ]
+    },
+    {
+      "id": "428884708",
+      "name": "Nantaheku 風黑",
+      "lat": 38.1835685,
+      "lon": 129.9392001,
+      "type": "station",
+      "tags": {
+        "operator": "Izarail",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "540826",
+          "seq": 1
+        }
+      ]
+    },
+    {
+      "id": "428884709",
+      "name": "Hewareki 根浦",
+      "lat": 38.1509828,
+      "lon": 129.965136,
+      "type": "station",
+      "tags": {
+        "operator": "Izarail",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "540826",
+          "seq": 2
+        }
+      ]
+    },
+    {
+      "id": "428884710",
+      "name": "Tsuifuku 原福",
+      "lat": 38.0904207,
+      "lon": 129.9553465,
+      "type": "station",
+      "tags": {
+        "operator": "Izarail",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "540826",
+          "seq": 3
+        }
+      ]
+    },
+    {
+      "id": "428884711",
+      "name": "Ukora 霞田",
+      "lat": 38.0672528,
+      "lon": 129.9360217,
+      "type": "station",
+      "tags": {
+        "Pewapato": "根岩",
+        "operator": "Izarail",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "540826",
+          "seq": 5
+        }
+      ]
+    },
+    {
+      "id": "428884712",
+      "name": "Pewapato 根岩",
+      "lat": 37.9945992,
+      "lon": 129.9253422,
+      "type": "station",
+      "tags": {
+        "Pewapato": "根岩",
+        "operator": "Izarail",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "540826",
+          "seq": 6
+        }
+      ]
+    },
+    {
+      "id": "428884713",
+      "name": "Seriigo 岱梧",
+      "lat": 37.936665,
+      "lon": 129.9248337,
+      "type": "station",
+      "tags": {
+        "operator": "Izarail",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "540826",
+          "seq": 7
+        }
+      ]
+    },
+    {
+      "id": "428884714",
+      "name": "Sayokonu 木米",
+      "lat": 37.9021635,
+      "lon": 129.9357675,
+      "type": "station",
+      "tags": {
+        "operator": "Izarail",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "540826",
+          "seq": 8
+        }
+      ]
+    },
+    {
+      "id": "428884715",
+      "name": "Rihasamo 高山",
+      "lat": 38.2104458,
+      "lon": 129.9108486,
+      "type": "station",
+      "tags": {
+        "operator": "Izarail",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "540826",
+          "seq": 0
+        }
+      ]
+    },
+    {
+      "id": "428884716",
+      "name": "Jinbaku",
+      "lat": 38.0368183,
+      "lon": 129.9230536,
+      "type": "station",
+      "tags": {
+        "operator": "Izarail",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "540826",
+          "seq": 4
+        }
+      ]
+    },
+    {
+      "id": "428884717",
+      "name": "Handan 駻覃",
+      "lat": 37.9731048,
+      "lon": 129.9479725,
+      "type": "station",
+      "tags": {
+        "operator": "Izarail",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "540826",
+          "seq": 9
+        }
+      ]
+    },
+    {
+      "id": "428884718",
+      "name": "Suidai 水台",
+      "lat": 37.8795695,
+      "lon": 129.9412543,
+      "type": "station",
+      "tags": {
+        "operator": "Izarail",
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "540826",
+          "seq": 10
+        }
+      ]
+    },
+    {
+      "id": "430074510",
+      "name": "Tanjiku 淡地九",
+      "lat": 39.0621047,
+      "lon": 129.506479,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "330825",
+          "seq": 0
+        }
+      ]
+    },
+    {
+      "id": "430074511",
+      "name": "Akachi 蛞遅",
+      "lat": 39.1322867,
+      "lon": 129.2828133,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "330825",
+          "seq": 1
+        }
+      ]
+    },
+    {
+      "id": "430074512",
+      "name": "Setaki Bunki",
+      "lat": 39.2099661,
+      "lon": 129.2362791,
+      "type": "station",
+      "tags": {
+        "railway": "station"
+      },
+      "lines": [
+        {
+          "relId": "330825",
+          "seq": 2
         }
       ]
     },
