@@ -234,12 +234,10 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
   // ── METADATA: colours, display names, sidebar order ──────────────────────
-  // Add new entries here when you want custom metadata for a relation.
-  // If a relation ID is present in lines.json but NOT here, it will appear
-  // automatically in the "Other" group with a neutral grey colour.
   const RM = {
+    // ── Metro – Sainðaul ──────────────────────────────────────────────────
     "242546": { "group": "Metro", "name": "🂼 Line 8", "ref": "8", "colour": "#00A2D3" },
-    "242547": { "group": "Metro", "name": "🂼 Line 4 (local service for Kawaei 珂夼栄方面各駅停車)", "ref": "4", "colour": "#FFD912" },
+    "242547": { "group": "Metro", "name": "🂼 Line 4 (local for Kawaei 珂夬栄方面各駅停車)", "ref": "4", "colour": "#FFD912" },
     "242548": { "group": "Metro", "name": "🂼 Line 9 (for Shōryan Daishi)", "ref": "9", "colour": "#C40062" },
     "242549": { "group": "Metro", "name": "🂼 Line 1 (local for Enikezya Forum)", "ref": "1", "colour": "#FE7F00" },
     "242565": { "group": "Metro", "name": "🂼 Line 2 (for Mokoba)", "ref": "2", "colour": "#FF0000" },
@@ -255,25 +253,75 @@
     "242579": { "group": "Metro", "name": "🂼 Line 11", "ref": "11", "colour": "#c5e1a5" },
     "242580": { "group": "Metro", "name": "🂼 Line 15", "ref": "15", "colour": "#db287a" },
     "242593": { "group": "Metro", "name": "🂼 Line 13", "ref": "13", "colour": "#36873c" },
-    "292343": { "group": "Metro", "name": "🂼 Line 18 (for ??)", "ref": "", "colour": "#999999" },
-    "242568": { "group": "Other systems", "name": "Portflyer", "ref": "PF", "colour": "#b9a5bd" },
-    "242572": { "group": "Other systems", "name": "Linhai Monorail", "ref": "LH", "colour": "#bcbf62" },
-    "242613": { "group": "Other systems", "name": "Portliner", "ref": "PL", "colour": "#e2bfa7" },
-    "283140": { "group": "Other systems", "name": "Kayan Railway Sakamo Line 嘉鞍高速鉄道Sakamo線", "ref": "KY03", "colour": "#990000" },
-    "283141": { "group": "Other systems", "name": "Kayan Railway Main Line 嘉鞍高速鉄道本線", "ref": "KY02", "colour": "#993300" },
-    "303201": { "group": "Other systems", "name": "🂻 Hoze-Oyehatton Line (for Kadokamahiwa)", "ref": "OH", "colour": "#CD5C5C" },
-    "272674": { "group": "Thru services", "name": "🇂 Kwōkei Line (suburban service, for Yamagoka) 荒京線 (近郊電車, 倉湖加方面)", "ref": "CKW", "colour": "#99FFFF" },
+    "292343": { "group": "Metro", "name": "🂼 Line 18", "ref": "18", "colour": "#999999" },
+    "424786": { "group": "Metro", "name": "🂼 Line 4 (rapid for Kawaei 珂夬栄方面快速)", "ref": "4", "colour": "#FFD912" },
+    "424869": { "group": "Metro", "name": "🂼 Line 2 (for Hintomaui)", "ref": "2", "colour": "#FF0000" },
+    "424884": { "group": "Metro", "name": "🂼 Line 3 (rapid to Ansan Shakuiadae)", "ref": "3", "colour": "#009E4F" },
+    "424885": { "group": "Metro", "name": "🂼 Line 3 (local to Ansan Shakuiadae)", "ref": "3", "colour": "#009E4F" },
+    "424886": { "group": "Metro", "name": "🂼 Line 2 (for Naezoto – Mokoba origin)", "ref": "2", "colour": "#FF0000" },
+    "424887": { "group": "Metro", "name": "🂼 Line 2 (for Naezoto – Hintomaui origin)", "ref": "2", "colour": "#FF0000" },
+    "424931": { "group": "Metro", "name": "🂼 Line 1 (local for Ikashumai Sports Center)", "ref": "1", "colour": "#FE7F00" },
+    "424996": { "group": "Metro", "name": "🂼 Line 12 (for Niji-Yōneo)", "ref": "12", "colour": "#86ebeb" },
+    "424997": { "group": "Metro", "name": "🂼 Line 10 to Uhāra-Motu", "ref": "10", "colour": "#C46200" },
+    "425101": { "group": "Metro", "name": "🂼 Line 6 (for Nari-Gotsurindai)", "ref": "6", "colour": "#3465a4" },
+    // ── Riyatoma Metro ────────────────────────────────────────────────────
+    "325848": { "group": "Riyatoma Metro", "name": "🂼 Riyatoma Line 2", "ref": "R2", "colour": "#00d659" },
+    "325857": { "group": "Riyatoma Metro", "name": "🂼 Riyatoma Line 4", "ref": "R4", "colour": "#d9534f" },
+    "325858": { "group": "Riyatoma Metro", "name": "🂼 Riyatoma Line 3", "ref": "R3", "colour": "#428bca" },
+    "526355": { "group": "Riyatoma Metro", "name": "🂼 Riyatoma Line 5", "ref": "R5", "colour": "#7F00FF" },
+    // ── Izarail commuter / express ─────────────────────────────────────────
+    "272434": { "group": "Izarail", "name": "🆂 Airport Express (to Sabullan)", "ref": "AX", "colour": "#CC99FF" },
+    "272491": { "group": "Izarail", "name": "🆂 Chikaoi Line", "ref": "CO", "colour": "#FF3333" },
+    "272493": { "group": "Izarail", "name": "🆂 Kidai Line 磯大線", "ref": "KD", "colour": "#A7CF7E" },
+    "272510": { "group": "Izarail", "name": "🆂 Seishaku Line (to Igattarun)", "ref": "SK", "colour": "#7AE3E3" },
+    "272511": { "group": "Izarail", "name": "🆂 Gaekwan-Dōnbu Line 外環東部線", "ref": "GD", "colour": "#B16B48" },
+    "272674": { "group": "Izarail", "name": "🆂 Kwōkei Line (suburban, for Yamagoka) 荒京線", "ref": "CKW", "colour": "#99FFFF" },
+    "325613": { "group": "Izarail", "name": "🆂 Nakitsahe Line", "ref": "RC", "colour": "#e0d040" },
+    "325633": { "group": "Izarail", "name": "🆂 Shippanu Line", "ref": "RD", "colour": "#1690FF" },
+    "325731": { "group": "Izarail", "name": "🆂 Riyatoma Airport Express", "ref": "RAX", "colour": "#7900f3" },
+    "326968": { "group": "Izarail", "name": "🆂 Kawasabu Line (to Niji-Kawayatsu)", "ref": "CKS", "colour": "#339966" },
+    "326969": { "group": "Izarail", "name": "🆂 Shirause Line (to Usehari)", "ref": "SU", "colour": "#B16B48" },
+    "327143": { "group": "Izarail", "name": "🆂 Kawasabu Line (to Sabullan)", "ref": "CKS", "colour": "#339966" },
+    "327149": { "group": "Izarail", "name": "🆂 Airport Express (to SUL)", "ref": "AX", "colour": "#CC99FF" },
+    "414569": { "group": "Izarail", "name": "🆂 Airport Express (Illashiya › SUL)", "ref": "AX", "colour": "#CC99FF" },
+    "414570": { "group": "Izarail", "name": "🆂 Airport Express (Onnojaris › SUL)", "ref": "AX", "colour": "#CC99FF" },
+    "414674": { "group": "Izarail", "name": "🆂 Todakuri Line", "ref": "TD", "colour": "#2d83a2" },
+    // ── Thru services ──────────────────────────────────────────────────────
     "303222": { "group": "Thru services", "name": "Shinsabu Hidano Line Thru Service", "ref": "", "colour": "#BC8F8F" },
     "303223": { "group": "Thru services", "name": "Shinsabu Oitsura Line Thru Service", "ref": "", "colour": "#FFFACD" },
     "303227": { "group": "Thru services", "name": "Shikisabu dyenches thru service", "ref": "", "colour": "#D2B48C" },
-    "303270": { "group": "Thru services", "name": "Line 5 Shosen Line Thru service", "ref": "", "colour": "#D2B48C" }
+    "303270": { "group": "Thru services", "name": "Line 5 Shosen Line Thru service", "ref": "", "colour": "#D2B48C" },
+    // ── Other systems ──────────────────────────────────────────────────────
+    "187662": { "group": "Other systems", "name": "IZX Keishin Line IZX京深高速鉄道線", "ref": "IZX1", "colour": "#0000CD" },
+    "242568": { "group": "Other systems", "name": "Portflyer", "ref": "PF", "colour": "#b9a5bd" },
+    "242572": { "group": "Other systems", "name": "Linhai Monorail", "ref": "LH", "colour": "#bcbf62" },
+    "242613": { "group": "Other systems", "name": "Portliner", "ref": "PL", "colour": "#e2bfa7" },
+    "272574": { "group": "Other systems", "name": "IZX Eira Line IZX永羅高速線", "ref": "IZX3", "colour": "#45B86B" },
+    "278441": { "group": "Other systems", "name": "IZX Nankai Line IZX南海線", "ref": "NKI", "colour": "#990000" },
+    "283140": { "group": "Other systems", "name": "Kayan Railway Sakamo Line 嘉鞍高速鉄道Sakamo線", "ref": "KY03", "colour": "#990000" },
+    "283141": { "group": "Other systems", "name": "Kayan Railway Main Line 嘉鞍高速鉄道本線", "ref": "KY02", "colour": "#993300" },
+    "288171": { "group": "Other systems", "name": "IZX Seibu Naeryuku Line IZX西部内陸線", "ref": "IZSN", "colour": "#8B0000" },
+    "288508": { "group": "Other systems", "name": "IZX Ryānkai Line 両海IZX", "ref": "RK", "colour": "#008000" },
+    "289147": { "group": "Other systems", "name": "IZX Naeryuku Tanshuku Line IZX内陸短縮線", "ref": "NT", "colour": "#6600CC" },
+    "302747": { "group": "Other systems", "name": "Nijikutō Main Line 西海本線", "ref": "NKT", "colour": "#333333" },
+    "303201": { "group": "Other systems", "name": "🂻 Hoze-Oyehatton Line (for Kadokamahiwa)", "ref": "OH", "colour": "#CD5C5C" },
+    "326613": { "group": "Other systems", "name": "Chishi Rapid Line 歯師快速線", "ref": "CSR", "colour": "#bfff00" },
+    "326860": { "group": "Other systems", "name": "CL Shirukami 荒釜号", "ref": "CL10", "colour": "#778899" },
+    "330825": { "group": "Other systems", "name": "Peison Main Line 平尊本線", "ref": "IR35", "colour": "#4B0082" },
+    "414197": { "group": "Other systems", "name": "Tandan-Nanpuku Line 丹淡南北線", "ref": "TDN", "colour": "#FF8C00" },
+    "449777": { "group": "Other systems", "name": "Minarajaki SUL–PSM", "ref": "MNR", "colour": "#888888" },
+    "470427": { "group": "Other systems", "name": "Metropolitan Fast Commuter 首都圏廣域高速鉄道", "ref": "MTX1", "colour": "#0000CD" },
+    "540826": { "group": "Other systems", "name": "Suikō Line 水高線", "ref": "SUK", "colour": "#333333" },
+    "541404": { "group": "Other systems", "name": "IZX Komokata Sūnkwan Line IZX其泉縦貫線", "ref": "KU", "colour": "#0000CD" }
   };
 
   // Sidebar display order per group
   const GROUPS = {
-    'Metro':         [242567,242593,242571,242579,242569,242548,242546,242576,242578,242577,242547,242566,242565,242549,242343,242573,242570,242580,292343],
-    'Other systems': [303201,242613,283141,283140,242568,242572],
-    'Thru services': [272674,303222,303223,303227,303270]
+    'Metro':          [242567,242593,242571,424996,242579,424997,242569,242548,242546,242576,242578,242577,242547,424786,242566,424884,424885,242565,424869,424886,424887,242549,424931,242573,242570,242580,292343],
+    'Riyatoma Metro': [325858,325848,325857,526355],
+    'Izarail':        [272434,272491,272493,272510,272511,272674,325613,325633,325731,326968,327143,326969,327149,414569,414570,414674],
+    'Thru services':  [303222,303223,303227,303270],
+    'Other systems':  [187662,272574,278441,288171,288508,289147,541404,303201,242613,283141,283140,242568,242572,302747,326613,326860,330825,414197,449777,470427,540826]
   };
 
   // ── TILE FILTER ──────────────────────────────────────────────
@@ -431,8 +479,6 @@
   function status(msg,ms=3000){sbar.textContent=msg;sbar.classList.remove('h');clearTimeout(sbar._t);sbar._t=setTimeout(()=>sbar.classList.add('h'),ms);}
 
   // ── RENDER FROM lines.json geometry ─────────────────────────────────────
-  // lines.json format: { "lines": { "<id>": [ [[lat,lon], ...], ... ], ... } }
-  // Each entry is an array of polyline segments (array of [lat,lon] pairs).
   const layers={},vis={};
 
   function renderFromJson(id, segments) {
@@ -458,8 +504,6 @@
     vis[id] = true;
   }
 
-  // Build the effective groups list, auto-adding any IDs present in
-  // lines.json that are missing from GROUPS into an "Other" bucket.
   function buildEffectiveGroups(allIds) {
     const knownIds = new Set(Object.values(GROUPS).flat().map(String));
     const extra = allIds.filter(id => !knownIds.has(id));
@@ -471,7 +515,6 @@
   function buildLegend(effectiveGroups) {
     const el = document.getElementById('legend'); el.innerHTML = '';
     Object.entries(effectiveGroups).forEach(([g, ids]) => {
-      // Only show groups that have at least one rendered relation
       const present = ids.filter(rid => layers[String(rid)]);
       if (!present.length) return;
       const w = document.createElement('div'); w.className = 'lg';
@@ -558,26 +601,18 @@
   // ── MAIN ─────────────────────────────────────────────────────────────────
   async function main() {
     const ld = document.getElementById('ld'), lt = document.getElementById('ld-txt');
-
     lt.textContent = 'Loading transit data…';
-
-    // Fetch lines.json (built by CI from data/xml/*.xml)
     const resp = await fetch('data/lines.json');
     const json = await resp.json();
     const linesData = json.lines || {};
-
     const allIds = Object.keys(linesData);
     const effectiveGroups = buildEffectiveGroups(allIds);
-
-    // Render every relation present in lines.json
     allIds.forEach(id => {
       const segments = linesData[id];
       if (segments && segments.length) renderFromJson(id, segments);
     });
-
     lt.textContent = 'Loading stations…';
     await loadStations();
-
     ld.classList.add('done');
     setTimeout(() => ld.remove(), 600);
     buildLegend(effectiveGroups);
