@@ -177,7 +177,7 @@
             <button>Map <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button>
             <div class="dropdown--sub">
               <span class="dd-lbl">City maps</span>
-              <a href="map.html" class="active">Sai&#x00F0;aul</a>
+              <a href="map.html" class="active">Saï&#x00F0;aul</a>
               <a href="map-warohan.html">Warohan</a>
               <a href="map-panaireki.html">Panaireki</a>
               <a href="map-sannupuri.html">Sannupuri</a>
@@ -233,37 +233,43 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
+  // ── METADATA: colours, display names, sidebar order ──────────────────────
+  // Add new entries here when you want custom metadata for a relation.
+  // If a relation ID is present in lines.json but NOT here, it will appear
+  // automatically in the "Other" group with a neutral grey colour.
   const RM = {
-  "242546": { "group": "Metro", "name": "🂼 Line 8", "ref": "8", "colour": "#00A2D3" },
-  "242547": { "group": "Metro", "name": "🂼 Line 4 (local service for Kawaei 珂夼栄方面各駅停車)", "ref": "4", "colour": "#FFD912" },
-  "242548": { "group": "Metro", "name": "🂼 Line 9 (for Shōryan Daishi)", "ref": "9", "colour": "#C40062" },
-  "242549": { "group": "Metro", "name": "🂼 Line 1 (local for Enikezya Forum)", "ref": "1", "colour": "#FE7F00" },
-  "242565": { "group": "Metro", "name": "🂼 Line 2 (for Mokoba)", "ref": "2", "colour": "#FF0000" },
-  "242566": { "group": "Metro", "name": "🂼 Line 3 (local to Iyogateri)", "ref": "3", "colour": "#009E4F" },
-  "242567": { "group": "Metro", "name": "🂼 Line 14", "ref": "14", "colour": "#72E400" },
-  "242569": { "group": "Metro", "name": "🂼 Line 10 to Shakihori", "ref": "10", "colour": "#C46200" },
-  "242570": { "group": "Metro", "name": "🂼 Line 16", "ref": "16", "colour": "#816cb1" },
-  "242571": { "group": "Metro", "name": "🂼 Line 12 (for Mewakate-Kippai)", "ref": "12", "colour": "#86ebeb" },
-  "242573": { "group": "Metro", "name": "🂼 Line 17 (for Tswakanami Airport)", "ref": "17", "colour": "#f985bb" },
-  "242576": { "group": "Metro", "name": "🂼 Line 7", "ref": "7", "colour": "#00a0bc" },
-  "242577": { "group": "Metro", "name": "🂼 Line 5 (local service for Jisahara)", "ref": "5", "colour": "#9e6a51" },
-  "242578": { "group": "Metro", "name": "🂼 Line 6 (for Saibu Panatsawa)", "ref": "6", "colour": "#3465a4" },
-  "242579": { "group": "Metro", "name": "🂼 Line 11", "ref": "11", "colour": "#c5e1a5" },
-  "242580": { "group": "Metro", "name": "🂼 Line 15", "ref": "15", "colour": "#db287a" },
-  "242593": { "group": "Metro", "name": "🂼 Line 13", "ref": "13", "colour": "#36873c" },
-  "292343": { "group": "Metro", "name": "🂼 Line 18 (for ??)", "ref": "", "colour": "#999999" },
-  "242568": { "group": "Other systems", "name": "Portflyer", "ref": "PF", "colour": "#b9a5bd" },
-  "242572": { "group": "Other systems", "name": "Linhai Monorail", "ref": "LH", "colour": "#bcbf62" },
-  "242613": { "group": "Other systems", "name": "Portliner", "ref": "PL", "colour": "#e2bfa7" },
-  "283140": { "group": "Other systems", "name": "Kayan Railway Sakamo Line 嘉鞍高速鉄道Sakamo線", "ref": "KY03", "colour": "#990000" },
-  "283141": { "group": "Other systems", "name": "Kayan Railway Main Line 嘉鞍高速鉄道本線", "ref": "KY02", "colour": "#993300" },
-  "303201": { "group": "Other systems", "name": "🂻 Hoze-Oyehatton Line (for Kadokamahiwa)", "ref": "OH", "colour": "#CD5C5C" },
-  "272674": { "group": "Thru services", "name": "🇂 Kwōkei Line (suburban service, for Yamagoka) 荒京線 (近郊電車, 倉湖加方面)", "ref": "CKW", "colour": "#99FFFF" },
-  "303222": { "group": "Thru services", "name": "Shinsabu Hidano Line Thru Service", "ref": "", "colour": "#BC8F8F" },
-  "303223": { "group": "Thru services", "name": "Shinsabu Oitsura Line Thru Service", "ref": "", "colour": "#FFFACD" },
-  "303227": { "group": "Thru services", "name": "Shikisabu dyenches thru service", "ref": "", "colour": "#D2B48C" },
-  "303270": { "group": "Thru services", "name": "Line 5 Shosen Line Thru service", "ref": "", "colour": "#D2B48C" }
-};
+    "242546": { "group": "Metro", "name": "🂼 Line 8", "ref": "8", "colour": "#00A2D3" },
+    "242547": { "group": "Metro", "name": "🂼 Line 4 (local service for Kawaei 珂夼栄方面各駅停車)", "ref": "4", "colour": "#FFD912" },
+    "242548": { "group": "Metro", "name": "🂼 Line 9 (for Shōryan Daishi)", "ref": "9", "colour": "#C40062" },
+    "242549": { "group": "Metro", "name": "🂼 Line 1 (local for Enikezya Forum)", "ref": "1", "colour": "#FE7F00" },
+    "242565": { "group": "Metro", "name": "🂼 Line 2 (for Mokoba)", "ref": "2", "colour": "#FF0000" },
+    "242566": { "group": "Metro", "name": "🂼 Line 3 (local to Iyogateri)", "ref": "3", "colour": "#009E4F" },
+    "242567": { "group": "Metro", "name": "🂼 Line 14", "ref": "14", "colour": "#72E400" },
+    "242569": { "group": "Metro", "name": "🂼 Line 10 to Shakihori", "ref": "10", "colour": "#C46200" },
+    "242570": { "group": "Metro", "name": "🂼 Line 16", "ref": "16", "colour": "#816cb1" },
+    "242571": { "group": "Metro", "name": "🂼 Line 12 (for Mewakate-Kippai)", "ref": "12", "colour": "#86ebeb" },
+    "242573": { "group": "Metro", "name": "🂼 Line 17 (for Tswakanami Airport)", "ref": "17", "colour": "#f985bb" },
+    "242576": { "group": "Metro", "name": "🂼 Line 7", "ref": "7", "colour": "#00a0bc" },
+    "242577": { "group": "Metro", "name": "🂼 Line 5 (local service for Jisahara)", "ref": "5", "colour": "#9e6a51" },
+    "242578": { "group": "Metro", "name": "🂼 Line 6 (for Saibu Panatsawa)", "ref": "6", "colour": "#3465a4" },
+    "242579": { "group": "Metro", "name": "🂼 Line 11", "ref": "11", "colour": "#c5e1a5" },
+    "242580": { "group": "Metro", "name": "🂼 Line 15", "ref": "15", "colour": "#db287a" },
+    "242593": { "group": "Metro", "name": "🂼 Line 13", "ref": "13", "colour": "#36873c" },
+    "292343": { "group": "Metro", "name": "🂼 Line 18 (for ??)", "ref": "", "colour": "#999999" },
+    "242568": { "group": "Other systems", "name": "Portflyer", "ref": "PF", "colour": "#b9a5bd" },
+    "242572": { "group": "Other systems", "name": "Linhai Monorail", "ref": "LH", "colour": "#bcbf62" },
+    "242613": { "group": "Other systems", "name": "Portliner", "ref": "PL", "colour": "#e2bfa7" },
+    "283140": { "group": "Other systems", "name": "Kayan Railway Sakamo Line 嘉鞍高速鉄道Sakamo線", "ref": "KY03", "colour": "#990000" },
+    "283141": { "group": "Other systems", "name": "Kayan Railway Main Line 嘉鞍高速鉄道本線", "ref": "KY02", "colour": "#993300" },
+    "303201": { "group": "Other systems", "name": "🂻 Hoze-Oyehatton Line (for Kadokamahiwa)", "ref": "OH", "colour": "#CD5C5C" },
+    "272674": { "group": "Thru services", "name": "🇂 Kwōkei Line (suburban service, for Yamagoka) 荒京線 (近郊電車, 倉湖加方面)", "ref": "CKW", "colour": "#99FFFF" },
+    "303222": { "group": "Thru services", "name": "Shinsabu Hidano Line Thru Service", "ref": "", "colour": "#BC8F8F" },
+    "303223": { "group": "Thru services", "name": "Shinsabu Oitsura Line Thru Service", "ref": "", "colour": "#FFFACD" },
+    "303227": { "group": "Thru services", "name": "Shikisabu dyenches thru service", "ref": "", "colour": "#D2B48C" },
+    "303270": { "group": "Thru services", "name": "Line 5 Shosen Line Thru service", "ref": "", "colour": "#D2B48C" }
+  };
+
+  // Sidebar display order per group
   const GROUPS = {
     'Metro':         [242567,242593,242571,242579,242569,242548,242546,242576,242578,242577,242547,242566,242565,242549,242343,242573,242570,242580,292343],
     'Other systems': [303201,242613,283141,283140,242568,242572],
@@ -271,10 +277,6 @@
   };
 
   // ── TILE FILTER ──────────────────────────────────────────────
-  // Applies CSS filter to .leaflet-tile-pane based on active layer + theme.
-  // 'standard' / 'topo' in dark theme: dim + desaturate
-  // 'dark': invert + hue-rotate (works in both light and dark theme)
-  // 'blank': no filter needed
   function applyTileFilter(layer) {
     const mapEl = document.getElementById('map');
     const dark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -293,7 +295,6 @@
     t.addEventListener('click',()=>{
       d=d==='dark'?'light':'dark';
       h.setAttribute('data-theme',d);
-      // re-apply tile filter after theme change
       const activeLayer = document.querySelector('.base-btn.on')?.dataset.layer || 'standard';
       applyTileFilter(activeLayer);
       const blankBtn=document.querySelector('.base-btn[data-layer="blank"]');
@@ -355,13 +356,11 @@
       {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
     topo:L.tileLayer('https://tile.opengeofiction.net/ogf-topo/{z}/{x}/{y}.png',
       {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
-    // 'dark' reuses the standard carto tiles with CSS invert filter
     dark:L.tileLayer('https://tile.opengeofiction.net/ogf-carto/{z}/{x}/{y}.png',
       {maxZoom:19,attribution:'&copy; <a href="https://opengeofiction.net" target="_blank">OpenGeoFiction</a>'}),
     blank:makeBlank()
   };
   tiles.standard.addTo(map);
-  // Apply initial filter (dark theme on load)
   applyTileFilter('standard');
 
   document.querySelectorAll('.base-btn').forEach(b=>{
@@ -431,43 +430,60 @@
   const sbar=document.getElementById('sbar');
   function status(msg,ms=3000){sbar.textContent=msg;sbar.classList.remove('h');clearTimeout(sbar._t);sbar._t=setTimeout(()=>sbar.classList.add('h'),ms);}
 
-  const OV='https://overpass.opengeofiction.net/api/interpreter';
-  async function fetch_rels(ids){
-    const r=await fetch(OV,{method:'POST',body:'data='+encodeURIComponent('[out:json];relation(id:'+ids+');out geom;'),headers:{'Content-Type':'application/x-www-form-urlencoded'}});
-    return (await r.json()).elements;
-  }
-
+  // ── RENDER FROM lines.json geometry ─────────────────────────────────────
+  // lines.json format: { "lines": { "<id>": [ [[lat,lon], ...], ... ], ... } }
+  // Each entry is an array of polyline segments (array of [lat,lon] pairs).
   const layers={},vis={};
-  function renderRel(el){
-    const id=String(el.id),m=RM[id]||{};
-    const col=m.colour||el.tags?.colour||'#888';
-    const thru=m.group==='Thru services';
-    const grp=L.layerGroup();
-    (el.members||[]).forEach(w=>{
-      if(w.type==='way'&&w.geometry?.length>1){
-        const opts={color:col,weight:m.group==='Metro'?4:3,opacity:thru?.65:.9,smoothFactor:1.5};
-        if(thru)opts.dashArray='7 4';
-        L.polyline(w.geometry.map(p=>[p.lat,p.lon]),opts)
-          .bindTooltip(clean(m.name||id)+(m.ref?' · '+m.ref:''),{sticky:true,className:'lt'})
-          .addTo(grp);
-      }
+
+  function renderFromJson(id, segments) {
+    const m = RM[id] || {};
+    const col = m.colour || '#888888';
+    const thru = m.group === 'Thru services';
+    const grp = L.layerGroup();
+    segments.forEach(seg => {
+      if (!seg || seg.length < 2) return;
+      const opts = {
+        color: col,
+        weight: m.group === 'Metro' ? 4 : 3,
+        opacity: thru ? .65 : .9,
+        smoothFactor: 1.5
+      };
+      if (thru) opts.dashArray = '7 4';
+      L.polyline(seg, opts)
+        .bindTooltip(clean(m.name || id) + (m.ref ? ' · ' + m.ref : ''), { sticky: true, className: 'lt' })
+        .addTo(grp);
     });
-    grp.addTo(map);layers[id]=grp;vis[id]=true;
+    grp.addTo(map);
+    layers[id] = grp;
+    vis[id] = true;
   }
 
-  function buildLegend(){
-    const el=document.getElementById('legend');el.innerHTML='';
-    ['Metro','Other systems','Thru services'].forEach(g=>{
-      const w=document.createElement('div');w.className='lg';
-      w.innerHTML='<div class="lg-title">'+g+'</div>';
-      GROUPS[g].forEach(rid=>{
-        const m=RM[String(rid)]||{},c=m.colour||'#888',n=clean(m.name||String(rid));
-        const item=document.createElement('div');item.className='li';item.dataset.rid=rid;
-        item.innerHTML='<span class="li-sw" style="background:'+c+'"></span><span class="li-name">'+n+'</span><span class="li-ref">'+(m.ref||'')+'</span>';
-        item.addEventListener('click',()=>{
-          const id=String(rid);
-          if(vis[id]){map.removeLayer(layers[id]);vis[id]=false;item.classList.add('off');}
-          else{layers[id]?.addTo(map);vis[id]=true;item.classList.remove('off');}
+  // Build the effective groups list, auto-adding any IDs present in
+  // lines.json that are missing from GROUPS into an "Other" bucket.
+  function buildEffectiveGroups(allIds) {
+    const knownIds = new Set(Object.values(GROUPS).flat().map(String));
+    const extra = allIds.filter(id => !knownIds.has(id));
+    const effective = { ...GROUPS };
+    if (extra.length) effective['Other'] = extra.map(Number);
+    return effective;
+  }
+
+  function buildLegend(effectiveGroups) {
+    const el = document.getElementById('legend'); el.innerHTML = '';
+    Object.entries(effectiveGroups).forEach(([g, ids]) => {
+      // Only show groups that have at least one rendered relation
+      const present = ids.filter(rid => layers[String(rid)]);
+      if (!present.length) return;
+      const w = document.createElement('div'); w.className = 'lg';
+      w.innerHTML = '<div class="lg-title">' + g + '</div>';
+      present.forEach(rid => {
+        const m = RM[String(rid)] || {}, c = m.colour || '#888', n = clean(m.name || String(rid));
+        const item = document.createElement('div'); item.className = 'li'; item.dataset.rid = rid;
+        item.innerHTML = '<span class="li-sw" style="background:' + c + '"></span><span class="li-name">' + n + '</span><span class="li-ref">' + (m.ref || '') + '</span>';
+        item.addEventListener('click', () => {
+          const id = String(rid);
+          if (vis[id]) { map.removeLayer(layers[id]); vis[id] = false; item.classList.add('off'); }
+          else { layers[id]?.addTo(map); vis[id] = true; item.classList.remove('off'); }
         });
         w.appendChild(item);
       });
@@ -475,16 +491,17 @@
     });
   }
 
-  // ── STAZIONI ──────────────────────────────────────────────
+  // ── STATIONS (still from Overpass — node data not in lines.json) ─────────
   const stLayer = L.layerGroup().addTo(map);
+  const OV = 'https://overpass.opengeofiction.net/api/interpreter';
   const ST_BBOX = '35.85,128.70,36.18,129.10';
 
   async function loadStations() {
-    const q = '[out:json][timeout:30];node["railway"~"station|stop"]('+ST_BBOX+');out body;';
+    const q = '[out:json][timeout:30];node["railway"~"station|stop"](' + ST_BBOX + ');out body;';
     const r = await fetch(OV, {
-      method:'POST',
-      body:'data='+encodeURIComponent(q),
-      headers:{'Content-Type':'application/x-www-form-urlencoded'}
+      method: 'POST',
+      body: 'data=' + encodeURIComponent(q),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
     const data = await r.json();
     data.elements.forEach(renderStation);
@@ -494,26 +511,26 @@
     const name = node.tags?.name || node.tags?.['name:en'] || '';
     const isMain = node.tags?.railway === 'station';
     const icon = L.divIcon({
-      className:'',
-      html:'<div class="st-dot st-sm"></div>',
-      iconSize:[10,10],
-      iconAnchor:[5,5]
+      className: '',
+      html: '<div class="st-dot st-sm"></div>',
+      iconSize: [10, 10],
+      iconAnchor: [5, 5]
     });
-    const m = L.marker([node.lat,node.lon],{icon,title:name,zIndexOffset:isMain?200:100});
+    const m = L.marker([node.lat, node.lon], { icon, title: name, zIndexOffset: isMain ? 200 : 100 });
     m.addTo(stLayer);
     m._stName = name;
     m._stMain = isMain;
     m._labelBound = false;
-    if (name) m.bindTooltip(makeStationTooltipEl(name, false),{sticky:true,className:'lt'});
+    if (name) m.bindTooltip(makeStationTooltipEl(name, false), { sticky: true, className: 'lt' });
   }
 
   function updateStations() {
     const z = map.getZoom();
     stLayer.eachLayer(m => {
-      const el = m.getElement(); if(!el) return;
-      const dot = el.querySelector('.st-dot'); if(!dot) return;
-      if (z < 10) { el.style.display='none'; return; }
-      el.style.display='';
+      const el = m.getElement(); if (!el) return;
+      const dot = el.querySelector('.st-dot'); if (!dot) return;
+      if (z < 10) { el.style.display = 'none'; return; }
+      el.style.display = '';
       dot.className = z >= 16 ? 'st-dot st-lg'
                     : z >= 14 ? 'st-dot st-md'
                     : z >= 12 ? 'st-dot st-sm'
@@ -522,38 +539,50 @@
       const bold = z >= 16;
       if (wantPerm && !m._labelBound) {
         m.unbindTooltip();
-        m.bindTooltip(makeStationTooltipEl(m._stName, bold),{
-          permanent:true,
-          direction:'right',
-          offset:[8,0],
-          className:'lt'
+        m.bindTooltip(makeStationTooltipEl(m._stName, bold), {
+          permanent: true,
+          direction: 'right',
+          offset: [8, 0],
+          className: 'lt'
         }).openTooltip();
         m._labelBound = true;
       } else if (!wantPerm && m._labelBound) {
         m.unbindTooltip();
         m._labelBound = false;
-        if (m._stName) m.bindTooltip(makeStationTooltipEl(m._stName, false),{sticky:true,className:'lt'});
+        if (m._stName) m.bindTooltip(makeStationTooltipEl(m._stName, false), { sticky: true, className: 'lt' });
       }
     });
   }
   map.on('zoomend', updateStations);
 
-  async function main(){
-    const ld=document.getElementById('ld'),lt=document.getElementById('ld-txt');
-    let done=0;
-    const entries=Object.entries(GROUPS);
-    await Promise.all([
-      ...entries.map(async([g,ids])=>{
-        lt.textContent='Loading '+g+'…';
-        (await fetch_rels(ids.join(','))).forEach(renderRel);
-        lt.textContent='Loaded '+(++done)+'/'+entries.length+'…';
-      }),
-      loadStations()
-    ]);
-    ld.classList.add('done');setTimeout(()=>ld.remove(),600);
-    buildLegend();
+  // ── MAIN ─────────────────────────────────────────────────────────────────
+  async function main() {
+    const ld = document.getElementById('ld'), lt = document.getElementById('ld-txt');
+
+    lt.textContent = 'Loading transit data…';
+
+    // Fetch lines.json (built by CI from data/xml/*.xml)
+    const resp = await fetch('data/lines.json');
+    const json = await resp.json();
+    const linesData = json.lines || {};
+
+    const allIds = Object.keys(linesData);
+    const effectiveGroups = buildEffectiveGroups(allIds);
+
+    // Render every relation present in lines.json
+    allIds.forEach(id => {
+      const segments = linesData[id];
+      if (segments && segments.length) renderFromJson(id, segments);
+    });
+
+    lt.textContent = 'Loading stations…';
+    await loadStations();
+
+    ld.classList.add('done');
+    setTimeout(() => ld.remove(), 600);
+    buildLegend(effectiveGroups);
     updateStations();
-    status(Object.keys(layers).length+' transit lines loaded');
+    status(allIds.length + ' transit lines loaded');
   }
   main();
   </script>
