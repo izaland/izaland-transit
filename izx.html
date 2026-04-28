@@ -554,22 +554,26 @@
 
     </div><!-- /tab-keishin -->
 
-    <!-- ─────────────────────────────────────────
+<!-- ─────────────────────────────────────────
          PANEL: RYĀNKAI
     ───────────────────────────────────────── -->
     <div class="line-tab-panel" id="tab-ryankai" role="tabpanel" aria-labelledby="btn-ryankai">
 
       <div class="section-header">
         <h2>IZX Ryānkai Line <span style="font-weight:400;color:var(--text-muted);">兩海線</span></h2>
-        <p>The Ryānkai Line (兩海線, <em>Ryānkai-sen</em>, lit. "Two Seas Line") is IZX's longest and fastest corridor, running approximately 600 km from <strong>Sainðaul Central</strong> to <strong>Sannupuri</strong> along the western coast. At up to 360 km/h it is the fastest scheduled service in the IZX network. Two service tiers operate: the Super Express (R — limited stops) and the Regional Express (S — intermediate stops).</p>
+        <p>The Ryānkai Line (兩海線, <em>Ryānkai-sen</em>, lit. "Two Seas Line") is IZX's longest and fastest corridor, running approximately 629 km from <strong>Sainðaul Central</strong> to <strong>Sannupuri</strong> along the western coast. Six through-service patterns (L, K, J, G, I, H) share the infrastructure, with branches into the Seibu Naeryuku region (SA/SK), the Dōnpuku valley (DP), and a future international extension toward Eulerhafen.</p>
       </div>
 
       <!-- Service key -->
       <div class="keishin-container" style="margin-bottom:var(--space-4);">
         <div class="svc-key">
-          <div class="svc-key-item"><div class="svc-key-dot" style="background:#0a7a6e;"></div><strong>R</strong> — Super Express (limited stops, up to 360 km/h)</div>
-          <div class="svc-key-item"><div class="svc-key-dot" style="background:#14b8a6;"></div><strong>S</strong> — Regional Express (intermediate stops)</div>
-          <div class="svc-key-item" style="gap:.5rem;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:currentColor;border:2px solid var(--text-muted);"></span>● stops &nbsp;|&nbsp; | passes &nbsp;|&nbsp; <span style="color:var(--text-faint)">— does not serve</span></div>
+          <div class="svc-key-item"><div class="svc-key-dot" style="background:#A7084B;"></div><strong>L</strong> — Super Express (limited stops, Sainðaul–Riyatoma)</div>
+          <div class="svc-key-item"><div class="svc-key-dot" style="background:#EA7501;"></div><strong>K</strong> — Express via SA/SK branch → Kiikori / Burgenau</div>
+          <div class="svc-key-item"><div class="svc-key-dot" style="background:#C9211E;"></div><strong>J</strong> — Express via SA branch → Fudoasamo</div>
+          <div class="svc-key-item"><div class="svc-key-dot" style="background:#148466;"></div><strong>G</strong> — Long-distance → Sannupuri (+ future international)</div>
+          <div class="svc-key-item"><div class="svc-key-dot" style="background:#1F6A39;"></div><strong>I</strong> — Regional via DP branch → Togumua / Nuen</div>
+          <div class="svc-key-item"><div class="svc-key-dot" style="background:#50938A;"></div><strong>H</strong> — Coastal express → Sannupuri</div>
+          <div class="svc-key-item" style="gap:.5rem;">● always stops &nbsp;|&nbsp; ▲ conditional/selected &nbsp;|&nbsp; ↘ terminus/branch &nbsp;|&nbsp; <span style="opacity:.5;">|</span> passes &nbsp;|&nbsp; <span style="color:var(--text-faint)">— no service &nbsp;|&nbsp; (blank) track n/a</span></div>
         </div>
       </div>
 
@@ -577,66 +581,570 @@
         <table class="keishin-table">
           <thead>
             <tr>
-              <th rowspan="2">Code</th>
-              <th rowspan="2" style="text-align:left;">Station</th>
-              <th rowspan="2" style="text-align:left;">漢字</th>
-              <th colspan="2" style="border-bottom:none;">Distance (km)</th>
-              <th colspan="2">Services</th>
-              <th rowspan="2">Location</th>
+              <th rowspan="2" style="width:52px;">Code</th>
+              <th rowspan="2" style="text-align:left;min-width:160px;">Station</th>
+              <th rowspan="2" style="text-align:left;">駅名</th>
+              <th style="font-size:.65rem;width:52px;">from<br>Sainðaul<br>(km)</th>
+              <th style="font-size:.65rem;width:52px;">between<br>stations<br>(km)</th>
+              <th style="background:#A7084B;color:#fff;width:28px;">L</th>
+              <th style="background:#EA7501;color:#fff;width:28px;">K</th>
+              <th style="background:#C9211E;color:#fff;width:28px;">J</th>
+              <th style="background:#148466;color:#fff;width:28px;">G</th>
+              <th style="background:#1F6A39;color:#fff;width:28px;">I</th>
+              <th style="background:#50938A;color:#fff;width:28px;">H</th>
+              <th rowspan="2" style="text-align:left;min-width:130px;">Notes</th>
             </tr>
-            <tr>
-              <th style="font-size:.65rem;">from<br>Sainðaul</th>
-              <th style="font-size:.65rem;">between<br>stations</th>
-              <th style="color:#0a7a6e;">R</th>
-              <th style="color:#14b8a6;">S</th>
-            </tr>
+            <tr><!-- second header row intentionally empty (rowspan covers most) --></tr>
           </thead>
           <tbody>
-            <tr class="row-sep"><td colspan="8">▸ Main line (RK01 → RK09)</td></tr>
+            <tr class="row-sep" style="--sep-color:#14b8a6;"><td colspan="12">🔵  Main Line — Sainðaul Central → Sannupuri</td></tr>
             <tr>
-              <td class="kt-code">RK01</td><td class="kt-name major">Sainðaul Central</td><td class="kt-kanji">作安崎中央</td>
-              <td class="kt-dist">0.00</td><td class="kt-dist">0.00</td>
-              <td class="svc-cell" style="background:#0a7a6e;color:#fff;">●</td><td class="svc-cell" style="background:#14b8a6;color:#fff;">●</td><td></td>
+              <td class="kt-code" style="">R01</td>
+              <td class="kt-name major" style="">Sainðaul Central</td>
+              <td class="kt-kanji" style="">作安崎中央</td>
+              <td class="kt-dist" style="">0,00</td>
+              <td class="kt-dist" style="">—</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#C9211E;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#148466;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#1F6A39;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#50938A;color:#fff;font-weight:bold;">●</td>
+              <td class="kt-notes" style=""><span style="font-size:.75rem;color:var(--text-muted);">Hub, Capital</span></td>
             </tr>
             <tr>
-              <td class="kt-code">RK02</td><td class="kt-name">Asaji-Torimoshi</td><td class="kt-kanji"></td>
-              <td class="kt-dist">~85</td><td class="kt-dist">~85</td>
-              <td class="svc-cell" style="background:#0a7a6e;color:#fff;opacity:.6;">|</td><td class="svc-cell" style="background:#14b8a6;color:#fff;">●</td><td></td>
+              <td class="kt-code" style="">R02</td>
+              <td class="kt-name" style="">Asaji Torimoshi</td>
+              <td class="kt-kanji" style="">安佐寺狛篠</td>
+              <td class="kt-dist" style="">15,30</td>
+              <td class="kt-dist" style="">15,30</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#C9211E;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#148466;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#1F6A39;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#50938A;color:#fff;font-weight:bold;">●</td>
+              <td class="kt-notes" style=""></td>
             </tr>
             <tr>
-              <td class="kt-code">RK03</td><td class="kt-name">Enikezya</td><td class="kt-kanji"></td>
-              <td class="kt-dist">~150</td><td class="kt-dist">~65</td>
-              <td class="svc-cell" style="background:#0a7a6e;color:#fff;">●</td><td class="svc-cell" style="background:#14b8a6;color:#fff;">●</td><td></td>
+              <td class="kt-code" style="">R03</td>
+              <td class="kt-name" style="">Shin-Enikezya</td>
+              <td class="kt-kanji" style="">新盛狩</td>
+              <td class="kt-dist" style="">35,19</td>
+              <td class="kt-dist" style="">19,89</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#EA7501;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#C9211E;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style=""><span style="font-size:.75rem;color:var(--text-muted);">AV passing loop</span></td>
             </tr>
             <tr>
-              <td class="kt-code">RK04</td><td class="kt-name">Isadashi</td><td class="kt-kanji"></td>
-              <td class="kt-dist">~210</td><td class="kt-dist">~60</td>
-              <td class="svc-cell" style="background:#0a7a6e;color:#fff;opacity:.6;">|</td><td class="svc-cell" style="background:#14b8a6;color:#fff;">●</td><td></td>
+              <td class="kt-code" style="">R04</td>
+              <td class="kt-name" style="">Nari-Odanuri</td>
+              <td class="kt-kanji" style="">東裏屈</td>
+              <td class="kt-dist" style="">55,53</td>
+              <td class="kt-dist" style="">20,34</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style=""></td>
             </tr>
             <tr>
-              <td class="kt-code">RK05</td><td class="kt-name major">Humabe Kukujai Resort</td><td class="kt-kanji"></td>
-              <td class="kt-dist">~290</td><td class="kt-dist">~80</td>
-              <td class="svc-cell" style="background:#0a7a6e;color:#fff;">●</td><td class="svc-cell" style="background:#14b8a6;color:#fff;">●</td><td></td>
+              <td class="kt-code" style="">R05</td>
+              <td class="kt-name" style="">Todakuri-Tojirushi <small>(Kosui Tsiiku)</small></td>
+              <td class="kt-kanji" style="">束巻祖連 <small>(湖水地區)</small></td>
+              <td class="kt-dist" style="">90,37</td>
+              <td class="kt-dist" style="">34,84</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style=""><span style="font-size:.75rem;color:var(--text-muted);">AV passing loop</span></td>
             </tr>
             <tr>
-              <td class="kt-code">RK06</td><td class="kt-name">Fukuoka</td><td class="kt-kanji"></td>
-              <td class="kt-dist">~360</td><td class="kt-dist">~70</td>
-              <td class="svc-cell" style="background:#0a7a6e;color:#fff;opacity:.6;">|</td><td class="svc-cell" style="background:#14b8a6;color:#fff;">●</td><td></td>
+              <td class="kt-code" style="">R06</td>
+              <td class="kt-name major" style="">Isadashi</td>
+              <td class="kt-kanji" style="">安村</td>
+              <td class="kt-dist" style="">129,89</td>
+              <td class="kt-dist" style="">39,52</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#C9211E;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#148466;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#1F6A39;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#50938A;color:#fff;font-weight:bold;">●</td>
+              <td class="kt-notes" style=""><span style="font-size:.75rem;color:var(--text-muted);">Interchange</span></td>
             </tr>
             <tr>
-              <td class="kt-code">RK07</td><td class="kt-name">Riyatoma</td><td class="kt-kanji"></td>
-              <td class="kt-dist">~450</td><td class="kt-dist">~90</td>
-              <td class="svc-cell" style="background:#0a7a6e;color:#fff;">●</td><td class="svc-cell" style="background:#14b8a6;color:#fff;">●</td><td></td>
+              <td class="kt-code" style="background:rgba(255,210,0,.07);">R61</td>
+              <td class="kt-name" style="background:rgba(255,210,0,.07);">Shin-Gomatsuki</td>
+              <td class="kt-kanji" style="background:rgba(255,210,0,.07);">新悟万原</td>
+              <td class="kt-dist" style="background:rgba(255,210,0,.07);">157,24</td>
+              <td class="kt-dist" style="background:rgba(255,210,0,.07);">27,35</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(255,210,0,.07);"></td>
             </tr>
             <tr>
-              <td class="kt-code">RK08</td><td class="kt-name">Chunnitai</td><td class="kt-kanji"></td>
-              <td class="kt-dist">~545</td><td class="kt-dist">~95</td>
-              <td class="svc-cell" style="background:#0a7a6e;color:#fff;opacity:.6;">|</td><td class="svc-cell" style="background:#14b8a6;color:#fff;">●</td><td></td>
+              <td class="kt-code" style="">R07</td>
+              <td class="kt-name" style="">Beikejo</td>
+              <td class="kt-kanji" style="">塀気条</td>
+              <td class="kt-dist" style="">171,68</td>
+              <td class="kt-dist" style="">14,44</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style=""></td>
             </tr>
             <tr>
-              <td class="kt-code">RK09</td><td class="kt-name major">Sannupuri</td><td class="kt-kanji"></td>
-              <td class="kt-dist">~600</td><td class="kt-dist">~55</td>
-              <td class="svc-cell" style="background:#0a7a6e;color:#fff;">●</td><td class="svc-cell" style="background:#14b8a6;color:#fff;">●</td><td></td>
+              <td class="kt-code" style="">R08</td>
+              <td class="kt-name" style="">Rinnajin</td>
+              <td class="kt-kanji" style="">林奈神</td>
+              <td class="kt-dist" style="">192,72</td>
+              <td class="kt-dist" style="">21,04</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#EA7501;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#C9211E;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style=""></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(255,210,0,.07);">R81</td>
+              <td class="kt-name" style="background:rgba(255,210,0,.07);">Aihasa</td>
+              <td class="kt-kanji" style="background:rgba(255,210,0,.07);">間夏祭</td>
+              <td class="kt-dist" style="background:rgba(255,210,0,.07);">204,54</td>
+              <td class="kt-dist" style="background:rgba(255,210,0,.07);">11,82</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#148466;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#1F6A39;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(255,210,0,.07);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="">R09</td>
+              <td class="kt-name" style="">Humabe Resort</td>
+              <td class="kt-kanji" style="">—</td>
+              <td class="kt-dist" style="">242,02</td>
+              <td class="kt-dist" style="">37,48</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style=""></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="">R10</td>
+              <td class="kt-name" style="">Furesāri</td>
+              <td class="kt-kanji" style="">絃河</td>
+              <td class="kt-dist" style="">275,52</td>
+              <td class="kt-dist" style="">33,50</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#C9211E;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#50938A;color:#fff;font-weight:bold;">●</td>
+              <td class="kt-notes" style=""></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="">R11</td>
+              <td class="kt-name" style="">Kahenji-Nukkistama</td>
+              <td class="kt-kanji" style="">鹿返寺〇〇</td>
+              <td class="kt-dist" style="">297,86</td>
+              <td class="kt-dist" style="">22,34</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style=""></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="">R12</td>
+              <td class="kt-name" style="">Ōdakaida-Ranku</td>
+              <td class="kt-kanji" style="">大刀嵐久</td>
+              <td class="kt-dist" style="">318,47</td>
+              <td class="kt-dist" style="">20,61</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style=""></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="">R13</td>
+              <td class="kt-name major" style="">Riyatoma</td>
+              <td class="kt-kanji" style="">追庥</td>
+              <td class="kt-dist" style="">369,19</td>
+              <td class="kt-dist" style="">50,72</td>
+              <td class="svc-cell" style="background:#A7084B;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">↘</td><td class="svc-cell" style="background:#C9211E;color:#fff;font-weight:bold;">↘</td><td class="svc-cell" style="background:#148466;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#1F6A39;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#50938A;color:#fff;font-weight:bold;">●</td>
+              <td class="kt-notes" style=""><span style="font-size:.75rem;color:var(--text-muted);">Line L terminus; SA branch</span></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="">R14</td>
+              <td class="kt-name" style="">Kōsa-Hannan</td>
+              <td class="kt-kanji" style="">考砂阪南</td>
+              <td class="kt-dist" style="">415,70</td>
+              <td class="kt-dist" style="">46,51</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#148466;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#50938A;color:#fff;font-weight:bold;">●</td>
+              <td class="kt-notes" style=""><span style="font-size:.75rem;color:var(--text-muted);">K/J → SA branch</span></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="">R15</td>
+              <td class="kt-name" style="">Shin-Makkenoke</td>
+              <td class="kt-kanji" style="">新平坂</td>
+              <td class="kt-dist" style="">440,63</td>
+              <td class="kt-dist" style="">24,93</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#148466;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#1F6A39;color:#fff;font-weight:bold;">↘</td><td class="svc-cell" style="background:#50938A;color:#fff;font-weight:bold;">●</td>
+              <td class="kt-notes" style=""><span style="font-size:.75rem;color:var(--text-muted);">I → DP branch</span></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="">R16</td>
+              <td class="kt-name" style="">Soritsun Kōwen</td>
+              <td class="kt-kanji" style="">〇〇公園</td>
+              <td class="kt-dist" style="">471,13</td>
+              <td class="kt-dist" style="">30,50</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#148466;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#50938A;color:#fff;font-weight:bold;">●</td>
+              <td class="kt-notes" style=""></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="">R17</td>
+              <td class="kt-name" style="">Hentsari-Donan</td>
+              <td class="kt-kanji" style="">〇〇土南</td>
+              <td class="kt-dist" style="">502,10</td>
+              <td class="kt-dist" style="">30,97</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#148466;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#50938A;color:#fff;font-weight:bold;">●</td>
+              <td class="kt-notes" style=""></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="">R18</td>
+              <td class="kt-name" style="">Rekefura-Kōwen</td>
+              <td class="kt-kanji" style="">長福田公園</td>
+              <td class="kt-dist" style="">533,96</td>
+              <td class="kt-dist" style="">31,86</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#148466;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#50938A;color:#fff;font-weight:bold;">●</td>
+              <td class="kt-notes" style=""></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="">R19</td>
+              <td class="kt-name" style="">Chunnitai</td>
+              <td class="kt-kanji" style="">秋森</td>
+              <td class="kt-dist" style="">568,60</td>
+              <td class="kt-dist" style="">34,64</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#148466;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#50938A;color:#fff;font-weight:bold;">●</td>
+              <td class="kt-notes" style=""></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="">R20</td>
+              <td class="kt-name" style="">Shin-Pekonai</td>
+              <td class="kt-kanji" style="">新牛沢</td>
+              <td class="kt-dist" style="">586,14</td>
+              <td class="kt-dist" style="">17,54</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#148466;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#50938A;color:#fff;font-weight:bold;">●</td>
+              <td class="kt-notes" style=""></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="">R21</td>
+              <td class="kt-name major" style="">Sannupuri</td>
+              <td class="kt-kanji" style="">乾山</td>
+              <td class="kt-dist" style="">628,75</td>
+              <td class="kt-dist" style="">42,61</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#148466;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#50938A;color:#fff;font-weight:bold;">●</td>
+              <td class="kt-notes" style=""><span style="font-size:.75rem;color:var(--text-muted);">Terminus G+H</span></td>
+            </tr>
+            <tr class="row-sep" style="--sep-color:#3b82f6;"><td colspan="12">🌐  International Extension (future) — Sannupuri → Eulerhafen C.</td></tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(59,130,246,.09);">SZ1</td>
+              <td class="kt-name" style="background:rgba(59,130,246,.09);">Shirariushinai</td>
+              <td class="kt-kanji" style="background:rgba(59,130,246,.09);">યાદદા૮ેયાપ૩</td>
+              <td class="kt-dist" style="background:rgba(59,130,246,.09);">—</td>
+              <td class="kt-dist" style="background:rgba(59,130,246,.09);">59,80</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#148466;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(59,130,246,.09);"><span style="font-size:.75rem;color:var(--text-muted);">Wendmark-Dzenkoku</span></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(59,130,246,.09);">SZ2</td>
+              <td class="kt-name" style="background:rgba(59,130,246,.09);">Hataranta</td>
+              <td class="kt-kanji" style="background:rgba(59,130,246,.09);">埼渚</td>
+              <td class="kt-dist" style="background:rgba(59,130,246,.09);">—</td>
+              <td class="kt-dist" style="background:rgba(59,130,246,.09);">28,70</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#148466;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(59,130,246,.09);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(59,130,246,.09);">SZ3</td>
+              <td class="kt-name" style="background:rgba(59,130,246,.09);">TBD</td>
+              <td class="kt-kanji" style="background:rgba(59,130,246,.09);">TBD</td>
+              <td class="kt-dist" style="background:rgba(59,130,246,.09);">—</td>
+              <td class="kt-dist" style="background:rgba(59,130,246,.09);">22,77</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#148466;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(59,130,246,.09);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(59,130,246,.09);">SZ4</td>
+              <td class="kt-name" style="background:rgba(59,130,246,.09);">Eulerhafen C.</td>
+              <td class="kt-kanji" style="background:rgba(59,130,246,.09);">૮ૅ૩ેધૅદ્ત૨ેપ્中央</td>
+              <td class="kt-dist" style="background:rgba(59,130,246,.09);">—</td>
+              <td class="kt-dist" style="background:rgba(59,130,246,.09);">20,00</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#148466;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(59,130,246,.09);"></td>
+            </tr>
+            <tr class="row-sep" style="--sep-color:#7c3aed;"><td colspan="12">🟣  Seibu Naeryuku Branch (SA) — Riyatoma → Fudoasamo  [J only beyond Poridake]</td></tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(147,100,230,.07);">SA01</td>
+              <td class="kt-name" style="background:rgba(147,100,230,.07);">Chunðouni-Naoza</td>
+              <td class="kt-kanji" style="background:rgba(147,100,230,.07);">鮪種 - 椒潟</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#EA7501;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#C9211E;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(147,100,230,.07);"><span style="font-size:.75rem;color:var(--text-muted);">K+J coupled</span></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(147,100,230,.07);">SA02</td>
+              <td class="kt-name major" style="background:rgba(147,100,230,.07);">Poridake</td>
+              <td class="kt-kanji" style="background:rgba(147,100,230,.07);">登館</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#C9211E;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(147,100,230,.07);"><span style="font-size:.75rem;color:var(--text-muted);">K/J split point</span></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(147,100,230,.07);">SA101</td>
+              <td class="kt-name" style="background:rgba(147,100,230,.07);">Hakosakki</td>
+              <td class="kt-kanji" style="background:rgba(147,100,230,.07);">元端</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#C9211E;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(147,100,230,.07);"><span style="font-size:.75rem;color:var(--text-muted);">J only; added later</span></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(147,100,230,.07);">SA03</td>
+              <td class="kt-name" style="background:rgba(147,100,230,.07);">Pakkutanma</td>
+              <td class="kt-kanji" style="background:rgba(147,100,230,.07);">赤谷</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#C9211E;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(147,100,230,.07);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(147,100,230,.07);">SA04</td>
+              <td class="kt-name major" style="background:rgba(147,100,230,.07);">Yamagata</td>
+              <td class="kt-kanji" style="background:rgba(147,100,230,.07);">倉泉</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#C9211E;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(147,100,230,.07);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(147,100,230,.07);">SA05</td>
+              <td class="kt-name" style="background:rgba(147,100,230,.07);">Tentosamo</td>
+              <td class="kt-kanji" style="background:rgba(147,100,230,.07);">犬山</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#C9211E;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(147,100,230,.07);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(147,100,230,.07);">SA06</td>
+              <td class="kt-name major" style="background:rgba(147,100,230,.07);">Fudoasamo</td>
+              <td class="kt-kanji" style="background:rgba(147,100,230,.07);">皿山</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(147,100,230,.07);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="color:#9ca3af;">—</td><td class="svc-cell" style="background:#C9211E;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(147,100,230,.07);"><span style="font-size:.75rem;color:var(--text-muted);">J terminus</span></td>
+            </tr>
+            <tr class="row-sep" style="--sep-color:#b45309;"><td colspan="12">🟠  K sub-branch (SK) — Poridake → Kiikori</td></tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(234,117,1,.07);">SK01</td>
+              <td class="kt-name" style="background:rgba(234,117,1,.07);">Sumāra</td>
+              <td class="kt-kanji" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(234,117,1,.07);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(234,117,1,.07);">SK02</td>
+              <td class="kt-name" style="background:rgba(234,117,1,.07);">Tohpatogu</td>
+              <td class="kt-kanji" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(234,117,1,.07);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(234,117,1,.07);">SK03</td>
+              <td class="kt-name" style="background:rgba(234,117,1,.07);">Soranaka</td>
+              <td class="kt-kanji" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(234,117,1,.07);"><span style="font-size:.75rem;color:var(--text-muted);">K bifurcation point</span></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(234,117,1,.07);">SK04</td>
+              <td class="kt-name major" style="background:rgba(234,117,1,.07);">Tsobunetoka</td>
+              <td class="kt-kanji" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(234,117,1,.07);"><span style="font-size:.75rem;color:var(--text-muted);">K terminus (some services)</span></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(234,117,1,.07);">SK05</td>
+              <td class="kt-name major" style="background:rgba(234,117,1,.07);">Kiikori</td>
+              <td class="kt-kanji" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="kt-dist" style="background:rgba(234,117,1,.07);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(234,117,1,.07);"><span style="font-size:.75rem;color:var(--text-muted);">Ki via Hwabu Line</span></td>
+            </tr>
+            <tr class="row-note"><td colspan="12">✦ Blönland border — via Hwabu Line (reversing at Kiikori) ✦</td></tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(130,100,200,.1);">BL01</td>
+              <td class="kt-name" style="background:rgba(130,100,200,.1);">Gunporainen</td>
+              <td class="kt-kanji" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="kt-dist" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="kt-dist" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(130,100,200,.1);"><span style="font-size:.75rem;color:var(--text-muted);">via Hwabu Line (reversing)</span></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(130,100,200,.1);">BL02</td>
+              <td class="kt-name" style="background:rgba(130,100,200,.1);">Yamatsuka / Banzilluun</td>
+              <td class="kt-kanji" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="kt-dist" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="kt-dist" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(130,100,200,.1);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(130,100,200,.1);">BL03</td>
+              <td class="kt-name" style="background:rgba(130,100,200,.1);">Behringstein / Berinshutain</td>
+              <td class="kt-kanji" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="kt-dist" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="kt-dist" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(130,100,200,.1);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(130,100,200,.1);">BL04</td>
+              <td class="kt-name" style="background:rgba(130,100,200,.1);">Pyhritz-Keltenberg</td>
+              <td class="kt-kanji" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="kt-dist" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="kt-dist" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(130,100,200,.1);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(130,100,200,.1);">BL05</td>
+              <td class="kt-name major" style="background:rgba(130,100,200,.1);">Burgenau HBF</td>
+              <td class="kt-kanji" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="kt-dist" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="kt-dist" style="background:rgba(130,100,200,.1);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#EA7501;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(130,100,200,.1);"><span style="font-size:.75rem;color:var(--text-muted);">Ki terminus; Blönland capital</span></td>
+            </tr>
+            <tr class="row-sep" style="--sep-color:#16a34a;"><td colspan="12">🟢  Dōnpuku Branch (DP) — Shin-Makkenoke → Togumua  [I service]</td></tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(31,106,57,.08);">DP01</td>
+              <td class="kt-name" style="background:rgba(31,106,57,.08);">Makkenoke</td>
+              <td class="kt-kanji" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#1F6A39;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(31,106,57,.08);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(31,106,57,.08);">DP02</td>
+              <td class="kt-name" style="background:rgba(31,106,57,.08);">Tanjiku</td>
+              <td class="kt-kanji" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#1F6A39;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(31,106,57,.08);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(31,106,57,.08);">DP03</td>
+              <td class="kt-name" style="background:rgba(31,106,57,.08);">Hidankoibo</td>
+              <td class="kt-kanji" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#1F6A39;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(31,106,57,.08);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(31,106,57,.08);">DP04</td>
+              <td class="kt-name" style="background:rgba(31,106,57,.08);">Mitakagi</td>
+              <td class="kt-kanji" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#1F6A39;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(31,106,57,.08);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(31,106,57,.08);">DP05</td>
+              <td class="kt-name major" style="background:rgba(31,106,57,.08);">Sonzhin</td>
+              <td class="kt-kanji" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#1F6A39;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(31,106,57,.08);"><span style="font-size:.75rem;color:var(--text-muted);">I bifurcation point</span></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(31,106,57,.08);">DP06</td>
+              <td class="kt-name" style="background:rgba(31,106,57,.08);">Kakuitama</td>
+              <td class="kt-kanji" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#1F6A39;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(31,106,57,.08);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(31,106,57,.08);">DP07</td>
+              <td class="kt-name major" style="background:rgba(31,106,57,.08);">Togumua</td>
+              <td class="kt-kanji" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.08);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#1F6A39;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(31,106,57,.08);"><span style="font-size:.75rem;color:var(--text-muted);">I terminus (some services)</span></td>
+            </tr>
+            <tr class="row-note"><td colspan="12">✦ Nuen border ✦</td></tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(31,106,57,.13);">DN01</td>
+              <td class="kt-name" style="background:rgba(31,106,57,.13);">Usemihaki</td>
+              <td class="kt-kanji" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#1F6A39;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(31,106,57,.13);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(31,106,57,.13);">DN02</td>
+              <td class="kt-name" style="background:rgba(31,106,57,.13);">Tsusamo</td>
+              <td class="kt-kanji" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#1F6A39;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(31,106,57,.13);"><span style="font-size:.75rem;color:var(--text-muted);">Border — Nuen</span></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(31,106,57,.13);">DN03</td>
+              <td class="kt-name" style="background:rgba(31,106,57,.13);">Taobin</td>
+              <td class="kt-kanji" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#1F6A39;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(31,106,57,.13);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(31,106,57,.13);">DN04</td>
+              <td class="kt-name" style="background:rgba(31,106,57,.13);">Haoji</td>
+              <td class="kt-kanji" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#1F6A39;color:#fff;opacity:.75;">▲</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(31,106,57,.13);"></td>
+            </tr>
+            <tr>
+              <td class="kt-code" style="background:rgba(31,106,57,.13);">DN05</td>
+              <td class="kt-name major" style="background:rgba(31,106,57,.13);">Kyuoi-Maka</td>
+              <td class="kt-kanji" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="kt-dist" style="background:rgba(31,106,57,.13);">—</td>
+              <td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td><td class="svc-cell" style="background:#1F6A39;color:#fff;font-weight:bold;">●</td><td class="svc-cell" style="background:#4a5568;color:#9ca3af;">—</td>
+              <td class="kt-notes" style="background:rgba(31,106,57,.13);"><span style="font-size:.75rem;color:var(--text-muted);">Ii terminus</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Legend -->
+      <div class="keishin-container" style="margin-top:calc(-1 * var(--space-6));">
+        <table class="keishin-table" style="width:auto;min-width:0;">
+          <tbody>
+            <tr>
+              <td style="background:#A7084B;color:#fff;font-weight:bold;text-align:center;width:32px;">●</td>
+              <td style="background:#F2C4D8;color:#A7084B;text-align:center;width:32px;">▲</td>
+              <td style="text-align:left;padding-left:var(--space-3);">Line L — always stops (●) / conditional stop (▲)</td>
+              <td style="background:#EA7501;color:#fff;font-weight:bold;text-align:center;width:32px;">●</td>
+              <td style="background:#FDDCB5;color:#EA7501;text-align:center;width:32px;">▲</td>
+              <td style="text-align:left;padding-left:var(--space-3);">Line K — always stops (●) / conditional stop (▲)</td>
+            </tr>
+            <tr>
+              <td style="background:#C9211E;color:#fff;font-weight:bold;text-align:center;">●</td>
+              <td style="background:#F5BFBE;color:#C9211E;text-align:center;">▲</td>
+              <td style="text-align:left;padding-left:var(--space-3);">Line J — always stops (●) / conditional stop (▲)</td>
+              <td style="background:#148466;color:#fff;font-weight:bold;text-align:center;">●</td>
+              <td style="background:#B3E0D3;color:#148466;text-align:center;">▲</td>
+              <td style="text-align:left;padding-left:var(--space-3);">Line G — always stops (●) / conditional stop (▲)</td>
+            </tr>
+            <tr>
+              <td style="background:#1F6A39;color:#fff;font-weight:bold;text-align:center;">●</td>
+              <td style="background:#B8DEC7;color:#1F6A39;text-align:center;">▲</td>
+              <td style="text-align:left;padding-left:var(--space-3);">Line I — always stops (●) / conditional stop (▲)</td>
+              <td style="background:#50938A;color:#fff;font-weight:bold;text-align:center;">●</td>
+              <td style="background:#C8E6E3;color:#50938A;text-align:center;">▲</td>
+              <td style="text-align:left;padding-left:var(--space-3);">Line H — always stops (●) / conditional stop (▲)</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="background:#4a5568;color:#9ca3af;text-align:center;font-size:.75rem;">—</td>
+              <td style="text-align:left;padding-left:var(--space-3);">No service on this section</td>
+              <td colspan="2" style="color:#9ca3af;text-align:center;font-size:.75rem;">(blank)</td>
+              <td style="text-align:left;padding-left:var(--space-3);">Track does not exist on this section</td>
             </tr>
           </tbody>
         </table>
@@ -645,7 +1153,7 @@
       <div class="keishin-tools">
         <div class="keishin-tools-title">IZX Ryānkai — Notes</div>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:var(--space-6);font-size:var(--text-xs);color:var(--text-muted);line-height:1.7;">
-          <p>Distances marked <strong>~</strong> are approximate pending full survey data. Station codes (RK-series), kanji names, and intermediate stop patterns for service S are provisional and will be updated as data becomes available. The Ryānkai Line shares its Sainðaul terminus platforms with the Keishin Line.</p>
+          <p>Stations marked <strong style="color:rgba(255,210,0,.9);">■ WIP</strong> (yellow rows) are planned/under construction. The <strong>International Extension</strong> (SZ series, blue rows) is a future project pending bilateral agreement with Wendmark-Dzenkoku. The SK sub-branch reverses at Kiikori to join the Hwabu Line into Blönland. Station codes R-series replace the provisional RK-series from the earlier table.</p>
         </div>
       </div>
 
