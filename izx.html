@@ -127,7 +127,7 @@
        LINE DETAIL TABS
     ══════════════════════════════════════ */
     .line-tabs-wrapper{max-width:1400px;margin:0 auto;padding:0 var(--space-8);}
-    .line-tabs-bar{display:flex;gap:var(--space-2);border-bottom:2px solid var(--border);margin-bottom:var(--space-8);overflow-x:auto;}
+    .line-tabs-bar{display:flex;gap:var(--space-2);border-bottom:2px solid var(--border);margin-bottom:var(--space-8);overflow-x:auto;overflow-y:visible;}
     .line-tab-btn{
       display:flex;align-items:center;gap:var(--space-2);
       background:none;border:none;cursor:pointer;
@@ -142,8 +142,8 @@
     .line-tab-btn:hover{color:var(--text);}
     .line-tab-btn.active{color:var(--text);border-bottom-color:var(--tab-color,var(--accent));}
     .line-tab-btn .tab-swatch{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-    .line-tab-panel{display:none;}
-    .line-tab-panel.active{display:block;}
+    .line-tab-panel{display:none;overflow:visible;}
+    .line-tab-panel.active{display:block;overflow:visible;}
   </style>
 </head>
 <body>
