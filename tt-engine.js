@@ -1,6 +1,6 @@
 /* ================================================================
    TT-ENGINE — Motore universale orari IZX
-   Dipende da: izx-data.js (IZX_LINES)
+   Dipende da: izx-data.js (IZX_LINES, TRAIN_NUM_CONFIG)
    API pubblica: TTEngine.query(opts) → Array<Trip>
 ================================================================ */
 
@@ -18,6 +18,35 @@ const TTEngine = (() => {
   }
   function isPeak(sec, peakWindows) {
     return peakWindows.some(w => sec >= hmToSec(w.start) && sec < hmToSec(w.end));
+  }
+
+  /* ----------------------------------------------------------------
+   * trainNumber(lineId, svcId, direction, tripIndex)
+   *
+   * Calcola il numero di corsa secondo lo schema TRAIN_NUM_CONFIG:
+   *
+   *   numero = lineDigit × 10000
+   *          + svcBase × 100
+   *          + seq
+   *
+   * dove seq è un contatore progressivo per direzione:
+   *   SB (Outbound) → numeri PARI  (seq = tripIndex × 2 + 2)
+   *   NB (Inbound)  → numeri DISPARI (seq = tripIndex × 2 + 1)
+   *
+   * Il numero è sempre a 5 cifre, zero-padded.
+   * Esempio: KE-A-SB terzo treno → 1×10000 + 0×100 + 6 = 10006
+   *          RY-I-NB primo treno → 2×10000 + 30×100 + 1 = 23001
+   * ---------------------------------------------------------------- */
+  function trainNumber(lineId, svcId, direction, tripIndex) {
+    const cfg = typeof TRAIN_NUM_CONFIG !== "undefined" ? TRAIN_NUM_CONFIG : null;
+    if (!cfg || !cfg[lineId]) return null;
+    const { lineDigit, svcBase } = cfg[lineId];
+    const base = svcBase[svcId] ?? 0;
+    const seq  = direction === "NB"
+      ? tripIndex * 2 + 1   // dispari → inbound
+      : tripIndex * 2 + 2;  // pari    → outbound
+    const num = lineDigit * 10000 + base * 100 + seq;
+    return String(num).padStart(5, "0");
   }
 
   /**
@@ -163,17 +192,18 @@ const TTEngine = (() => {
 
         if (maxDep >= fromSec && minDep <= toSec) {
           trips.push({
-            _uid:      `${lineId}:${svcId}:${dir}:${cursor}`,
+            _uid:        `${lineId}:${svcId}:${dir}:${cursor}`,
             lineId,
             svcId,
-            name:      svc.name,
-            color:     svc.color,
-            cls:       svc.cls,
-            direction: dir,
-            origin:    stops[0],
+            name:        svc.name,
+            color:       svc.color,
+            cls:         svc.cls,
+            direction:   dir,
+            origin:      stops[0],
             terminus,
-            routeType, // "direct" | "punohai" | null
-            stops:     tripStops,
+            routeType,   // "direct" | "punohai" | null
+            trainNumber: trainNumber(lineId, svcId, dir, tripIndex),
+            stops:       tripStops,
           });
         }
       }
@@ -237,6 +267,11 @@ const TTEngine = (() => {
    *   fromTime   {string}           "HH:MM"
    *   toTime     {string}           "HH:MM"  (default "23:30")
    *   services   {string[]}         filtro servizi opzionale (es. ["I","IS","IL"])
+   *
+   * Ogni Trip include il campo `trainNumber` (stringa a 5 cifre, es. "10006").
+   * Schema:
+   *   [lineDigit 1c][svcBase 2c][seq 2c]
+   *   SB → seq pari (2,4,6,…) · NB → seq dispari (1,3,5,…)
    *
    * Nota sui servizi Daidōn (I / IS / IL):
    *   Ogni Trip include il campo `routeType`:

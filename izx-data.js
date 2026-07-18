@@ -485,6 +485,44 @@ const KE_PEAK_WINDOWS = [
 ];
 
 /* ================================================================
+   TRAIN NUMBER CONFIGURATION
+   ----------------------------------------------------------------
+   Schema: [linePrefix][svcPrefix][seq]
+     - linePrefix : 3 cifre (es. 100 = KE, 200 = RY/DI)
+     - svcPrefix  : 2 cifre (es. 00 = A, 10 = B, …)
+     - seq        : generato dinamicamente dal motore (progressivo
+                    di partenza, basato sull'ordine temporale)
+
+   Pari/dispari:
+     SB (Outbound) → numeri PARI
+     NB (Inbound)  → numeri DISPARI
+
+   Struttura del numero finale (5 cifre):
+     [linePrefix 1 cifra][svcPrefix 2 cifre][seq 2 cifre]
+     Es: KE-A-SB-terzo treno → 1 00 06 → 10006
+
+   Prefissi per linea:
+     KE  → 1xxxx
+     RY  → 2xxxx   (include servizi Daidōn I/IS/IL)
+     DI* → 3xxxx   (* i servizi DI sono già in RY ma con prefisso separato
+                     per distinguere i treni che entrano nella tratta DI)
+
+   Prefissi per servizio (2 cifre, moltiplicato × 100):
+     KE: A=00, B=10, C=20, Cp=25, D=30, E=35, F=40
+     RY: L=00, K=10, J=15, G=20, H=25, I=30, IS=35, IL=40
+================================================================ */
+const TRAIN_NUM_CONFIG = {
+  KE: {
+    lineDigit: 1,
+    svcBase: { A:0, B:10, C:20, Cp:25, D:30, E:35, F:40 },
+  },
+  RY: {
+    lineDigit: 2,
+    svcBase: { L:0, K:10, J:15, G:20, H:25, I:30, IS:35, IL:40 },
+  },
+};
+
+/* ================================================================
    IZX_LINES — registro centrale di tutte le linee IZX
 ================================================================ */
 const IZX_LINES = {
