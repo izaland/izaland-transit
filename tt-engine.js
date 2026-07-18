@@ -19,13 +19,40 @@ const TTEngine = (() => {
   function isPeak(sec, peakWindows) {
     return peakWindows.some(w => sec >= hmToSec(w.start) && sec < hmToSec(w.end));
   }
-  function stopIsActive(code, conditionalStops, tripIndex, peakNow) {
+
+  /**
+   * Restituisce true se la fermata è attiva per questo trip.
+   *
+   * Regole supportate:
+   *   "peak"     — solo nelle ore di punta
+   *   "alternate"— in alternanza (ogni 2 corse), con phase opzionale
+   *   "always"   — sempre attiva (usato per terminali fissi)
+   *   "direct"   — attiva sui treni diretti (routeType !== "punohai")
+   *   "punohai"  — attiva solo sui treni via Punohai (routeType === "punohai")
+   *
+   * I treni Daidōn alternano percorso diretto e via Punohai:
+   *   tripIndex pari  → diretto  (DI13 transito, DI131 saltata)
+   *   tripIndex dispari → punohai (DI131 fermata, DI13 saltata/transitata)
+   */
+  function stopIsActive(code, conditionalStops, tripIndex, peakNow, routeType) {
     if (!conditionalStops?.[code]) return true;
-    const rule = conditionalStops[code];
-    if (rule.rule === "peak") return peakNow;
-    if (rule.rule === "alternate") return (tripIndex + (rule.phase ?? 0)) % 2 === 0;
-    if (rule.rule === "always") return true;
+    const rule = conditionalStops[code].rule;
+    if (rule === "peak")     return peakNow;
+    if (rule === "alternate") return (tripIndex + (conditionalStops[code].phase ?? 0)) % 2 === 0;
+    if (rule === "always")   return true;
+    if (rule === "direct")   return routeType !== "punohai";
+    if (rule === "punohai")  return routeType === "punohai";
     return true;
+  }
+
+  /**
+   * Dwell in secondi per una fermata.
+   * DI13 Sasshi è un transito: il treno non si ferma (0 s dwell).
+   * Tutte le altre fermate: 60 s.
+   */
+  const TRANSIT_STATIONS = new Set(["DI13"]);
+  function dwellSec(code) {
+    return TRANSIT_STATIONS.has(code) ? 0 : 60;
   }
 
   /* ---- genera tutte le corse di un servizio in una direzione ---- */
@@ -37,21 +64,16 @@ const TTEngine = (() => {
     const peaks  = line.PEAK;
     const offset = (line.OFFSETS?.[svcId] ?? 0) * 60;
 
-    // stops in ordine corretto per la direzione
+    // fermate in ordine canonico per la direzione
     const stopsRaw = svc.stops.filter(s => tt[s] !== undefined);
     const stops    = dir === "NB" ? [...stopsRaw].reverse() : stopsRaw;
 
     if (stops.length < 2) return [];
 
-    // offset dell'origine nel TT (per NB è l'ultima fermata)
-    const originKey     = stops[0];
-    const originOffset  = dir === "NB" ? tt[stopsRaw[stopsRaw.length - 1]] : 0;
     const totalDuration = tt[stopsRaw[stopsRaw.length - 1]];
 
-    // terminus_split: peso per questa direzione
     const splits = line.TERMINUS_SPLIT?.[svcId];
 
-    // Genera corse ogni intervallo, da SERVICE_START a SERVICE_END
     const SERVICE_START = hmToSec("06:00");
     const SERVICE_END   = hmToSec("23:30");
 
@@ -62,7 +84,18 @@ const TTEngine = (() => {
       const tripIndex = trips.length;
       const peakNow   = isPeak(cursor, peaks);
       const freq_ph   = peakNow ? freq.peak : freq.offpeak;
+      // freq_ph può essere 0.5 (ogni 2 ore) → interval = 7200 s
       const interval  = Math.round(3600 / freq_ph);
+
+      // Determina il tipo di percorso per i treni Daidōn
+      // I treni di indice pari sono "diretti", dispari sono "punohai"
+      // (valido per servizi I, IS, IL che usano le regole direct/punohai)
+      const hasPunohaiRule = Object.values(svc.conditionalStops || {}).some(
+        r => r.rule === "punohai" || r.rule === "direct"
+      );
+      const routeType = hasPunohaiRule
+        ? (tripIndex % 2 === 0 ? "direct" : "punohai")
+        : null;
 
       // scegli terminus con round-robin sui pesi
       let terminus = stops[stops.length - 1];
@@ -76,42 +109,65 @@ const TTEngine = (() => {
         }
       }
 
-      // costruisci le fermate del trip fino al terminus scelto
+      // Per i treni via Punohai il TT usa DI131 + DI14 (via Punohai);
+      // il timing di DI14 via Punohai = DI131 + 1286 s (calcolato qui
+      // se non esplicitamente presente nel TT).
+      // Il TT base (I/IS/IL) contiene DI14 come valore diretto; per la
+      // variante Punohai costruiamo il timing DI14 dinamicamente.
+      function getOffset(stCode) {
+        if (routeType === "punohai" && stCode === "DI14" && tt["DI131"] !== undefined) {
+          // DI14 via Punohai = DI131 + 1286 s
+          return tt["DI131"] + 1286;
+        }
+        return tt[stCode];
+      }
+
+      // costruisci le fermate del trip
       const tripStops = {};
       const conditionalStops = svc.conditionalStops || null;
+
       for (const st of stops) {
-        if (!stopIsActive(st, conditionalStops, tripIndex, peakNow) && st !== terminus) continue;
+        if (!stopIsActive(st, conditionalStops, tripIndex, peakNow, routeType)) continue;
 
         const rawOffset = dir === "NB"
-          ? (totalDuration - tt[st])
-          : tt[st];
+          ? (totalDuration - getOffset(st))
+          : getOffset(st);
+
+        if (rawOffset === undefined) continue;
+
         const depSec = cursor + rawOffset;
-        const arrSec = depSec - 60; // dwell 60s
+        const dwell  = dwellSec(st);
+        const arrSec = depSec - dwell;
+
         tripStops[st] = {
-          arr: secToHM(arrSec < cursor ? depSec : arrSec),
-          dep: secToHM(depSec),
+          arr:     secToHM(arrSec < cursor ? depSec : arrSec),
+          dep:     secToHM(depSec),
+          transit: dwell === 0,   // true per le stazioni di transito (DI13)
         };
         if (st === terminus) break;
       }
 
       // filtra: includi solo se il trip ferma nel range richiesto
       const depTimes = Object.values(tripStops).map(t => hmToSec(t.dep));
-      const minDep   = Math.min(...depTimes);
-      const maxDep   = Math.max(...depTimes);
+      if (depTimes.length > 0) {
+        const minDep = Math.min(...depTimes);
+        const maxDep = Math.max(...depTimes);
 
-      if (maxDep >= fromSec && minDep <= toSec) {
-        trips.push({
-          _uid:      `${lineId}:${svcId}:${dir}:${cursor}`,
-          lineId,
-          svcId,
-          name:      svc.name,
-          color:     svc.color,
-          cls:       svc.cls,
-          direction: dir,
-          origin:    stops[0],
-          terminus,
-          stops:     tripStops,
-        });
+        if (maxDep >= fromSec && minDep <= toSec) {
+          trips.push({
+            _uid:      `${lineId}:${svcId}:${dir}:${cursor}`,
+            lineId,
+            svcId,
+            name:      svc.name,
+            color:     svc.color,
+            cls:       svc.cls,
+            direction: dir,
+            origin:    stops[0],
+            terminus,
+            routeType, // "direct" | "punohai" | null
+            stops:     tripStops,
+          });
+        }
       }
 
       cursor += interval;
@@ -134,9 +190,9 @@ const TTEngine = (() => {
       if (pairSvcId) {
         const depKey = t => Object.values(t.stops)[0].dep;
         const twin   = trips.find(t =>
-          !used.has(t._uid)          &&
-          t.lineId    === trip.lineId    &&
-          t.svcId     === pairSvcId      &&
+          !used.has(t._uid)             &&
+          t.lineId    === trip.lineId   &&
+          t.svcId     === pairSvcId     &&
           t.direction === trip.direction &&
           depKey(t)   === depKey(trip)
         );
@@ -168,11 +224,17 @@ const TTEngine = (() => {
    *
    * opts:
    *   lines      {string|string[]}  "KE" | "RY" | ["KE","RY"] | "ALL"
-   *   station    {string}           codice fermata (es. "K08", "R06")
+   *   station    {string}           codice fermata (es. "K08", "DI3", "DI131")
    *   direction  {string}           "SB" | "NB" | "" (entrambe)
    *   fromTime   {string}           "HH:MM"
    *   toTime     {string}           "HH:MM"  (default "23:30")
-   *   services   {string[]}         filtro servizi opzionale (es. ["A","B"])
+   *   services   {string[]}         filtro servizi opzionale (es. ["I","IS","IL"])
+   *
+   * Nota sui servizi Daidōn (I / IS / IL):
+   *   Ogni Trip include il campo `routeType`:
+   *     "direct"  → percorso diretto (DI13 transito, DI131 saltata)
+   *     "punohai" → percorso via Punohai (DI131 fermata, DI13 saltata)
+   *   Le fermate di transito hanno il flag `transit: true` nell'oggetto fermata.
    */
   function query(opts = {}) {
     const {
@@ -187,11 +249,10 @@ const TTEngine = (() => {
     const fromSec = hmToSec(fromTime);
     const toSec   = hmToSec(toTime);
 
-    // risolvi quali linee cercare
     let lineIds;
-    if (lines === "ALL")            lineIds = Object.keys(IZX_LINES);
-    else if (Array.isArray(lines))  lineIds = lines;
-    else                            lineIds = [lines];
+    if (lines === "ALL")           lineIds = Object.keys(IZX_LINES);
+    else if (Array.isArray(lines)) lineIds = lines;
+    else                           lineIds = [lines];
 
     const dirs = direction ? [direction] : ["SB", "NB"];
     const results = [];
@@ -211,6 +272,8 @@ const TTEngine = (() => {
           const trips = generateTripsForService(lineId, svcId, dir, fromSec, toSec);
 
           // filtra per stazione se richiesta
+          // DI131 Punohai: inclusa anche nei trip punohai anche se non
+          // appare nei svc.stops canonici (viene aggiunta dinamicamente)
           const filtered = station
             ? trips.filter(t => t.stops[station] !== undefined)
             : trips;
@@ -220,7 +283,7 @@ const TTEngine = (() => {
       }
     }
 
-    // ordina per orario di partenza alla stazione cercata (o origine)
+    // ordina per orario di partenza alla stazione cercata (o prima fermata)
     results.sort((a, b) => {
       const getKey = t => station && t.stops[station]
         ? hmToSec(t.stops[station].dep)
