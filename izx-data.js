@@ -147,10 +147,17 @@ const RY_SVC = {
         R20:{rule:"alternate", phase:0},
         R21:{rule:"always"}
       }},
-  I: {coeff:1.15, name:"Daidōn", cls:"svc-I", color:"#1F6A39",
-      stops:["R01","R02","R06","R13","R14","R15"],
+  I: {coeff:1.15, name:"Daid\u014dn", cls:"svc-I", color:"#1F6A39",
+      stops:["R01","R02","R06","R13","R14","R15",
+             "DI1","DI2","DI3","DI4","DI5","DI6",
+             "DI7","DI8","DI9","DI10","DI11","DI12",
+             "DI13","DI14"],
       conditionalStops:{
-        R81:{rule:"alternate", phase:0}
+        R81: {rule:"alternate", phase:0},
+        /* DI13 Sasshi: fermata solo sui treni diretti (non via Punohai) */
+        DI13:{rule:"direct"},
+        /* DI131 Punohai: fermata solo sui treni che deviano via Punohai */
+        DI131:{rule:"punohai"},
       }},
   H: {coeff:1.15, name:"Kinbuku", cls:"svc-H", color:"#50938A",
       stops:["R01","R02","R06","R10","R14","R15","R16","R17","R18","R19","R20","R21"]},
@@ -183,7 +190,7 @@ const SA_CANONICAL_ORDER = [
   "BL01","BL02","BL03","BL04","BL05"
 ];
 
-/* ---- DŌNPUKU BRANCH (DP / DN) ---- */
+/* ---- DŌNPUKU BRANCH (DP / DN) — retained for reference ---- */
 const DP_ST = {
   DP01:{n:"Makkenoke",  k:"",b:"dp"}, DP02:{n:"Tanjiku",    k:"",b:"dp"},
   DP03:{n:"Hidankoibo", k:"",b:"dp"}, DP04:{n:"Mitakagi",   k:"",b:"dp"},
@@ -198,6 +205,43 @@ const DP_CANONICAL_ORDER = [
   "DN01","DN02","DN03","DN04","DN05"
 ];
 
+/* ---- DAIDŌN BRANCH (DI) — antenna da Shin-Makkenoke (R15, km 440.63)
+   Tratta storica velocizzata in attesa della nuova AV.
+   km = chilometrica progressiva dall'origine R01 (Saindaul Central).
+
+   Biforcazione a DI12 Sonzhin Juwon (km 748.470):
+     · Treni diretti:    DI12 → DI13 Sasshi (transito) → DI14 Tsusamo  (km 815.480)
+     · Treni via Punohai: DI12 → DI131 Punohai → DI14 Tsusamo           (km 811.240)
+       (i treni via Punohai transitano a DI13 senza fermata)
+---- */
+const DI_ST = {
+  DI1:  {n:"Makkenoke",         k:"\u5e73\u5742",         b:"di", km:457.530},
+  DI2:  {n:"Akachi",            k:"\u86de\u9045",         b:"di", km:487.930},
+  DI3:  {n:"Tanjiku",           k:"\u6de1\u5730\u4e5d",   b:"di", km:516.330},
+  DI4:  {n:"Kus\u016b\u0101rikko", k:"\u6749\u9db4",      b:"di", km:538.380},
+  DI5:  {n:"Hilannobi",         k:"\u6afb\u5ca1",         b:"di", km:549.150},
+  DI6:  {n:"Mahara-Bunki",      k:"\u99ac\u69b3\u5206\u5c90", b:"di", km:580.900},
+  DI7:  {n:"Niji-Hidankoibo",   k:"\u897f\u68ee\u888b",   b:"di", km:592.280},
+  DI8:  {n:"Sanagai",           k:"\u58eb\u624b\u4f0a",   b:"di", km:611.030},
+  DI9:  {n:"Kink\u0101jin",     k:"\u91d1\u5408\u79e6",   b:"di", km:634.450},
+  DI10: {n:"Rakeino",           k:"\u7c9f\u6191",         b:"di", km:696.270},
+  DI11: {n:"Shinzhin",          k:"\u65b0\u81e3",         b:"di", km:741.280},
+  DI12: {n:"Sonzhin Juwon",     k:"\u5c0a\u81e3\u4e2d\u592e", b:"di", km:748.470},
+  /* percorso diretto nord */
+  DI13: {n:"Sasshi",            k:"\u9752\u5fd7",         b:"di",    km:760.010},
+  DI14: {n:"Tsusamo",           k:"\u9ed2\u5c71",         b:"di",    km:815.480},
+  /* percorso via Punohai (deviazione da DI12) */
+  DI131:{n:"Punohai",           k:"\u8c4a\u534a",         b:"di_ph", km:765.660},
+  /* DI14 condivisa: km via Punohai = 811.240, via diretta = 815.480
+     Il motore usa il percorso diretto come riferimento canonico */
+};
+
+const DI_CANONICAL_ORDER = [
+  "DI1","DI2","DI3","DI4","DI5","DI6",
+  "DI7","DI8","DI9","DI10","DI11","DI12",
+  "DI13","DI131","DI14"
+];
+
 /* ---- INTERNATIONAL EXTENSION (G, future) ---- */
 const RY_INT_ST = {
   R22:{n:"Shiki-Sannupuri",k:"\u5317\u4e7e\u5c71",b:"int"},
@@ -207,13 +251,23 @@ const RY_INT_ST = {
   SZ3:{n:"Eulerhafen C.",  k:"",                   b:"sz"},
 };
 
-/* ---- RY_TT — offset in secondi da R01 (include 60s dwell per fermata) ---- */
+/* ---- RY_TT — offset in secondi da R01 (include 60s dwell per fermata)
+   Servizio I (Daidōn): timing DI provvisori — da aggiornare con velocità
+   effettive della tratta storica velocizzata una volta disponibili.
+---- */
 const RY_TT = {
   L:{R01:0,R02:366,R03:772,R04:1136,R05:1855,R06:2689,R61:3277,R07:3570,R08:3983,R81:4245,R09:5214,R10:6176,R11:6864,R12:7232,R13:8380},
   K:{R01:0,R02:366,R03:712,R06:1909,R08:2723,R10:3776,R13:4960,R14:5579,SA01:5800,SA02:6220,SK01:6520,SK02:6880,SK03:7240,SK04:7600,SK05:7960,BL01:8500,BL02:8980,BL03:9460,BL04:9940,BL05:10480},
   J:{R01:0,R02:366,R03:712,R06:1909,R08:2723,R10:3776,R13:4960,R14:5579,SA01:5800,SA02:6220,SA101:6460,SA03:6700,SA04:7000,SA05:7300,SA06:7600},
   G:{R01:0,R02:306,R06:1789,R08:2603,R81:2805,R10:3716,R13:4900,R14:5519,R15:5899,R16:6273,R17:6651,R18:7039,R19:7455,R20:7696,R21:8194,R22:8734,R23:9394,SZ1:10054,SZ2:10594,SZ3:11134},
-  I:{R01:0,R02:306,R06:1789,R10:3596,R13:4780,R15:5719,DP01:6079,DP02:6499,DP03:6919,DP04:7339,DP05:7759,DP06:8179,DP07:8599,DN01:9079,DN02:9559,DN03:10039,DN04:10519,DN05:10999},
+  /* Servizio I — timing DI da aggiornare con velocità tratta storica */
+  I:{R01:0,R02:306,R06:1789,R10:3596,R13:4780,R15:5719,
+     DI1:6079,DI2:6739,DI3:7339,DI4:7819,DI5:8059,DI6:8779,
+     DI7:9019,DI8:9439,DI9:9979,DI10:11359,DI11:12379,DI12:12559,
+     /* diretto: DI13 transito, poi DI14 */
+     DI13:12819,DI14:14059,
+     /* via Punohai: DI131 fermata, poi DI14 */
+     DI131:12979},
   H:{R01:0,R02:306,R06:1789,R10:3596,R14:5339,R15:5719,R16:6093,R17:6471,R18:6859,R19:7275,R20:7516,R21:8014},
 };
 
@@ -336,8 +390,8 @@ const IZX_LINES = {
     shortLabel:"Ry\u0101nkai",
     color:     "#148466",
     textColor: "#ffffff",
-    ST:        RY_ST,
-    CANONICAL: RY_CANONICAL_ORDER,
+    ST:        Object.assign({}, RY_ST, DI_ST),
+    CANONICAL: RY_CANONICAL_ORDER.concat(DI_CANONICAL_ORDER),
     SVC:       RY_SVC,
     TT:        RY_TT,
     FREQ:      RY_FREQ,
@@ -346,7 +400,7 @@ const IZX_LINES = {
       K: [{terminus:"BL05", weight:1}, {terminus:"R21", weight:1}],
       J: [{terminus:"SA06", weight:1}],
       G: [{terminus:"R21",  weight:1}],  /* ext internaz. futura */
-      I: [{terminus:"DN05", weight:1}],
+      I: [{terminus:"DI14", weight:1}],
       H: [{terminus:"R21",  weight:1}],
       L: [{terminus:"R21",  weight:1}],
     },
