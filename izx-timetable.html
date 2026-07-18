@@ -152,6 +152,7 @@
     .dir-badge{font-size:.65rem;padding:1px 6px;border-radius:4px;font-weight:600;}
     .dir-ib{background:rgba(59,130,246,.15);color:#60a5fa;}
     .dir-ob{background:rgba(245,158,11,.15);color:#fbbf24;}
+    .train-num{font-variant-numeric:tabular-nums;font-size:.72rem;font-weight:600;color:var(--text-muted);letter-spacing:.03em;}
     .terminus-small{font-size:.65rem;color:var(--text-muted);}
     .expand-cell{width:32px;text-align:center;}
     .expand-arrow{font-size:.65rem;color:var(--text-faint);display:inline-block;transition:transform var(--transition);}
@@ -607,6 +608,7 @@ function renderResults(trips, stCode, lineId) {
         <th class="expand-cell"></th>
         <th class="left">Line</th>
         <th class="left">Service</th>
+        <th>Train №</th>
         <th>Dir</th>
         <th>Dep</th>
         <th>Arr</th>
@@ -625,6 +627,16 @@ function renderResults(trips, stCode, lineId) {
     const dirLabel  = isInbound
       ? (lineDef?.inboundLabel  ?? "↑ Inbound")
       : (lineDef?.outboundLabel ?? "↓ Outbound");
+
+    // Train number — show paired trains as A / B
+    let trainNumHtml;
+    if (trip._paired && trip._twin) {
+      const numA = trip.trainNumber ?? "—";
+      const numB = trip._twin.trainNumber ?? "—";
+      trainNumHtml = `<span class="train-num">${numA}<br><span style="color:var(--text-faint)">${numB}</span></span>`;
+    } else {
+      trainNumHtml = `<span class="train-num">${trip.trainNumber ?? "—"}</span>`;
+    }
 
     let svcHtml;
     let terminusHtml;
@@ -652,13 +664,14 @@ function renderResults(trips, stCode, lineId) {
           <span class="line-badge" style="background:${lineDef?.color ?? '#666'}">${trip.lineId}</span>
         </td>
         <td class="left">${svcHtml}</td>
+        <td>${trainNumHtml}</td>
         <td><span class="dir-badge ${dirCls}">${dirLabel}</span></td>
         <td class="time-cell">${dep}</td>
         <td class="time-cell" style="color:var(--text-muted)">${arr}</td>
         <td class="left">${terminusHtml}</td>
       </tr>
       <tr class="trip-detail-row" id="detail-${idx}" style="display:none">
-        <td colspan="7">${buildStopList(trip, stCode)}</td>
+        <td colspan="8">${buildStopList(trip, stCode)}</td>
       </tr>`;
   });
 
