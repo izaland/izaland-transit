@@ -149,9 +149,9 @@
           <a href="other-rail.html">Other Rail</a>
           <div class="dropdown-divider"></div>
           <span class="dropdown-label">IZX</span>
-          <a href="izx-timetable.html" class="active">📅 Timetable</a>
-          <a href="marcia.html">📊 Train graph</a>
-          <a href="izx-ticket.html">🎫 Tickets &amp; Fares</a>
+          <a href="izx-timetable.html" class="active">&#128197; Timetable</a>
+          <a href="marcia.html">&#128202; Train graph</a>
+          <a href="izx-ticket.html">&#127891; Tickets &amp; Fares</a>
         </div>
       </div>
       <div class="nav-item">
@@ -331,9 +331,9 @@ function toggleSvc(lineId, svcId, chipEl) {
    SEARCH
 ================================================================ */
 function doSearch() {
-  const selVal  = document.getElementById("sel-station").value;
-  const dir     = document.getElementById("sel-dir").value;
-  const fromTime= document.getElementById("sel-from").value || "06:00";
+  const selVal   = document.getElementById("sel-station").value;
+  const selDir   = document.getElementById("sel-dir").value;   // "IB" | "OB" | ""
+  const fromTime = document.getElementById("sel-from").value || "06:00";
 
   if (!selVal) {
     document.getElementById("results-panel").innerHTML =
@@ -355,15 +355,23 @@ function doSearch() {
   }
 
   // esegui query per ogni linea attiva
+  // Traduce IB/OB → SB/NB in base al campo inboundDir di ogni linea
   let results = [];
   for (const [lid, svcs] of Object.entries(svcFilter)) {
+    const lineDef  = IZX_LINES[lid];
+    const ibDir    = lineDef.inboundDir ?? "NB";  // direzione fisica che corrisponde a Inbound
+    const obDir    = ibDir === "NB" ? "SB" : "NB";
+    let engineDir  = "";
+    if (selDir === "IB") engineDir = ibDir;
+    else if (selDir === "OB") engineDir = obDir;
+
     const trips = TTEngine.query({
-      lines:    lid,
-      station:  stCode,
-      direction: dir || "",
+      lines:     lid,
+      station:   stCode,
+      direction: engineDir,
       fromTime,
-      toTime:   "29:00",
-      services: svcs,
+      toTime:    "29:00",
+      services:  svcs,
     });
     results.push(...trips);
   }
@@ -389,7 +397,7 @@ function renderResults(trips, stCode, lineId) {
     return;
   }
 
-  const line = IZX_LINES[lineId];
+  const line   = IZX_LINES[lineId];
   const stName = line?.ST[stCode]?.n ?? stCode;
 
   let html = `
@@ -411,12 +419,16 @@ function renderResults(trips, stCode, lineId) {
       <tbody id="tt-body">`;
 
   trips.forEach((trip, idx) => {
-    const stopData = trip.stops[stCode];
-    const dep = stopData?.dep ?? "—";
-    const arr = stopData?.arr ?? "—";
-    const lineDef = IZX_LINES[trip.lineId];
-    const dirCls   = trip.direction === "SB" ? "dir-sb" : "dir-nb";
-    const dirLabel = trip.direction === "SB" ? "→ SB" : "← NB";
+    const stopData  = trip.stops[stCode];
+    const dep       = stopData?.dep ?? "—";
+    const arr       = stopData?.arr ?? "—";
+    const lineDef   = IZX_LINES[trip.lineId];
+    const ibDir     = lineDef?.inboundDir ?? "NB";
+    const isInbound = trip.direction === ibDir;
+    const dirCls    = isInbound ? "dir-ib" : "dir-ob";
+    const dirLabel  = isInbound
+      ? (lineDef?.inboundLabel  ?? "↑ Inbound")
+      : (lineDef?.outboundLabel ?? "↓ Outbound");
 
     let svcHtml;
     let terminusHtml;
