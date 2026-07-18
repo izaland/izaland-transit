@@ -491,6 +491,7 @@ const IZX_LINES = {
   KE: {
     id:"KE", label:"IZX Keishin", shortLabel:"Keishin",
     color:"#002A91", textColor:"#ffffff",
+    inboundDir:"NB", inboundLabel:"↑ Inbound — Sainðaul", outboundLabel:"↓ Outbound — Daishin",
     ST:KE_ST, CANONICAL:KE_CANONICAL_ORDER, SVC:KE_SVC,
     TT:KE_TT, FREQ:KE_FREQ, PEAK:KE_PEAK_WINDOWS,
     TERMINUS_SPLIT:{
@@ -506,6 +507,7 @@ const IZX_LINES = {
   RY: {
     id:"RY", label:"IZX Ry\u0101nkai", shortLabel:"Ry\u0101nkai",
     color:"#148466", textColor:"#ffffff",
+    inboundDir:"NB", inboundLabel:"↑ Inbound — Sainðaul", outboundLabel:"↓ Outbound — Tsusamo",
     ST:Object.assign({},RY_ST,DI_ST),
     CANONICAL:RY_CANONICAL_ORDER.concat(DI_CANONICAL_ORDER),
     SVC:RY_SVC, TT:RY_TT, FREQ:RY_FREQ, PEAK:RY_PEAK_WINDOWS,
@@ -521,7 +523,7 @@ const IZX_LINES = {
     },
     OFFSETS:{L:0,K:5,J:35,G:10,I:0,IS:20,IL:40,H:50},
   },
-
+   
   /* EI: placeholder — aggiungere EI_TT, EI_FREQ, EI_PEAK quando pronti */
   // EI: { id:"EI", label:"IZX Eira", ... },
 };
