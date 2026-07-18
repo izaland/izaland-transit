@@ -154,8 +154,8 @@ const RY_SVC = {
              "DI13","DI14"],
       conditionalStops:{
         R81: {rule:"alternate", phase:0},
-        /* DI13 Sasshi: fermata solo sui treni diretti (non via Punohai) */
-        DI13:{rule:"direct"},
+        /* DI13 Sasshi: fermata solo sui treni diretti (transito per via Punohai) */
+        DI13: {rule:"direct"},
         /* DI131 Punohai: fermata solo sui treni che deviano via Punohai */
         DI131:{rule:"punohai"},
       }},
@@ -209,9 +209,23 @@ const DP_CANONICAL_ORDER = [
    Tratta storica velocizzata in attesa della nuova AV.
    km = chilometrica progressiva dall'origine R01 (Saindaul Central).
 
+   Velocità massime per tratta (cinematic N700S, a=0.72 m/s²):
+     R15–DI1   120 km/h
+     DI1–DI2   160 km/h (10 km) poi 130
+     DI2–DI3   180 km/h (10 km) poi 160
+     DI3–DI4   180 km/h (15 km) poi 130
+     DI4–DI5   130 km/h media
+     DI5–DI6   200 km/h (25 km) poi 160
+     DI6–DI7   180 km/h (10 km) poi 130
+     DI7–DI8   150 km/h media
+     DI8–DI9   220 km/h (23.42 km piena distanza)
+     DI9–DI10  220 km/h (30 km) poi 160
+     DI10–DI12 160 km/h media
+     DI12–DI14 170 km/h diretto | 140 km/h via Punohai
+
    Biforcazione a DI12 Sonzhin Juwon (km 748.470):
-     · Treni diretti:    DI12 → DI13 Sasshi (transito) → DI14 Tsusamo  (km 815.480)
-     · Treni via Punohai: DI12 → DI131 Punohai → DI14 Tsusamo           (km 811.240)
+     · Treni diretti:     DI12 → DI13 Sasshi (transito) → DI14 Tsusamo  km 815.480
+     · Treni via Punohai: DI12 → DI131 Punohai → DI14 Tsusamo           km 811.240
        (i treni via Punohai transitano a DI13 senza fermata)
 ---- */
 const DI_ST = {
@@ -232,8 +246,7 @@ const DI_ST = {
   DI14: {n:"Tsusamo",           k:"\u9ed2\u5c71",         b:"di",    km:815.480},
   /* percorso via Punohai (deviazione da DI12) */
   DI131:{n:"Punohai",           k:"\u8c4a\u534a",         b:"di_ph", km:765.660},
-  /* DI14 condivisa: km via Punohai = 811.240, via diretta = 815.480
-     Il motore usa il percorso diretto come riferimento canonico */
+  /* DI14 condivisa: km via Punohai = 811.240, via diretta = 815.480 */
 };
 
 const DI_CANONICAL_ORDER = [
@@ -252,22 +265,47 @@ const RY_INT_ST = {
 };
 
 /* ---- RY_TT — offset in secondi da R01 (include 60s dwell per fermata)
-   Servizio I (Daidōn): timing DI provvisori — da aggiornare con velocità
-   effettive della tratta storica velocizzata una volta disponibili.
+
+   Servizio I (Daid\u014dn) — timing DI calcolati con cinematica N700S
+   (accelerazione/decelerazione 0.72 m/s\u00b2, sosta 60 s per fermata).
+   DI13 Sasshi = transito sui treni diretti, nessuna sosta (0 s dwell).
+   Timing via Punohai: DI131 al posto di DI13+DI14 diretto.
+
+   Tempi di percorrenza tratta storica (da R15):
+     R15\u2192DI14 diretto:    ~163 min  (9847 s da R15)
+     R15\u2192DI14 via Punohai: ~166 min  (10079 s da R15)
 ---- */
 const RY_TT = {
   L:{R01:0,R02:366,R03:772,R04:1136,R05:1855,R06:2689,R61:3277,R07:3570,R08:3983,R81:4245,R09:5214,R10:6176,R11:6864,R12:7232,R13:8380},
   K:{R01:0,R02:366,R03:712,R06:1909,R08:2723,R10:3776,R13:4960,R14:5579,SA01:5800,SA02:6220,SK01:6520,SK02:6880,SK03:7240,SK04:7600,SK05:7960,BL01:8500,BL02:8980,BL03:9460,BL04:9940,BL05:10480},
   J:{R01:0,R02:366,R03:712,R06:1909,R08:2723,R10:3776,R13:4960,R14:5579,SA01:5800,SA02:6220,SA101:6460,SA03:6700,SA04:7000,SA05:7300,SA06:7600},
   G:{R01:0,R02:306,R06:1789,R08:2603,R81:2805,R10:3716,R13:4900,R14:5519,R15:5899,R16:6273,R17:6651,R18:7039,R19:7455,R20:7696,R21:8194,R22:8734,R23:9394,SZ1:10054,SZ2:10594,SZ3:11134},
-  /* Servizio I — timing DI da aggiornare con velocità tratta storica */
-  I:{R01:0,R02:306,R06:1789,R10:3596,R13:4780,R15:5719,
-     DI1:6079,DI2:6739,DI3:7339,DI4:7819,DI5:8059,DI6:8779,
-     DI7:9019,DI8:9439,DI9:9979,DI10:11359,DI11:12379,DI12:12559,
-     /* diretto: DI13 transito, poi DI14 */
-     DI13:12819,DI14:14059,
-     /* via Punohai: DI131 fermata, poi DI14 */
-     DI131:12979},
+  /* Servizio I — timing DI calcolati con cinematica N700S (a=0.72 m/s²)
+     Legenda: ogni valore = secondi da R01 all'arrivo in stazione
+     DI13 = transito treni diretti (nessun dwell aggiunto)
+     DI131 = solo treni via Punohai */
+  I:{
+    R01:0, R02:306, R06:1789, R13:4780, R14:5399, R15:5719,
+    /* tratta DI storica velocizzata */
+    DI1:  6332,  /* +613 s da R15  (120 km/h, 16.9 km) */
+    DI2:  7239,  /* +907 s  (160/130, 30.4 km) */
+    DI3:  7979,  /* +740 s  (180/160, 28.4 km) */
+    DI4:  8597,  /* +618 s  (180/130, 22.05 km) */
+    DI5:  9005,  /* +408 s  (130, 10.77 km) */
+    DI6:  9738,  /* +733 s  (200/160, 31.75 km) */
+    DI7: 10099,  /* +361 s  (180/130, 11.38 km) */
+    DI8: 10667,  /* +568 s  (150, 18.75 km) */
+    DI9: 11195,  /* +528 s  (220, 23.42 km) */
+    DI10:12538,  /* +1343 s (220/160, 61.82 km) */
+    DI11:13672,  /* +1134 s (160, 45.01 km) */
+    DI12:13956,  /* +284 s  (160, 7.19 km) */
+    /* percorso diretto: DI13 = transito (no dwell), DI14 terminus */
+    DI13:14266,  /* +310 s transito (170 km/h, 11.54 km, no 60s dwell) */
+    DI14:15566,  /* +1300 s (170 km/h, 55.47 km) */
+    /* percorso via Punohai: DI131 fermata, poi DI14 */
+    DI131:14512, /* +556 s da DI12 (140 km/h, 17.19 km) */
+    /* DI14 via Punohai = DI131 + 1286 s = 15798 s (nel motore: calcolato dinamicamente) */
+  },
   H:{R01:0,R02:306,R06:1789,R10:3596,R14:5339,R15:5719,R16:6093,R17:6471,R18:6859,R19:7275,R20:7516,R21:8014},
 };
 
@@ -323,8 +361,6 @@ const EI_SVC = {
 
 /* ================================================================
    KE_TT — offset in secondi dall'origine per ogni servizio
-   (calibrati dal SCHEDULE hardcoded: A/B/C/Cp da dati reali,
-    D/E/F calcolati geometricamente a 210 km/h base)
 ================================================================ */
 const KE_TT = {
   A:  {K01:0,K02:360,K03:960,K08:3540,K10:4680,K12:4800,K17:8340,N1:9120,N2:9600,N3:10200,N4:10800},
@@ -336,10 +372,6 @@ const KE_TT = {
   F:  {K101:0,K102:190,K120:538,K103:1072,K104:1549,K105:2123,K106:2486,K160:3043,K10:4635,K11:5517,K12:6478,K13:7307,K14:8129,K144:8647,K15:8958,K16:9648,K116:10216,K17:10625,N1:11216,N2:11742,N3:12539,N4:12981},
 };
 
-/* ================================================================
-   KE_FREQ — treni/ora per direzione
-   KE_PEAK_WINDOWS — finestre di punta
-================================================================ */
 const KE_FREQ = {
   A:  {offpeak:3, peak:3},
   B:  {offpeak:2, peak:2},
@@ -356,55 +388,38 @@ const KE_PEAK_WINDOWS = [
 
 /* ================================================================
    IZX_LINES — registro centrale di tutte le linee IZX
-   Il tt-engine usa questo oggetto come unica fonte di verità.
-   Per aggiungere una nuova linea: basta aggiungere un blocco qui.
 ================================================================ */
 const IZX_LINES = {
   KE: {
-    id:        "KE",
-    label:     "IZX Keishin",
-    shortLabel:"Keishin",
-    color:     "#002A91",
-    textColor: "#ffffff",
-    ST:        KE_ST,
-    CANONICAL: KE_CANONICAL_ORDER,
-    SVC:       KE_SVC,
-    TT:        KE_TT,
-    FREQ:      KE_FREQ,
-    PEAK:      KE_PEAK_WINDOWS,
-    /* Varianti di terminus: quali servizi vanno fino a N4 vs K17 */
-    TERMINUS_SPLIT: {
-      A: [{terminus:"K17", weight:2}, {terminus:"N4", weight:1}],
-      B: [{terminus:"K17", weight:2}, {terminus:"N4", weight:1}],
-      D: [{terminus:"N4", weight:1}],
-      E: [{terminus:"N4", weight:1}],
-      F: [{terminus:"N4", weight:1}],
+    id:"KE", label:"IZX Keishin", shortLabel:"Keishin",
+    color:"#002A91", textColor:"#ffffff",
+    ST:KE_ST, CANONICAL:KE_CANONICAL_ORDER, SVC:KE_SVC,
+    TT:KE_TT, FREQ:KE_FREQ, PEAK:KE_PEAK_WINDOWS,
+    TERMINUS_SPLIT:{
+      A:[{terminus:"K17",weight:2},{terminus:"N4",weight:1}],
+      B:[{terminus:"K17",weight:2},{terminus:"N4",weight:1}],
+      D:[{terminus:"N4",weight:1}],
+      E:[{terminus:"N4",weight:1}],
+      F:[{terminus:"N4",weight:1}],
     },
-    /* Offset di partenza per distribuire i servizi nell'ora (minuti) */
-    OFFSETS: {A:0, B:10, C:30, Cp:0, D:15, E:45, F:0},
+    OFFSETS:{A:0,B:10,C:30,Cp:0,D:15,E:45,F:0},
   },
 
   RY: {
-    id:        "RY",
-    label:     "IZX Ry\u0101nkai",
-    shortLabel:"Ry\u0101nkai",
-    color:     "#148466",
-    textColor: "#ffffff",
-    ST:        Object.assign({}, RY_ST, DI_ST),
-    CANONICAL: RY_CANONICAL_ORDER.concat(DI_CANONICAL_ORDER),
-    SVC:       RY_SVC,
-    TT:        RY_TT,
-    FREQ:      RY_FREQ,
-    PEAK:      RY_PEAK_WINDOWS,
-    TERMINUS_SPLIT: {
-      K: [{terminus:"BL05", weight:1}, {terminus:"R21", weight:1}],
-      J: [{terminus:"SA06", weight:1}],
-      G: [{terminus:"R21",  weight:1}],  /* ext internaz. futura */
-      I: [{terminus:"DI14", weight:1}],
-      H: [{terminus:"R21",  weight:1}],
-      L: [{terminus:"R21",  weight:1}],
+    id:"RY", label:"IZX Ry\u0101nkai", shortLabel:"Ry\u0101nkai",
+    color:"#148466", textColor:"#ffffff",
+    ST:Object.assign({},RY_ST,DI_ST),
+    CANONICAL:RY_CANONICAL_ORDER.concat(DI_CANONICAL_ORDER),
+    SVC:RY_SVC, TT:RY_TT, FREQ:RY_FREQ, PEAK:RY_PEAK_WINDOWS,
+    TERMINUS_SPLIT:{
+      K:[{terminus:"BL05",weight:1},{terminus:"R21",weight:1}],
+      J:[{terminus:"SA06",weight:1}],
+      G:[{terminus:"R21", weight:1}],
+      I:[{terminus:"DI14",weight:1}],
+      H:[{terminus:"R21", weight:1}],
+      L:[{terminus:"R21", weight:1}],
     },
-    OFFSETS: {L:0, K:5, J:35, G:10, I:20, H:40},
+    OFFSETS:{L:0,K:5,J:35,G:10,I:20,H:40},
   },
 
   /* EI: placeholder — aggiungere EI_TT, EI_FREQ, EI_PEAK quando pronti */
