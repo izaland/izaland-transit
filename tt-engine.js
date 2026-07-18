@@ -72,7 +72,11 @@ const TTEngine = (() => {
 
     const totalDuration = tt[stopsRaw[stopsRaw.length - 1]];
 
-    const splits = line.TERMINUS_SPLIT?.[svcId];
+    // In SB il terminus viene scelto con TERMINUS_SPLIT (round-robin sui pesi).
+    // In NB il treno torna verso l'origine SB, quindi il terminus è sempre
+    // la prima stazione del percorso SB (stopsRaw[0]).
+    const splits = dir === "SB" ? (line.TERMINUS_SPLIT?.[svcId] ?? null) : null;
+    const nbTerminus = dir === "NB" ? stopsRaw[0] : null;
 
     const SERVICE_START = hmToSec("06:00");
     const SERVICE_END   = hmToSec("23:30");
@@ -97,9 +101,13 @@ const TTEngine = (() => {
         ? (tripIndex % 2 === 0 ? "direct" : "punohai")
         : null;
 
-      // scegli terminus con round-robin sui pesi
+      // Scegli terminus:
+      //   NB → sempre stopsRaw[0] (origine del percorso SB = Sainðaul)
+      //   SB → round-robin su TERMINUS_SPLIT (o ultima fermata se non definito)
       let terminus = stops[stops.length - 1];
-      if (splits && splits.length > 0) {
+      if (nbTerminus) {
+        terminus = nbTerminus;
+      } else if (splits && splits.length > 0) {
         const totalWeight = splits.reduce((a, b) => a + b.weight, 0);
         let acc = 0;
         const slot = tripIndex % totalWeight;
