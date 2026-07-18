@@ -120,6 +120,11 @@
     .ac-empty{padding:var(--space-4) var(--space-3);font-size:var(--text-sm);color:var(--text-muted);text-align:center;}
     mark{background:var(--accent-glow);color:var(--accent);border-radius:2px;padding:0 1px;font-style:normal;}
 
+    /* ALIAS item */
+    .ac-item--alias .ac-item-code{color:var(--accent);min-width:auto;padding-right:var(--space-2);}
+    .ac-alias-dots{display:flex;gap:3px;align-items:center;}
+    .ac-alias-dot{width:7px;height:7px;border-radius:50%;}
+
     /* LINE CHIPS */
     .line-chips{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-4);}
     .line-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;font-size:var(--text-xs);font-weight:700;cursor:pointer;border:2px solid transparent;transition:opacity var(--transition),border-color var(--transition);color:#fff;opacity:0.45;user-select:none;}
@@ -286,13 +291,35 @@
 
 <script>
 /* ================================================================
+   STATION ALIASES — nodi condivisi tra più linee
+   Ogni alias raggruppa più coppie {lineId, code} in un'unica voce
+   di autocomplete. L'utente vede "K01/R01 Sainðaul Central" e
+   ottiene i treni di tutte le linee elencate.
+================================================================ */
+const STATION_ALIASES = [
+  {
+    id:    "alias:sainðaul-central",
+    label: "K01/R01",
+    name:  "Sainðaul Central",
+    kanji: "作安崎中央",
+    nodes: [
+      { lineId: "KE", code: "K01" },
+      { lineId: "RY", code: "R01" },
+    ],
+  },
+  // ← aggiungi qui altri nodi condivisi in futuro
+];
+
+/* ================================================================
    UI STATE
 ================================================================ */
 let activeLines   = new Set(Object.keys(IZX_LINES));
 let activeSvcs    = new Set();
 let lastResults   = [];
 
-// Stazione selezionata: { lineId, code }
+// selectedStation è ora uno dei due formati:
+//   { alias: true, nodes: [{lineId,code},…], name, label }
+//   { alias: false, lineId, code }
 let selectedStation = null;
 
 /* ================================================================
@@ -311,10 +338,14 @@ for (const [lineId, line] of Object.entries(IZX_LINES)) {
       kanji: st.k ?? "",
       lineColor: line.color,
       lineLabel: line.shortLabel,
-      // testo di ricerca normalizzato
       searchStr: `${code} ${st.n} ${st.k ?? ""}`.toLowerCase(),
     });
   }
+}
+
+/* Costruisce il searchStr per ogni alias sulla base dei nomi già in STATION_INDEX */
+for (const alias of STATION_ALIASES) {
+  alias.searchStr = `${alias.label} ${alias.name} ${alias.kanji ?? ""}`.toLowerCase();
 }
 
 /* ================================================================
@@ -341,40 +372,88 @@ function filterStations(q) {
   return STATION_INDEX.filter(s => s.searchStr.includes(ql)).slice(0, 50);
 }
 
+function filterAliases(q) {
+  const ql = q.toLowerCase().trim();
+  if (!ql) return STATION_ALIASES;
+  return STATION_ALIASES.filter(a => a.searchStr.includes(ql));
+}
+
 function renderAC(q) {
-  const results = filterStations(q);
-  if (!results.length) {
+  const matchedAliases  = filterAliases(q);
+  const matchedStations = filterStations(q);
+
+  if (!matchedAliases.length && !matchedStations.length) {
     acList.innerHTML = `<div class="ac-empty">No stations found</div>`;
     openAC();
     return;
   }
 
-  // raggruppa per linea
-  const byLine = {};
-  for (const r of results) {
-    if (!byLine[r.lineId]) byLine[r.lineId] = [];
-    byLine[r.lineId].push(r);
-  }
-
   let html = "";
-  for (const [lid, items] of Object.entries(byLine)) {
-    const line = IZX_LINES[lid];
-    html += `<div class="ac-group-label"><span class="ac-group-dot" style="background:${line.color}"></span>${line.label}</div>`;
-    for (const item of items) {
+
+  /* ---- Sezione alias (priorità visiva) ---- */
+  if (matchedAliases.length) {
+    html += `<div class="ac-group-label">
+      <span class="ac-group-dot" style="background:linear-gradient(135deg,#3b82f6,#a855f7)"></span>
+      Multi-line stations
+    </div>`;
+    for (const alias of matchedAliases) {
+      const dotsHtml = alias.nodes.map(n => {
+        const col = IZX_LINES[n.lineId]?.color ?? "#888";
+        return `<span class="ac-alias-dot" style="background:${col}"></span>`;
+      }).join("");
       html += `
-        <div class="ac-item" role="option" data-value="${item.value}" data-name="${escHtml(item.name)}" data-line="${item.lineId}" data-code="${item.code}">
-          <span class="ac-item-code">${highlight(item.code, q)}</span>
-          <span class="ac-item-name">${highlight(item.name, q)}</span>
-          ${item.kanji ? `<span class="ac-item-kanji">${highlight(item.kanji, q)}</span>` : ""}
+        <div class="ac-item ac-item--alias" role="option"
+             data-alias-id="${escHtml(alias.id)}"
+             data-alias-name="${escHtml(alias.name)}"
+             data-alias-label="${escHtml(alias.label)}">
+          <span class="ac-alias-dots">${dotsHtml}</span>
+          <span class="ac-item-code">${highlight(alias.label, q)}</span>
+          <span class="ac-item-name">${highlight(alias.name, q)}</span>
+          ${alias.kanji ? `<span class="ac-item-kanji">${highlight(alias.kanji, q)}</span>` : ""}
         </div>`;
     }
   }
+
+  /* ---- Sezione stazioni normali raggruppate per linea ---- */
+  if (matchedStations.length) {
+    const byLine = {};
+    for (const r of matchedStations) {
+      if (!byLine[r.lineId]) byLine[r.lineId] = [];
+      byLine[r.lineId].push(r);
+    }
+    for (const [lid, items] of Object.entries(byLine)) {
+      const line = IZX_LINES[lid];
+      html += `<div class="ac-group-label"><span class="ac-group-dot" style="background:${line.color}"></span>${line.label}</div>`;
+      for (const item of items) {
+        html += `
+          <div class="ac-item" role="option"
+               data-value="${item.value}"
+               data-name="${escHtml(item.name)}"
+               data-line="${item.lineId}"
+               data-code="${item.code}">
+            <span class="ac-item-code">${highlight(item.code, q)}</span>
+            <span class="ac-item-name">${highlight(item.name, q)}</span>
+            ${item.kanji ? `<span class="ac-item-kanji">${highlight(item.kanji, q)}</span>` : ""}
+          </div>`;
+      }
+    }
+  }
+
   acList.innerHTML = html;
   focusedIdx = -1;
   openAC();
 
-  // click su item
-  acList.querySelectorAll(".ac-item").forEach(el => {
+  /* Click su alias */
+  acList.querySelectorAll(".ac-item--alias").forEach(el => {
+    el.addEventListener("mousedown", e => {
+      e.preventDefault();
+      const aliasObj = STATION_ALIASES.find(a => a.id === el.dataset.aliasId);
+      if (aliasObj) selectAlias(aliasObj);
+    });
+  });
+
+  /* Click su stazione normale */
+  acList.querySelectorAll(".ac-item:not(.ac-item--alias)").forEach(el => {
     el.addEventListener("mousedown", e => {
       e.preventDefault();
       selectStation(el.dataset.line, el.dataset.code, el.dataset.name);
@@ -395,8 +474,16 @@ function moveFocus(delta) {
   el.scrollIntoView({ block: "nearest" });
 }
 
+function selectAlias(aliasObj) {
+  selectedStation = { alias: true, nodes: aliasObj.nodes, name: aliasObj.name, label: aliasObj.label };
+  stationInput.value = `${aliasObj.label}  ${aliasObj.name}`;
+  clearBtn.classList.add("visible");
+  closeAC();
+  doSearch();
+}
+
 function selectStation(lineId, code, name) {
-  selectedStation = { lineId, code };
+  selectedStation = { alias: false, lineId, code };
   stationInput.value = `${code}  ${name}`;
   clearBtn.classList.add("visible");
   closeAC();
@@ -422,10 +509,22 @@ stationInput.addEventListener("keydown", e => {
     e.preventDefault();
     const focused = acList.querySelector(".ac-item.focused");
     if (focused) {
-      selectStation(focused.dataset.line, focused.dataset.code, focused.dataset.name);
+      if (focused.classList.contains("ac-item--alias")) {
+        const aliasObj = STATION_ALIASES.find(a => a.id === focused.dataset.aliasId);
+        if (aliasObj) selectAlias(aliasObj);
+      } else {
+        selectStation(focused.dataset.line, focused.dataset.code, focused.dataset.name);
+      }
     } else {
-      const first = acList.querySelector(".ac-item");
-      if (first) selectStation(first.dataset.line, first.dataset.code, first.dataset.name);
+      // Prima voce disponibile (alias o stazione)
+      const firstAlias = acList.querySelector(".ac-item--alias");
+      const firstStation = acList.querySelector(".ac-item:not(.ac-item--alias)");
+      if (firstAlias) {
+        const aliasObj = STATION_ALIASES.find(a => a.id === firstAlias.dataset.aliasId);
+        if (aliasObj) selectAlias(aliasObj);
+      } else if (firstStation) {
+        selectStation(firstStation.dataset.line, firstStation.dataset.code, firstStation.dataset.name);
+      }
     }
   }
   else if (e.key === "Escape") closeAC();
@@ -540,10 +639,10 @@ function doSearch() {
     return;
   }
 
-  const { lineId, code: stCode } = selectedStation;
   const selDir   = document.getElementById("sel-dir").value;
   const fromTime = document.getElementById("sel-from").value || "06:00";
 
+  /* Costruisce il filtro svc per linea */
   const svcFilter = {};
   for (const lineId2 of activeLines) {
     const line = IZX_LINES[lineId2];
@@ -554,9 +653,17 @@ function doSearch() {
     if (svcs.length) svcFilter[lineId2] = svcs;
   }
 
+  /* Normalizza i nodi da interrogare */
+  const nodes = selectedStation.alias
+    ? selectedStation.nodes
+    : [{ lineId: selectedStation.lineId, code: selectedStation.code }];
+
   let results = [];
-  for (const [lid, svcs] of Object.entries(svcFilter)) {
-    const lineDef  = IZX_LINES[lid];
+
+  for (const { lineId, code: stCode } of nodes) {
+    if (!svcFilter[lineId]) continue; // linea disattivata dai chip
+
+    const lineDef  = IZX_LINES[lineId];
     const ibDir    = lineDef.inboundDir ?? "NB";
     const obDir    = ibDir === "NB" ? "SB" : "NB";
     let engineDir  = "";
@@ -564,42 +671,58 @@ function doSearch() {
     else if (selDir === "OB") engineDir = obDir;
 
     const trips = TTEngine.query({
-      lines:     lid,
+      lines:     lineId,
       station:   stCode,
       direction: engineDir,
       fromTime,
       toTime:    "29:00",
-      services:  svcs,
+      services:  svcFilter[lineId],
     });
     results.push(...trips);
   }
 
+  /* Ordina per orario di partenza dalla stazione selezionata */
   results.sort((a, b) => {
-    const tA = a.stops[stCode] ? TTEngine.hmToSec(a.stops[stCode].dep) : 999999;
-    const tB = b.stops[stCode] ? TTEngine.hmToSec(b.stops[stCode].dep) : 999999;
+    const nodeA = selectedStation.alias
+      ? selectedStation.nodes.find(n => n.lineId === a.lineId)
+      : selectedStation;
+    const nodeB = selectedStation.alias
+      ? selectedStation.nodes.find(n => n.lineId === b.lineId)
+      : selectedStation;
+    const codeA = nodeA?.code ?? "";
+    const codeB = nodeB?.code ?? "";
+    const tA = a.stops[codeA] ? TTEngine.hmToSec(a.stops[codeA].dep) : 999999;
+    const tB = b.stops[codeB] ? TTEngine.hmToSec(b.stops[codeB].dep) : 999999;
     return tA - tB;
   });
 
   lastResults = results;
-  renderResults(results, stCode, lineId);
+  renderResults(results, selectedStation);
 }
 
 /* ================================================================
    RENDER
 ================================================================ */
-function renderResults(trips, stCode, lineId) {
+function renderResults(trips, sel) {
   const panel = document.getElementById("results-panel");
   if (!trips.length) {
     panel.innerHTML = `<div class="no-results"><div class="no-results-icon">🚃</div><p>No services found for the selected filters.</p></div>`;
     return;
   }
 
-  const line   = IZX_LINES[lineId];
-  const stName = line?.ST[stCode]?.n ?? stCode;
+  /* Titolo: per alias mostra "K01/R01 Sainðaul Central", per singola come prima */
+  let titleHtml;
+  if (sel.alias) {
+    titleHtml = `Departures from <strong>${sel.label} ${sel.name}</strong>`;
+  } else {
+    const line   = IZX_LINES[sel.lineId];
+    const stName = line?.ST[sel.code]?.n ?? sel.code;
+    titleHtml = `Departures from <strong>${sel.code} ${stName}</strong>`;
+  }
 
   let html = `
     <div class="results-header">
-      <div class="results-title">Departures from <strong>${stCode} ${stName}</strong></div>
+      <div class="results-title">${titleHtml}</div>
       <div class="results-count">${trips.length} service${trips.length !== 1 ? "s" : ""}</div>
     </div>
     <div class="results-table-wrap">
@@ -617,6 +740,11 @@ function renderResults(trips, stCode, lineId) {
       <tbody id="tt-body">`;
 
   trips.forEach((trip, idx) => {
+    /* Recupera il codice stazione corretto per questo trip */
+    const stCode = sel.alias
+      ? (sel.nodes.find(n => n.lineId === trip.lineId)?.code ?? "")
+      : sel.code;
+
     const stopData  = trip.stops[stCode];
     const dep       = stopData?.dep ?? "—";
     const arr       = stopData?.arr ?? "—";
@@ -628,7 +756,6 @@ function renderResults(trips, stCode, lineId) {
       ? (lineDef?.inboundLabel  ?? "↑ Inbound")
       : (lineDef?.outboundLabel ?? "↓ Outbound");
 
-    // Train number — show paired trains as A / B
     let trainNumHtml;
     if (trip._paired && trip._twin) {
       const numA = trip.trainNumber ?? "—";
