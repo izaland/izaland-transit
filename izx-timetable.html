@@ -64,10 +64,61 @@
     .search-row{display:flex;gap:var(--space-4);flex-wrap:wrap;align-items:flex-end;}
     .search-field{display:flex;flex-direction:column;gap:var(--space-2);flex:1;min-width:180px;}
     .search-field label{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);}
-    .search-field select,.search-field input{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-3);font-size:var(--text-sm);color:var(--text);font-family:var(--font-body);transition:border-color var(--transition);outline:none;}
+    .search-field select,.search-field input[type="time"],.search-field input[type="text"]{
+      background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-md);
+      padding:var(--space-3);font-size:var(--text-sm);color:var(--text);font-family:var(--font-body);
+      transition:border-color var(--transition);outline:none;
+    }
     .search-field select:focus,.search-field input:focus{border-color:var(--accent);}
     .search-btn{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-md);padding:var(--space-3) var(--space-6);font-size:var(--text-sm);font-weight:700;cursor:pointer;transition:background var(--transition);white-space:nowrap;height:42px;align-self:flex-end;}
     .search-btn:hover{background:var(--accent-hover);}
+
+    /* STATION AUTOCOMPLETE */
+    .station-wrap{position:relative;}
+    .station-input-row{display:flex;align-items:center;gap:0;position:relative;}
+    .station-input-row input[type="text"]{
+      width:100%;padding-right:2.2rem;
+    }
+    .station-clear{
+      position:absolute;right:var(--space-3);top:50%;transform:translateY(-50%);
+      background:none;border:none;color:var(--text-faint);cursor:pointer;
+      font-size:1rem;line-height:1;padding:0;display:none;
+      transition:color var(--transition);
+    }
+    .station-clear:hover{color:var(--text-muted);}
+    .station-clear.visible{display:block;}
+    .station-badge{
+      display:inline-flex;align-items:center;gap:5px;
+      padding:2px 8px;border-radius:99px;font-size:.7rem;font-weight:700;
+      color:#fff;margin-right:var(--space-2);
+    }
+    .ac-dropdown{
+      position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:200;
+      background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+      box-shadow:0 8px 24px oklch(0 0 0/.22);max-height:280px;overflow-y:auto;
+      display:none;
+    }
+    .ac-dropdown.open{display:block;}
+    .ac-group-label{
+      font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+      color:var(--text-faint);padding:var(--space-2) var(--space-3) var(--space-1);
+      display:flex;align-items:center;gap:var(--space-2);
+    }
+    .ac-group-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    .ac-item{
+      display:flex;align-items:center;gap:var(--space-3);
+      padding:var(--space-2) var(--space-3);cursor:pointer;
+      transition:background var(--transition);font-size:var(--text-sm);
+    }
+    .ac-item:hover,.ac-item.focused{background:var(--surface-2);}
+    .ac-item-code{
+      font-size:.7rem;font-weight:700;color:var(--text-muted);
+      font-variant-numeric:tabular-nums;min-width:38px;
+    }
+    .ac-item-name{flex:1;color:var(--text);}
+    .ac-item-kanji{font-size:.75rem;color:var(--text-muted);}
+    .ac-empty{padding:var(--space-4) var(--space-3);font-size:var(--text-sm);color:var(--text-muted);text-align:center;}
+    mark{background:var(--accent-glow);color:var(--accent);border-radius:2px;padding:0 1px;font-style:normal;}
 
     /* LINE CHIPS */
     .line-chips{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-4);}
@@ -177,10 +228,27 @@
   <div class="search-panel">
     <div class="search-card">
       <div class="search-row">
-        <div class="search-field">
-          <label for="sel-station">Station</label>
-          <select id="sel-station"><option value="">— select station —</option></select>
+
+        <!-- STATION AUTOCOMPLETE -->
+        <div class="search-field" style="flex:2;min-width:220px;">
+          <label for="station-input">Station</label>
+          <div class="station-wrap">
+            <div class="station-input-row">
+              <input
+                type="text"
+                id="station-input"
+                autocomplete="off"
+                placeholder="Type station name or code…"
+                aria-label="Station"
+                aria-autocomplete="list"
+                aria-controls="ac-list"
+              >
+              <button class="station-clear" id="station-clear" aria-label="Clear station" tabindex="-1">&times;</button>
+            </div>
+            <div class="ac-dropdown" id="ac-list" role="listbox"></div>
+          </div>
         </div>
+
         <div class="search-field" style="max-width:160px;">
           <label for="sel-dir">Direction</label>
           <select id="sel-dir">
@@ -219,20 +287,171 @@
 /* ================================================================
    UI STATE
 ================================================================ */
-let activeLines   = new Set(Object.keys(IZX_LINES));   // tutte attive di default
-let activeSvcs    = new Set();                          // vuoto = tutte
+let activeLines   = new Set(Object.keys(IZX_LINES));
+let activeSvcs    = new Set();
 let lastResults   = [];
 
+// Stazione selezionata: { lineId, code }
+let selectedStation = null;
+
 /* ================================================================
-   INIT — popola dropdown stazioni e line chips
+   STATION INDEX — costruito una volta sola al boot
+================================================================ */
+const STATION_INDEX = [];
+for (const [lineId, line] of Object.entries(IZX_LINES)) {
+  for (const code of line.CANONICAL) {
+    const st = line.ST[code];
+    if (!st) continue;
+    STATION_INDEX.push({
+      value: `${lineId}:${code}`,
+      lineId,
+      code,
+      name:  st.n,
+      kanji: st.k ?? "",
+      lineColor: line.color,
+      lineLabel: line.shortLabel,
+      // testo di ricerca normalizzato
+      searchStr: `${code} ${st.n} ${st.k ?? ""}`.toLowerCase(),
+    });
+  }
+}
+
+/* ================================================================
+   AUTOCOMPLETE
+================================================================ */
+const stationInput = document.getElementById("station-input");
+const acList       = document.getElementById("ac-list");
+const clearBtn     = document.getElementById("station-clear");
+let   focusedIdx   = -1;
+let   acOpen       = false;
+
+function highlight(text, query) {
+  if (!query) return escHtml(text);
+  const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")})`, "gi");
+  return escHtml(text).replace(re, "<mark>$1</mark>");
+}
+function escHtml(s) {
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function filterStations(q) {
+  const ql = q.toLowerCase().trim();
+  if (!ql) return STATION_INDEX.slice(0, 60);
+  return STATION_INDEX.filter(s => s.searchStr.includes(ql)).slice(0, 50);
+}
+
+function renderAC(q) {
+  const results = filterStations(q);
+  if (!results.length) {
+    acList.innerHTML = `<div class="ac-empty">No stations found</div>`;
+    openAC();
+    return;
+  }
+
+  // raggruppa per linea
+  const byLine = {};
+  for (const r of results) {
+    if (!byLine[r.lineId]) byLine[r.lineId] = [];
+    byLine[r.lineId].push(r);
+  }
+
+  let html = "";
+  for (const [lid, items] of Object.entries(byLine)) {
+    const line = IZX_LINES[lid];
+    html += `<div class="ac-group-label"><span class="ac-group-dot" style="background:${line.color}"></span>${line.label}</div>`;
+    for (const item of items) {
+      html += `
+        <div class="ac-item" role="option" data-value="${item.value}" data-name="${escHtml(item.name)}" data-line="${item.lineId}" data-code="${item.code}">
+          <span class="ac-item-code">${highlight(item.code, q)}</span>
+          <span class="ac-item-name">${highlight(item.name, q)}</span>
+          ${item.kanji ? `<span class="ac-item-kanji">${highlight(item.kanji, q)}</span>` : ""}
+        </div>`;
+    }
+  }
+  acList.innerHTML = html;
+  focusedIdx = -1;
+  openAC();
+
+  // click su item
+  acList.querySelectorAll(".ac-item").forEach(el => {
+    el.addEventListener("mousedown", e => {
+      e.preventDefault();
+      selectStation(el.dataset.line, el.dataset.code, el.dataset.name);
+    });
+  });
+}
+
+function openAC()  { acList.classList.add("open"); acOpen = true; }
+function closeAC() { acList.classList.remove("open"); acOpen = false; focusedIdx = -1; }
+
+function moveFocus(delta) {
+  const items = acList.querySelectorAll(".ac-item");
+  if (!items.length) return;
+  items[focusedIdx]?.classList.remove("focused");
+  focusedIdx = Math.max(0, Math.min(items.length - 1, focusedIdx + delta));
+  const el = items[focusedIdx];
+  el.classList.add("focused");
+  el.scrollIntoView({ block: "nearest" });
+}
+
+function selectStation(lineId, code, name) {
+  selectedStation = { lineId, code };
+  stationInput.value = `${code}  ${name}`;
+  clearBtn.classList.add("visible");
+  closeAC();
+  doSearch();
+}
+
+stationInput.addEventListener("input", () => {
+  selectedStation = null;
+  clearBtn.classList.toggle("visible", stationInput.value.length > 0);
+  renderAC(stationInput.value);
+});
+
+stationInput.addEventListener("focus", () => {
+  if (!selectedStation) renderAC(stationInput.value);
+  else openAC();
+});
+
+stationInput.addEventListener("keydown", e => {
+  if (!acOpen) return;
+  if (e.key === "ArrowDown") { e.preventDefault(); moveFocus(1); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); moveFocus(-1); }
+  else if (e.key === "Enter") {
+    e.preventDefault();
+    const focused = acList.querySelector(".ac-item.focused");
+    if (focused) {
+      selectStation(focused.dataset.line, focused.dataset.code, focused.dataset.name);
+    } else {
+      const first = acList.querySelector(".ac-item");
+      if (first) selectStation(first.dataset.line, first.dataset.code, first.dataset.name);
+    }
+  }
+  else if (e.key === "Escape") closeAC();
+});
+
+document.addEventListener("click", e => {
+  if (!e.target.closest(".station-wrap")) closeAC();
+});
+
+clearBtn.addEventListener("click", () => {
+  stationInput.value = "";
+  selectedStation = null;
+  clearBtn.classList.remove("visible");
+  stationInput.focus();
+  renderAC("");
+  document.getElementById("results-panel").innerHTML =
+    `<div class="no-results"><div class="no-results-icon">🔍</div><p>Select a station to view the timetable.</p></div>`;
+});
+
+/* ================================================================
+   INIT
 ================================================================ */
 (function init() {
-  // Logo dark/light
   const isDark = () => document.documentElement.dataset.theme === "dark";
   document.querySelectorAll(".logo-dark").forEach(el  => el.style.display = isDark() ? "" : "none");
   document.querySelectorAll(".logo-light").forEach(el => el.style.display = isDark() ? "none" : "");
 
-  // Theme toggle
   document.querySelectorAll("[data-theme-toggle]").forEach(btn => {
     btn.addEventListener("click", () => {
       document.documentElement.dataset.theme = isDark() ? "light" : "dark";
@@ -241,7 +460,6 @@ let lastResults   = [];
     });
   });
 
-  // Nav dropdowns
   document.querySelectorAll(".nav-item").forEach(item => {
     item.querySelector("button")?.addEventListener("click", e => {
       e.stopPropagation();
@@ -250,22 +468,6 @@ let lastResults   = [];
     });
   });
   document.addEventListener("click", () => document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("open")));
-
-  // Popola stazioni raggruppate per linea
-  const sel = document.getElementById("sel-station");
-  for (const [lineId, line] of Object.entries(IZX_LINES)) {
-    const grp = document.createElement("optgroup");
-    grp.label = line.label;
-    for (const code of line.CANONICAL) {
-      const st = line.ST[code];
-      if (!st) continue;
-      const opt = document.createElement("option");
-      opt.value = `${lineId}:${code}`;
-      opt.textContent = `${code} ${st.n}${st.k ? " · " + st.k : ""}`;
-      grp.appendChild(opt);
-    }
-    sel.appendChild(grp);
-  }
 
   // Line chips
   const chipsEl = document.getElementById("line-chips");
@@ -285,7 +487,7 @@ let lastResults   = [];
 ================================================================ */
 function toggleLine(lineId, chipEl) {
   if (activeLines.has(lineId)) {
-    if (activeLines.size === 1) return; // almeno una linea sempre attiva
+    if (activeLines.size === 1) return;
     activeLines.delete(lineId);
     chipEl.classList.remove("active");
   } else {
@@ -331,19 +533,16 @@ function toggleSvc(lineId, svcId, chipEl) {
    SEARCH
 ================================================================ */
 function doSearch() {
-  const selVal   = document.getElementById("sel-station").value;
-  const selDir   = document.getElementById("sel-dir").value;   // "IB" | "OB" | ""
-  const fromTime = document.getElementById("sel-from").value || "06:00";
-
-  if (!selVal) {
+  if (!selectedStation) {
     document.getElementById("results-panel").innerHTML =
       `<div class="no-results"><div class="no-results-icon">🔍</div><p>Select a station to view the timetable.</p></div>`;
     return;
   }
 
-  const [lineId, stCode] = selVal.split(":");
+  const { lineId, code: stCode } = selectedStation;
+  const selDir   = document.getElementById("sel-dir").value;
+  const fromTime = document.getElementById("sel-from").value || "06:00";
 
-  // costruisci filtro servizi attivi per linea
   const svcFilter = {};
   for (const lineId2 of activeLines) {
     const line = IZX_LINES[lineId2];
@@ -354,12 +553,10 @@ function doSearch() {
     if (svcs.length) svcFilter[lineId2] = svcs;
   }
 
-  // esegui query per ogni linea attiva
-  // Traduce IB/OB → SB/NB in base al campo inboundDir di ogni linea
   let results = [];
   for (const [lid, svcs] of Object.entries(svcFilter)) {
     const lineDef  = IZX_LINES[lid];
-    const ibDir    = lineDef.inboundDir ?? "NB";  // direzione fisica che corrisponde a Inbound
+    const ibDir    = lineDef.inboundDir ?? "NB";
     const obDir    = ibDir === "NB" ? "SB" : "NB";
     let engineDir  = "";
     if (selDir === "IB") engineDir = ibDir;
@@ -376,7 +573,6 @@ function doSearch() {
     results.push(...trips);
   }
 
-  // ordina per orario di partenza alla stazione
   results.sort((a, b) => {
     const tA = a.stops[stCode] ? TTEngine.hmToSec(a.stops[stCode].dep) : 999999;
     const tB = b.stops[stCode] ? TTEngine.hmToSec(b.stops[stCode].dep) : 999999;
