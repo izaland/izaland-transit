@@ -7,8 +7,8 @@
    KEISHIN LINE
 ---------------------------------------------------------------- */
 const KE_ST = {
-  K01:  {n:"Sain\u00f0aul Central",        k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e",  b:"main",   km:0},
-  K02:  {n:"Niji-Sain\u00f0aul",            k:"\u897f\u4f5c\u5b89\u5d0e",      b:"main",   km:11.4},
+  K01:  {n:"Sainðaul Central",        k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e",  b:"main",   km:0},
+  K02:  {n:"Niji-Sainðaul",            k:"\u897f\u4f5c\u5b89\u5d0e",      b:"main",   km:11.4},
   K03:  {n:"Asunahama Int'l Airport",     k:"\u5929\u5cf6\u570b\u969b\u7a7a\u6e2f", b:"main", km:35.4},
   K31:  {n:"Pyanuza",                     k:"",                              b:"cprime"},
   K32:  {n:"Nagayamatsu",                 k:"",                              b:"cprime"},
@@ -92,7 +92,7 @@ const KE_SVC = {
    RYĀNKAI LINE
 ---------------------------------------------------------------- */
 const RY_ST = {
-  R01:  {n:"Sain\u00f0aul Central",   k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e", b:"main", km:0},
+  R01:  {n:"Sainðaul Central",   k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e", b:"main", km:0},
   R02:  {n:"Asaji Torimoshi",         k:"\u5b89\u4f50\u5bfa\u72db\u7bf9", b:"main", km:15.30},
   R03:  {n:"Shin-Enikezya",           k:"\u65b0\u76db\u72e9",             b:"main", km:35.19},
   R04:  {n:"Nari-Odanuri",            k:"\u6771\u88cf\u5c48",             b:"main", km:55.53},
@@ -147,25 +147,76 @@ const RY_SVC = {
         R20:{rule:"alternate", phase:0},
         R21:{rule:"always"}
       }},
-  I: {coeff:1.15, name:"Daid\u014dn", cls:"svc-I", color:"#1F6A39",
-      stops:["R01","R02","R06","R13","R14","R15",
-             "DI1","DI2","DI3","DI4","DI5","DI6",
-             "DI7","DI8","DI9","DI10","DI11","DI12",
-             "DI13","DI14"],
-      conditionalStops:{
-        R81: {rule:"alternate", phase:0},
-        /* DI13 Sasshi: fermata solo sui treni diretti (transito per via Punohai) */
-        DI13: {rule:"direct"},
-        /* DI131 Punohai: fermata solo sui treni che deviano via Punohai */
-        DI131:{rule:"punohai"},
-      }},
+
+  /* ---- SERVIZIO I — Daidōn (tratta DI) ----
+     Tre varianti sulla stessa tratta storica velocizzata:
+
+     I   = Rapido   : R01,R02,R06,R13,R14,R15 → DI1,DI3,DI8,DI9,DI12,DI14
+                       Frequenza: 1 tph
+     IS  = Semi     : come Rapido + DI2, DI5, DI6
+                       Frequenza: 0.5 tph (1 ogni 2 ore)
+     IL  = Local    : tutte le stazioni
+                       Frequenza: 0.5 tph (1 ogni 2 ore)
+
+     Stazioni saltate per variante:
+       Rapido salta: DI2 (Akachi), DI4 (Kusūārikko), DI5 (Hilannobi),
+                     DI6 (Mahara-Bunki), DI7 (Niji-Hidankoibo — NB: DI7
+                     è già nella lista, ma Rapido ferma DI3→DI8 diretto),
+                     DI10 (Rakeino), DI11 (Shinzhin)
+       Semi salta:   DI4 (Kusūārikko), DI10 (Rakeino), DI11 (Shinzhin)
+       Local:        ferma a tutte
+
+     DI13 Sasshi = transito su tutti i treni diretti (no dwell).
+     DI131 Punohai = solo treni via Punohai (0.5 tph, alternati ai diretti).
+
+     Tutti i timing sono calcolati con cinematica N700S (a = 0.72 m/s²,
+     dwell 60 s per fermata, 0 s transito).
+  ---- */
+  I: {
+    coeff:1.15, name:"Daid\u014dn Rapido", cls:"svc-I", color:"#1F6A39",
+    /* Fermate Rapido: tratta storica R + DI1,DI3,DI8,DI9,DI12,DI14 */
+    stops:["R01","R02","R06","R13","R14","R15",
+           "DI1","DI3","DI8","DI9","DI12","DI14"],
+    conditionalStops:{
+      R81:  {rule:"alternate", phase:0},
+      DI13: {rule:"direct"},   /* transito treni diretti */
+      DI131:{rule:"punohai"},  /* solo treni via Punohai */
+    }
+  },
+
+  IS: {
+    coeff:1.12, name:"Daid\u014dn Semi", cls:"svc-IS", color:"#2E8B57",
+    /* Fermate Semi: Rapido + DI2 (Akachi), DI5 (Hilannobi), DI6 (Mahara-Bunki) */
+    stops:["R01","R02","R06","R13","R14","R15",
+           "DI1","DI2","DI3","DI5","DI6",
+           "DI8","DI9","DI12","DI14"],
+    conditionalStops:{
+      R81:  {rule:"alternate", phase:0},
+      DI13: {rule:"direct"},
+      DI131:{rule:"punohai"},
+    }
+  },
+
+  IL: {
+    coeff:1.08, name:"Daid\u014dn Local", cls:"svc-IL", color:"#52A870",
+    /* Fermate Local: tutte le stazioni DI */
+    stops:["R01","R02","R06","R13","R14","R15",
+           "DI1","DI2","DI3","DI4","DI5","DI6",
+           "DI7","DI8","DI9","DI10","DI11","DI12","DI14"],
+    conditionalStops:{
+      R81:  {rule:"alternate", phase:0},
+      DI13: {rule:"direct"},
+      DI131:{rule:"punohai"},
+    }
+  },
+
   H: {coeff:1.15, name:"Kinbuku", cls:"svc-H", color:"#50938A",
       stops:["R01","R02","R06","R10","R14","R15","R16","R17","R18","R19","R20","R21"]},
 };
 
 /* ---- SEIBU NAERYUKU BRANCH (SA / SK / BL) ---- */
 const SA_ST = {
-  SA01:  {n:"Chun\u00f0ouni-Naoza",  k:"\u9baa\u7a2e - \u6912\u6f5f", b:"sa"},
+  SA01:  {n:"Chunðouni-Naoza",  k:"\u9baa\u7a2e - \u6912\u6f5f", b:"sa"},
   SA02:  {n:"Poridake",               k:"\u767b\u9928",                   b:"sa"},
   SA101: {n:"Hakosakki",              k:"\u5143\u7aef",                   b:"sa_j"},
   SA03:  {n:"Pakkutanma",             k:"\u8d64\u8c37",                   b:"sa_j"},
@@ -266,28 +317,70 @@ const RY_INT_ST = {
 
 /* ---- RY_TT — offset in secondi da R01 (include 60s dwell per fermata)
 
-   Servizio I (Daid\u014dn) — timing DI calcolati con cinematica N700S
-   (accelerazione/decelerazione 0.72 m/s\u00b2, sosta 60 s per fermata).
-   DI13 Sasshi = transito sui treni diretti, nessuna sosta (0 s dwell).
-   Timing via Punohai: DI131 al posto di DI13+DI14 diretto.
+   Servizio I — tre varianti (Rapido / Semi / Local)
+   Tutti i timing sono calcolati con cinematica N700S (a = 0.72 m/s²,
+   dwell 60 s per fermata, 0 s per transito).
 
-   Tempi di percorrenza tratta storica (da R15):
-     R15\u2192DI14 diretto:    ~163 min  (9847 s da R15)
-     R15\u2192DI14 via Punohai: ~166 min  (10079 s da R15)
+   I   (Rapido)  : DI1, DI3, DI8, DI9, DI12, DI14            → R15→DI14 ~152 min
+   IS  (Semi)    : DI1, DI2, DI3, DI5, DI6, DI8, DI9, DI12,
+                   DI14                                        → R15→DI14 ~158 min
+   IL  (Local)   : tutte le stazioni DI1–DI14                 → R15→DI14 ~164 min
+
+   DI13 Sasshi = transito (nessun dwell) su treni diretti.
+   DI131 Punohai = solo treni via Punohai (alternati ai diretti).
+   Timing via Punohai: DI131 +556 s da DI12; DI14 +1286 s da DI131.
 ---- */
 const RY_TT = {
   L:{R01:0,R02:366,R03:772,R04:1136,R05:1855,R06:2689,R61:3277,R07:3570,R08:3983,R81:4245,R09:5214,R10:6176,R11:6864,R12:7232,R13:8380},
   K:{R01:0,R02:366,R03:712,R06:1909,R08:2723,R10:3776,R13:4960,R14:5579,SA01:5800,SA02:6220,SK01:6520,SK02:6880,SK03:7240,SK04:7600,SK05:7960,BL01:8500,BL02:8980,BL03:9460,BL04:9940,BL05:10480},
   J:{R01:0,R02:366,R03:712,R06:1909,R08:2723,R10:3776,R13:4960,R14:5579,SA01:5800,SA02:6220,SA101:6460,SA03:6700,SA04:7000,SA05:7300,SA06:7600},
   G:{R01:0,R02:306,R06:1789,R08:2603,R81:2805,R10:3716,R13:4900,R14:5519,R15:5899,R16:6273,R17:6651,R18:7039,R19:7455,R20:7696,R21:8194,R22:8734,R23:9394,SZ1:10054,SZ2:10594,SZ3:11134},
-  /* Servizio I — timing DI calcolati con cinematica N700S (a=0.72 m/s²)
-     Legenda: ogni valore = secondi da R01 all'arrivo in stazione
-     DI13 = transito treni diretti (nessun dwell aggiunto)
-     DI131 = solo treni via Punohai */
+
+  /* ---- I (Rapido) — ferma: DI1, DI3, DI8, DI9, DI12, DI14 ----
+     Tratte pass-through (no sosta intermedia):
+       DI1→DI3 : salta DI2 (Akachi)
+       DI3→DI8 : salta DI4, DI5, DI6, DI7 (Kusūārikko, Hilannobi, Mahara-Bunki, Niji-Hidankoibo)
+       DI9→DI12: salta DI10, DI11 (Rakeino, Shinzhin)
+  ---- */
   I:{
     R01:0, R02:306, R06:1789, R13:4780, R14:5399, R15:5719,
-    /* tratta DI storica velocizzata */
-    DI1:  6332,  /* +613 s da R15  (120 km/h, 16.9 km) */
+    DI1:  6332,  /* +613 s  da R15  (120 km/h, 16.9 km) */
+    DI3:  7862,  /* +1530 s da DI1  (pass DI2: 160/130→180/160, 58.8 km) */
+    DI8:  9627,  /* +1765 s da DI3  (pass DI4–DI7: 180/130→130→200/160→180/130→150) */
+    DI9: 10195,  /* +568 s  da DI8  (220 km/h, 23.42 km) */
+    DI12:11723,  /* +1528 s da DI9  (pass DI10–DI11: 220/160→160→160) */
+    DI13:12033,  /* +310 s  transito (170 km/h, 11.54 km, no dwell) */
+    DI14:13333,  /* +1300 s (170 km/h, 55.47 km) */
+    /* via Punohai */
+    DI131:12279, /* +556 s  da DI12 (140 km/h, 17.19 km) */
+    /* DI14 via Punohai = DI131 + 1286 s = 13565 (calcolato dinamicamente dal motore) */
+  },
+
+  /* ---- IS (Semi) — ferma: DI1, DI2, DI3, DI5, DI6, DI8, DI9, DI12, DI14 ----
+     Tratte pass-through:
+       DI3→DI5 : salta DI4 (Kusūārikko)
+       DI6→DI8 : salta DI7 (Niji-Hidankoibo)
+       DI9→DI12: salta DI10, DI11 (Rakeino, Shinzhin)
+  ---- */
+  IS:{
+    R01:0, R02:306, R06:1789, R13:4780, R14:5399, R15:5719,
+    DI1:  6332,  /* +613 s  da R15  (120 km/h) */
+    DI2:  7239,  /* +907 s  da DI1  (160/130, 30.4 km) */
+    DI3:  7979,  /* +740 s  da DI2  (180/160, 28.4 km) */
+    DI5:  8895,  /* +916 s  da DI3  (pass DI4: 180/130→130, 32.82 km) */
+    DI6:  9628,  /* +733 s  da DI5  (200/160, 31.75 km) */
+    DI8: 10350,  /* +722 s  da DI6  (pass DI7: 180/130→150, 30.13 km) */
+    DI9: 10878,  /* +528 s  da DI8  (220 km/h, 23.42 km) */
+    DI12:12406,  /* +1528 s da DI9  (pass DI10–DI11) */
+    DI13:12716,  /* +310 s  transito */
+    DI14:14016,  /* +1300 s (170 km/h) */
+    DI131:12962, /* +556 s  da DI12 (140 km/h) */
+  },
+
+  /* ---- IL (Local) — ferma a tutte le stazioni DI ---- */
+  IL:{
+    R01:0, R02:306, R06:1789, R13:4780, R14:5399, R15:5719,
+    DI1:  6332,  /* +613 s  (120 km/h, 16.9 km) */
     DI2:  7239,  /* +907 s  (160/130, 30.4 km) */
     DI3:  7979,  /* +740 s  (180/160, 28.4 km) */
     DI4:  8597,  /* +618 s  (180/130, 22.05 km) */
@@ -299,24 +392,29 @@ const RY_TT = {
     DI10:12538,  /* +1343 s (220/160, 61.82 km) */
     DI11:13672,  /* +1134 s (160, 45.01 km) */
     DI12:13956,  /* +284 s  (160, 7.19 km) */
-    /* percorso diretto: DI13 = transito (no dwell), DI14 terminus */
-    DI13:14266,  /* +310 s transito (170 km/h, 11.54 km, no 60s dwell) */
-    DI14:15566,  /* +1300 s (170 km/h, 55.47 km) */
-    /* percorso via Punohai: DI131 fermata, poi DI14 */
-    DI131:14512, /* +556 s da DI12 (140 km/h, 17.19 km) */
-    /* DI14 via Punohai = DI131 + 1286 s = 15798 s (nel motore: calcolato dinamicamente) */
+    DI13:14266,  /* +310 s  transito */
+    DI14:15566,  /* +1300 s (170 km/h) */
+    DI131:14512, /* +556 s  da DI12 (140 km/h) */
   },
+
   H:{R01:0,R02:306,R06:1789,R10:3596,R14:5339,R15:5719,R16:6093,R17:6471,R18:6859,R19:7275,R20:7516,R21:8014},
 };
 
-/* ---- RY_FREQ — treni/ora per direzione ---- */
+/* ---- RY_FREQ — treni/ora per direzione ----
+   I   = 1 tph  (Rapido, orario fisso)
+   IS  = 0.5 tph (Semi, ogni 2 ore — sfasato di 30 min da I)
+   IL  = 0.5 tph (Local, ogni 2 ore — sfasato di 60 min da I)
+   → nelle ore di punta IS e IL salgono a 1 tph ciascuno
+---- */
 const RY_FREQ = {
-  L:{offpeak:1,peak:2},
-  K:{offpeak:2,peak:2},
-  J:{offpeak:2,peak:2},
-  G:{offpeak:1,peak:1},
-  I:{offpeak:1,peak:1},
-  H:{offpeak:1,peak:1},
+  L: {offpeak:1,  peak:2},
+  K: {offpeak:2,  peak:2},
+  J: {offpeak:2,  peak:2},
+  G: {offpeak:1,  peak:1},
+  I: {offpeak:1,  peak:1},   /* Rapido  — 1 tph */
+  IS:{offpeak:0.5,peak:1},   /* Semi    — 1 ogni 2 ore (peak: 1 tph) */
+  IL:{offpeak:0.5,peak:1},   /* Local   — 1 ogni 2 ore (peak: 1 tph) */
+  H: {offpeak:1,  peak:1},
 };
 const RY_PEAK_WINDOWS = [
   {start:"07:30",end:"09:00"},
@@ -327,7 +425,7 @@ const RY_PEAK_WINDOWS = [
    EIRA LINE
 ---------------------------------------------------------------- */
 const EI_ST = {
-  E01: {n:"Sain\u00f0aul Central",        k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e",  b:"main", km:0},
+  E01: {n:"Sainðaul Central",        k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e",  b:"main", km:0},
   E02: {n:"Kawayatsu",                    k:"\u5609\u592c\u82eb",               b:"main", km:19.16},
   E03: {n:"Shin-Abiro Kung\u014dsan",     k:"\u65b0\u736f\u8def\u30fb\u52f3\u525b\u5c71", b:"main", km:65.43},
   E04: {n:"Sahnajima Juwon",              k:"\u5f4c\u6e67\u4e2d\u592e",         b:"main", km:98.41},
@@ -416,10 +514,12 @@ const IZX_LINES = {
       J:[{terminus:"SA06",weight:1}],
       G:[{terminus:"R21", weight:1}],
       I:[{terminus:"DI14",weight:1}],
+      IS:[{terminus:"DI14",weight:1}],
+      IL:[{terminus:"DI14",weight:1}],
       H:[{terminus:"R21", weight:1}],
       L:[{terminus:"R21", weight:1}],
     },
-    OFFSETS:{L:0,K:5,J:35,G:10,I:20,H:40},
+    OFFSETS:{L:0,K:5,J:35,G:10,I:0,IS:20,IL:40,H:50},
   },
 
   /* EI: placeholder — aggiungere EI_TT, EI_FREQ, EI_PEAK quando pronti */
