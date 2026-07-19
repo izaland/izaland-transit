@@ -24,15 +24,15 @@ const KE_ST = {
   K120: {n:"Panatsawa",                   k:"",                              b:"saka"},
   K103: {n:"Katayoshi Juwon",             k:"\u6cc9\u5cf0\u4e2d\u592e",      b:"saka"},
   K104: {n:"Illashiya",                   k:"\u72d0\u68b2",                  b:"saka"},
-  K105: {n:"Ch\u014dpatsu",               k:"",                              b:"saka"},
-  K106: {n:"Kohtos\u014dre",              k:"",                              b:"saka"},
-  K160: {n:"Ikahoro K\u014dwen",          k:"",                              b:"saka"},
+  K105: {n:"Chōpatsu",               k:"",                              b:"saka"},
+  K106: {n:"Kohtosōre",              k:"",                              b:"saka"},
+  K160: {n:"Ikahoro Kōwen",          k:"",                              b:"saka"},
   K10:  {n:"Shin-Kichatsura Teba",        k:"\u65b0\u4e80\u8336\u5915\u99ac", b:"main",  km:252.52},
   K11:  {n:"Shin-Kashioka",               k:"\u65b0\u7b20\u4ed8",            b:"main",   km:296.64},
   K12:  {n:"Panaireki",                   k:"\u82e5\u6d66",                  b:"main",   km:345.01},
-  K13:  {n:"Hy\u014dmonan Resort",         k:"\u88cf\u8302\u5357\u904a\u5712", b:"main",  km:386.29},
+  K13:  {n:"Hyōmonan Resort",         k:"\u88cf\u8302\u5357\u904a\u5712", b:"main",  km:386.29},
   K14:  {n:"Shin-Imihatsorul",            k:"\u65b0\u7acb\u9bad\u57fc",      b:"main",   km:427.14},
-  K144: {n:"Tsirina Wents\u0101n",         k:"\u969c\u5185\u9280\u5c1a",      b:"main",   km:451.74},
+  K144: {n:"Tsirina Wentsān",         k:"\u969c\u5185\u9280\u5c1a",      b:"main",   km:451.74},
   K15:  {n:"Naeba",                       k:"\u5185\u6ce2",                  b:"main",   km:465.21},
   K16:  {n:"Eyenniyul Juwon",             k:"\u7cf8\u4e94\u5d0e\u4e2d\u592e", b:"main",  km:499.04},
   K116: {n:"Yaseura",                     k:"\u8db3\u751f\u7530",            b:"main",   km:526.31},
@@ -95,7 +95,7 @@ const RY_ST = {
   R01:  {n:"Sainðaul Central",   k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e", b:"main", km:0},
   R02:  {n:"Asaji Torimoshi",         k:"\u5b89\u4f50\u5bfa\u72db\u7bf9", b:"main", km:15.30},
   R03:  {n:"Shin-Enikezya",           k:"\u65b0\u76db\u72e9",             b:"main", km:35.19},
-  R04:  {n:"Nari-Odanuri",            k:"\u6771\u88cf\u5c48",             b:"main", km:55.53},
+  R04:  {n:"Nari-Odanuri",            k:"\u6771\u88cf\u5c45",             b:"main", km:55.53},
   R05:  {n:"Todakuri-Tojirushi",      k:"\u675f\u5dfb\u7956\u9023",       b:"main", km:90.37},
   R06:  {n:"Isadashi",                k:"\u5b89\u6751",                   b:"main", km:129.89},
   R61:  {n:"Shin-Gomatsuki",          k:"\u65b0\u609f\u4e07\u539f",       b:"main", km:157.24},
@@ -618,14 +618,34 @@ const IZX_LINES = {
        di manutenzione notturna). L'ultimo treno regolare parte alle
        23:30 dal capolinea; i treni SW partono più tardi ma terminano
        in una stazione più prossima.
-         A  K01→K17 139 min  cutoff 22:11
-         B  K01→K17 174 min  cutoff 21:36
-         C  K01→K17 160 min  cutoff 21:50
+         SB — dal capolinea-origine verso il terminus abbreviato:
+           A  K01→K17  139 min  cutoff SB 22:11
+           B  K01→K17  174 min  cutoff SB 21:36
+           C  K01→K17  160 min  cutoff SB 21:50
+           D  K101→K104  20 min  cutoff SB 24:10  (servizio pendolari)
+           E  K101→K104  19 min  cutoff SB 24:10
+           F  K101→K10   77 min  cutoff SB 23:12
+         NB — dal terminus abbreviato verso il capolinea-destinazione:
+           A  K17→K01  139 min  cutoff NB 22:11
+           B  K08→K01   70 min  cutoff NB 23:20
+           C  K09→K01   68 min  cutoff NB 23:22
+           D  K10→K101  61 min  cutoff NB 23:29
+           E  K10→K101  61 min  cutoff NB 23:29
+           F  K10→K101  77 min  cutoff NB 23:12
     ---------------------------------------------------------------- */
     SHORT_WORKING:[
       {svcId:"A", dir:"SB", cutoff:"22:11", terminus:"K17"},
+      {svcId:"A", dir:"NB", cutoff:"22:11", terminus:"K17"},
       {svcId:"B", dir:"SB", cutoff:"21:36", terminus:"K17"},
+      {svcId:"B", dir:"NB", cutoff:"23:20", terminus:"K08"},
       {svcId:"C", dir:"SB", cutoff:"21:50", terminus:"K17"},
+      {svcId:"C", dir:"NB", cutoff:"23:22", terminus:"K09"},
+      {svcId:"D", dir:"SB", cutoff:"24:10", terminus:"K104"},
+      {svcId:"D", dir:"NB", cutoff:"23:29", terminus:"K10"},
+      {svcId:"E", dir:"SB", cutoff:"24:10", terminus:"K104"},
+      {svcId:"E", dir:"NB", cutoff:"23:29", terminus:"K10"},
+      {svcId:"F", dir:"SB", cutoff:"23:12", terminus:"K10"},
+      {svcId:"F", dir:"NB", cutoff:"23:12", terminus:"K10"},
     ],
   },
 
@@ -656,18 +676,42 @@ const IZX_LINES = {
     /* ----------------------------------------------------------------
        SHORT_WORKING — treni serali con terminus abbreviato
        Regola: cutoff = 24:30 − durata(origine→terminus SW)
-         L  R01→R13 140 min  cutoff 22:10
-         K  R01→R13  83 min  cutoff 23:07
-         J  R01→R13  83 min  cutoff 23:07
-         G  R01→R15  98 min  cutoff 22:51
-         H  R01→R15  95 min  cutoff 22:54
+         SB — dal capolinea-origine verso il terminus abbreviato:
+           L  R01→R13   140 min  cutoff SB 22:10
+           K  R01→R13    83 min  cutoff SB 23:07
+           J  R01→R13    83 min  cutoff SB 23:07
+           G  R01→R15    98 min  cutoff SB 22:51
+           H  R01→R15    95 min  cutoff SB 22:54
+           I  R01→R15    95 min  cutoff SB 22:54
+           IS R01→R15    95 min  cutoff SB 22:54
+           IL R01→R15    95 min  cutoff SB 22:54
+         NB — dal terminus abbreviato verso il capolinea-destinazione:
+           L  R06→R01    45 min  cutoff NB 23:45
+           K  R06→R01    32 min  cutoff NB 23:58
+           J  R06→R01    32 min  cutoff NB 23:58
+           G  R13→R01    82 min  cutoff NB 23:08
+           H  R10→R01    60 min  cutoff NB 23:30
+           I  R15→R01    95 min  cutoff NB 22:54
+           IS R15→R01    95 min  cutoff NB 22:54
+           IL R15→R01    95 min  cutoff NB 22:54
     ---------------------------------------------------------------- */
     SHORT_WORKING:[
-      {svcId:"L", dir:"SB", cutoff:"22:10", terminus:"R13"},
-      {svcId:"K", dir:"SB", cutoff:"23:07", terminus:"R13"},
-      {svcId:"J", dir:"SB", cutoff:"23:07", terminus:"R13"},
-      {svcId:"G", dir:"SB", cutoff:"22:51", terminus:"R15"},
-      {svcId:"H", dir:"SB", cutoff:"22:54", terminus:"R15"},
+      {svcId:"L",  dir:"SB", cutoff:"22:10", terminus:"R13"},
+      {svcId:"L",  dir:"NB", cutoff:"23:45", terminus:"R06"},
+      {svcId:"K",  dir:"SB", cutoff:"23:07", terminus:"R13"},
+      {svcId:"K",  dir:"NB", cutoff:"23:58", terminus:"R06"},
+      {svcId:"J",  dir:"SB", cutoff:"23:07", terminus:"R13"},
+      {svcId:"J",  dir:"NB", cutoff:"23:58", terminus:"R06"},
+      {svcId:"G",  dir:"SB", cutoff:"22:51", terminus:"R15"},
+      {svcId:"G",  dir:"NB", cutoff:"23:08", terminus:"R13"},
+      {svcId:"H",  dir:"SB", cutoff:"22:54", terminus:"R15"},
+      {svcId:"H",  dir:"NB", cutoff:"23:30", terminus:"R10"},
+      {svcId:"I",  dir:"SB", cutoff:"22:54", terminus:"R15"},
+      {svcId:"I",  dir:"NB", cutoff:"22:54", terminus:"R15"},
+      {svcId:"IS", dir:"SB", cutoff:"22:54", terminus:"R15"},
+      {svcId:"IS", dir:"NB", cutoff:"22:54", terminus:"R15"},
+      {svcId:"IL", dir:"SB", cutoff:"22:54", terminus:"R15"},
+      {svcId:"IL", dir:"NB", cutoff:"22:54", terminus:"R15"},
     ],
   },
    
