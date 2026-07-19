@@ -331,6 +331,22 @@
   const FIXED_FEE = 4.50;
   const USD_RATE  = 0.832;
 
+  /* ── HUB: Sainðaul Central appears once in the dropdown (under Keishin)
+     with value "HUB". At runtime HUB is resolved to the canonical code
+     for the relevant line before any lookup.                           ── */
+  const HUB_VAL = 'HUB';
+  const HUB_K   = 'K01';
+  const HUB_R   = 'R01';
+  const HUB_E   = 'E01';
+
+  /* Resolve HUB to the canonical station code for a given service key */
+  function resolveHub(code, svcKey){
+    if(code !== HUB_VAL) return code;
+    if(RY_SVCS.has(svcKey)) return HUB_R;
+    if(EI_SVCS.has(svcKey)) return HUB_E;
+    return HUB_K;
+  }
+
   /* Unified station + service lookups */
   const ALL_ST  = Object.assign({}, KE_ST,  RY_ST,  EI_ST);
   const ALL_SVC = Object.assign({}, KE_SVC, RY_SVC, EI_SVC);
@@ -339,23 +355,24 @@
   const KE_SAKA_SVCS = new Set(['D','E','F']);
   const RY_SVCS      = new Set(['L','K','J','G','I','H']);
   const EI_SVCS      = new Set(['N','M','MF','MI','MS']);
+  const KE_SVCS      = new Set([...KE_MAIN_SVCS, ...KE_SAKA_SVCS]);
 
-  /* KE select order */
+  /* KE select order — K01 is the canonical HUB entry; R01/E01 are skipped */
   const KE_SELECT_ORDER = [
     "K01","K02","K03","K04","K05","K06","K07","K08","K09","K10",
     "K11","K12","K13","K14","K144","K15","K16","K116","K17",
     "N1","N2","N3","N4",
     "K101","K102","K120","K103","K104","K105","K106","K160",
   ];
-  /* RY select order */
+  /* RY select order — R01 omitted (HUB already covered by Keishin entry) */
   const RY_SELECT_ORDER = [
-    "R01","R02","R03","R04","R05","R06","R61","R07","R08","R81",
+    "R02","R03","R04","R05","R06","R61","R07","R08","R81",
     "R09","R10","R11","R12","R13","R14","R15","R16","R17","R18",
     "R19","R20","R21",
   ];
-  /* EI select order */
+  /* EI select order — E01 omitted (HUB already covered by Keishin entry) */
   const EI_SELECT_ORDER = [
-    "E01","E02","E03","E04","E05","E06","E07","E08","E09","E10","E12",
+    "E02","E03","E04","E05","E06","E07","E08","E09","E10","E12",
   ];
 
   const KE_BL = {main:"Main Line",saka:"Sakamuso Branch",cprime:"C\u2032 Bypass",nankai:"Nankai ext."};
@@ -371,17 +388,37 @@
     return Math.round((FIXED_FEE+progKm(km))*sc*cc*100)/100;
   }
 
+  /* ── lineOf: determine the line of a user-selected code.
+     HUB is treated as KE (it appears in the Keishin group).
+     For all other codes use the actual data prefix.            ── */
+  function lineOf(code){
+    if(code === HUB_VAL) return 'KE';
+    if(RY_ST[code])  return 'RY';
+    if(EI_ST[code])  return 'EI';
+    return 'KE';
+  }
+
+  /* ── isInterline: HUB→HUB or any same-line pair is NOT interline ── */
+  function isInterline(from, to){
+    if(from === HUB_VAL && to === HUB_VAL) return false;
+    return lineOf(from) !== lineOf(to);
+  }
+
   function stKm(code, svcKey){
+    /* resolve HUB to canonical code for this service */
+    const c = resolveHub(code, svcKey);
     if(RY_SVCS.has(svcKey)){
-      return RY_ST[code] ? RY_ST[code].km : null;
+      return RY_ST[c] ? RY_ST[c].km : null;
     }
     if(EI_SVCS.has(svcKey)){
-      return EI_ST[code] ? EI_ST[code].km : null;
+      return EI_ST[c] ? EI_ST[c].km : null;
     }
-    if(code === 'K101' && KE_MAIN_SVCS.has(svcKey)) code = 'K02';
-    if(svcKey === 'Cp')            return KE_CP[code]  !== undefined ? KE_CP[code]  : null;
-    if(KE_SAKA_SVCS.has(svcKey))  return KE_SK[code]  !== undefined ? KE_SK[code]  : null;
-    return KE_ST[code] ? KE_ST[code].km : null;
+    /* Keishin */
+    let kc = c;
+    if(kc === 'K101' && KE_MAIN_SVCS.has(svcKey)) kc = 'K02';
+    if(svcKey === 'Cp')           return KE_CP[kc] !== undefined ? KE_CP[kc] : null;
+    if(KE_SAKA_SVCS.has(svcKey)) return KE_SK[kc] !== undefined ? KE_SK[kc] : null;
+    return KE_ST[kc] ? KE_ST[kc].km : null;
   }
 
   function tariffKm(from, to, svcKey){
@@ -392,9 +429,12 @@
   }
 
   function serves(svcKey, from, to){
+    /* resolve HUB alias for this service */
+    const f0 = resolveHub(from, svcKey);
+    const t0 = resolveHub(to,   svcKey);
     const stops = ALL_SVC[svcKey].stops;
-    const f = (from === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : from;
-    const t = (to   === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : to;
+    const f = (f0 === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : f0;
+    const t = (t0 === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : t0;
     const fi = stops.indexOf(f);
     const ti = stops.indexOf(t);
     return fi !== -1 && ti !== -1 && fi !== ti;
@@ -405,23 +445,17 @@
     const sf  = document.getElementById('sel-from');
     const st2 = document.getElementById('sel-to');
 
-    function addGroup(label, order, stData){
-      const ogs = [document.createElement('optgroup'), document.createElement('optgroup')];
-      ogs.forEach(og => og.label = label);
-      order.forEach(code => {
-        const s = stData[code]; if(!s) return;
-        [sf, st2].forEach((el, i) => {
-          const o = document.createElement('option');
-          o.value = code;
-          o.textContent = code+' '+s.n+(s.k?' \u00b7 '+s.k:'');
-          ogs[i].appendChild(o);
-        });
+    /* Helper: add a single <option> to both selects */
+    function addOpt(ogs, value, label){
+      [0,1].forEach(i => {
+        const o = document.createElement('option');
+        o.value = value;
+        o.textContent = label;
+        ogs[i].appendChild(o);
       });
-      sf.appendChild(ogs[0]);
-      st2.appendChild(ogs[1]);
     }
 
-    /* Keishin: split by branch label */
+    /* ── Keishin: split by branch, K01 rendered as HUB ── */
     let lastB = null;
     let ogs = [null, null];
     KE_SELECT_ORDER.forEach(code => {
@@ -429,25 +463,37 @@
       const bl = KE_BL[s.b] || s.b;
       if(s.b !== lastB){
         ogs = [document.createElement('optgroup'), document.createElement('optgroup')];
-        ogs.forEach(og => { og.label = 'Keishin — '+bl; });
+        ogs.forEach(og => { og.label = 'Keishin \u2014 '+bl; });
         sf.appendChild(ogs[0]); st2.appendChild(ogs[1]);
         lastB = s.b;
       }
-      [sf, st2].forEach((el, i) => {
-        const o = document.createElement('option');
-        o.value = code;
-        o.textContent = code+' '+s.n+(s.k?' \u00b7 '+s.k:'');
-        ogs[i].appendChild(o);
-      });
+      /* K01 = shared hub: expose as HUB value, label shows all three codes */
+      const value = (code === 'K01') ? HUB_VAL : code;
+      const label = (code === 'K01')
+        ? 'K01/R01/E01 '+s.n+(s.k?' \u00b7 '+s.k:'')
+        : code+' '+s.n+(s.k?' \u00b7 '+s.k:'');
+      addOpt(ogs, value, label);
     });
 
-    /* Ryānkai: single group */
-    addGroup('Ry\u0101nkai — Main Line', RY_SELECT_ORDER, RY_ST);
+    /* ── Ryānkai: R01 skipped (HUB already added above) ── */
+    const ryOgs = [document.createElement('optgroup'), document.createElement('optgroup')];
+    ryOgs.forEach(og => og.label = 'Ry\u0101nkai \u2014 Main Line');
+    sf.appendChild(ryOgs[0]); st2.appendChild(ryOgs[1]);
+    RY_SELECT_ORDER.forEach(code => {
+      const s = RY_ST[code]; if(!s) return;
+      addOpt(ryOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:''));
+    });
 
-    /* Eira: single group */
-    addGroup('Eira — Main Line', EI_SELECT_ORDER, EI_ST);
+    /* ── Eira: E01 skipped (HUB already added above) ── */
+    const eiOgs = [document.createElement('optgroup'), document.createElement('optgroup')];
+    eiOgs.forEach(og => og.label = 'Eira \u2014 Main Line');
+    sf.appendChild(eiOgs[0]); st2.appendChild(eiOgs[1]);
+    EI_SELECT_ORDER.forEach(code => {
+      const s = EI_ST[code]; if(!s) return;
+      addOpt(eiOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:''));
+    });
 
-    sf.value='K01'; st2.value='K17';
+    sf.value = HUB_VAL; st2.value = 'K17';
   }
 
   const CLASS_C = {standard:1.00, blue_seat:1.55, yurani:2.40};
@@ -456,11 +502,15 @@
   function fmt(n)  { return '\u0116\u202f'+n.toFixed(2); }
   function fusd(n) { return '(US$\u202f'+(n*USD_RATE).toFixed(2)+')'; }
 
+  /* station display name — HUB resolves to K01 label */
+  function stName(code){
+    if(code === HUB_VAL) return ALL_ST[HUB_K] ? ALL_ST[HUB_K].n : 'Sain\u00f0aul Central';
+    return ALL_ST[code] ? ALL_ST[code].n : code;
+  }
+
   /* ================================================================
      STOP PATTERN DIAGRAM
   ================================================================ */
-
-  function lineOf(code){ return RY_ST[code] ? 'RY' : EI_ST[code] ? 'EI' : 'KE'; }
 
   function canonicalOrderFor(code){
     const line = lineOf(code);
@@ -470,10 +520,13 @@
   }
 
   function serviceRange(svcKey, from, to){
+    /* resolve HUB before diagram lookup */
+    const fromR = resolveHub(from, svcKey);
+    const toR   = resolveHub(to,   svcKey);
     const info = ALL_SVC[svcKey];
     const svcStopList = info.stops;
-    const f = (from === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : from;
-    const t = (to   === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : to;
+    const f = (fromR === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : fromR;
+    const t = (toR   === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : toR;
     let fi = svcStopList.indexOf(f);
     let ti = svcStopList.indexOf(t);
     if(fi === -1 || ti === -1 || fi === ti) return {stops:new Set(), through:new Set()};
@@ -501,13 +554,20 @@
 
   function buildCanonicalCols(activeRows, from, to){
     const needed = new Set();
-    needed.add(from); needed.add(to);
+    /* add resolved codes for diagram */
+    activeRows.forEach(({k}) => {
+      needed.add(resolveHub(from, k));
+      needed.add(resolveHub(to,   k));
+    });
+    if(!activeRows.length){ needed.add(resolveHub(from,'F')); needed.add(resolveHub(to,'F')); }
     activeRows.forEach(({k}) => {
       const {stops, through} = serviceRange(k, from, to);
       stops.forEach(c => needed.add(c));
       through.forEach(c => needed.add(c));
     });
-    const CORD = canonicalOrderFor(from);
+    /* canonical order based on first resolved from */
+    const firstSvc = activeRows.length ? activeRows[0].k : 'F';
+    const CORD = canonicalOrderFor(resolveHub(from, firstSvc));
     return CORD.filter(c => needed.has(c));
   }
 
@@ -529,7 +589,10 @@
     cols.forEach(code => {
       const td = document.createElement('td');
       td.style.cssText = `width:${COL_W}px;min-width:${COL_W}px;max-width:${COL_W}px;padding:0;text-align:center;vertical-align:bottom;padding-bottom:6px;`;
-      const isOD = (code === from || code === to);
+      /* isOD check against resolved codes */
+      const isOD = activeRows.some(({k}) =>
+        resolveHub(from,k)===code || resolveHub(to,k)===code
+      );
       const s = ALL_ST[code];
       const label = s ? (code+' '+(s.n.length>13 ? s.n.slice(0,12)+'\u2026' : s.n)) : code;
       const span = document.createElement('span');
@@ -570,7 +633,7 @@
         td.style.cssText = `width:${COL_W}px;min-width:${COL_W}px;max-width:${COL_W}px;height:26px;padding:0;position:relative;text-align:center;vertical-align:middle;`;
         const inRange = svcAll.has(code);
         const isStop  = svcStops.has(code);
-        const isOD    = (code === from || code === to);
+        const isOD    = resolveHub(from,k)===code || resolveHub(to,k)===code;
         const isFirst = ci === 0;
         const isLast  = ci === cols.length - 1;
         const isBypass = !inRange && ci > firstColIdx && ci < lastColIdx;
@@ -593,14 +656,6 @@
       });
       tbl.appendChild(tr);
     });
-  }
-
-  const HUB_R = "R01";
-  const HUB_K = "K01";
-  const HUB_E = "E01";
-
-  function isInterline(from, to){
-    return lineOf(from) !== lineOf(to);
   }
 
   function getDiscount(km){
@@ -636,9 +691,7 @@
     res.style.display = 'block';
     cards.innerHTML = '';
 
-    routeEl.textContent =
-      (ALL_ST[from]?ALL_ST[from].n:from)+' \u2192 '+
-      (ALL_ST[to]?ALL_ST[to].n:to);
+    routeEl.textContent = stName(from)+' \u2192 '+stName(to);
 
     const clss = classF==='all' ? ['standard','blue_seat','yurani'] : [classF];
 
@@ -680,27 +733,27 @@
 
       let hub1, hub2, svcs1, svcs2;
       if(fromLine === 'RY' && toLine === 'KE'){
-        hub1 = HUB_R; hub2 = HUB_K;
+        hub1 = HUB_VAL; hub2 = HUB_VAL;
         svcs1 = Object.keys(RY_SVC); svcs2 = Object.keys(KE_SVC);
         szNote.innerHTML = "\u24d8 Transfer at Sain\u00f0aul Central (R01/K01). Combined fare applied.";
       } else if(fromLine === 'KE' && toLine === 'RY'){
-        hub1 = HUB_K; hub2 = HUB_R;
+        hub1 = HUB_VAL; hub2 = HUB_VAL;
         svcs1 = Object.keys(KE_SVC); svcs2 = Object.keys(RY_SVC);
         szNote.innerHTML = "\u24d8 Transfer at Sain\u00f0aul Central (K01/R01). Combined fare applied.";
       } else if(fromLine === 'EI' && toLine === 'KE'){
-        hub1 = HUB_E; hub2 = HUB_K;
+        hub1 = HUB_VAL; hub2 = HUB_VAL;
         svcs1 = Object.keys(EI_SVC); svcs2 = Object.keys(KE_SVC);
         szNote.innerHTML = "\u24d8 Transfer at Sain\u00f0aul Central (E01/K01). Combined fare applied.";
       } else if(fromLine === 'KE' && toLine === 'EI'){
-        hub1 = HUB_K; hub2 = HUB_E;
+        hub1 = HUB_VAL; hub2 = HUB_VAL;
         svcs1 = Object.keys(KE_SVC); svcs2 = Object.keys(EI_SVC);
         szNote.innerHTML = "\u24d8 Transfer at Sain\u00f0aul Central (K01/E01). Combined fare applied.";
       } else if(fromLine === 'EI' && toLine === 'RY'){
-        hub1 = HUB_E; hub2 = HUB_R;
+        hub1 = HUB_VAL; hub2 = HUB_VAL;
         svcs1 = Object.keys(EI_SVC); svcs2 = Object.keys(RY_SVC);
         szNote.innerHTML = "\u24d8 Transfer at Sain\u00f0aul Central (E01/R01). Combined fare applied.";
       } else if(fromLine === 'RY' && toLine === 'EI'){
-        hub1 = HUB_R; hub2 = HUB_E;
+        hub1 = HUB_VAL; hub2 = HUB_VAL;
         svcs1 = Object.keys(RY_SVC); svcs2 = Object.keys(EI_SVC);
         szNote.innerHTML = "\u24d8 Transfer at Sain\u00f0aul Central (R01/E01). Combined fare applied.";
       }
