@@ -146,6 +146,24 @@ const TTEngine = (() => {
         }
       }
 
+      // ---- SHORT WORKING: sovrascrive terminus per corse notturne ----
+      // Legge SHORT_WORKING dalla definizione della linea in izx-data.js.
+      // Ogni regola: { svcId, dir ("SB"|"NB"|"BOTH"), cutoff ("HH:MM"), terminus }
+      // La prima regola che soddisfa tutte le condizioni vince.
+      // Il terminus ridotto deve esistere nel TT del servizio, altrimenti
+      // la regola viene ignorata silenziosamente.
+      const swRules = line.SHORT_WORKING ?? [];
+      for (const sw of swRules) {
+        const dirMatch = sw.dir === "BOTH" || sw.dir === dir;
+        if (dirMatch && sw.svcId === svcId && cursor >= hmToSec(sw.cutoff)) {
+          if (tt[sw.terminus] !== undefined) {
+            terminus = sw.terminus;
+          }
+          break;
+        }
+      }
+      // ---- fine SHORT WORKING ----
+
       // Per i treni via Punohai il TT usa DI131 + DI14 (via Punohai);
       // il timing di DI14 via Punohai = DI131 + 1286 s (calcolato qui
       // se non esplicitamente presente nel TT).
@@ -278,6 +296,11 @@ const TTEngine = (() => {
    *     "direct"  → percorso diretto (DI13 transito, DI131 saltata)
    *     "punohai" → percorso via Punohai (DI131 fermata, DI13 saltata)
    *   Le fermate di transito hanno il flag `transit: true` nell'oggetto fermata.
+   *
+   * SHORT_WORKING:
+   *   Alcune corse notturne terminano a un capolinea ridotto definito in
+   *   line.SHORT_WORKING. Il campo `terminus` del Trip riflette già la
+   *   stazione ridotta; nessun campo aggiuntivo è necessario lato UI.
    */
   function query(opts = {}) {
     const {
