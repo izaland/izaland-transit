@@ -445,7 +445,7 @@ const EI_CANONICAL_ORDER = [
 ];
 
 const EI_SVC = {
-  N:  {coeff:1.00, name:"Nazionale",          cls:"svc-N",  color:"#32CD32",
+  N:  {coeff:1.00, name:"Domestic",          cls:"svc-N",  color:"#32CD32",
        stops:["E01","E02","E03","E04","E05","E06","E07","E08","E09","E10","E12"]},
   M:  {coeff:1.08, name:"Minarajaki Express", cls:"svc-M",  color:"#228B22",
        stops:["E01","E04","E05","E08","E12"]},
@@ -456,6 +456,67 @@ const EI_SVC = {
   MS: {coeff:1.20, name:"Minarajaki Super",   cls:"svc-MS", color:"#00BFFF",
        stops:["E01","E04","E05","E08","E12"]},
 };
+
+/* ================================================================
+   EI_TT — offset in secondi da E01 per ogni servizio
+   Cinematica: a = 0.60 m/s², dwell 60 s per fermata, E11 saltata (km null)
+   Velocità di riferimento:
+     M (Express) : 160 km/h max sulle tratte > 60 km, 130 km/h sulle brevi
+     N (Nazionale): 120 km/h max, 100 km/h media effettiva
+================================================================ */
+const EI_TT = {
+
+  /* ---- M — Express: E01, E04, E05, E08, E12 ----
+     E01→E04 :  98.41 km a ~130 km/h eff. → ~2720 s + 60 s dwell
+     E04→E05 :  28.37 km a ~110 km/h eff. → ~928 s  + 60 s dwell
+     E05→E08 : 124.08 km a ~150 km/h eff. → ~2978 s + 60 s dwell
+     E08→E12 : 124.63 km a ~155 km/h eff. → ~2895 s
+  ---- */
+  M: {
+    E01:    0,
+    E04: 2780,   /* +2780 s  (~46 min, 98.41 km a ~127 km/h)  */
+    E05: 3768,   /* +988 s   (~16 min, 28.37 km a ~103 km/h)  */
+    E08: 6806,   /* +3038 s  (~51 min, 124.08 km a ~147 km/h) */
+    E12: 9761,   /* +2955 s  (~49 min, 124.63 km a ~152 km/h) */
+  },
+
+  /* ---- N — Nazionale: tutte le stazioni eccetto E11 (km null) ----
+     E01→E02 :  19.16 km a  ~92 km/h eff. → ~749 s  + 60 s dwell
+     E02→E03 :  46.27 km a ~100 km/h eff. → ~1666 s + 60 s dwell
+     E03→E04 :  32.98 km a ~107 km/h eff. → ~1108 s + 60 s dwell
+     E04→E05 :  28.37 km a ~104 km/h eff. → ~981 s  + 60 s dwell
+     E05→E06 :  31.98 km a ~100 km/h eff. → ~1151 s + 60 s dwell
+     E06→E07 :  31.24 km a  ~97 km/h eff. → ~1158 s + 60 s dwell
+     E07→E08 :  60.86 km a ~110 km/h eff. → ~1993 s + 60 s dwell
+     E08→E09 :  28.91 km a  ~97 km/h eff. → ~1072 s + 60 s dwell
+     E09→E10 :  28.29 km a  ~99 km/h eff. → ~1029 s + 60 s dwell
+     E10→E12 :  67.43 km a ~110 km/h eff. → ~2207 s (E11 saltata, no dwell)
+  ---- */
+  N: {
+    E01:     0,
+    E02:   749,   /* +749 s   (~12 min)  */
+    E03:  2475,   /* +1726 s  (~29 min)  */
+    E04:  3643,   /* +1168 s  (~19 min)  */
+    E05:  4684,   /* +1041 s  (~17 min)  */
+    E06:  5895,   /* +1211 s  (~20 min)  */
+    E07:  7113,   /* +1218 s  (~20 min)  */
+    E08:  9166,   /* +2053 s  (~34 min)  */
+    E09: 10298,   /* +1132 s  (~19 min)  */
+    E10: 11387,   /* +1089 s  (~18 min)  */
+    /* E11 saltata — km null */
+    E12: 13654,   /* +2267 s  (~38 min, 67.43 km) */
+  },
+};
+
+const EI_FREQ = {
+  M: {offpeak: 2, peak: 3},   /* 1 ogni 30 min, peak ogni 20 min */
+  N: {offpeak: 2, peak: 3},   /* alternati con M: copertura ogni ~15 min in peak */
+};
+
+const EI_PEAK_WINDOWS = [
+  {start: "07:00", end: "09:30"},
+  {start: "17:00", end: "20:00"},
+];
 
 /* ================================================================
    KE_TT — offset in secondi dall'origine per ogni servizio
@@ -520,6 +581,10 @@ const TRAIN_NUM_CONFIG = {
     lineDigit: 2,
     svcBase: { L:0, K:10, J:15, G:20, H:25, I:30, IS:35, IL:40 },
   },
+   EI: {
+    lineDigit: 3,
+    svcBase: { N: 0, M: 10 },
+  },
 };
 
 /* ================================================================
@@ -574,6 +639,27 @@ const IZX_LINES = {
     OFFSETS:{L:22, K:10, J:38, G:19, I:6, IS:29, IL:54, H:56},
   },
    
-  /* EI: placeholder — aggiungere EI_TT, EI_FREQ, EI_PEAK quando pronti */
-  // EI: { id:"EI", label:"IZX Eira", ... },
+    EI: {
+    id: "EI", label: "IZX Eira", shortLabel: "Eira",
+    color: "#228B22", textColor: "#ffffff",
+    inboundDir: "NB",
+    inboundLabel:  "↑ Inbound — Sainðaul",
+    outboundLabel: "↓ Outbound — Nagareki",
+    ST: EI_ST,
+    CANONICAL: EI_CANONICAL_ORDER,
+    SVC: EI_SVC,
+    TT:  EI_TT,
+    FREQ: EI_FREQ,
+    PEAK: EI_PEAK_WINDOWS,
+    TERMINUS_SPLIT: {
+      M: [{terminus: "E12", weight: 1}],
+      N: [{terminus: "E12", weight: 1}],
+    },
+    /* ----------------------------------------------------------------
+       OFFSETS (minuti dall'orario base 06:00)
+       M=0 primo express del mattino, N sfasato di 15 min per garantire
+       copertura alternata ogni ~15 min nelle ore di punta.
+    ---------------------------------------------------------------- */
+    OFFSETS: {M: 5, N: 20},
+  },
 };
