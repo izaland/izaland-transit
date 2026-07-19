@@ -610,7 +610,12 @@ const IZX_LINES = {
        Ryānkai in uscita da K01 Sainðaul Central.
        A=0 (treno inaugurale fisso), gli altri sfasati di conseguenza.
     ---------------------------------------------------------------- */
-    OFFSETS:{A:0, B:14, C:32, Cp:7, D:17, E:47, F:35},
+        OFFSETS:{A:0, B:14, C:32, Cp:7, D:17, E:47, F:35},
+    SHORT_WORKING:[
+      {svcId:"A", dir:"SB", cutoff:"21:30", terminus:"K17"},
+      {svcId:"B", dir:"SB", cutoff:"22:00", terminus:"K17"},
+      {svcId:"C", dir:"SB", cutoff:"21:00", terminus:"K17"},
+    ],
   },
 
   RY: {
@@ -636,7 +641,14 @@ const IZX_LINES = {
        della stessa linea in uscita da R01 Sainðaul Central.
        Regola narrativa: I (Rapido Daidōn) precede L (locale) di ~16 min.
     ---------------------------------------------------------------- */
-    OFFSETS:{L:22, K:10, J:38, G:19, I:6, IS:29, IL:54, H:56},
+        OFFSETS:{L:22, K:10, J:38, G:19, I:6, IS:29, IL:54, H:56},
+    SHORT_WORKING:[
+      {svcId:"L", dir:"SB", cutoff:"21:00", terminus:"R13"},
+      {svcId:"K", dir:"SB", cutoff:"22:00", terminus:"R13"},
+      {svcId:"J", dir:"SB", cutoff:"22:00", terminus:"R13"},
+      {svcId:"G", dir:"SB", cutoff:"21:30", terminus:"R15"},
+      {svcId:"H", dir:"SB", cutoff:"21:30", terminus:"R15"},
+    ],
   },
    
     EI: {
@@ -660,6 +672,10 @@ const IZX_LINES = {
        M=0 primo express del mattino, N sfasato di 15 min per garantire
        copertura alternata ogni ~15 min nelle ore di punta.
     ---------------------------------------------------------------- */
-    OFFSETS: {M: 5, N: 20},
+        OFFSETS:{M:5, N:20},
+    SHORT_WORKING:[
+      {svcId:"M", dir:"SB", cutoff:"21:00", terminus:"E08"},
+      {svcId:"N", dir:"SB", cutoff:"22:00", terminus:"E08"},
+    ],
   },
 };
