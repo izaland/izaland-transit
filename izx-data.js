@@ -539,7 +539,13 @@ const IZX_LINES = {
       E:[{terminus:"N4",weight:1}],
       F:[{terminus:"N4",weight:1}],
     },
-    OFFSETS:{A:0,B:10,C:30,Cp:0,D:15,E:45,F:0},
+    /* ----------------------------------------------------------------
+       OFFSETS (minuti dall'orario base 06:00)
+       Calibrati per evitare partenze allo stesso minuto con la linea
+       Ryānkai in uscita da K01 Sainðaul Central.
+       A=0 (treno inaugurale fisso), gli altri sfasati di conseguenza.
+    ---------------------------------------------------------------- */
+    OFFSETS:{A:0, B:14, C:32, Cp:7, D:17, E:47, F:35},
   },
 
   RY: {
@@ -559,7 +565,13 @@ const IZX_LINES = {
       H:[{terminus:"R21", weight:1}],
       L:[{terminus:"R21", weight:1}],
     },
-    OFFSETS:{L:0,K:5,J:35,G:10,I:0,IS:20,IL:40,H:50},
+    /* ----------------------------------------------------------------
+       OFFSETS (minuti dall'orario base 06:00)
+       Calibrati per evitare sovrapposizioni con Keishin e tra servizi
+       della stessa linea in uscita da R01 Sainðaul Central.
+       Regola narrativa: I (Rapido Daidōn) precede L (locale) di ~16 min.
+    ---------------------------------------------------------------- */
+    OFFSETS:{L:22, K:10, J:38, G:19, I:6, IS:29, IL:54, H:56},
   },
    
   /* EI: placeholder — aggiungere EI_TT, EI_FREQ, EI_PEAK quando pronti */
