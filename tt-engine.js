@@ -108,7 +108,7 @@ const TTEngine = (() => {
     const nbTerminus = dir === "NB" ? stopsRaw[0] : null;
 
     const SERVICE_START = hmToSec("06:00");
-    const SERVICE_END   = hmToSec("23:30");
+    const SERVICE_END   = hmToSec("24:30"); // ultimo treno parte entro 24:30 (manutenzione notturna)
 
     const trips = [];
     let   cursor = SERVICE_START + offset;
@@ -301,6 +301,11 @@ const TTEngine = (() => {
    *   Alcune corse notturne terminano a un capolinea ridotto definito in
    *   line.SHORT_WORKING. Il campo `terminus` del Trip riflette già la
    *   stazione ridotta; nessun campo aggiuntivo è necessario lato UI.
+   *
+   * Orario di servizio:
+   *   Prima corsa: 06:00 (+ offset per linea)
+   *   Ultima partenza dal capolinea: max 24:30
+   *   La rete è chiusa dalle 24:30 per la manutenzione notturna.
    */
   function query(opts = {}) {
     const {
