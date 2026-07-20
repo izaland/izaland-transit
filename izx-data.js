@@ -1,5 +1,5 @@
 /* ================================================================
-   IZX DATA MODULE — Keishin (KE_) + Ryānkai (RY_)
+   IZX DATA MODULE — Keishin (KE_) + Ryānkai (RY_) + Eira (EI_) + Seibu Naeryuku (SN_)
    Loaded by izx-ticket.html before the main script.
 ================================================================ */
 
@@ -24,15 +24,15 @@ const KE_ST = {
   K120: {n:"Panatsawa",                   k:"",                              b:"saka"},
   K103: {n:"Katayoshi Juwon",             k:"\u6cc9\u5cf0\u4e2d\u592e",      b:"saka"},
   K104: {n:"Illashiya",                   k:"\u72d0\u68b2",                  b:"saka"},
-  K105: {n:"Chōpatsu",               k:"",                              b:"saka"},
-  K106: {n:"Kohtosōre",              k:"",                              b:"saka"},
-  K160: {n:"Ikahoro Kōwen",          k:"",                              b:"saka"},
+  K105: {n:"Ch\u014dpatsu",               k:"",                              b:"saka"},
+  K106: {n:"Kohtos\u014dre",              k:"",                              b:"saka"},
+  K160: {n:"Ikahoro K\u014dwen",          k:"",                              b:"saka"},
   K10:  {n:"Shin-Kichatsura Teba",        k:"\u65b0\u4e80\u8336\u5915\u99ac", b:"main",  km:252.52},
   K11:  {n:"Shin-Kashioka",               k:"\u65b0\u7b20\u4ed8",            b:"main",   km:296.64},
   K12:  {n:"Panaireki",                   k:"\u82e5\u6d66",                  b:"main",   km:345.01},
-  K13:  {n:"Hyōmonan Resort",         k:"\u88cf\u8302\u5357\u904a\u5712", b:"main",  km:386.29},
+  K13:  {n:"Hy\u014dmonan Resort",         k:"\u88cf\u8302\u5357\u904a\u5712", b:"main",  km:386.29},
   K14:  {n:"Shin-Imihatsorul",            k:"\u65b0\u7acb\u9bad\u57fc",      b:"main",   km:427.14},
-  K144: {n:"Tsirina Wentsān",         k:"\u969c\u5185\u9280\u5c1a",      b:"main",   km:451.74},
+  K144: {n:"Tsirina Wents\u0101n",         k:"\u969c\u5185\u9280\u5c1a",      b:"main",   km:451.74},
   K15:  {n:"Naeba",                       k:"\u5185\u6ce2",                  b:"main",   km:465.21},
   K16:  {n:"Eyenniyul Juwon",             k:"\u7cf8\u4e94\u5d0e\u4e2d\u592e", b:"main",  km:499.04},
   K116: {n:"Yaseura",                     k:"\u8db3\u751f\u7530",            b:"main",   km:526.31},
@@ -147,46 +147,18 @@ const RY_SVC = {
         R20:{rule:"alternate", phase:0},
         R21:{rule:"always"}
       }},
-
-  /* ---- SERVIZIO I — Daidōn (tratta DI) ----
-     Tre varianti sulla stessa tratta storica velocizzata:
-
-     I   = Rapido   : R01,R02,R06,R13,R14,R15 → DI1,DI3,DI8,DI9,DI12,DI14
-                       Frequenza: 1 tph
-     IS  = Semi     : come Rapido + DI2, DI5, DI6
-                       Frequenza: 0.5 tph (1 ogni 2 ore)
-     IL  = Local    : tutte le stazioni
-                       Frequenza: 0.5 tph (1 ogni 2 ore)
-
-     Stazioni saltate per variante:
-       Rapido salta: DI2 (Akachi), DI4 (Kusūārikko), DI5 (Hilannobi),
-                     DI6 (Mahara-Bunki), DI7 (Niji-Hidankoibo — NB: DI7
-                     è già nella lista, ma Rapido ferma DI3→DI8 diretto),
-                     DI10 (Rakeino), DI11 (Shinzhin)
-       Semi salta:   DI4 (Kusūārikko), DI10 (Rakeino), DI11 (Shinzhin)
-       Local:        ferma a tutte
-
-     DI13 Sasshi = transito su tutti i treni diretti (no dwell).
-     DI131 Punohai = solo treni via Punohai (0.5 tph, alternati ai diretti).
-
-     Tutti i timing sono calcolati con cinematica N700S (a = 0.72 m/s²,
-     dwell 60 s per fermata, 0 s transito).
-  ---- */
   I: {
     coeff:1.15, name:"Daid\u014dn Rapido", cls:"svc-I", color:"#1F6A39",
-    /* Fermate Rapido: tratta storica R + DI1,DI3,DI8,DI9,DI12,DI14 */
     stops:["R01","R02","R06","R13","R14","R15",
            "DI1","DI3","DI8","DI9","DI12","DI14"],
     conditionalStops:{
       R81:  {rule:"alternate", phase:0},
-      DI13: {rule:"direct"},   /* transito treni diretti */
-      DI131:{rule:"punohai"},  /* solo treni via Punohai */
+      DI13: {rule:"direct"},
+      DI131:{rule:"punohai"},
     }
   },
-
   IS: {
     coeff:1.12, name:"Daid\u014dn Semi", cls:"svc-IS", color:"#2E8B57",
-    /* Fermate Semi: Rapido + DI2 (Akachi), DI5 (Hilannobi), DI6 (Mahara-Bunki) */
     stops:["R01","R02","R06","R13","R14","R15",
            "DI1","DI2","DI3","DI5","DI6",
            "DI8","DI9","DI12","DI14"],
@@ -196,10 +168,8 @@ const RY_SVC = {
       DI131:{rule:"punohai"},
     }
   },
-
   IL: {
     coeff:1.08, name:"Daid\u014dn Local", cls:"svc-IL", color:"#52A870",
-    /* Fermate Local: tutte le stazioni DI */
     stops:["R01","R02","R06","R13","R14","R15",
            "DI1","DI2","DI3","DI4","DI5","DI6",
            "DI7","DI8","DI9","DI10","DI11","DI12","DI14"],
@@ -209,14 +179,13 @@ const RY_SVC = {
       DI131:{rule:"punohai"},
     }
   },
-
   H: {coeff:1.15, name:"Kinbuku", cls:"svc-H", color:"#50938A",
       stops:["R01","R02","R06","R10","R14","R15","R16","R17","R18","R19","R20","R21"]},
 };
 
-/* ---- SEIBU NAERYUKU BRANCH (SA / SK / BL) ---- */
+/* ---- SEIBU NAERYUKU BRANCH (SA / SK / BL) — legacy names retained ---- */
 const SA_ST = {
-  SA01:  {n:"Chunðouni-Naoza",  k:"\u9baa\u7a2e - \u6912\u6f5f", b:"sa"},
+  SA01:  {n:"Chun\u00f0ouni-Naoza",  k:"\u9baa\u7a2e - \u6912\u6f5f", b:"sa"},
   SA02:  {n:"Poridake",               k:"\u767b\u9928",                   b:"sa"},
   SA101: {n:"Hakosakki",              k:"\u5143\u7aef",                   b:"sa_j"},
   SA03:  {n:"Pakkutanma",             k:"\u8d64\u8c37",                   b:"sa_j"},
@@ -256,29 +225,7 @@ const DP_CANONICAL_ORDER = [
   "DN01","DN02","DN03","DN04","DN05"
 ];
 
-/* ---- DAIDŌN BRANCH (DI) — antenna da Shin-Makkenoke (R15, km 440.63)
-   Tratta storica velocizzata in attesa della nuova AV.
-   km = chilometrica progressiva dall'origine R01 (Saindaul Central).
-
-   Velocità massime per tratta (cinematic N700S, a=0.72 m/s²):
-     R15–DI1   120 km/h
-     DI1–DI2   160 km/h (10 km) poi 130
-     DI2–DI3   180 km/h (10 km) poi 160
-     DI3–DI4   180 km/h (15 km) poi 130
-     DI4–DI5   130 km/h media
-     DI5–DI6   200 km/h (25 km) poi 160
-     DI6–DI7   180 km/h (10 km) poi 130
-     DI7–DI8   150 km/h media
-     DI8–DI9   220 km/h (23.42 km piena distanza)
-     DI9–DI10  220 km/h (30 km) poi 160
-     DI10–DI12 160 km/h media
-     DI12–DI14 170 km/h diretto | 140 km/h via Punohai
-
-   Biforcazione a DI12 Sonzhin Juwon (km 748.470):
-     · Treni diretti:     DI12 → DI13 Sasshi (transito) → DI14 Tsusamo  km 815.480
-     · Treni via Punohai: DI12 → DI131 Punohai → DI14 Tsusamo           km 811.240
-       (i treni via Punohai transitano a DI13 senza fermata)
----- */
+/* ---- DAIDŌN BRANCH (DI) ---- */
 const DI_ST = {
   DI1:  {n:"Makkenoke",         k:"\u5e73\u5742",         b:"di", km:457.530},
   DI2:  {n:"Akachi",            k:"\u86de\u9045",         b:"di", km:487.930},
@@ -292,12 +239,9 @@ const DI_ST = {
   DI10: {n:"Rakeino",           k:"\u7c9f\u6191",         b:"di", km:696.270},
   DI11: {n:"Shinzhin",          k:"\u65b0\u81e3",         b:"di", km:741.280},
   DI12: {n:"Sonzhin Juwon",     k:"\u5c0a\u81e3\u4e2d\u592e", b:"di", km:748.470},
-  /* percorso diretto nord */
   DI13: {n:"Sasshi",            k:"\u9752\u5fd7",         b:"di",    km:760.010},
   DI14: {n:"Tsusamo",           k:"\u9ed2\u5c71",         b:"di",    km:815.480},
-  /* percorso via Punohai (deviazione da DI12) */
   DI131:{n:"Punohai",           k:"\u8c4a\u534a",         b:"di_ph", km:765.660},
-  /* DI14 condivisa: km via Punohai = 811.240, via diretta = 815.480 */
 };
 
 const DI_CANONICAL_ORDER = [
@@ -315,105 +259,65 @@ const RY_INT_ST = {
   SZ3:{n:"Eulerhafen C.",  k:"",                   b:"sz"},
 };
 
-/* ---- RY_TT — offset in secondi da R01 (include 60s dwell per fermata)
-
-   Servizio I — tre varianti (Rapido / Semi / Local)
-   Tutti i timing sono calcolati con cinematica N700S (a = 0.72 m/s²,
-   dwell 60 s per fermata, 0 s per transito).
-
-   I   (Rapido)  : DI1, DI3, DI8, DI9, DI12, DI14            → R15→DI14 ~152 min
-   IS  (Semi)    : DI1, DI2, DI3, DI5, DI6, DI8, DI9, DI12,
-                   DI14                                        → R15→DI14 ~158 min
-   IL  (Local)   : tutte le stazioni DI1–DI14                 → R15→DI14 ~164 min
-
-   DI13 Sasshi = transito (nessun dwell) su treni diretti.
-   DI131 Punohai = solo treni via Punohai (alternati ai diretti).
-   Timing via Punohai: DI131 +556 s da DI12; DI14 +1286 s da DI131.
----- */
 const RY_TT = {
   L:{R01:0,R02:366,R03:772,R04:1136,R05:1855,R06:2689,R61:3277,R07:3570,R08:3983,R81:4245,R09:5214,R10:6176,R11:6864,R12:7232,R13:8380},
   K:{R01:0,R02:366,R03:712,R06:1909,R08:2723,R10:3776,R13:4960,R14:5579,SA01:5800,SA02:6220,SK01:6520,SK02:6880,SK03:7240,SK04:7600,SK05:7960,BL01:8500,BL02:8980,BL03:9460,BL04:9940,BL05:10480},
   J:{R01:0,R02:366,R03:712,R06:1909,R08:2723,R10:3776,R13:4960,R14:5579,SA01:5800,SA02:6220,SA101:6460,SA03:6700,SA04:7000,SA05:7300,SA06:7600},
   G:{R01:0,R02:306,R06:1789,R08:2603,R81:2805,R10:3716,R13:4900,R14:5519,R15:5899,R16:6273,R17:6651,R18:7039,R19:7455,R20:7696,R21:8194,R22:8734,R23:9394,SZ1:10054,SZ2:10594,SZ3:11134},
-
-  /* ---- I (Rapido) — ferma: DI1, DI3, DI8, DI9, DI12, DI14 ----
-     Tratte pass-through (no sosta intermedia):
-       DI1→DI3 : salta DI2 (Akachi)
-       DI3→DI8 : salta DI4, DI5, DI6, DI7 (Kusūārikko, Hilannobi, Mahara-Bunki, Niji-Hidankoibo)
-       DI9→DI12: salta DI10, DI11 (Rakeino, Shinzhin)
-  ---- */
   I:{
     R01:0, R02:306, R06:1789, R13:4780, R14:5399, R15:5719,
-    DI1:  6332,  /* +613 s  da R15  (120 km/h, 16.9 km) */
-    DI3:  7862,  /* +1530 s da DI1  (pass DI2: 160/130→180/160, 58.8 km) */
-    DI8:  9627,  /* +1765 s da DI3  (pass DI4–DI7: 180/130→130→200/160→180/130→150) */
-    DI9: 10195,  /* +568 s  da DI8  (220 km/h, 23.42 km) */
-    DI12:11723,  /* +1528 s da DI9  (pass DI10–DI11: 220/160→160→160) */
-    DI13:12033,  /* +310 s  transito (170 km/h, 11.54 km, no dwell) */
-    DI14:13333,  /* +1300 s (170 km/h, 55.47 km) */
-    /* via Punohai */
-    DI131:12279, /* +556 s  da DI12 (140 km/h, 17.19 km) */
-    /* DI14 via Punohai = DI131 + 1286 s = 13565 (calcolato dinamicamente dal motore) */
+    DI1:  6332,
+    DI3:  7862,
+    DI8:  9627,
+    DI9: 10195,
+    DI12:11723,
+    DI13:12033,
+    DI14:13333,
+    DI131:12279,
   },
-
-  /* ---- IS (Semi) — ferma: DI1, DI2, DI3, DI5, DI6, DI8, DI9, DI12, DI14 ----
-     Tratte pass-through:
-       DI3→DI5 : salta DI4 (Kusūārikko)
-       DI6→DI8 : salta DI7 (Niji-Hidankoibo)
-       DI9→DI12: salta DI10, DI11 (Rakeino, Shinzhin)
-  ---- */
   IS:{
     R01:0, R02:306, R06:1789, R13:4780, R14:5399, R15:5719,
-    DI1:  6332,  /* +613 s  da R15  (120 km/h) */
-    DI2:  7239,  /* +907 s  da DI1  (160/130, 30.4 km) */
-    DI3:  7979,  /* +740 s  da DI2  (180/160, 28.4 km) */
-    DI5:  8895,  /* +916 s  da DI3  (pass DI4: 180/130→130, 32.82 km) */
-    DI6:  9628,  /* +733 s  da DI5  (200/160, 31.75 km) */
-    DI8: 10350,  /* +722 s  da DI6  (pass DI7: 180/130→150, 30.13 km) */
-    DI9: 10878,  /* +528 s  da DI8  (220 km/h, 23.42 km) */
-    DI12:12406,  /* +1528 s da DI9  (pass DI10–DI11) */
-    DI13:12716,  /* +310 s  transito */
-    DI14:14016,  /* +1300 s (170 km/h) */
-    DI131:12962, /* +556 s  da DI12 (140 km/h) */
+    DI1:  6332,
+    DI2:  7239,
+    DI3:  7979,
+    DI5:  8895,
+    DI6:  9628,
+    DI8: 10350,
+    DI9: 10878,
+    DI12:12406,
+    DI13:12716,
+    DI14:14016,
+    DI131:12962,
   },
-
-  /* ---- IL (Local) — ferma a tutte le stazioni DI ---- */
   IL:{
     R01:0, R02:306, R06:1789, R13:4780, R14:5399, R15:5719,
-    DI1:  6332,  /* +613 s  (120 km/h, 16.9 km) */
-    DI2:  7239,  /* +907 s  (160/130, 30.4 km) */
-    DI3:  7979,  /* +740 s  (180/160, 28.4 km) */
-    DI4:  8597,  /* +618 s  (180/130, 22.05 km) */
-    DI5:  9005,  /* +408 s  (130, 10.77 km) */
-    DI6:  9738,  /* +733 s  (200/160, 31.75 km) */
-    DI7: 10099,  /* +361 s  (180/130, 11.38 km) */
-    DI8: 10667,  /* +568 s  (150, 18.75 km) */
-    DI9: 11195,  /* +528 s  (220, 23.42 km) */
-    DI10:12538,  /* +1343 s (220/160, 61.82 km) */
-    DI11:13672,  /* +1134 s (160, 45.01 km) */
-    DI12:13956,  /* +284 s  (160, 7.19 km) */
-    DI13:14266,  /* +310 s  transito */
-    DI14:15566,  /* +1300 s (170 km/h) */
-    DI131:14512, /* +556 s  da DI12 (140 km/h) */
+    DI1:  6332,
+    DI2:  7239,
+    DI3:  7979,
+    DI4:  8597,
+    DI5:  9005,
+    DI6:  9738,
+    DI7: 10099,
+    DI8: 10667,
+    DI9: 11195,
+    DI10:12538,
+    DI11:13672,
+    DI12:13956,
+    DI13:14266,
+    DI14:15566,
+    DI131:14512,
   },
-
   H:{R01:0,R02:306,R06:1789,R10:3596,R14:5339,R15:5719,R16:6093,R17:6471,R18:6859,R19:7275,R20:7516,R21:8014},
 };
 
-/* ---- RY_FREQ — treni/ora per direzione ----
-   I   = 1 tph  (Rapido, orario fisso)
-   IS  = 0.5 tph (Semi, ogni 2 ore — sfasato di 30 min da I)
-   IL  = 0.5 tph (Local, ogni 2 ore — sfasato di 60 min da I)
-   → nelle ore di punta IS e IL salgono a 1 tph ciascuno
----- */
 const RY_FREQ = {
   L: {offpeak:1,  peak:2},
   K: {offpeak:2,  peak:2},
   J: {offpeak:2,  peak:2},
   G: {offpeak:1,  peak:1},
-  I: {offpeak:1,  peak:1},   /* Rapido  — 1 tph */
-  IS:{offpeak:0.5,peak:1},   /* Semi    — 1 ogni 2 ore (peak: 1 tph) */
-  IL:{offpeak:0.5,peak:1},   /* Local   — 1 ogni 2 ore (peak: 1 tph) */
+  I: {offpeak:1,  peak:1},
+  IS:{offpeak:0.5,peak:1},
+  IL:{offpeak:0.5,peak:1},
   H: {offpeak:1,  peak:1},
 };
 const RY_PEAK_WINDOWS = [
@@ -457,60 +361,32 @@ const EI_SVC = {
        stops:["E01","E04","E05","E08","E12"]},
 };
 
-/* ================================================================
-   EI_TT — offset in secondi da E01 per ogni servizio
-   Cinematica: a = 0.60 m/s², dwell 60 s per fermata, E11 saltata (km null)
-   Velocità di riferimento:
-     M (Express) : 160 km/h max sulle tratte > 60 km, 130 km/h sulle brevi
-     N (Nazionale): 120 km/h max, 100 km/h media effettiva
-================================================================ */
 const EI_TT = {
-
-  /* ---- M — Express: E01, E04, E05, E08, E12 ----
-     E01→E04 :  98.41 km a ~130 km/h eff. → ~2720 s + 60 s dwell
-     E04→E05 :  28.37 km a ~110 km/h eff. → ~928 s  + 60 s dwell
-     E05→E08 : 124.08 km a ~150 km/h eff. → ~2978 s + 60 s dwell
-     E08→E12 : 124.63 km a ~155 km/h eff. → ~2895 s
-  ---- */
   M: {
     E01:    0,
-    E04: 2780,   /* +2780 s  (~46 min, 98.41 km a ~127 km/h)  */
-    E05: 3768,   /* +988 s   (~16 min, 28.37 km a ~103 km/h)  */
-    E08: 6806,   /* +3038 s  (~51 min, 124.08 km a ~147 km/h) */
-    E12: 9761,   /* +2955 s  (~49 min, 124.63 km a ~152 km/h) */
+    E04: 2780,
+    E05: 3768,
+    E08: 6806,
+    E12: 9761,
   },
-
-  /* ---- N — Nazionale: tutte le stazioni eccetto E11 (km null) ----
-     E01→E02 :  19.16 km a  ~92 km/h eff. → ~749 s  + 60 s dwell
-     E02→E03 :  46.27 km a ~100 km/h eff. → ~1666 s + 60 s dwell
-     E03→E04 :  32.98 km a ~107 km/h eff. → ~1108 s + 60 s dwell
-     E04→E05 :  28.37 km a ~104 km/h eff. → ~981 s  + 60 s dwell
-     E05→E06 :  31.98 km a ~100 km/h eff. → ~1151 s + 60 s dwell
-     E06→E07 :  31.24 km a  ~97 km/h eff. → ~1158 s + 60 s dwell
-     E07→E08 :  60.86 km a ~110 km/h eff. → ~1993 s + 60 s dwell
-     E08→E09 :  28.91 km a  ~97 km/h eff. → ~1072 s + 60 s dwell
-     E09→E10 :  28.29 km a  ~99 km/h eff. → ~1029 s + 60 s dwell
-     E10→E12 :  67.43 km a ~110 km/h eff. → ~2207 s (E11 saltata, no dwell)
-  ---- */
   N: {
     E01:     0,
-    E02:   749,   /* +749 s   (~12 min)  */
-    E03:  2475,   /* +1726 s  (~29 min)  */
-    E04:  3643,   /* +1168 s  (~19 min)  */
-    E05:  4684,   /* +1041 s  (~17 min)  */
-    E06:  5895,   /* +1211 s  (~20 min)  */
-    E07:  7113,   /* +1218 s  (~20 min)  */
-    E08:  9166,   /* +2053 s  (~34 min)  */
-    E09: 10298,   /* +1132 s  (~19 min)  */
-    E10: 11387,   /* +1089 s  (~18 min)  */
-    /* E11 saltata — km null */
-    E12: 13654,   /* +2267 s  (~38 min, 67.43 km) */
+    E02:   749,
+    E03:  2475,
+    E04:  3643,
+    E05:  4684,
+    E06:  5895,
+    E07:  7113,
+    E08:  9166,
+    E09: 10298,
+    E10: 11387,
+    E12: 13654,
   },
 };
 
 const EI_FREQ = {
-  M: {offpeak: 2, peak: 3},   /* 1 ogni 30 min, peak ogni 20 min */
-  N: {offpeak: 2, peak: 3},   /* alternati con M: copertura ogni ~15 min in peak */
+  M: {offpeak: 2, peak: 3},
+  N: {offpeak: 2, peak: 3},
 };
 
 const EI_PEAK_WINDOWS = [
@@ -519,7 +395,7 @@ const EI_PEAK_WINDOWS = [
 ];
 
 /* ================================================================
-   KE_TT — offset in secondi dall'origine per ogni servizio
+   KE_TT
 ================================================================ */
 const KE_TT = {
   A:  {K01:0,K02:360,K03:960,K08:3540,K10:4680,K12:4800,K17:8340,N1:9120,N2:9600,N3:10200,N4:10800},
@@ -546,31 +422,98 @@ const KE_PEAK_WINDOWS = [
 ];
 
 /* ================================================================
-   TRAIN NUMBER CONFIGURATION
+   SEIBU NAERYUKU LINE (SN)
+   Branch da Riyatoma (R13) verso Yamagata — futura prosecuzione a Sanain
+   Servizi: K (via sub-branch SK) e G (schema alternato rapido/locale)
+   Cinematica: N700S a=0.72 m/s², dwell 60s, vmax 160 km/h
    ----------------------------------------------------------------
-   Schema: [linePrefix][svcPrefix][seq]
-     - linePrefix : 3 cifre (es. 100 = KE, 200 = RY/DI)
-     - svcPrefix  : 2 cifre (es. 00 = A, 10 = B, …)
-     - seq        : generato dinamicamente dal motore (progressivo
-                    di partenza, basato sull'ordine temporale)
+   Distanze e tempi cinematici:
+     SN01→SN02  34870 m  →  846s + 60s dwell = 906s  (15 min)
+     SN02→SN03  35720 m  →  865s + 60s dwell = 1831s (30 min)
+     SN03→SN04  26250 m  →  652s + 60s dwell = 2543s (42 min)
+     SN04→SN05  42800 m  → 1025s + 60s dwell = 3628s (60 min)
+     SN05→SN06  30900 m  →  757s + 60s dwell = 4445s (74 min)
+     SN06→SN07  24760 m  →  619s + 60s dwell = 5124s (85 min)
+     SN07→SN08  22940 m  →  578s             = 5762s (96 min)
+================================================================ */
+const SN_ST = {
+  SN01: {n:"Riyatoma",                    k:"\u8ffd\u5ea5",                       b:"main", km:0},
+  SN02: {n:"Sayaize",                     k:"\u991d\u62ed",                       b:"main", km:34.870},
+  SN03: {n:"Ha\u00f0ohano-Chun\u00f0ouuni", k:"\u9baa\u7a2e\u30fb\u6912\u6f5f", b:"main", km:70.590},
+  SN04: {n:"Mirayama-Hattsuma",           k:"\u6c34\u826f\u5009\u767a\u7dad",     b:"main", km:96.840},
+  SN05: {n:"Poridake",                    k:"\u767b\u9928",                       b:"main", km:139.640},
+  SN06: {n:"Hakosakki",                   k:"\u5143\u7aef",                       b:"main", km:170.540},
+  SN07: {n:"Pakkutanma",                  k:"\u8d64\u8c37",                       b:"main", km:195.300},
+  SN08: {n:"Yamagata",                    k:"\u5009\u6cc9",                       b:"main", km:218.240},
+};
 
-   Pari/dispari:
-     SB (Outbound) → numeri PARI
-     NB (Inbound)  → numeri DISPARI
+const SN_CANONICAL_ORDER = [
+  "SN01","SN02","SN03","SN04","SN05","SN06","SN07","SN08"
+];
 
-   Struttura del numero finale (5 cifre):
-     [linePrefix 1 cifra][svcPrefix 2 cifre][seq 2 cifre]
-     Es: KE-A-SB-terzo treno → 1 00 06 → 10006
+/* ----------------------------------------------------------------
+   SN_TT — offset in secondi da SN01 (Riyatoma)
 
-   Prefissi per linea:
-     KE  → 1xxxx
-     RY  → 2xxxx   (include servizi Daidōn I/IS/IL)
-     DI* → 3xxxx   (* i servizi DI sono già in RY ma con prefisso separato
-                     per distinguere i treni che entrano nella tratta DI)
+   Servizio K: ferma SN01 + SN05(Poridake), poi esce su sub-branch SK
+   Servizio G — schema alternato (phase):
+     G_rapid (phase 0, 1 tph): SN01, SN05, SN08
+     G_local (phase 1, 1 tph): tutte le stazioni
+   → 2 tph a SN05 e SN08, 1 tph nelle stazioni minori
+---------------------------------------------------------------- */
+const SN_TT = {
+  K: {
+    SN01:    0,
+    SN05: 3628,
+    /* prosegue su SK dopo SN05 */
+  },
+  G_rapid: {
+    SN01:    0,
+    SN05: 3628,
+    SN08: 5762,
+  },
+  G_local: {
+    SN01:    0,
+    SN02:  906,
+    SN03: 1831,
+    SN04: 2543,
+    SN05: 3628,
+    SN06: 4445,
+    SN07: 5124,
+    SN08: 5762,
+  },
+};
 
-   Prefissi per servizio (2 cifre, moltiplicato × 100):
-     KE: A=00, B=10, C=20, Cp=25, D=30, E=35, F=40
-     RY: L=00, K=10, J=15, G=20, H=25, I=30, IS=35, IL=40
+const SN_SVC = {
+  K: {
+    coeff: 1.08, name: "North West (SN)", cls: "svc-K", color: "#EA7501",
+    stops: ["SN01","SN05"],
+    note: "Prosegue su sub-branch SK dopo Poridake",
+  },
+  G_rapid: {
+    coeff: 1.10, name: "Daihuku Rapido",  cls: "svc-G",       color: "#148466",
+    stops: ["SN01","SN05","SN08"],
+    phase: 0,
+  },
+  G_local: {
+    coeff: 0.92, name: "Daihuku Local",   cls: "svc-G-local", color: "#1aa87e",
+    stops: ["SN01","SN02","SN03","SN04","SN05","SN06","SN07","SN08"],
+    phase: 1,
+  },
+};
+
+const SN_FREQ = {
+  K:       {offpeak: 2, peak: 2},
+  G_rapid: {offpeak: 1, peak: 1},
+  G_local: {offpeak: 1, peak: 1},
+};
+
+const SN_PEAK_WINDOWS = [
+  {start:"07:30", end:"09:00"},
+  {start:"17:00", end:"19:30"},
+];
+
+/* ================================================================
+   TRAIN NUMBER CONFIGURATION
 ================================================================ */
 const TRAIN_NUM_CONFIG = {
   KE: {
@@ -581,9 +524,13 @@ const TRAIN_NUM_CONFIG = {
     lineDigit: 2,
     svcBase: { L:0, K:10, J:15, G:20, H:25, I:30, IS:35, IL:40 },
   },
-   EI: {
+  EI: {
     lineDigit: 3,
     svcBase: { N: 0, M: 10 },
+  },
+  SN: {
+    lineDigit: 4,
+    svcBase: { K:10, G_rapid:20, G_local:25 },
   },
 };
 
@@ -594,7 +541,7 @@ const IZX_LINES = {
   KE: {
     id:"KE", label:"IZX Keishin", shortLabel:"Keishin",
     color:"#002A91", textColor:"#ffffff",
-    inboundDir:"NB", inboundLabel:"↑ Inbound — Sainðaul", outboundLabel:"↓ Outbound — Daishin",
+    inboundDir:"NB", inboundLabel:"\u2191 Inbound \u2014 Sain\u00f0aul", outboundLabel:"\u2193 Outbound \u2014 Daishin",
     ST:KE_ST, CANONICAL:KE_CANONICAL_ORDER, SVC:KE_SVC,
     TT:KE_TT, FREQ:KE_FREQ, PEAK:KE_PEAK_WINDOWS,
     TERMINUS_SPLIT:{
@@ -604,35 +551,7 @@ const IZX_LINES = {
       E:[{terminus:"N4",weight:1}],
       F:[{terminus:"N4",weight:1}],
     },
-    /* ----------------------------------------------------------------
-       OFFSETS (minuti dall'orario base 06:00)
-       Calibrati per evitare partenze allo stesso minuto con la linea
-       Ryānkai in uscita da K01 Sainðaul Central.
-       A=0 (treno inaugurale fisso), gli altri sfasati di conseguenza.
-    ---------------------------------------------------------------- */
-        OFFSETS:{A:0, B:14, C:32, Cp:7, D:17, E:47, F:35},
-    /* ----------------------------------------------------------------
-       SHORT_WORKING — treni serali con terminus abbreviato
-       Regola: cutoff = 24:30 − durata(origine→terminus SW)
-       Nessun treno deve arrivare a destino oltre le 24:30 (finestra
-       di manutenzione notturna). L'ultimo treno regolare parte alle
-       23:30 dal capolinea; i treni SW partono più tardi ma terminano
-       in una stazione più prossima.
-         SB — dal capolinea-origine verso il terminus abbreviato:
-           A  K01→K17  139 min  cutoff SB 22:11
-           B  K01→K17  174 min  cutoff SB 21:36
-           C  K01→K17  160 min  cutoff SB 21:50
-           D  K101→K104  20 min  cutoff SB 24:10  (servizio pendolari)
-           E  K101→K104  19 min  cutoff SB 24:10
-           F  K101→K10   77 min  cutoff SB 23:12
-         NB — dal terminus abbreviato verso il capolinea-destinazione:
-           A  K17→K01  139 min  cutoff NB 22:11
-           B  K08→K01   70 min  cutoff NB 23:20
-           C  K09→K01   68 min  cutoff NB 23:22
-           D  K10→K101  61 min  cutoff NB 23:29
-           E  K10→K101  61 min  cutoff NB 23:29
-           F  K10→K101  77 min  cutoff NB 23:12
-    ---------------------------------------------------------------- */
+    OFFSETS:{A:0, B:14, C:32, Cp:7, D:17, E:47, F:35},
     SHORT_WORKING:[
       {svcId:"A", dir:"SB", cutoff:"22:11", terminus:"K17"},
       {svcId:"A", dir:"NB", cutoff:"22:11", terminus:"K17"},
@@ -652,7 +571,7 @@ const IZX_LINES = {
   RY: {
     id:"RY", label:"IZX Ry\u0101nkai", shortLabel:"Ry\u0101nkai",
     color:"#148466", textColor:"#ffffff",
-    inboundDir:"NB", inboundLabel:"↑ Inbound — Sainðaul", outboundLabel:"↓ Outbound — Tsusamo",
+    inboundDir:"NB", inboundLabel:"\u2191 Inbound \u2014 Sain\u00f0aul", outboundLabel:"\u2193 Outbound \u2014 Tsusamo",
     ST:Object.assign({},RY_ST,DI_ST),
     CANONICAL:RY_CANONICAL_ORDER.concat(DI_CANONICAL_ORDER),
     SVC:RY_SVC, TT:RY_TT, FREQ:RY_FREQ, PEAK:RY_PEAK_WINDOWS,
@@ -666,35 +585,7 @@ const IZX_LINES = {
       H:[{terminus:"R21", weight:1}],
       L:[{terminus:"R21", weight:1}],
     },
-    /* ----------------------------------------------------------------
-       OFFSETS (minuti dall'orario base 06:00)
-       Calibrati per evitare sovrapposizioni con Keishin e tra servizi
-       della stessa linea in uscita da R01 Sainðaul Central.
-       Regola narrativa: I (Rapido Daidōn) precede L (locale) di ~16 min.
-    ---------------------------------------------------------------- */
-        OFFSETS:{L:22, K:10, J:38, G:19, I:6, IS:29, IL:54, H:56},
-    /* ----------------------------------------------------------------
-       SHORT_WORKING — treni serali con terminus abbreviato
-       Regola: cutoff = 24:30 − durata(origine→terminus SW)
-         SB — dal capolinea-origine verso il terminus abbreviato:
-           L  R01→R13   140 min  cutoff SB 22:10
-           K  R01→R13    83 min  cutoff SB 23:07
-           J  R01→R13    83 min  cutoff SB 23:07
-           G  R01→R15    98 min  cutoff SB 22:51
-           H  R01→R15    95 min  cutoff SB 22:54
-           I  R01→R15    95 min  cutoff SB 22:54
-           IS R01→R15    95 min  cutoff SB 22:54
-           IL R01→R15    95 min  cutoff SB 22:54
-         NB — dal terminus abbreviato verso il capolinea-destinazione:
-           L  R06→R01    45 min  cutoff NB 23:45
-           K  R06→R01    32 min  cutoff NB 23:58
-           J  R06→R01    32 min  cutoff NB 23:58
-           G  R13→R01    82 min  cutoff NB 23:08
-           H  R10→R01    60 min  cutoff NB 23:30
-           I  R15→R01    95 min  cutoff NB 22:54
-           IS R15→R01    95 min  cutoff NB 22:54
-           IL R15→R01    95 min  cutoff NB 22:54
-    ---------------------------------------------------------------- */
+    OFFSETS:{L:22, K:10, J:38, G:19, I:6, IS:29, IL:54, H:56},
     SHORT_WORKING:[
       {svcId:"L",  dir:"SB", cutoff:"22:10", terminus:"R13"},
       {svcId:"L",  dir:"NB", cutoff:"23:45", terminus:"R06"},
@@ -714,13 +605,13 @@ const IZX_LINES = {
       {svcId:"IL", dir:"NB", cutoff:"22:54", terminus:"R15"},
     ],
   },
-   
-    EI: {
+
+  EI: {
     id: "EI", label: "IZX Eira", shortLabel: "Eira",
     color: "#228B22", textColor: "#ffffff",
     inboundDir: "NB",
-    inboundLabel:  "↑ Inbound — Sainðaul",
-    outboundLabel: "↓ Outbound — Nagareki",
+    inboundLabel:  "\u2191 Inbound \u2014 Sain\u00f0aul",
+    outboundLabel: "\u2193 Outbound \u2014 Nagareki",
     ST: EI_ST,
     CANONICAL: EI_CANONICAL_ORDER,
     SVC: EI_SVC,
@@ -731,21 +622,39 @@ const IZX_LINES = {
       M: [{terminus: "E12", weight: 1}],
       N: [{terminus: "E12", weight: 1}],
     },
-    /* ----------------------------------------------------------------
-       OFFSETS (minuti dall'orario base 06:00)
-       M=0 primo express del mattino, N sfasato di 15 min per garantire
-       copertura alternata ogni ~15 min nelle ore di punta.
-    ---------------------------------------------------------------- */
-        OFFSETS:{M:5, N:20},
-    /* ----------------------------------------------------------------
-       SHORT_WORKING — treni serali con terminus abbreviato
-       Regola: cutoff = 24:30 − durata(origine→terminus SW)
-         M  E01→E08 113 min  cutoff 22:36
-         N  E01→E08 153 min  cutoff 21:57
-    ---------------------------------------------------------------- */
+    OFFSETS:{M:5, N:20},
     SHORT_WORKING:[
       {svcId:"M", dir:"SB", cutoff:"22:36", terminus:"E08"},
       {svcId:"N", dir:"SB", cutoff:"21:57", terminus:"E08"},
+    ],
+  },
+
+  SN: {
+    id: "SN", label: "IZX Seibu Naeryuku", shortLabel: "Seibu Naeryuku",
+    color: "#7B3F9E", textColor: "#ffffff",
+    inboundDir: "NB",
+    inboundLabel:  "\u2191 Inbound \u2014 Riyatoma",
+    outboundLabel: "\u2193 Outbound \u2014 Yamagata",
+    ST: SN_ST,
+    CANONICAL: SN_CANONICAL_ORDER,
+    SVC: SN_SVC,
+    TT:  SN_TT,
+    FREQ: SN_FREQ,
+    PEAK: SN_PEAK_WINDOWS,
+    /* SN01 (Riyatoma) = interscambio con RY R13 */
+    INTERCHANGE: {SN01: "R13"},
+    TERMINUS_SPLIT: {
+      K:       [{terminus: "SN05", weight: 1}],
+      G_rapid: [{terminus: "SN08", weight: 1}],
+      G_local: [{terminus: "SN08", weight: 1}],
+    },
+    /* offset calcolati a partire da R13 Riyatoma — sfasati rispetto a G su RY */
+    OFFSETS: {K: 5, G_rapid: 10, G_local: 40},
+    SHORT_WORKING:[
+      {svcId:"G_rapid", dir:"SB", cutoff:"23:05", terminus:"SN08"},
+      {svcId:"G_local", dir:"SB", cutoff:"22:35", terminus:"SN08"},
+      {svcId:"G_rapid", dir:"NB", cutoff:"23:05", terminus:"SN08"},
+      {svcId:"G_local", dir:"NB", cutoff:"22:35", terminus:"SN08"},
     ],
   },
 };
