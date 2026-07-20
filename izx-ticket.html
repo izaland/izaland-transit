@@ -955,7 +955,10 @@
             <div class="leg-svc">${badge} <span class="svc-name">${leg.svcName}</span></div>
             <div class="leg-times">${leg.boardDep} \u2192 ${leg.alightArr}</div>
             <div class="leg-stations">${leg.boardName} \u2192 ${leg.alightName}</div>
-            <div class="leg-train">#${leg.trainNumber ?? '--'}</div>
+                        <div class="leg-meta">
+              <span class="leg-train">#${leg.trainNumber ?? '--'}</span>
+              ${leg.km != null ? `<span class="leg-km">${Math.round(leg.km)} km</span>` : ''}
+            </div>
           </div>`;
         if (li < j.legs.length - 1) {
           const waitMin = j.transferWaitMin ?? IZXRouter.TRANSFER_MIN;
@@ -971,7 +974,7 @@
       card.innerHTML = `
         <div class="journey-header">
           <div class="journey-times">${j.departureTime} \u2192 ${j.arrivalTime}</div>
-          <div class="journey-dur">${j.totalMinutes} min ${transferBadge}</div>
+          <div class="journey-dur">${j.totalMinutes} min ${transferBadge}${j.totalKm != null ? ` <span class="journey-km">· ${Math.round(j.totalKm)} km</span>` : ''}</div>
         </div>` + legsHTML;
 
       listEl.appendChild(card);
