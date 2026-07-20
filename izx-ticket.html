@@ -114,6 +114,11 @@
     .svc-MS{background:#00BFFF;color:#000;}
     /* ── Seibu Naeryuku ── */
     .svc-SN{background:#7B3F9E;color:#fff;}
+    /* ── Airport Express ── */
+    .svc-AX-est{background:#CC99FF;color:#1a0033;}
+    .svc-AX-baj{background:#CC99FF;color:#1a0033;}
+    .svc-AX-sak{background:#CC99FF;color:#1a0033;}
+    .svc-AX{background:#CC99FF;color:#1a0033;}
     /* ── combo badge (two pills side by side) ── */
     .combo-badges{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
     .combo-sep{font-size:.65rem;color:var(--text-faint);}
@@ -384,6 +389,11 @@
             <option value="MI">MI — Minarajaki Intercity</option>
             <option value="MS">MS — Minarajaki Super</option>
           </optgroup>
+          <optgroup label="Airport Express">
+            <option value="EST">EST — AX Ramo Est</option>
+            <option value="BAJ">BAJ — AX Bajikoe</option>
+            <option value="SAK">SAK — AX Sakamuso</option>
+          </optgroup>
         </select>
       </div>
     </div>
@@ -450,6 +460,7 @@
           <option value="RY">Ryānkai</option>
           <option value="EI">Eira</option>
           <option value="SN">Seibu Naeryuku</option>
+          <option value="AX">Airport Express</option>
         </select>
       </div>
     </div>
@@ -485,6 +496,7 @@
 </footer>
 
 <script src="izx-data.js"></script>
+<script src="ax-data.js"></script>
 <script src="tt-engine.js"></script>
 <script src="routing.js"></script>
 <script>
@@ -540,12 +552,13 @@
     return HUB_K;
   }
 
-  const ALL_ST  = Object.assign({}, KE_ST, RY_ST, EI_ST);
-  const ALL_SVC = Object.assign({}, KE_SVC, RY_SVC, EI_SVC);
+  const ALL_ST  = Object.assign({}, KE_ST, RY_ST, EI_ST, AX_ST);
+  const ALL_SVC = Object.assign({}, KE_SVC, RY_SVC, EI_SVC, AX_SVC);
   const KE_MAIN_SVCS = new Set(['A','B','C','Cp']);
   const KE_SAKA_SVCS = new Set(['D','E','F']);
   const RY_SVCS      = new Set(['L','K','J','G','I','H']);
   const EI_SVCS      = new Set(['N','M','MF','MI','MS']);
+  const AX_SVCS      = new Set(['EST','BAJ','SAK']);
   const KE_SVCS      = new Set([...KE_MAIN_SVCS, ...KE_SAKA_SVCS]);
 
   const KE_SELECT_ORDER = [
@@ -562,6 +575,11 @@
   const EI_SELECT_ORDER = [
     "E02","E03","E04","E05","E06","E07","E08","E09","E10","E12",
   ];
+  const AX_SELECT_ORDER = [
+    "AX00","AX01","AX02","AX03","AX04","AX05","AX07","AX06","AX08","AX09",
+    "AX20","AX21","AX22","AX23",
+    "AX30","AX31","AX32","AX33","AX34",
+  ];
   const KE_BL = {main:"Main Line",saka:"Sakamuso Branch",cprime:"C\u2032 Bypass",nankai:"Nankai ext."};
 
   function progKm(d){
@@ -574,6 +592,7 @@
   function calcPrice(km,sc,cc){ return Math.round((FIXED_FEE+progKm(km))*sc*cc*100)/100; }
   function lineOf(code){
     if(code === HUB_VAL) return 'KE';
+    if(AX_ST[code])  return 'AX';
     if(RY_ST[code])  return 'RY';
     if(EI_ST[code])  return 'EI';
     return 'KE';
@@ -584,6 +603,7 @@
   }
   function stKm(code, svcKey){
     const c = resolveHub(code, svcKey);
+    if(AX_SVCS.has(svcKey)) return AX_ST[c] ? AX_ST[c].km : null;
     if(RY_SVCS.has(svcKey)) return RY_ST[c] ? RY_ST[c].km : null;
     if(EI_SVCS.has(svcKey)) return EI_ST[c] ? EI_ST[c].km : null;
     let kc = c;
@@ -599,7 +619,8 @@
   }
   function serves(svcKey, from, to){
     const f0 = resolveHub(from, svcKey), t0 = resolveHub(to, svcKey);
-    const stops = ALL_SVC[svcKey].stops;
+    const info = ALL_SVC[svcKey]; if(!info) return false;
+    const stops = info.stops;
     const f = (f0 === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : f0;
     const t = (t0 === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : t0;
     const fi = stops.indexOf(f), ti = stops.indexOf(t);
@@ -632,6 +653,19 @@
     eiOgs.forEach(og => og.label='Eira \u2014 Main Line');
     sf.appendChild(eiOgs[0]); st2.appendChild(eiOgs[1]);
     EI_SELECT_ORDER.forEach(code => { const s=EI_ST[code]; if(!s) return; addOpt(eiOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:'')); });
+    /* Airport Express */
+    const axBranches = {common:'Common',est:'Est Branch',baj:'Bajikoe Branch',sak:'Sakamuso Branch'};
+    let lastAxB = null, axOgs = [null,null];
+    AX_SELECT_ORDER.forEach(code => {
+      const s = AX_ST[code]; if(!s) return;
+      const bl = axBranches[s.b] || s.b;
+      if(s.b !== lastAxB){
+        axOgs = [document.createElement('optgroup'),document.createElement('optgroup')];
+        axOgs.forEach(og => { og.label='Airport Express \u2014 '+bl; });
+        sf.appendChild(axOgs[0]); st2.appendChild(axOgs[1]); lastAxB=s.b;
+      }
+      addOpt(axOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:''));
+    });
     sf.value = HUB_VAL; st2.value = 'K17';
   }
 
@@ -648,6 +682,7 @@
     const line = lineOf(code);
     if(line==='RY') return RY_CANONICAL_ORDER;
     if(line==='EI') return EI_CANONICAL_ORDER;
+    if(line==='AX') return AX_CANONICAL_ORDER.EST;
     return KE_CANONICAL_ORDER;
   }
   function serviceRange(svcKey, from, to){
@@ -768,7 +803,7 @@
       else if(fromLine==='KE'&&toLine==='EI'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(KE_SVC);svcs2=Object.keys(EI_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (K01/E01). Combined fare applied.';}
       else if(fromLine==='EI'&&toLine==='RY'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(EI_SVC);svcs2=Object.keys(RY_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (E01/R01). Combined fare applied.';}
       else if(fromLine==='RY'&&toLine==='EI'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(RY_SVC);svcs2=Object.keys(EI_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (R01/E01). Combined fare applied.';}
-      svcs1.forEach(s1=>{ svcs2.forEach(s2=>{
+      if(svcs1&&svcs2) svcs1.forEach(s1=>{ svcs2.forEach(s2=>{
         const t1=calcSegment(from,hub1,s1,'standard'), t2=calcSegment(hub2,to,s2,'standard');
         if(!t1||!t2) return;
         const totalKm=t1.km+t2.km, discount=getDiscount(totalKm), comboLabel=s1+'+'+s2;
@@ -856,7 +891,7 @@
       if(!byLine[st.lineId]) byLine[st.lineId] = [];
       byLine[st.lineId].push(st);
     });
-    const lineLabels = {KE:'Keishin', RY:'Ry\u0101nkai', EI:'Eira', SN:'Seibu Naeryuku'};
+    const lineLabels = {KE:'Keishin', RY:'Ry\u0101nkai', EI:'Eira', SN:'Seibu Naeryuku', AX:'Airport Express'};
     Object.entries(byLine).forEach(([lineId, stations]) => {
       const ogF = document.createElement('optgroup');
       const ogT = document.createElement('optgroup');
