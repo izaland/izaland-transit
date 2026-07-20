@@ -170,18 +170,21 @@
     .journey-times{font-family:var(--font-display);font-size:var(--text-base);font-weight:800;letter-spacing:-.01em;}
     .journey-dur{font-size:var(--text-xs);color:var(--text-muted);}
     .journey-dur .transfer-badge{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:1px 8px;font-size:.68rem;margin-left:6px;color:var(--text-muted);}
+    .journey-km{font-size:.68rem;color:var(--text-faint);font-variant-numeric:tabular-nums;}
     .journey-legs{display:flex;flex-direction:column;gap:2px;}
-    .leg-row{display:flex;align-items:center;gap:var(--space-3);font-size:var(--text-xs);padding:5px 0;}
+    .leg-row{display:flex;align-items:center;gap:var(--space-3);font-size:var(--text-xs);padding:5px 0;flex-wrap:wrap;}
     .leg-svc{display:flex;align-items:center;gap:5px;min-width:120px;}
     .leg-times{font-variant-numeric:tabular-nums;color:var(--text-muted);min-width:110px;}
     .leg-stations{flex:1;color:var(--text);}
+    .leg-meta{display:flex;align-items:center;gap:var(--space-3);}
     .leg-train{color:var(--text-faint);font-size:.65rem;font-family:monospace;}
-    .leg-intermediates{display:none;flex-direction:column;gap:1px;padding:4px 0 2px calc(120px + var(--space-3));border-left:2px solid var(--border);margin-left:4px;}
-.leg-intermediates.open{display:flex;}
-.leg-int-row{font-size:.65rem;color:var(--text-faint);font-variant-numeric:tabular-nums;display:flex;gap:var(--space-3);}
-.leg-int-time{min-width:80px;}
-.leg-expand-btn{background:none;border:none;color:var(--text-faint);font-size:.65rem;cursor:pointer;padding:0 2px;font-family:var(--font-body);text-decoration:underline dotted;}
-.leg-expand-btn:hover{color:var(--text-muted);}
+    .leg-km{color:var(--text-faint);font-size:.65rem;font-variant-numeric:tabular-nums;}
+    .leg-expand-btn{background:none;border:none;color:var(--accent);font-size:.65rem;cursor:pointer;padding:0 2px;font-family:var(--font-body);text-decoration:underline dotted;white-space:nowrap;}
+    .leg-expand-btn:hover{color:var(--text-muted);}
+    .leg-intermediates{display:none;flex-direction:column;gap:1px;padding:3px 0 3px calc(120px + var(--space-3) + var(--space-3));border-left:2px solid var(--border);margin:2px 0 2px 4px;}
+    .leg-intermediates.open{display:flex;}
+    .leg-int-row{font-size:.65rem;color:var(--text-faint);font-variant-numeric:tabular-nums;display:flex;gap:var(--space-3);}
+    .leg-int-time{min-width:80px;}
     .transfer-row{display:flex;align-items:center;gap:var(--space-2);font-size:.7rem;color:var(--text-faint);padding:2px 0 2px var(--space-4);}
     .transfer-row::before{content:'';display:inline-block;width:2px;height:16px;background:var(--border);border-radius:1px;margin-right:4px;}
     .jp-no-result{color:var(--text-faint);font-size:var(--text-xs);font-style:italic;padding:var(--space-4) 0;text-align:center;}
@@ -225,7 +228,6 @@
       color:var(--text-faint);
       font-variant-numeric:tabular-nums;
     }
-    /* separator label between earlier/loaded/later groups */
     .jp-time-sep{
       display:flex;
       align-items:center;
@@ -303,7 +305,7 @@
 
 <div class="sim-card">
 
-  <!-- ── TAB BAR ── -->
+  <!-- ══ TAB BAR ══ -->
   <div class="tab-bar">
     <button class="tab-btn active" data-tab="fares">🎫 Fares</button>
     <button class="tab-btn" data-tab="planner">🏛️ Journey Planner</button>
@@ -392,8 +394,8 @@
 
     <div class="formula-box">
       <strong>Fare formula:</strong><br>
-      <code>price = (Ė 4.50 + progressive_km_rate) × service_coeff × class_coeff</code><br>
-      Distance tiers: <strong>Ė 0.195/km</strong> (0–100 km) · <strong>Ė 0.165/km</strong> (101–300 km) · <strong>Ė 0.140/km</strong> (301+ km)<br>
+      <code>price = (Ė 4.50 + progressive_km_rate) × service_coeff × class_coeff</code><br>
+      Distance tiers: <strong>Ė 0.195/km</strong> (0–100 km) · <strong>Ė 0.165/km</strong> (101–300 km) · <strong>Ė 0.140/km</strong> (301+ km)<br>
       Classes: Standard ×1.00 · Blue Seat ×1.55 · Yurani ×2.40<br>
       Currency: <strong>Ė (Etsi)</strong> · 1 Ė = 0.832 USD
     </div>
@@ -731,7 +733,7 @@
     const results=[];
     if(!isInterline(from,to)){
       szNote.style.display=(from==='K101'||to==='K101')?'block':'none';
-      szNote.innerHTML='ⓘ <strong>Shutokwen-nai (SZ zone):</strong> Tickets from/to Sakamuso (K101) include the urban link to Sain\u00f0aul Central (K01) at no extra charge.';
+      szNote.innerHTML='\u24d8 <strong>Shutokwen-nai (SZ zone):</strong> Tickets from/to Sakamuso (K101) include the urban link to Sain\u00f0aul Central (K01) at no extra charge.';
       const svcs=svcF==='all'?Object.keys(ALL_SVC):[svcF];
       svcs.forEach(k=>{
         if(!serves(k,from,to)) return;
@@ -742,12 +744,12 @@
       szNote.style.display='block';
       const fromLine=lineOf(from), toLine=lineOf(to);
       let hub1,hub2,svcs1,svcs2;
-      if(fromLine==='RY'&&toLine==='KE'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(RY_SVC);svcs2=Object.keys(KE_SVC);szNote.innerHTML='ⓘ Transfer at Sain\u00f0aul Central (R01/K01). Combined fare applied.';}
-      else if(fromLine==='KE'&&toLine==='RY'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(KE_SVC);svcs2=Object.keys(RY_SVC);szNote.innerHTML='ⓘ Transfer at Sain\u00f0aul Central (K01/R01). Combined fare applied.';}
-      else if(fromLine==='EI'&&toLine==='KE'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(EI_SVC);svcs2=Object.keys(KE_SVC);szNote.innerHTML='ⓘ Transfer at Sain\u00f0aul Central (E01/K01). Combined fare applied.';}
-      else if(fromLine==='KE'&&toLine==='EI'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(KE_SVC);svcs2=Object.keys(EI_SVC);szNote.innerHTML='ⓘ Transfer at Sain\u00f0aul Central (K01/E01). Combined fare applied.';}
-      else if(fromLine==='EI'&&toLine==='RY'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(EI_SVC);svcs2=Object.keys(RY_SVC);szNote.innerHTML='ⓘ Transfer at Sain\u00f0aul Central (E01/R01). Combined fare applied.';}
-      else if(fromLine==='RY'&&toLine==='EI'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(RY_SVC);svcs2=Object.keys(EI_SVC);szNote.innerHTML='ⓘ Transfer at Sain\u00f0aul Central (R01/E01). Combined fare applied.';}
+      if(fromLine==='RY'&&toLine==='KE'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(RY_SVC);svcs2=Object.keys(KE_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (R01/K01). Combined fare applied.';}
+      else if(fromLine==='KE'&&toLine==='RY'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(KE_SVC);svcs2=Object.keys(RY_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (K01/R01). Combined fare applied.';}
+      else if(fromLine==='EI'&&toLine==='KE'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(EI_SVC);svcs2=Object.keys(KE_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (E01/K01). Combined fare applied.';}
+      else if(fromLine==='KE'&&toLine==='EI'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(KE_SVC);svcs2=Object.keys(EI_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (K01/E01). Combined fare applied.';}
+      else if(fromLine==='EI'&&toLine==='RY'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(EI_SVC);svcs2=Object.keys(RY_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (E01/R01). Combined fare applied.';}
+      else if(fromLine==='RY'&&toLine==='EI'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(RY_SVC);svcs2=Object.keys(EI_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (R01/E01). Combined fare applied.';}
       svcs1.forEach(s1=>{ svcs2.forEach(s2=>{
         const t1=calcSegment(from,hub1,s1,'standard'), t2=calcSegment(hub2,to,s2,'standard');
         if(!t1||!t2) return;
@@ -777,7 +779,7 @@
         headerHTML=`<span class="svc-badge svc-${first.svc==='Cp'?'Cp':first.svc}">${pill}</span><span class="svc-name">${info.name}</span>`;
       }
       const priceRowsHTML=rows.map(r=>{ const isBest=r.price===minP; return `<div class="price-row${isBest?' best-price':''}"><span class="price-class">${CLASS_L[r.class]}</span><span class="price-val">${fmt(r.price)} <span class="price-usd">${fusd(r.price)}</span></span></div>`; }).join('');
-      card.innerHTML=`<div class="service-card-header">${headerHTML}</div><div class="price-rows">${priceRowsHTML}</div><div class="card-km">${first.km.toFixed(1)} km${isCombo?' · combined fare':''}</div>`;
+      card.innerHTML=`<div class="service-card-header">${headerHTML}</div><div class="price-rows">${priceRowsHTML}</div><div class="card-km">${first.km.toFixed(1)} km${isCombo?' \u00b7 combined fare':''}</div>`;
       cards.appendChild(card);
     });
     if(results[0].type==='combo'){
@@ -798,27 +800,14 @@
   });
 
   /* ================================================================
-     JOURNEY PLANNER — powered by IZXRouter + TTEngine
+     JOURNEY PLANNER
   ================================================================ */
-
-  /* ----------------------------------------------------------------
-   * State for earlier/later browsing
-   * _jpState holds the current search parameters and the window of
-   * results already shown, so Earlier/Later can shift the window.
-   * ---------------------------------------------------------------- */
   const _jpState = {
-    from:       null,
-    to:         null,
-    lineF:      null,
-    /* Earliest departure (HH:MM) of the currently displayed batch */
-    windowStart: null,
-    /* Latest departure (HH:MM) of the currently displayed batch */
-    windowEnd:   null,
-    /* All journeys accumulated across Earlier/Later calls */
-    all:         [],
+    from: null, to: null, lineF: null,
+    windowStart: null, windowEnd: null,
+    all: [],
   };
 
-  /* Helpers — parse / add minutes to "HH:MM" strings */
   function _parseMins(hhmm) {
     const [h, m] = hhmm.split(':').map(Number);
     return h * 60 + m;
@@ -828,49 +817,34 @@
     const m = ((total % 1440) + 1440) % 1440 % 60;
     return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
   }
-  /* Return a time string 1 minute AFTER the latest departure in journeys */
   function _nextAfter(journeys) {
     if (!journeys.length) return null;
     let maxMins = -Infinity;
-    journeys.forEach(j => {
-      const m = _parseMins(j.departureTime);
-      if (m > maxMins) maxMins = m;
-    });
+    journeys.forEach(j => { const m = _parseMins(j.departureTime); if (m > maxMins) maxMins = m; });
     return _fmtMins(maxMins + 1);
   }
-  /* Return a time string 3 hours BEFORE the earliest departure, as the
-   * look-back anchor for IZXRouter (router always searches forward). */
   function _prevBefore(journeys) {
     if (!journeys.length) return null;
     let minMins = Infinity;
-    journeys.forEach(j => {
-      const m = _parseMins(j.departureTime);
-      if (m < minMins) minMins = m;
-    });
-    /* Go back 3 h so router can find trains that arrive before minMins */
+    journeys.forEach(j => { const m = _parseMins(j.departureTime); if (m < minMins) minMins = m; });
     return _fmtMins(minMins - 180);
   }
 
-  /* Popola i dropdown del planner usando TTEngine.allStations() */
   function buildPlannerSelects(){
     const jpFrom = document.getElementById('jp-from');
     const jpTo   = document.getElementById('jp-to');
-
     const byLine = {};
     TTEngine.allStations().forEach(st => {
       if(!byLine[st.lineId]) byLine[st.lineId] = [];
       byLine[st.lineId].push(st);
     });
-
     const lineLabels = {KE:'Keishin', RY:'Ry\u0101nkai', EI:'Eira', SN:'Seibu Naeryuku'};
-
     Object.entries(byLine).forEach(([lineId, stations]) => {
       const ogF = document.createElement('optgroup');
       const ogT = document.createElement('optgroup');
       ogF.label = ogT.label = lineLabels[lineId] || lineId;
-
       stations.forEach(st => {
-        const label = st.code + ' ' + st.name + (st.kanji ? ' · ' + st.kanji : '');
+        const label = st.code + ' ' + st.name + (st.kanji ? ' \u00b7 ' + st.kanji : '');
         [ogF, ogT].forEach((og) => {
           const opt = document.createElement('option');
           opt.value = st.code;
@@ -878,11 +852,9 @@
           og.appendChild(opt);
         });
       });
-
       jpFrom.appendChild(ogF);
       jpTo.appendChild(ogT);
     });
-
     jpFrom.value = 'R13';
     jpTo.value   = 'SN08';
   }
@@ -893,8 +865,7 @@
     return `<span class="svc-badge ${cls}" style="background:${color};color:#fff">${label}</span>`;
   }
 
-  /* ---- Core render function ---- */
-  function renderJourneys(journeys, fromName, toName, mode /* 'replace'|'prepend'|'append' */) {
+  function renderJourneys(journeys, fromName, toName, mode) {
     const resEl   = document.getElementById('jp-results');
     const titleEl = document.getElementById('jp-route-title');
     const listEl  = document.getElementById('journey-list');
@@ -912,7 +883,6 @@
       return;
     }
 
-    /* Merge with global list and de-duplicate by trainNumber+departure */
     if (mode === 'prepend') {
       const existingKeys = new Set(_jpState.all.map(j => j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
       const fresh = journeys.filter(j => !existingKeys.has(j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
@@ -925,19 +895,16 @@
       _jpState.all = [...journeys];
     }
 
-    /* Sort all by departure */
     _jpState.all.sort((a,b) => _parseMins(a.departureTime) - _parseMins(b.departureTime));
 
-    /* Transfer note */
     const hasTransfer = _jpState.all.some(j => j.transfers > 0);
     if (hasTransfer) {
       noteEl.style.display = 'block';
-      noteEl.innerHTML = `ⓘ Transfer time: minimum <strong>${IZXRouter.TRANSFER_MIN} min</strong> between trains at the same station.`;
+      noteEl.innerHTML = `\u24d8 Transfer time: minimum <strong>${IZXRouter.TRANSFER_MIN} min</strong> between trains at the same station.`;
     } else {
       noteEl.style.display = 'none';
     }
 
-    /* Update window bounds */
     if (_jpState.all.length) {
       _jpState.windowStart = _jpState.all[0].departureTime;
       _jpState.windowEnd   = _jpState.all[_jpState.all.length - 1].departureTime;
@@ -956,16 +923,27 @@
       let legsHTML = '<div class="journey-legs">';
       j.legs.forEach((leg, li) => {
         const badge = svcBadgeHTML(leg.svcId, leg.svcLogical, leg.color);
+        const intStops = leg.intermediateStops ?? [];
+        const intId = `int-${idx}-${li}`;
+        const expandBtn = intStops.length
+          ? `<button class="leg-expand-btn" data-target="${intId}">▸ ${intStops.length} stop${intStops.length > 1 ? 's' : ''}</button>`
+          : '';
+        const intHTML = intStops.map(s =>
+          `<div class="leg-int-row"><span class="leg-int-time">${s.arr} \u2192 ${s.dep}</span><span>${s.name}</span></div>`
+        ).join('');
+
         legsHTML += `
           <div class="leg-row">
             <div class="leg-svc">${badge} <span class="svc-name">${leg.svcName}</span></div>
             <div class="leg-times">${leg.boardDep} \u2192 ${leg.alightArr}</div>
-            <div class="leg-stations">${leg.boardName} \u2192 ${leg.alightName}</div>
-                        <div class="leg-meta">
+            <div class="leg-stations">${leg.boardName} \u2192 ${leg.alightName} ${expandBtn}</div>
+            <div class="leg-meta">
               <span class="leg-train">#${leg.trainNumber ?? '--'}</span>
               ${leg.km != null ? `<span class="leg-km">${Math.round(leg.km)} km</span>` : ''}
             </div>
-          </div>`;
+          </div>
+          ${intStops.length ? `<div class="leg-intermediates" id="${intId}">${intHTML}</div>` : ''}`;
+
         if (li < j.legs.length - 1) {
           const waitMin = j.transferWaitMin ?? IZXRouter.TRANSFER_MIN;
           const node    = IZXRouter.stationName(j.transferNodes[li]);
@@ -980,24 +958,32 @@
       card.innerHTML = `
         <div class="journey-header">
           <div class="journey-times">${j.departureTime} \u2192 ${j.arrivalTime}</div>
-          <div class="journey-dur">${j.totalMinutes} min ${transferBadge}${j.totalKm != null ? ` <span class="journey-km">· ${Math.round(j.totalKm)} km</span>` : ''}</div>
+          <div class="journey-dur">${j.totalMinutes} min ${transferBadge}${j.totalKm != null ? ` <span class="journey-km">\u00b7 ${Math.round(j.totalKm)} km</span>` : ''}</div>
         </div>` + legsHTML;
+
+      /* Attach expand button listeners after card is in DOM */
+      card.querySelectorAll('.leg-expand-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = card.querySelector('#' + btn.dataset.target);
+          if (!target) return;
+          const open = target.classList.toggle('open');
+          btn.textContent = open
+            ? btn.textContent.replace('\u25b8', '\u25be')
+            : btn.textContent.replace('\u25be', '\u25b8');
+        });
+      });
 
       listEl.appendChild(card);
     });
 
-    /* Show navigation bar and update chip */
     navBar.style.display = 'flex';
-    timeChip.textContent =
-      _jpState.windowStart + ' \u2013 ' + _jpState.windowEnd;
+    timeChip.textContent = _jpState.windowStart + ' \u2013 ' + _jpState.windowEnd;
 
-    /* Scroll to newly prepended items when earlier */
     if (mode === 'prepend' && journeys.length) {
       listEl.firstElementChild?.scrollIntoView({behavior:'smooth', block:'nearest'});
     }
   }
 
-  /* ---- Search helpers ---- */
   function _runSearch(from, to, depTime, lineF) {
     return IZXRouter.search(from, to, depTime, {
       maxResults: 5,
@@ -1017,60 +1003,42 @@
     const to      = document.getElementById('jp-to').value;
     const depTime = document.getElementById('jp-time').value || '08:00';
     const lineF   = document.getElementById('jp-line').value;
-
     if (from === to) { alert('Please select two different stations.'); return; }
-
-    /* Reset state */
-    _jpState.from  = from;
-    _jpState.to    = to;
-    _jpState.lineF = lineF;
-    _jpState.all   = [];
-
+    _jpState.from = from; _jpState.to = to; _jpState.lineF = lineF; _jpState.all = [];
     const journeys = _runSearch(from, to, depTime, lineF);
-    const fromName = IZXRouter.stationName(from);
-    const toName   = IZXRouter.stationName(to);
-    renderJourneys(journeys, fromName, toName, 'replace');
+    renderJourneys(journeys, IZXRouter.stationName(from), IZXRouter.stationName(to), 'replace');
   });
 
-  /* ---- Earlier button ---- */
   document.getElementById('jp-earlier').addEventListener('click', () => {
     if (!_jpState.from) return;
     const anchor = _prevBefore(_jpState.all);
     if (!anchor) return;
     const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF);
-    /* Keep only trains that depart BEFORE the current window start */
     const cutoff = _parseMins(_jpState.windowStart);
     const earlier = journeys.filter(j => _parseMins(j.departureTime) < cutoff);
-    const fromName = IZXRouter.stationName(_jpState.from);
-    const toName   = IZXRouter.stationName(_jpState.to);
     if (!earlier.length) {
       const btn = document.getElementById('jp-earlier');
       const orig = btn.innerHTML;
-      btn.textContent = 'No earlier trains';
-      btn.disabled = true;
+      btn.textContent = 'No earlier trains'; btn.disabled = true;
       setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
       return;
     }
-    renderJourneys(earlier, fromName, toName, 'prepend');
+    renderJourneys(earlier, IZXRouter.stationName(_jpState.from), IZXRouter.stationName(_jpState.to), 'prepend');
   });
 
-  /* ---- Later button ---- */
   document.getElementById('jp-later').addEventListener('click', () => {
     if (!_jpState.from) return;
     const anchor = _nextAfter(_jpState.all);
     if (!anchor) return;
     const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF);
-    const fromName = IZXRouter.stationName(_jpState.from);
-    const toName   = IZXRouter.stationName(_jpState.to);
     if (!journeys.length) {
       const btn = document.getElementById('jp-later');
       const orig = btn.innerHTML;
-      btn.textContent = 'No later trains';
-      btn.disabled = true;
+      btn.textContent = 'No later trains'; btn.disabled = true;
       setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
       return;
     }
-    renderJourneys(journeys, fromName, toName, 'append');
+    renderJourneys(journeys, IZXRouter.stationName(_jpState.from), IZXRouter.stationName(_jpState.to), 'append');
   });
 
 })();
