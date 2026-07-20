@@ -138,9 +138,20 @@
 
     /* RESULTS */
     .results-panel{max-width:960px;margin:0 auto var(--space-12);padding:0 var(--space-8);}
-    .results-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-4);}
+    .results-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-4);gap:var(--space-3);flex-wrap:wrap;}
     .results-title{font-family:var(--font-display);font-size:var(--text-base);font-weight:700;}
+    .results-meta{display:flex;align-items:center;gap:var(--space-3);}
     .results-count{font-size:var(--text-xs);color:var(--text-muted);}
+    .csv-btn{
+      display:inline-flex;align-items:center;gap:5px;
+      background:none;border:1px solid var(--border);color:var(--text-muted);
+      border-radius:var(--radius-md);padding:4px 12px;
+      font-size:var(--text-xs);font-weight:700;cursor:pointer;
+      transition:color var(--transition),border-color var(--transition),background var(--transition);
+      white-space:nowrap;
+    }
+    .csv-btn:hover{color:var(--text);border-color:var(--text-muted);background:var(--surface-2);}
+    .csv-btn svg{flex-shrink:0;}
     .results-table-wrap{overflow-x:auto;}
     table.tt{width:100%;border-collapse:collapse;font-size:var(--text-xs);background:var(--surface);border-radius:var(--radius-xl);overflow:hidden;border:1px solid var(--border);}
     table.tt th{background:var(--surface-2);color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:var(--space-3);text-align:center;border-bottom:2px solid var(--border);}
@@ -225,7 +236,7 @@
   </nav>
 
   <div class="page-header">
-    <a href="izx.html" class="back-link">← IZX Overview</a>
+    <a href="izx.html" class="back-link">&larr; IZX Overview</a>
     <div class="page-label">IZX Network</div>
     <h1 class="page-title">Timetable Search</h1>
     <p class="page-desc">Search across all IZX lines. Select a station to view all services of the day, filterable by line, service type and direction.</p>
@@ -244,7 +255,7 @@
                 type="text"
                 id="station-input"
                 autocomplete="off"
-                placeholder="Type station name or code…"
+                placeholder="Type station name or code&hellip;"
                 aria-label="Station"
                 aria-autocomplete="list"
                 aria-controls="ac-list"
@@ -259,8 +270,8 @@
           <label for="sel-dir">Direction</label>
           <select id="sel-dir">
             <option value="">Both</option>
-            <option value="IB">↑ Inbound</option>
-            <option value="OB">↓ Outbound</option>
+            <option value="IB">&uarr; Inbound</option>
+            <option value="OB">&darr; Outbound</option>
           </select>
         </div>
         <div class="search-field" style="max-width:130px;">
@@ -280,35 +291,31 @@
 
   <div class="results-panel" id="results-panel">
     <div class="no-results">
-      <div class="no-results-icon">🔍</div>
+      <div class="no-results-icon">&#128269;</div>
       <p>Select a station to view the timetable.</p>
     </div>
   </div>
 
   <footer>
-    <p>Izaland Transit Portal · <a href="izx.html">IZX Overview</a> · Timetable dynamically generated</p>
+    <p>Izaland Transit Portal &middot; <a href="izx.html">IZX Overview</a> &middot; Timetable dynamically generated</p>
   </footer>
 
 <script>
 /* ================================================================
-   STATION ALIASES — nodi condivisi tra più linee
-   Ogni alias raggruppa più coppie {lineId, code} in un'unica voce
-   di autocomplete. L'utente vede "K01/R01 Sainðaul Central" e
-   ottiene i treni di tutte le linee elencate.
+   STATION ALIASES — nodi condivisi tra pi\u00f9 linee
 ================================================================ */
 const STATION_ALIASES = [
   {
-    id:    "alias:sainðaul-central",
+    id:    "alias:sain\u00f0aul-central",
     label: "K01/R01",
-    name:  "Sainðaul Central",
-    kanji: "作安崎中央",
+    name:  "Sain\u00f0aul Central",
+    kanji: "\u4f5c\u5b89\u5d0e\u4e2d\u592e",
     nodes: [
       { lineId: "KE", code: "K01" },
       { lineId: "RY", code: "R01" },
       { lineId: "EI", code: "E01" },
     ],
   },
-  // ← aggiungi qui altri nodi condivisi in futuro
 ];
 
 /* ================================================================
@@ -317,14 +324,12 @@ const STATION_ALIASES = [
 let activeLines   = new Set(Object.keys(IZX_LINES));
 let activeSvcs    = new Set();
 let lastResults   = [];
+let lastStation   = null;   // riferimento aggiornato in doSearch()
 
-// selectedStation è ora uno dei due formati:
-//   { alias: true, nodes: [{lineId,code},…], name, label }
-//   { alias: false, lineId, code }
 let selectedStation = null;
 
 /* ================================================================
-   STATION INDEX — costruito una volta sola al boot
+   STATION INDEX
 ================================================================ */
 const STATION_INDEX = [];
 for (const [lineId, line] of Object.entries(IZX_LINES)) {
@@ -344,7 +349,6 @@ for (const [lineId, line] of Object.entries(IZX_LINES)) {
   }
 }
 
-/* Costruisce il searchStr per ogni alias sulla base dei nomi già in STATION_INDEX */
 for (const alias of STATION_ALIASES) {
   alias.searchStr = `${alias.label} ${alias.name} ${alias.kanji ?? ""}`.toLowerCase();
 }
@@ -360,7 +364,7 @@ let   acOpen       = false;
 
 function highlight(text, query) {
   if (!query) return escHtml(text);
-  const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")})`, "gi");
+  const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\\]\\]/g,"\\$&")})`, "gi");
   return escHtml(text).replace(re, "<mark>$1</mark>");
 }
 function escHtml(s) {
@@ -391,7 +395,6 @@ function renderAC(q) {
 
   let html = "";
 
-  /* ---- Sezione alias (priorità visiva) ---- */
   if (matchedAliases.length) {
     html += `<div class="ac-group-label">
       <span class="ac-group-dot" style="background:linear-gradient(135deg,#3b82f6,#a855f7)"></span>
@@ -415,7 +418,6 @@ function renderAC(q) {
     }
   }
 
-  /* ---- Sezione stazioni normali raggruppate per linea ---- */
   if (matchedStations.length) {
     const byLine = {};
     for (const r of matchedStations) {
@@ -444,7 +446,6 @@ function renderAC(q) {
   focusedIdx = -1;
   openAC();
 
-  /* Click su alias */
   acList.querySelectorAll(".ac-item--alias").forEach(el => {
     el.addEventListener("mousedown", e => {
       e.preventDefault();
@@ -453,7 +454,6 @@ function renderAC(q) {
     });
   });
 
-  /* Click su stazione normale */
   acList.querySelectorAll(".ac-item:not(.ac-item--alias)").forEach(el => {
     el.addEventListener("mousedown", e => {
       e.preventDefault();
@@ -517,7 +517,6 @@ stationInput.addEventListener("keydown", e => {
         selectStation(focused.dataset.line, focused.dataset.code, focused.dataset.name);
       }
     } else {
-      // Prima voce disponibile (alias o stazione)
       const firstAlias = acList.querySelector(".ac-item--alias");
       const firstStation = acList.querySelector(".ac-item:not(.ac-item--alias)");
       if (firstAlias) {
@@ -542,7 +541,7 @@ clearBtn.addEventListener("click", () => {
   stationInput.focus();
   renderAC("");
   document.getElementById("results-panel").innerHTML =
-    `<div class="no-results"><div class="no-results-icon">🔍</div><p>Select a station to view the timetable.</p></div>`;
+    `<div class="no-results"><div class="no-results-icon">&#128269;</div><p>Select a station to view the timetable.</p></div>`;
 });
 
 /* ================================================================
@@ -570,7 +569,6 @@ clearBtn.addEventListener("click", () => {
   });
   document.addEventListener("click", () => document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("open")));
 
-  // Line chips
   const chipsEl = document.getElementById("line-chips");
   for (const [lineId, line] of Object.entries(IZX_LINES)) {
     const chip = document.createElement("span");
@@ -611,7 +609,7 @@ function rebuildSvcChips() {
       chip.dataset.line = lineId;
       chip.dataset.svc  = svcId;
       chip.style.background = svc.color;
-      chip.textContent = `${lineId} ${svcId} · ${svc.name}`;
+      chip.textContent = `${lineId} ${svcId} \u00b7 ${svc.name}`;
       chip.addEventListener("click", () => toggleSvc(lineId, svcId, chip));
       el.appendChild(chip);
     }
@@ -636,14 +634,13 @@ function toggleSvc(lineId, svcId, chipEl) {
 function doSearch() {
   if (!selectedStation) {
     document.getElementById("results-panel").innerHTML =
-      `<div class="no-results"><div class="no-results-icon">🔍</div><p>Select a station to view the timetable.</p></div>`;
+      `<div class="no-results"><div class="no-results-icon">&#128269;</div><p>Select a station to view the timetable.</p></div>`;
     return;
   }
 
   const selDir   = document.getElementById("sel-dir").value;
   const fromTime = document.getElementById("sel-from").value || "06:00";
 
-  /* Costruisce il filtro svc per linea */
   const svcFilter = {};
   for (const lineId2 of activeLines) {
     const line = IZX_LINES[lineId2];
@@ -654,7 +651,6 @@ function doSearch() {
     if (svcs.length) svcFilter[lineId2] = svcs;
   }
 
-  /* Normalizza i nodi da interrogare */
   const nodes = selectedStation.alias
     ? selectedStation.nodes
     : [{ lineId: selectedStation.lineId, code: selectedStation.code }];
@@ -662,7 +658,7 @@ function doSearch() {
   let results = [];
 
   for (const { lineId, code: stCode } of nodes) {
-    if (!svcFilter[lineId]) continue; // linea disattivata dai chip
+    if (!svcFilter[lineId]) continue;
 
     const lineDef  = IZX_LINES[lineId];
     const ibDir    = lineDef.inboundDir ?? "NB";
@@ -682,7 +678,6 @@ function doSearch() {
     results.push(...trips);
   }
 
-  /* Ordina per orario di partenza dalla stazione selezionata */
   results.sort((a, b) => {
     const nodeA = selectedStation.alias
       ? selectedStation.nodes.find(n => n.lineId === a.lineId)
@@ -698,7 +693,132 @@ function doSearch() {
   });
 
   lastResults = results;
+  lastStation = selectedStation;
   renderResults(results, selectedStation);
+}
+
+/* ================================================================
+   CSV EXPORT
+   Genera un CSV a partire da lastResults con:
+     train_number, line, service_id, service_name, direction,
+     origin, terminus, dep_at_station, arr_at_station,
+     + una colonna per ogni fermata del viaggio (stop_<code>)
+   Il file riflette esattamente i risultati visibili a schermo.
+================================================================ */
+function exportCSV() {
+  if (!lastResults.length) return;
+
+  const sel = lastStation;
+
+  /* ----------------------------------------------------------
+     1. Raccoglie tutti i codici fermata unici (nell'ordine
+        in cui compaiono tra tutti i trip), per costruire
+        le intestazioni delle colonne fermate.
+  ---------------------------------------------------------- */
+  const allStopCodes = [];
+  const seenCodes = new Set();
+  for (const trip of lastResults) {
+    for (const code of Object.keys(trip.stops)) {
+      if (!seenCodes.has(code)) { seenCodes.add(code); allStopCodes.push(code); }
+    }
+    if (trip._paired && trip._twin) {
+      for (const code of Object.keys(trip._twin.stops)) {
+        if (!seenCodes.has(code)) { seenCodes.add(code); allStopCodes.push(code); }
+      }
+    }
+  }
+
+  /* ----------------------------------------------------------
+     2. Intestazione CSV
+  ---------------------------------------------------------- */
+  const fixedHeaders = [
+    "train_number", "line", "service_id", "service_name",
+    "direction", "origin", "terminus",
+    "dep_at_station", "arr_at_station",
+  ];
+  // Aggiunge intestazioni delle fermate: "stop_K01_arr", "stop_K01_dep", ...
+  const stopHeaders = allStopCodes.flatMap(c => [`stop_${c}_arr`, `stop_${c}_dep`]);
+  const headers = [...fixedHeaders, ...stopHeaders];
+
+  /* ----------------------------------------------------------
+     3. Righe dati
+  ---------------------------------------------------------- */
+  const rows = [];
+
+  for (const trip of lastResults) {
+    const tripsToExport = [trip];
+    if (trip._paired && trip._twin) tripsToExport.push(trip._twin);
+
+    for (const t of tripsToExport) {
+      const lineDef  = IZX_LINES[t.lineId];
+      const ibDir    = lineDef?.inboundDir ?? "NB";
+      const isInbound = t.direction === ibDir;
+      const dirLabel  = isInbound ? "inbound" : "outbound";
+
+      /* Codice stazione corrente per dep/arr a stazione */
+      const stCode = sel.alias
+        ? (sel.nodes.find(n => n.lineId === t.lineId)?.code ?? "")
+        : sel.code;
+      const stopData = t.stops[stCode];
+
+      /* Origine del viaggio (prima fermata) */
+      const firstCode  = Object.keys(t.stops)[0];
+      const originName = lineDef?.ST[firstCode]?.n ?? firstCode;
+      const termName   = lineDef?.ST[t.terminus]?.n ?? t.terminus;
+
+      const fixedValues = [
+        t.trainNumber ?? "",
+        t.lineId,
+        t.svcId,
+        t.name,
+        dirLabel,
+        `${firstCode} ${originName}`,
+        `${t.terminus} ${termName}`,
+        stopData?.dep ?? "",
+        stopData?.arr ?? "",
+      ];
+
+      const stopValues = allStopCodes.flatMap(c => {
+        const sd = t.stops[c];
+        return [sd?.arr ?? "", sd?.dep ?? ""];
+      });
+
+      rows.push([...fixedValues, ...stopValues]);
+    }
+  }
+
+  /* ----------------------------------------------------------
+     4. Serializza in CSV (RFC 4180)
+  ---------------------------------------------------------- */
+  function csvCell(v) {
+    const s = String(v);
+    return /[,"\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  }
+
+  const csvLines = [
+    headers.map(csvCell).join(","),
+    ...rows.map(r => r.map(csvCell).join(",")),
+  ];
+  const csvContent = csvLines.join("\r\n");
+
+  /* ----------------------------------------------------------
+     5. Download
+  ---------------------------------------------------------- */
+  const stLabel = sel.alias
+    ? sel.label.replace(/[^A-Za-z0-9_-]/g, "_")
+    : sel.code;
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const filename = `izx_timetable_${stLabel}_${dateStr}.csv`;
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 /* ================================================================
@@ -707,11 +827,10 @@ function doSearch() {
 function renderResults(trips, sel) {
   const panel = document.getElementById("results-panel");
   if (!trips.length) {
-    panel.innerHTML = `<div class="no-results"><div class="no-results-icon">🚃</div><p>No services found for the selected filters.</p></div>`;
+    panel.innerHTML = `<div class="no-results"><div class="no-results-icon">&#128643;</div><p>No services found for the selected filters.</p></div>`;
     return;
   }
 
-  /* Titolo: per alias mostra "K01/R01 Sainðaul Central", per singola come prima */
   let titleHtml;
   if (sel.alias) {
     titleHtml = `Departures from <strong>${sel.label} ${sel.name}</strong>`;
@@ -721,10 +840,24 @@ function renderResults(trips, sel) {
     titleHtml = `Departures from <strong>${sel.code} ${stName}</strong>`;
   }
 
+  /* Pulsante CSV */
+  const csvBtnHtml = `
+    <button class="csv-btn" onclick="exportCSV()" title="Export visible results as CSV">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Export CSV
+    </button>`;
+
   let html = `
     <div class="results-header">
       <div class="results-title">${titleHtml}</div>
-      <div class="results-count">${trips.length} service${trips.length !== 1 ? "s" : ""}</div>
+      <div class="results-meta">
+        <div class="results-count">${trips.length} service${trips.length !== 1 ? "s" : ""}</div>
+        ${csvBtnHtml}
+      </div>
     </div>
     <div class="results-table-wrap">
     <table class="tt">
@@ -732,7 +865,7 @@ function renderResults(trips, sel) {
         <th class="expand-cell"></th>
         <th class="left">Line</th>
         <th class="left">Service</th>
-        <th>Train №</th>
+        <th>Train &#8470;</th>
         <th>Dir</th>
         <th>Dep</th>
         <th>Arr</th>
@@ -741,29 +874,28 @@ function renderResults(trips, sel) {
       <tbody id="tt-body">`;
 
   trips.forEach((trip, idx) => {
-    /* Recupera il codice stazione corretto per questo trip */
     const stCode = sel.alias
       ? (sel.nodes.find(n => n.lineId === trip.lineId)?.code ?? "")
       : sel.code;
 
     const stopData  = trip.stops[stCode];
-    const dep       = stopData?.dep ?? "—";
-    const arr       = stopData?.arr ?? "—";
+    const dep       = stopData?.dep ?? "\u2014";
+    const arr       = stopData?.arr ?? "\u2014";
     const lineDef   = IZX_LINES[trip.lineId];
     const ibDir     = lineDef?.inboundDir ?? "NB";
     const isInbound = trip.direction === ibDir;
     const dirCls    = isInbound ? "dir-ib" : "dir-ob";
     const dirLabel  = isInbound
-      ? (lineDef?.inboundLabel  ?? "↑ Inbound")
-      : (lineDef?.outboundLabel ?? "↓ Outbound");
+      ? (lineDef?.inboundLabel  ?? "\u2191 Inbound")
+      : (lineDef?.outboundLabel ?? "\u2193 Outbound");
 
     let trainNumHtml;
     if (trip._paired && trip._twin) {
-      const numA = trip.trainNumber ?? "—";
-      const numB = trip._twin.trainNumber ?? "—";
+      const numA = trip.trainNumber ?? "\u2014";
+      const numB = trip._twin.trainNumber ?? "\u2014";
       trainNumHtml = `<span class="train-num">${numA}<br><span style="color:var(--text-faint)">${numB}</span></span>`;
     } else {
-      trainNumHtml = `<span class="train-num">${trip.trainNumber ?? "—"}</span>`;
+      trainNumHtml = `<span class="train-num">${trip.trainNumber ?? "\u2014"}</span>`;
     }
 
     let svcHtml;
@@ -775,19 +907,19 @@ function renderResults(trips, sel) {
       const termBName = lineDef?.ST[twin.terminus]?.n ?? twin.terminus;
       svcHtml = `
         <div class="svc-badge-group">
-          <span class="svc-badge" style="background:${trip.color}">${trip.svcId} · ${trip.name}</span>
-          <span class="svc-badge" style="background:${twin.color}">${twin.svcId} · ${twin.name}</span>
+          <span class="svc-badge" style="background:${trip.color}">${trip.svcId} &middot; ${trip.name}</span>
+          <span class="svc-badge" style="background:${twin.color}">${twin.svcId} &middot; ${twin.name}</span>
         </div>`;
       terminusHtml = `<span class="terminus-small">${trip.terminus} ${termAName} / ${twin.terminus} ${termBName}</span>`;
     } else {
       const termName = lineDef?.ST[trip.terminus]?.n ?? trip.terminus;
-      svcHtml = `<span class="svc-badge" style="background:${trip.color}">${trip.svcId} · ${trip.name}</span>`;
+      svcHtml = `<span class="svc-badge" style="background:${trip.color}">${trip.svcId} &middot; ${trip.name}</span>`;
       terminusHtml = `<span class="terminus-small">${trip.terminus} ${termName}</span>`;
     }
 
     html += `
       <tr class="tt-row" onclick="toggleDetail(${idx}, this)">
-        <td class="expand-cell"><span class="expand-arrow">▶</span></td>
+        <td class="expand-cell"><span class="expand-arrow">&#9654;</span></td>
         <td class="left">
           <span class="line-badge" style="background:${lineDef?.color ?? '#666'}">${trip.lineId}</span>
         </td>
@@ -838,7 +970,7 @@ function buildStopList(trip, currentStop) {
     return `
       ${renderSingleStopList(trip, currentStop)}
       <div class="trip-stop-branch">
-        <div class="trip-stop-branch-title">Paired branch · ${trip._twin.svcId} ${trip._twin.name}</div>
+        <div class="trip-stop-branch-title">Paired branch &middot; ${trip._twin.svcId} ${trip._twin.name}</div>
         ${renderSingleStopList(trip._twin, currentStop)}
       </div>`;
   }
