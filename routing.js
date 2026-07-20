@@ -182,6 +182,21 @@ const IZXRouter = (() => {
       alightArr:   alightStop?.arr ?? alightStop?.dep ?? "--:--",
       alightArrSec: alightSec,
       km:          legKm,          // km del singolo tratto (null se N/D)
+       intermediateStops: (() => {
+  const canon = IZX_LINES[lineId]?.SVC[svcId]?.stops ?? [];
+  const ordered = trip.direction === 'NB' ? [...canon].reverse() : canon;
+  const bi = ordered.indexOf(boardCode);
+  const ai = ordered.indexOf(alightCode);
+  if (bi === -1 || ai === -1) return [];
+  return ordered.slice(bi + 1, ai)
+    .filter(code => found.trip.stops[code])
+    .map(code => ({
+      code,
+      name: stationName(code),
+      arr:  found.trip.stops[code].arr,
+      dep:  found.trip.stops[code].dep,
+    }));
+})(),
     };
   }
 
