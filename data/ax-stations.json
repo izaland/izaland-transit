@@ -1,0 +1,571 @@
+{
+  "_network": "Izaland High Speed Railway",
+  "lines": {
+    "272434": {
+      "id": "272434",
+      "name": "🆂 Airport Express (to Sabullan)",
+      "ref": "AX",
+      "colour": "#CC99FF",
+      "operator": "Izarail",
+      "network": "IR首都圏近郊鉄道系 Izarail Capital Urban Network",
+      "route": "train",
+      "from": "Asunahama International Airport",
+      "to": "Sabullan"
+    },
+    "327149": {
+      "id": "327149",
+      "name": "🆂 Airport Express (to SUL)",
+      "ref": "AX",
+      "colour": "#CC99FF",
+      "operator": "Izarail",
+      "network": "Sainðaul Metropolitan Network",
+      "route": "train",
+      "from": "Asunahama International Airport",
+      "to": "Sabullan"
+    },
+    "414569": {
+      "id": "414569",
+      "name": "🆂 Airport Express (Illashiya > SUL)",
+      "ref": "AX",
+      "colour": "#CC99FF",
+      "operator": "Izarail",
+      "network": "IR首都圏近郊鉄道系 Izarail Capital Urban Network",
+      "route": "train",
+      "from": "Asunahama International Airport",
+      "to": "Sabullan"
+    },
+    "414570": {
+      "id": "414570",
+      "name": "🆂 Airport Express (Onnojaris > SUL)",
+      "ref": "AX",
+      "colour": "#CC99FF",
+      "operator": "Izarail",
+      "network": "IR首都圏近郊鉄道系 Izarail Capital Urban Network",
+      "route": "train",
+      "from": "Asunahama International Airport",
+      "to": "Sabullan"
+    }
+  },
+  "stations": [
+    {
+      "osmId": "126754750",
+      "name": "Rinkūn City",
+      "lat": 36.0844289,
+      "lon": 128.6805057,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "272434",
+          "seq": 142
+        },
+        {
+          "relId": "327149",
+          "seq": 2
+        },
+        {
+          "relId": "414569",
+          "seq": 8
+        },
+        {
+          "relId": "414570",
+          "seq": 3
+        }
+      ],
+      "stationId": "AX02",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX02"
+        }
+      ],
+      "name_kanji": "દાપ્‌ડેઃપ્ ટાઠા"
+    },
+    {
+      "osmId": "126754745",
+      "name": "Riimibaiken",
+      "lat": 36.0688638,
+      "lon": 128.7375193,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "272434",
+          "seq": 141
+        },
+        {
+          "relId": "327149",
+          "seq": 3
+        },
+        {
+          "relId": "414569",
+          "seq": 7
+        },
+        {
+          "relId": "414570",
+          "seq": 4
+        }
+      ],
+      "stationId": "AX03",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX03"
+        }
+      ],
+      "name_kanji": "𠝏卞"
+    },
+    {
+      "osmId": "127914807",
+      "name": "Kasakuri",
+      "lat": 36.02282,
+      "lon": 128.8558355,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "272434",
+          "seq": 140
+        },
+        {
+          "relId": "327149",
+          "seq": 4
+        }
+      ],
+      "stationId": "AX04",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX04"
+        },
+        {
+          "network": "IZX",
+          "line": "KE",
+          "code": "K02"
+        }
+      ],
+      "name_kanji": "鯛巻"
+    },
+    {
+      "osmId": "368583227",
+      "name": "Shimamera",
+      "lat": 36.0247784,
+      "lon": 128.9124068,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "272434",
+          "seq": 144
+        },
+        {
+          "relId": "327149",
+          "seq": 0
+        }
+      ],
+      "stationId": "AX05",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX05"
+        }
+      ],
+      "name_kanji": "渠瀬田"
+    },
+    {
+      "osmId": "124066084",
+      "name": "Herubori",
+      "lat": 36.0105864,
+      "lon": 128.9881596,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "272434",
+          "seq": 138
+        },
+        {
+          "relId": "327149",
+          "seq": 6
+        }
+      ],
+      "stationId": "AX07",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX07"
+        }
+      ],
+      "name_kanji": "杏登"
+    },
+    {
+      "osmId": "126497709",
+      "name": "Osenude",
+      "lat": 35.9846121,
+      "lon": 129.0863497,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "272434",
+          "seq": 137
+        },
+        {
+          "relId": "327149",
+          "seq": 7
+        }
+      ],
+      "stationId": "AX08",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX08"
+        }
+      ],
+      "name_kanji": "防斉"
+    },
+    {
+      "osmId": "126666496",
+      "name": "Sabullan",
+      "lat": 35.965483,
+      "lon": 129.1551173,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "272434",
+          "seq": 136
+        },
+        {
+          "relId": "327149",
+          "seq": 8
+        }
+      ],
+      "stationId": "AX09",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX09"
+        }
+      ],
+      "name_kanji": "ટરૃેધ્ધપ્"
+    },
+    {
+      "osmId": "123393771",
+      "name": "Eigandan Senpyan",
+      "lat": 35.9883885,
+      "lon": 128.7855719,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "414569",
+          "seq": 6
+        },
+        {
+          "relId": "414570",
+          "seq": 5
+        }
+      ],
+      "stationId": "AX20",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX20"
+        }
+      ],
+      "name_kanji": "永玵段船駢"
+    },
+    {
+      "osmId": "166465853",
+      "name": "Sasatotsu",
+      "lat": 35.6675813,
+      "lon": 128.8087022,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "414570",
+          "seq": 1
+        }
+      ],
+      "stationId": "AX22",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX22"
+        }
+      ],
+      "name_kanji": "佐々橋"
+    },
+    {
+      "osmId": "166453132",
+      "name": "Onnojaris",
+      "lat": 35.5227064,
+      "lon": 128.7530968,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "414570",
+          "seq": 0
+        }
+      ],
+      "stationId": "AX23",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX23"
+        }
+      ]
+    },
+    {
+      "osmId": "167664673",
+      "name": "Shin-Erigowa",
+      "lat": 35.7755693,
+      "lon": 128.7488448,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "414569",
+          "seq": 4
+        },
+        {
+          "relId": "414570",
+          "seq": 7
+        }
+      ],
+      "stationId": "AX30",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX30"
+        }
+      ],
+      "name_kanji": "新繰緊"
+    },
+    {
+      "osmId": "260849805",
+      "name": "Sejisebu",
+      "lat": 35.7194968,
+      "lon": 128.7850692,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "414569",
+          "seq": 0
+        }
+      ],
+      "stationId": "AX31",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX31"
+        }
+      ],
+      "name_kanji": "井終"
+    },
+    {
+      "osmId": "347551005",
+      "name": "Yutsukabul",
+      "lat": 35.6759759,
+      "lon": 128.6516815,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "414569",
+          "seq": 1
+        }
+      ],
+      "stationId": "AX32",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX32"
+        }
+      ],
+      "name_kanji": "柚鶴武崎"
+    },
+    {
+      "osmId": "154265060",
+      "name": "Akkosoi",
+      "lat": 35.6596547,
+      "lon": 128.4171764,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "414569",
+          "seq": 3
+        }
+      ],
+      "stationId": "AX33",
+      "stops": [
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX33"
+        }
+      ],
+      "name_kanji": "種綱"
+    },
+    {
+      "osmId": "229656494",
+      "name": "Sainðaul Central",
+      "lat": 36.0198786,
+      "lon": 128.966221,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "272434",
+          "seq": 139
+        },
+        {
+          "relId": "327149",
+          "seq": 5
+        }
+      ],
+      "stationId": "STN-010",
+      "stops": [
+        {
+          "network": "IZX",
+          "line": "KE",
+          "code": "K01"
+        },
+        {
+          "network": "IZX",
+          "line": "RY",
+          "code": "R01"
+        },
+        {
+          "network": "IZX",
+          "line": "EI",
+          "code": "E01"
+        },
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX06"
+        }
+      ],
+      "name_kanji": "作安崎中央"
+    },
+    {
+      "osmId": "126754752",
+      "name": "Sainðaul International Airport",
+      "lat": 36.1188173,
+      "lon": 128.6465448,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "272434",
+          "seq": 143
+        },
+        {
+          "relId": "327149",
+          "seq": 1
+        },
+        {
+          "relId": "414569",
+          "seq": 9
+        },
+        {
+          "relId": "414570",
+          "seq": 2
+        }
+      ],
+      "stationId": "STN-012",
+      "stops": [
+        {
+          "network": "IZX",
+          "line": "KE",
+          "code": "K03"
+        },
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX01"
+        }
+      ],
+      "name_kanji": "作安崎國際空港"
+    },
+    {
+      "osmId": "154265027",
+      "name": "Illashiya",
+      "lat": 35.7343291,
+      "lon": 128.30502,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "414569",
+          "seq": 2
+        }
+      ],
+      "stationId": "STN-061",
+      "stops": [
+        {
+          "network": "IZX",
+          "line": "KE",
+          "code": "K104"
+        },
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX34"
+        }
+      ],
+      "name_kanji": "狐棲"
+    },
+    {
+      "osmId": "167670124",
+      "name": "Showanul",
+      "lat": 35.9327057,
+      "lon": 128.8017276,
+      "type": "stop",
+      "tags": {},
+      "osmLines": [
+        {
+          "relId": "414569",
+          "seq": 5
+        },
+        {
+          "relId": "414570",
+          "seq": 6
+        }
+      ],
+      "stationId": "STN-065",
+      "stops": [
+        {
+          "network": "IZX",
+          "line": "KE",
+          "code": "K102"
+        },
+        {
+          "network": "AX",
+          "line": "AX",
+          "code": "AX21"
+        }
+      ],
+      "name_kanji": "書瓦崎"
+    }
+  ]
+}
