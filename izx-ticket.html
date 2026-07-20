@@ -114,7 +114,7 @@
     .svc-MS{background:#00BFFF;color:#000;}
     /* ── Seibu Naeryuku ── */
     .svc-SN{background:#7B3F9E;color:#fff;}
-    /* ── combo badge ── */
+    /* ── combo badge (two pills side by side) ── */
     .combo-badges{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
     .combo-sep{font-size:.65rem;color:var(--text-faint);}
 
@@ -128,7 +128,15 @@
     .diag-svc-pill{display:inline-block;font-size:.65rem;font-weight:800;padding:2px 6px;border-radius:3px;letter-spacing:.04em;}
     .diag-track-row td{height:26px;vertical-align:middle;}
     .diag-name-row td{vertical-align:bottom;padding-bottom:6px;}
-    .diag-sta-name{display:block;margin:0 auto;width:9px;height:72px;writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);font-size:9px;color:var(--text-muted);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .diag-sta-name{
+      display:block;margin:0 auto;
+      width:9px;height:72px;
+      writing-mode:vertical-rl;text-orientation:mixed;
+      transform:rotate(180deg);
+      font-size:9px;color:var(--text-muted);
+      line-height:1;white-space:nowrap;
+      overflow:hidden;text-overflow:ellipsis;
+    }
     .diag-sta-name.is-od{color:var(--text);font-weight:700;}
     .seg-l,.seg-r{position:absolute;top:50%;height:3px;width:50%;transform:translateY(-50%);}
     .seg-l{left:0;}.seg-r{right:0;}
@@ -160,28 +168,72 @@
     .journey-card.best{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
     .journey-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:var(--space-3);flex-wrap:wrap;gap:var(--space-2);}
     .journey-times{font-family:var(--font-display);font-size:var(--text-base);font-weight:800;letter-spacing:-.01em;}
-    .journey-dur{font-size:var(--text-xs);color:var(--text-muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-    .journey-dur .transfer-badge{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:1px 8px;font-size:.68rem;color:var(--text-muted);}
-    .journey-km{font-size:.68rem;color:var(--text-faint);font-variant-numeric:tabular-nums;}
+    .journey-dur{font-size:var(--text-xs);color:var(--text-muted);}
+    .journey-dur .transfer-badge{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:1px 8px;font-size:.68rem;margin-left:6px;color:var(--text-muted);}
     .journey-legs{display:flex;flex-direction:column;gap:2px;}
     .leg-row{display:flex;align-items:center;gap:var(--space-3);font-size:var(--text-xs);padding:5px 0;}
     .leg-svc{display:flex;align-items:center;gap:5px;min-width:120px;}
     .leg-times{font-variant-numeric:tabular-nums;color:var(--text-muted);min-width:110px;}
     .leg-stations{flex:1;color:var(--text);}
-    .leg-meta{display:flex;align-items:center;gap:var(--space-3);}
     .leg-train{color:var(--text-faint);font-size:.65rem;font-family:monospace;}
-    .leg-km{color:var(--text-faint);font-size:.65rem;font-variant-numeric:tabular-nums;}
     .transfer-row{display:flex;align-items:center;gap:var(--space-2);font-size:.7rem;color:var(--text-faint);padding:2px 0 2px var(--space-4);}
     .transfer-row::before{content:'';display:inline-block;width:2px;height:16px;background:var(--border);border-radius:1px;margin-right:4px;}
     .jp-no-result{color:var(--text-faint);font-size:var(--text-xs);font-style:italic;padding:var(--space-4) 0;text-align:center;}
     .jp-note{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);font-size:var(--text-xs);color:#93c5fd;margin-bottom:var(--space-4);display:none;}
 
     /* ── EARLIER / LATER NAVIGATION ── */
-    .jp-nav-bar{display:flex;gap:var(--space-3);margin-bottom:var(--space-4);align-items:center;}
-    .jp-nav-btn{background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);font-size:var(--text-xs);font-weight:600;font-family:var(--font-body);cursor:pointer;transition:background var(--transition),color var(--transition),border-color var(--transition);display:flex;align-items:center;gap:5px;}
-    .jp-nav-btn:hover{background:var(--border);color:var(--text);border-color:var(--text-muted);}
-    .jp-nav-btn:disabled{opacity:.35;cursor:default;}
-    .jp-time-chip{flex:1;text-align:center;font-size:var(--text-xs);color:var(--text-faint);font-variant-numeric:tabular-nums;}
+    .jp-nav-bar{
+      display:flex;
+      gap:var(--space-3);
+      margin-bottom:var(--space-4);
+      align-items:center;
+    }
+    .jp-nav-btn{
+      background:var(--surface-2);
+      border:1px solid var(--border);
+      color:var(--text-muted);
+      border-radius:var(--radius-md);
+      padding:var(--space-2) var(--space-4);
+      font-size:var(--text-xs);
+      font-weight:600;
+      font-family:var(--font-body);
+      cursor:pointer;
+      transition:background var(--transition),color var(--transition),border-color var(--transition);
+      display:flex;
+      align-items:center;
+      gap:5px;
+    }
+    .jp-nav-btn:hover{
+      background:var(--border);
+      color:var(--text);
+      border-color:var(--text-muted);
+    }
+    .jp-nav-btn:disabled{
+      opacity:.35;
+      cursor:default;
+    }
+    .jp-time-chip{
+      flex:1;
+      text-align:center;
+      font-size:var(--text-xs);
+      color:var(--text-faint);
+      font-variant-numeric:tabular-nums;
+    }
+    /* separator label between earlier/loaded/later groups */
+    .jp-time-sep{
+      display:flex;
+      align-items:center;
+      gap:var(--space-3);
+      color:var(--text-faint);
+      font-size:.68rem;
+      margin:var(--space-2) 0;
+    }
+    .jp-time-sep::before,.jp-time-sep::after{
+      content:'';
+      flex:1;
+      height:1px;
+      background:var(--border);
+    }
 
     @media(max-width:640px){
       .sim-row{grid-template-columns:1fr;}
@@ -189,7 +241,6 @@
       .sim-options{grid-template-columns:1fr;}
       nav,.page-header,.sim-card{padding-left:var(--space-4);padding-right:var(--space-4);}
       .jp-nav-bar{flex-wrap:wrap;}
-      .leg-row{flex-wrap:wrap;}
     }
   </style>
 </head>
@@ -246,18 +297,29 @@
 
 <div class="sim-card">
 
+  <!-- ── TAB BAR ── -->
   <div class="tab-bar">
     <button class="tab-btn active" data-tab="fares">🎫 Fares</button>
     <button class="tab-btn" data-tab="planner">🏛️ Journey Planner</button>
   </div>
 
-  <!-- TAB 1 — FARE CALCULATOR -->
+  <!-- ================================================================
+       TAB 1 — FARE CALCULATOR
+  ================================================================ -->
   <div class="tab-panel active" id="tab-fares">
+
     <div class="sim-row">
-      <div class="field-group"><label class="field-label" for="sel-from">From</label><select id="sel-from" class="field-select"></select></div>
+      <div class="field-group">
+        <label class="field-label" for="sel-from">From</label>
+        <select id="sel-from" class="field-select"></select>
+      </div>
       <button class="sim-swap" id="btn-swap" title="Swap">⇄</button>
-      <div class="field-group"><label class="field-label" for="sel-to">To</label><select id="sel-to" class="field-select"></select></div>
+      <div class="field-group">
+        <label class="field-label" for="sel-to">To</label>
+        <select id="sel-to" class="field-select"></select>
+      </div>
     </div>
+
     <div class="sim-options">
       <div class="field-group">
         <label class="field-label" for="sel-class">Class</label>
@@ -273,25 +335,35 @@
         <select id="sel-service" class="field-select">
           <option value="all">All services</option>
           <optgroup label="IZX Keishin">
-            <option value="A">A — Nonstop Express</option><option value="B">B — Semi-rapido</option>
-            <option value="C">C — Rapido</option><option value="Cp">C′ — Airport Bypass</option>
-            <option value="D">D — Sakamuso Rapido</option><option value="E">E — Sakamuso Express</option>
+            <option value="A">A — Nonstop Express</option>
+            <option value="B">B — Semi-rapido</option>
+            <option value="C">C — Rapido</option>
+            <option value="Cp">C′ — Airport Bypass</option>
+            <option value="D">D — Sakamuso Rapido</option>
+            <option value="E">E — Sakamuso Express</option>
             <option value="F">F — Omnibus</option>
           </optgroup>
           <optgroup label="IZX Ryānkai">
-            <option value="L">L — Omnibus</option><option value="K">K — Rapido AV</option>
-            <option value="J">J — Rapido AV</option><option value="G">G — Flagship AV</option>
-            <option value="I">I — Flagship AV</option><option value="H">H — Flagship AV</option>
+            <option value="L">L — Omnibus</option>
+            <option value="K">K — Rapido AV</option>
+            <option value="J">J — Rapido AV</option>
+            <option value="G">G — Flagship AV</option>
+            <option value="I">I — Flagship AV</option>
+            <option value="H">H — Flagship AV</option>
           </optgroup>
           <optgroup label="IZX Eira">
-            <option value="N">N — Nazionale</option><option value="M">M — Minarajaki Express</option>
-            <option value="MF">MF — Minarajaki Fast</option><option value="MI">MI — Minarajaki Intercity</option>
+            <option value="N">N — Nazionale</option>
+            <option value="M">M — Minarajaki Express</option>
+            <option value="MF">MF — Minarajaki Fast</option>
+            <option value="MI">MI — Minarajaki Intercity</option>
             <option value="MS">MS — Minarajaki Super</option>
           </optgroup>
         </select>
       </div>
     </div>
+
     <button class="sim-btn" id="btn-search">Search fares</button>
+
     <div id="results">
       <div class="sz-note" id="sz-note"></div>
       <div class="result-header">
@@ -301,7 +373,9 @@
       <div class="service-cards" id="service-cards"></div>
       <div id="stop-diagram">
         <div class="diag-title">Stop pattern</div>
-        <div class="diag-scroll"><table class="diag-table" id="diag-table"></table></div>
+        <div class="diag-scroll">
+          <table class="diag-table" id="diag-table"></table>
+        </div>
         <div class="diag-legend">
           <div class="diag-legend-item"><span style="width:10px;height:10px;border-radius:50%;background:var(--text-muted);border:2px solid var(--bg);display:inline-block;"></span> Stops</div>
           <div class="diag-legend-item"><span style="width:3px;height:10px;border-radius:2px;background:var(--text-muted);display:inline-block;"></span> Passes through</div>
@@ -309,6 +383,7 @@
         </div>
       </div>
     </div>
+
     <div class="formula-box">
       <strong>Fare formula:</strong><br>
       <code>price = (Ė 4.50 + progressive_km_rate) × service_coeff × class_coeff</code><br>
@@ -316,15 +391,26 @@
       Classes: Standard ×1.00 · Blue Seat ×1.55 · Yurani ×2.40<br>
       Currency: <strong>Ė (Etsi)</strong> · 1 Ė = 0.832 USD
     </div>
+
   </div><!-- /tab-fares -->
 
-  <!-- TAB 2 — JOURNEY PLANNER -->
+  <!-- ================================================================
+       TAB 2 — JOURNEY PLANNER
+  ================================================================ -->
   <div class="tab-panel" id="tab-planner">
+
     <div class="sim-row">
-      <div class="field-group"><label class="field-label" for="jp-from">From</label><select id="jp-from" class="field-select"></select></div>
+      <div class="field-group">
+        <label class="field-label" for="jp-from">From</label>
+        <select id="jp-from" class="field-select"></select>
+      </div>
       <button class="sim-swap" id="jp-swap" title="Swap">⇄</button>
-      <div class="field-group"><label class="field-label" for="jp-to">To</label><select id="jp-to" class="field-select"></select></div>
+      <div class="field-group">
+        <label class="field-label" for="jp-to">To</label>
+        <select id="jp-to" class="field-select"></select>
+      </div>
     </div>
+
     <div class="sim-options">
       <div class="field-group">
         <label class="field-label" for="jp-time">Depart at</label>
@@ -341,6 +427,7 @@
         </select>
       </div>
     </div>
+
     <button class="sim-btn" id="jp-search">Find journeys</button>
 
     <div id="jp-results">
@@ -362,6 +449,7 @@
 
       <div class="journey-list" id="journey-list"></div>
     </div>
+
   </div><!-- /tab-planner -->
 
 </div><!-- /sim-card -->
@@ -514,4 +602,469 @@
     ryOgs.forEach(og => og.label='Ry\u0101nkai \u2014 Main Line');
     sf.appendChild(ryOgs[0]); st2.appendChild(ryOgs[1]);
     RY_SELECT_ORDER.forEach(code => { const s=RY_ST[code]; if(!s) return; addOpt(ryOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:'')); });
-    const eiOgs = [document.createElement('optgroup'),docume
+    const eiOgs = [document.createElement('optgroup'),document.createElement('optgroup')];
+    eiOgs.forEach(og => og.label='Eira \u2014 Main Line');
+    sf.appendChild(eiOgs[0]); st2.appendChild(eiOgs[1]);
+    EI_SELECT_ORDER.forEach(code => { const s=EI_ST[code]; if(!s) return; addOpt(eiOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:'')); });
+    sf.value = HUB_VAL; st2.value = 'K17';
+  }
+
+  const CLASS_C = {standard:1.00, blue_seat:1.55, yurani:2.40};
+  const CLASS_L = {standard:"Standard", blue_seat:"Blue Seat", yurani:"Yurani"};
+  function fmt(n)  { return '\u0116\u202f'+n.toFixed(2); }
+  function fusd(n) { return '(US$\u202f'+(n*USD_RATE).toFixed(2)+')'; }
+  function stName(code){
+    if(code===HUB_VAL) return ALL_ST[HUB_K]?ALL_ST[HUB_K].n:'Sain\u00f0aul Central';
+    return ALL_ST[code]?ALL_ST[code].n:code;
+  }
+
+  function canonicalOrderFor(code){
+    const line = lineOf(code);
+    if(line==='RY') return RY_CANONICAL_ORDER;
+    if(line==='EI') return EI_CANONICAL_ORDER;
+    return KE_CANONICAL_ORDER;
+  }
+  function serviceRange(svcKey, from, to){
+    const fromR=resolveHub(from,svcKey), toR=resolveHub(to,svcKey);
+    const info=ALL_SVC[svcKey], svcStopList=info.stops;
+    const f=(fromR==='K101'&&KE_MAIN_SVCS.has(svcKey))?'K02':fromR;
+    const t=(toR==='K101'&&KE_MAIN_SVCS.has(svcKey))?'K02':toR;
+    let fi=svcStopList.indexOf(f), ti=svcStopList.indexOf(t);
+    if(fi===-1||ti===-1||fi===ti) return {stops:new Set(),through:new Set()};
+    if(fi>ti){const tmp=fi;fi=ti;ti=tmp;}
+    const stopsInSlice=svcStopList.slice(fi,ti+1), stopsSet=new Set(stopsInSlice);
+    const CORD=canonicalOrderFor(stopsInSlice[0]);
+    const canonFirst=CORD.indexOf(stopsInSlice[0]), canonLast=CORD.indexOf(stopsInSlice[stopsInSlice.length-1]);
+    const throughSet=new Set();
+    if(canonFirst!==-1&&canonLast!==-1){
+      const lo=Math.min(canonFirst,canonLast), hi=Math.max(canonFirst,canonLast);
+      for(let i=lo;i<=hi;i++){
+        const code=CORD[i]; if(stopsSet.has(code)) continue;
+        const s=ALL_ST[code]; if(!s) continue;
+        if((code==='K31'||code==='K32'||code==='K33')&&svcKey!=='Cp') continue;
+        if(s.b==='saka'&&!KE_SAKA_SVCS.has(svcKey)) continue;
+        throughSet.add(code);
+      }
+    }
+    return {stops:stopsSet, through:throughSet};
+  }
+  function buildCanonicalCols(activeRows, from, to){
+    const needed=new Set();
+    activeRows.forEach(({k})=>{ needed.add(resolveHub(from,k)); needed.add(resolveHub(to,k)); });
+    if(!activeRows.length){needed.add(resolveHub(from,'F'));needed.add(resolveHub(to,'F'));}
+    activeRows.forEach(({k})=>{ const {stops,through}=serviceRange(k,from,to); stops.forEach(c=>needed.add(c)); through.forEach(c=>needed.add(c)); });
+    const firstSvc=activeRows.length?activeRows[0].k:'F';
+    const CORD=canonicalOrderFor(resolveHub(from,firstSvc));
+    return CORD.filter(c=>needed.has(c));
+  }
+  function renderDiagram(activeRows, from, to){
+    const wrap=document.getElementById('stop-diagram'), tbl=document.getElementById('diag-table');
+    tbl.innerHTML='';
+    if(!activeRows.length){wrap.style.display='none';return;}
+    wrap.style.display='block';
+    const cols=buildCanonicalCols(activeRows,from,to), COL_W=28;
+    const nameTr=document.createElement('tr'); nameTr.className='diag-name-row';
+    const emptyTd=document.createElement('td'); emptyTd.className='diag-svc-col'; nameTr.appendChild(emptyTd);
+    cols.forEach(code=>{
+      const td=document.createElement('td');
+      td.style.cssText=`width:${COL_W}px;min-width:${COL_W}px;max-width:${COL_W}px;padding:0;text-align:center;vertical-align:bottom;padding-bottom:6px;`;
+      const isOD=activeRows.some(({k})=>resolveHub(from,k)===code||resolveHub(to,k)===code);
+      const s=ALL_ST[code];
+      const label=s?(code+' '+(s.n.length>13?s.n.slice(0,12)+'\u2026':s.n)):code;
+      const span=document.createElement('span'); span.className='diag-sta-name'+(isOD?' is-od':''); span.style.cssText='display:block;margin:0 auto;'; span.textContent=label;
+      td.appendChild(span); nameTr.appendChild(td);
+    });
+    tbl.appendChild(nameTr);
+    activeRows.forEach(({k})=>{
+      const info=ALL_SVC[k], color=info.color;
+      const {stops:svcStops,through:svcThrough}=serviceRange(k,from,to);
+      const svcAll=new Set([...svcStops,...svcThrough]);
+      let firstColIdx=Infinity, lastColIdx=-Infinity;
+      cols.forEach((code,ci)=>{ if(svcAll.has(code)){if(ci<firstColIdx)firstColIdx=ci;if(ci>lastColIdx)lastColIdx=ci;} });
+      const tr=document.createElement('tr'); tr.className='diag-track-row';
+      const labelTd=document.createElement('td'); labelTd.className='diag-svc-col';
+      const pill=document.createElement('span'); pill.className='diag-svc-pill svc-'+(k==='Cp'?'Cp':k); pill.textContent=k==='Cp'?'C\u2032':k;
+      labelTd.appendChild(pill); tr.appendChild(labelTd);
+      cols.forEach((code,ci)=>{
+        const td=document.createElement('td');
+        td.style.cssText=`width:${COL_W}px;min-width:${COL_W}px;max-width:${COL_W}px;height:26px;padding:0;position:relative;text-align:center;vertical-align:middle;`;
+        const inRange=svcAll.has(code), isStop=svcStops.has(code);
+        const isOD=resolveHub(from,k)===code||resolveHub(to,k)===code;
+        const isBypass=!inRange&&ci>firstColIdx&&ci<lastColIdx;
+        if(inRange){
+          if(ci>0){const sl=document.createElement('div');sl.className='seg-l';sl.style.cssText=`background:${color};opacity:0.75;`;td.appendChild(sl);}
+          if(ci<cols.length-1){const sr=document.createElement('div');sr.className='seg-r';sr.style.cssText=`background:${color};opacity:0.75;`;td.appendChild(sr);}
+          const inner=document.createElement('div'); inner.style.cssText='position:relative;z-index:3;display:flex;justify-content:center;align-items:center;height:100%;';
+          if(isStop){const dot=document.createElement('span');dot.className='dot-s'+(isOD?' od':'');dot.style.background=isOD?'var(--accent)':color;inner.appendChild(dot);}
+          else{const bar=document.createElement('span');bar.className='dot-p';bar.style.background=color;inner.appendChild(bar);}
+          td.appendChild(inner);
+        } else if(isBypass){
+          const bl=document.createElement('div');bl.className='seg-bypass-l';td.appendChild(bl);
+          const br=document.createElement('div');br.className='seg-bypass-r';td.appendChild(br);
+        }
+        tr.appendChild(td);
+      });
+      tbl.appendChild(tr);
+    });
+  }
+  function getDiscount(km){ if(km<200)return 0.05; if(km<400)return 0.08; if(km<700)return 0.10; if(km<1000)return 0.12; return 0.15; }
+  function calcSegment(from,to,svcKey,classKey){
+    if(!serves(svcKey,from,to)) return null;
+    const km=tariffKm(from,to,svcKey);
+    if(!km||km<=0) return null;
+    return {km, price:calcPrice(km,ALL_SVC[svcKey].coeff,CLASS_C[classKey])};
+  }
+
+  function renderFares(from, to, classF, svcF){
+    const res=document.getElementById('results'), cards=document.getElementById('service-cards');
+    const routeEl=document.getElementById('result-route'), metaEl=document.getElementById('result-meta');
+    const szNote=document.getElementById('sz-note');
+    res.style.display='block'; cards.innerHTML='';
+    routeEl.textContent=stName(from)+' \u2192 '+stName(to);
+    const clss=classF==='all'?['standard','blue_seat','yurani']:[classF];
+    const results=[];
+    if(!isInterline(from,to)){
+      szNote.style.display=(from==='K101'||to==='K101')?'block':'none';
+      szNote.innerHTML='ⓘ <strong>Shutokwen-nai (SZ zone):</strong> Tickets from/to Sakamuso (K101) include the urban link to Sain\u00f0aul Central (K01) at no extra charge.';
+      const svcs=svcF==='all'?Object.keys(ALL_SVC):[svcF];
+      svcs.forEach(k=>{
+        if(!serves(k,from,to)) return;
+        const km=tariffKm(from,to,k); if(!km||km<=0) return;
+        clss.forEach(c=>{ const price=calcPrice(km,ALL_SVC[k].coeff,CLASS_C[c]); results.push({type:'direct',label:k,svc:k,class:c,km,price}); });
+      });
+    } else {
+      szNote.style.display='block';
+      const fromLine=lineOf(from), toLine=lineOf(to);
+      let hub1,hub2,svcs1,svcs2;
+      if(fromLine==='RY'&&toLine==='KE'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(RY_SVC);svcs2=Object.keys(KE_SVC);szNote.innerHTML='ⓘ Transfer at Sain\u00f0aul Central (R01/K01). Combined fare applied.';}
+      else if(fromLine==='KE'&&toLine==='RY'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(KE_SVC);svcs2=Object.keys(RY_SVC);szNote.innerHTML='ⓘ Transfer at Sain\u00f0aul Central (K01/R01). Combined fare applied.';}
+      else if(fromLine==='EI'&&toLine==='KE'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(EI_SVC);svcs2=Object.keys(KE_SVC);szNote.innerHTML='ⓘ Transfer at Sain\u00f0aul Central (E01/K01). Combined fare applied.';}
+      else if(fromLine==='KE'&&toLine==='EI'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(KE_SVC);svcs2=Object.keys(EI_SVC);szNote.innerHTML='ⓘ Transfer at Sain\u00f0aul Central (K01/E01). Combined fare applied.';}
+      else if(fromLine==='EI'&&toLine==='RY'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(EI_SVC);svcs2=Object.keys(RY_SVC);szNote.innerHTML='ⓘ Transfer at Sain\u00f0aul Central (E01/R01). Combined fare applied.';}
+      else if(fromLine==='RY'&&toLine==='EI'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(RY_SVC);svcs2=Object.keys(EI_SVC);szNote.innerHTML='ⓘ Transfer at Sain\u00f0aul Central (R01/E01). Combined fare applied.';}
+      svcs1.forEach(s1=>{ svcs2.forEach(s2=>{
+        const t1=calcSegment(from,hub1,s1,'standard'), t2=calcSegment(hub2,to,s2,'standard');
+        if(!t1||!t2) return;
+        const totalKm=t1.km+t2.km, discount=getDiscount(totalKm), comboLabel=s1+'+'+s2;
+        clss.forEach(c=>{
+          const seg1=calcSegment(from,hub1,s1,c), seg2=calcSegment(hub2,to,s2,c);
+          const basePrice=seg1.price+seg2.price, finalPrice=Math.round(basePrice*(1-discount)*100)/100;
+          results.push({type:'combo',label:comboLabel,svc1:s1,svc2:s2,class:c,km:totalKm,price:finalPrice});
+        });
+      }); });
+    }
+    if(!results.length){ metaEl.textContent=''; cards.innerHTML='<p class="no-service">No valid route found.</p>'; document.getElementById('stop-diagram').style.display='none'; return; }
+    const labelOrder=[], grouped={};
+    results.forEach(r=>{ if(!grouped[r.label]){grouped[r.label]=[];labelOrder.push(r.label);} grouped[r.label].push(r); });
+    const kms=[...new Set(results.map(r=>r.km.toFixed(1)))];
+    metaEl.textContent=kms.length===1?kms[0]+' km':kms.join(' / ')+' km';
+    const minP=Math.min(...results.map(r=>r.price));
+    labelOrder.forEach(label=>{
+      const rows=grouped[label], first=rows[0], isCombo=first.type==='combo';
+      const card=document.createElement('div'); card.className='service-card';
+      let headerHTML;
+      if(isCombo){
+        const p1=first.svc1==='Cp'?'C\u2032':first.svc1, p2=first.svc2==='Cp'?'C\u2032':first.svc2;
+        headerHTML=`<div class="combo-badges"><span class="svc-badge svc-${first.svc1==='Cp'?'Cp':first.svc1}">${p1}</span><span class="combo-sep">+</span><span class="svc-badge svc-${first.svc2==='Cp'?'Cp':first.svc2}">${p2}</span></div><span class="svc-name">Transfer combo</span>`;
+      } else {
+        const info=ALL_SVC[first.svc], pill=first.svc==='Cp'?'C\u2032':first.svc;
+        headerHTML=`<span class="svc-badge svc-${first.svc==='Cp'?'Cp':first.svc}">${pill}</span><span class="svc-name">${info.name}</span>`;
+      }
+      const priceRowsHTML=rows.map(r=>{ const isBest=r.price===minP; return `<div class="price-row${isBest?' best-price':''}"><span class="price-class">${CLASS_L[r.class]}</span><span class="price-val">${fmt(r.price)} <span class="price-usd">${fusd(r.price)}</span></span></div>`; }).join('');
+      card.innerHTML=`<div class="service-card-header">${headerHTML}</div><div class="price-rows">${priceRowsHTML}</div><div class="card-km">${first.km.toFixed(1)} km${isCombo?' · combined fare':''}</div>`;
+      cards.appendChild(card);
+    });
+    if(results[0].type==='combo'){
+      document.getElementById('stop-diagram').style.display='none';
+    } else {
+      const diagSvcs=[...new Set(results.map(r=>r.svc))];
+      renderDiagram(diagSvcs.map(k=>({k})), from, to);
+    }
+  }
+
+  buildSelects();
+  document.getElementById('btn-swap').addEventListener('click',()=>{ const sf=document.getElementById('sel-from'),st=document.getElementById('sel-to'),tmp=sf.value; sf.value=st.value; st.value=tmp; });
+  document.getElementById('btn-search').addEventListener('click',()=>{
+    const from=document.getElementById('sel-from').value, to=document.getElementById('sel-to').value;
+    const cls=document.getElementById('sel-class').value, svc=document.getElementById('sel-service').value;
+    if(from===to){alert('Please select two different stations.');return;}
+    renderFares(from,to,cls,svc);
+  });
+
+  /* ================================================================
+     JOURNEY PLANNER — powered by IZXRouter + TTEngine
+  ================================================================ */
+
+  /* ----------------------------------------------------------------
+   * State for earlier/later browsing
+   * _jpState holds the current search parameters and the window of
+   * results already shown, so Earlier/Later can shift the window.
+   * ---------------------------------------------------------------- */
+  const _jpState = {
+    from:       null,
+    to:         null,
+    lineF:      null,
+    /* Earliest departure (HH:MM) of the currently displayed batch */
+    windowStart: null,
+    /* Latest departure (HH:MM) of the currently displayed batch */
+    windowEnd:   null,
+    /* All journeys accumulated across Earlier/Later calls */
+    all:         [],
+  };
+
+  /* Helpers — parse / add minutes to "HH:MM" strings */
+  function _parseMins(hhmm) {
+    const [h, m] = hhmm.split(':').map(Number);
+    return h * 60 + m;
+  }
+  function _fmtMins(total) {
+    const h = Math.floor(((total % 1440) + 1440) % 1440 / 60);
+    const m = ((total % 1440) + 1440) % 1440 % 60;
+    return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  }
+  /* Return a time string 1 minute AFTER the latest departure in journeys */
+  function _nextAfter(journeys) {
+    if (!journeys.length) return null;
+    let maxMins = -Infinity;
+    journeys.forEach(j => {
+      const m = _parseMins(j.departureTime);
+      if (m > maxMins) maxMins = m;
+    });
+    return _fmtMins(maxMins + 1);
+  }
+  /* Return a time string 3 hours BEFORE the earliest departure, as the
+   * look-back anchor for IZXRouter (router always searches forward). */
+  function _prevBefore(journeys) {
+    if (!journeys.length) return null;
+    let minMins = Infinity;
+    journeys.forEach(j => {
+      const m = _parseMins(j.departureTime);
+      if (m < minMins) minMins = m;
+    });
+    /* Go back 3 h so router can find trains that arrive before minMins */
+    return _fmtMins(minMins - 180);
+  }
+
+  /* Popola i dropdown del planner usando TTEngine.allStations() */
+  function buildPlannerSelects(){
+    const jpFrom = document.getElementById('jp-from');
+    const jpTo   = document.getElementById('jp-to');
+
+    const byLine = {};
+    TTEngine.allStations().forEach(st => {
+      if(!byLine[st.lineId]) byLine[st.lineId] = [];
+      byLine[st.lineId].push(st);
+    });
+
+    const lineLabels = {KE:'Keishin', RY:'Ry\u0101nkai', EI:'Eira', SN:'Seibu Naeryuku'};
+
+    Object.entries(byLine).forEach(([lineId, stations]) => {
+      const ogF = document.createElement('optgroup');
+      const ogT = document.createElement('optgroup');
+      ogF.label = ogT.label = lineLabels[lineId] || lineId;
+
+      stations.forEach(st => {
+        const label = st.code + ' ' + st.name + (st.kanji ? ' · ' + st.kanji : '');
+        [ogF, ogT].forEach((og) => {
+          const opt = document.createElement('option');
+          opt.value = st.code;
+          opt.textContent = label;
+          og.appendChild(opt);
+        });
+      });
+
+      jpFrom.appendChild(ogF);
+      jpTo.appendChild(ogT);
+    });
+
+    jpFrom.value = 'R13';
+    jpTo.value   = 'SN08';
+  }
+
+  function svcBadgeHTML(svcId, svcLogical, color) {
+    const label = svcId === 'Cp' ? 'C\u2032' : (svcLogical || svcId);
+    const cls   = 'svc-' + (svcId === 'Cp' ? 'Cp' : (svcLogical || svcId));
+    return `<span class="svc-badge ${cls}" style="background:${color};color:#fff">${label}</span>`;
+  }
+
+  /* ---- Core render function ---- */
+  function renderJourneys(journeys, fromName, toName, mode /* 'replace'|'prepend'|'append' */) {
+    const resEl   = document.getElementById('jp-results');
+    const titleEl = document.getElementById('jp-route-title');
+    const listEl  = document.getElementById('journey-list');
+    const noteEl  = document.getElementById('jp-note');
+    const navBar  = document.getElementById('jp-nav-bar');
+    const timeChip= document.getElementById('jp-time-chip');
+
+    resEl.style.display = 'block';
+    titleEl.textContent = fromName + ' \u2192 ' + toName;
+
+    if (!journeys.length && mode === 'replace') {
+      listEl.innerHTML = '<p class="jp-no-result">No journeys found in the next 3 hours.</p>';
+      noteEl.style.display = 'none';
+      navBar.style.display = 'none';
+      return;
+    }
+
+    /* Merge with global list and de-duplicate by trainNumber+departure */
+    if (mode === 'prepend') {
+      const existingKeys = new Set(_jpState.all.map(j => j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      const fresh = journeys.filter(j => !existingKeys.has(j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      _jpState.all = [...fresh, ..._jpState.all];
+    } else if (mode === 'append') {
+      const existingKeys = new Set(_jpState.all.map(j => j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      const fresh = journeys.filter(j => !existingKeys.has(j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      _jpState.all = [..._jpState.all, ...fresh];
+    } else {
+      _jpState.all = [...journeys];
+    }
+
+    /* Sort all by departure */
+    _jpState.all.sort((a,b) => _parseMins(a.departureTime) - _parseMins(b.departureTime));
+
+    /* Transfer note */
+    const hasTransfer = _jpState.all.some(j => j.transfers > 0);
+    if (hasTransfer) {
+      noteEl.style.display = 'block';
+      noteEl.innerHTML = `ⓘ Transfer time: minimum <strong>${IZXRouter.TRANSFER_MIN} min</strong> between trains at the same station.`;
+    } else {
+      noteEl.style.display = 'none';
+    }
+
+    /* Update window bounds */
+    if (_jpState.all.length) {
+      _jpState.windowStart = _jpState.all[0].departureTime;
+      _jpState.windowEnd   = _jpState.all[_jpState.all.length - 1].departureTime;
+    }
+
+    /* Render cards */
+    listEl.innerHTML = '';
+    _jpState.all.forEach((j, idx) => {
+      const card = document.createElement('div');
+      card.className = 'journey-card' + (idx === 0 ? ' best' : '');
+
+      const transferBadge = j.transfers > 0
+        ? `<span class="transfer-badge">${j.transfers} change</span>`
+        : '<span class="transfer-badge">Direct</span>';
+
+      let legsHTML = '<div class="journey-legs">';
+      j.legs.forEach((leg, li) => {
+        const badge = svcBadgeHTML(leg.svcId, leg.svcLogical, leg.color);
+        legsHTML += `
+          <div class="leg-row">
+            <div class="leg-svc">${badge} <span class="svc-name">${leg.svcName}</span></div>
+            <div class="leg-times">${leg.boardDep} \u2192 ${leg.alightArr}</div>
+            <div class="leg-stations">${leg.boardName} \u2192 ${leg.alightName}</div>
+            <div class="leg-train">#${leg.trainNumber ?? '--'}</div>
+          </div>`;
+        if (li < j.legs.length - 1) {
+          const waitMin = j.transferWaitMin ?? IZXRouter.TRANSFER_MIN;
+          const node    = IZXRouter.stationName(j.transferNodes[li]);
+          legsHTML += `
+            <div class="transfer-row">
+              Change at <strong>${node}</strong> \u2014 ${waitMin} min wait
+            </div>`;
+        }
+      });
+      legsHTML += '</div>';
+
+      card.innerHTML = `
+        <div class="journey-header">
+          <div class="journey-times">${j.departureTime} \u2192 ${j.arrivalTime}</div>
+          <div class="journey-dur">${j.totalMinutes} min ${transferBadge}</div>
+        </div>` + legsHTML;
+
+      listEl.appendChild(card);
+    });
+
+    /* Show navigation bar and update chip */
+    navBar.style.display = 'flex';
+    timeChip.textContent =
+      _jpState.windowStart + ' \u2013 ' + _jpState.windowEnd;
+
+    /* Scroll to newly prepended items when earlier */
+    if (mode === 'prepend' && journeys.length) {
+      listEl.firstElementChild?.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  }
+
+  /* ---- Search helpers ---- */
+  function _runSearch(from, to, depTime, lineF) {
+    return IZXRouter.search(from, to, depTime, {
+      maxResults: 5,
+      lines: lineF === 'ALL' ? undefined : lineF,
+    });
+  }
+
+  buildPlannerSelects();
+
+  document.getElementById('jp-swap').addEventListener('click', () => {
+    const f = document.getElementById('jp-from'), t = document.getElementById('jp-to');
+    const tmp = f.value; f.value = t.value; t.value = tmp;
+  });
+
+  document.getElementById('jp-search').addEventListener('click', () => {
+    const from    = document.getElementById('jp-from').value;
+    const to      = document.getElementById('jp-to').value;
+    const depTime = document.getElementById('jp-time').value || '08:00';
+    const lineF   = document.getElementById('jp-line').value;
+
+    if (from === to) { alert('Please select two different stations.'); return; }
+
+    /* Reset state */
+    _jpState.from  = from;
+    _jpState.to    = to;
+    _jpState.lineF = lineF;
+    _jpState.all   = [];
+
+    const journeys = _runSearch(from, to, depTime, lineF);
+    const fromName = IZXRouter.stationName(from);
+    const toName   = IZXRouter.stationName(to);
+    renderJourneys(journeys, fromName, toName, 'replace');
+  });
+
+  /* ---- Earlier button ---- */
+  document.getElementById('jp-earlier').addEventListener('click', () => {
+    if (!_jpState.from) return;
+    const anchor = _prevBefore(_jpState.all);
+    if (!anchor) return;
+    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF);
+    /* Keep only trains that depart BEFORE the current window start */
+    const cutoff = _parseMins(_jpState.windowStart);
+    const earlier = journeys.filter(j => _parseMins(j.departureTime) < cutoff);
+    const fromName = IZXRouter.stationName(_jpState.from);
+    const toName   = IZXRouter.stationName(_jpState.to);
+    if (!earlier.length) {
+      const btn = document.getElementById('jp-earlier');
+      const orig = btn.innerHTML;
+      btn.textContent = 'No earlier trains';
+      btn.disabled = true;
+      setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+      return;
+    }
+    renderJourneys(earlier, fromName, toName, 'prepend');
+  });
+
+  /* ---- Later button ---- */
+  document.getElementById('jp-later').addEventListener('click', () => {
+    if (!_jpState.from) return;
+    const anchor = _nextAfter(_jpState.all);
+    if (!anchor) return;
+    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF);
+    const fromName = IZXRouter.stationName(_jpState.from);
+    const toName   = IZXRouter.stationName(_jpState.to);
+    if (!journeys.length) {
+      const btn = document.getElementById('jp-later');
+      const orig = btn.innerHTML;
+      btn.textContent = 'No later trains';
+      btn.disabled = true;
+      setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+      return;
+    }
+    renderJourneys(journeys, fromName, toName, 'append');
+  });
+
+})();
+</script>
+</body>
+</html>
