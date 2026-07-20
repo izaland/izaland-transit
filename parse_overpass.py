@@ -3,11 +3,11 @@ import json, sys, os
 
 # ================================================================
 # OVERPASS QUERY (OGF server)
-# Tutte le relazioni route con network=Izaland High Speed Railway
+# Tutte le relazioni route con operator=Izarail + network=Izaland High Speed Railway
 # ================================================================
 # [out:xml][timeout:90];
 # (
-#   relation["network"="Izaland High Speed Railway"]["type"="route"];
+#   relation["operator"="Izarail"]["network"="Izaland High Speed Railway"]["type"="route"];
 # );
 # out body;
 # >;
@@ -18,9 +18,40 @@ import json, sys, os
 # curl:
 #   curl -X POST https://overpass.opengeofiction.net/api/interpreter \
 #     --data-urlencode 'data=[out:xml][timeout:90];
-#       (relation["network"="Izaland High Speed Railway"]["type"="route"];);
+#       (relation["operator"="Izarail"]["network"="Izaland High Speed Railway"]["type"="route"];);
 #       out body;>;out skel qt;' \
 #     -o izx_export.xml
+# ================================================================
+
+# ================================================================
+# OVERPASS QUERY — Airport Express (AX)
+# Linea AX + stazioni, operator=Izarail
+# ================================================================
+# [out:json][timeout:60];
+# (
+#   // Relazione della linea Airport Express
+#   relation["operator"="Izarail"]["ref"="AX"];
+#   relation["operator"="Izarail"]["name"~"Airport Express", i];
+#   relation["operator"="Izarail"]["network"~"Airport Express", i];
+#
+#   // Stazioni/nodi con codice AX__
+#   node["operator"="Izarail"]["ref"~"^AX[0-9]"];
+#   node["operator"="Izarail"]["network"~"Airport Express", i];
+#
+#   // Way e aree stazione
+#   way["operator"="Izarail"]["ref"~"^AX[0-9]"];
+#   nwr["operator"="Izarail"]["railway"="station"]["network"~"Airport Express", i];
+#   nwr["operator"="Izarail"]["railway"="halt"]["network"~"Airport Express", i];
+# );
+# out geom;
+#
+# curl:
+#   curl -X POST https://overpass.opengeofiction.net/api/interpreter \
+#     --data-urlencode 'data=[out:json][timeout:60];
+#       (relation["operator"="Izarail"]["ref"="AX"];
+#        node["operator"="Izarail"]["ref"~"^AX[0-9]"];);
+#       out geom;' \
+#     -o ax_export.json
 # ================================================================
 
 def clean(s):
