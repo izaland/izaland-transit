@@ -21,15 +21,13 @@
 const IZXRouter = (() => {
 
   /* ---- costanti ---- */
-  const TRANSFER_MIN   = 5;           // minuti fissi di transfer in stazione
+  const TRANSFER_MIN   = 5;
   const TRANSFER_SEC   = TRANSFER_MIN * 60;
-  const MAX_JOURNEYS   = 5;           // max risultati restituiti
-  const SEARCH_WINDOW  = 3 * 3600;    // finestra di ricerca: 3 ore da depTime
+  const MAX_JOURNEYS   = 5;
+  const SEARCH_WINDOW  = 3 * 3600;
 
   /* ----------------------------------------------------------------
    * interchangeNodes()
-   * Restituisce tutti i codici stazione che fungono da nodo di
-   * interscambio tra linee diverse.
    * ---------------------------------------------------------------- */
   function interchangeNodes() {
     const nodes = new Set();
@@ -103,8 +101,6 @@ const IZXRouter = (() => {
 
   /* ----------------------------------------------------------------
    * stationKm(lineId, code)
-   * Restituisce il km progressivo della stazione sulla sua linea,
-   * o null se non disponibile.
    * ---------------------------------------------------------------- */
   function stationKm(lineId, code) {
     const line = IZX_LINES[lineId];
@@ -164,6 +160,22 @@ const IZXRouter = (() => {
       ? Math.abs(kmAlight - kmBoard)
       : null;
 
+    /* Fermate intermedie */
+    const canon   = IZX_LINES[lineId]?.SVC[svcId]?.stops ?? [];
+    const ordered = trip.direction === 'NB' ? [...canon].reverse() : canon;
+    const bi = ordered.indexOf(boardCode);
+    const ai = ordered.indexOf(alightCode);
+    const intermediateStops = (bi !== -1 && ai !== -1)
+      ? ordered.slice(bi + 1, ai)
+          .filter(code => trip.stops[code])
+          .map(code => ({
+            code,
+            name: stationName(code),
+            arr:  trip.stops[code].arr,
+            dep:  trip.stops[code].dep,
+          }))
+      : [];
+
     return {
       lineId,
       svcId,
@@ -181,22 +193,8 @@ const IZXRouter = (() => {
       alightName:  stationName(alightCode),
       alightArr:   alightStop?.arr ?? alightStop?.dep ?? "--:--",
       alightArrSec: alightSec,
-      km:          legKm,          // km del singolo tratto (null se N/D)
-       intermediateStops: (() => {
-  const canon = IZX_LINES[lineId]?.SVC[svcId]?.stops ?? [];
-  const ordered = trip.direction === 'NB' ? [...canon].reverse() : canon;
-  const bi = ordered.indexOf(boardCode);
-  const ai = ordered.indexOf(alightCode);
-  if (bi === -1 || ai === -1) return [];
-  return ordered.slice(bi + 1, ai)
-    .filter(code => found.trip.stops[code])
-    .map(code => ({
-      code,
-      name: stationName(code),
-      arr:  found.trip.stops[code].arr,
-      dep:  found.trip.stops[code].dep,
-    }));
-})(),
+      km:           legKm,
+      intermediateStops,
     };
   }
 
@@ -224,7 +222,7 @@ const IZXRouter = (() => {
           departureTime: leg.boardDep,
           arrivalTime:   leg.alightArr,
           totalMinutes:  Math.round((leg.alightArrSec - leg.boardDepSec) / 60),
-          totalKm:       leg.km,          // km totali del viaggio
+          totalKm:       leg.km,
           transfers:     0,
           transferNodes: [],
         });
@@ -258,20 +256,17 @@ const IZXRouter = (() => {
                 const leg2 = buildLeg(lineId2, svcId2, partnerNode, to, transferReadySec);
                 if (!leg2) continue;
                 const waitSec = leg2.boardDepSec - leg1.alightArrSec;
-
-                /* km totali: somma dei due tratti (null se almeno uno manca) */
                 const totalKm = (leg1.km != null && leg2.km != null)
                   ? leg1.km + leg2.km
                   : (leg1.km ?? leg2.km ?? null);
-
                 journeys.push({
-                  legs:          [leg1, leg2],
-                  departureTime: leg1.boardDep,
-                  arrivalTime:   leg2.alightArr,
-                  totalMinutes:  Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+                  legs:            [leg1, leg2],
+                  departureTime:   leg1.boardDep,
+                  arrivalTime:     leg2.alightArr,
+                  totalMinutes:    Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
                   totalKm,
-                  transfers:     1,
-                  transferNodes: [midNode],
+                  transfers:       1,
+                  transferNodes:   [midNode],
                   transferWaitMin: Math.round(waitSec / 60),
                 });
               }
