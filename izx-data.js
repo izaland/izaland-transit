@@ -544,6 +544,8 @@ const IZX_LINES = {
     inboundDir:"NB", inboundLabel:"\u2191 Inbound \u2014 Sain\u00f0aul", outboundLabel:"\u2193 Outbound \u2014 Daishin",
     ST:KE_ST, CANONICAL:KE_CANONICAL_ORDER, SVC:KE_SVC,
     TT:KE_TT, FREQ:KE_FREQ, PEAK:KE_PEAK_WINDOWS,
+    /* Sainðaul Central (K01) è in interscambio con RY (R01) ed EI (E01) */
+    INTERCHANGE: { K01: "R01" },
     TERMINUS_SPLIT:{
       A:[{terminus:"K17",weight:2},{terminus:"N4",weight:1}],
       B:[{terminus:"K17",weight:2},{terminus:"N4",weight:1}],
@@ -575,6 +577,8 @@ const IZX_LINES = {
     ST:Object.assign({},RY_ST,DI_ST),
     CANONICAL:RY_CANONICAL_ORDER.concat(DI_CANONICAL_ORDER),
     SVC:RY_SVC, TT:RY_TT, FREQ:RY_FREQ, PEAK:RY_PEAK_WINDOWS,
+    /* Sainðaul Central (R01) è in interscambio con KE (K01) ed EI (E01) */
+    INTERCHANGE: { R01: "K01" },
     TERMINUS_SPLIT:{
       K:[{terminus:"BL05",weight:1},{terminus:"R21",weight:1}],
       J:[{terminus:"SA06",weight:1}],
@@ -618,6 +622,8 @@ const IZX_LINES = {
     TT:  EI_TT,
     FREQ: EI_FREQ,
     PEAK: EI_PEAK_WINDOWS,
+    /* Sainðaul Central (E01) è in interscambio con KE (K01) e RY (R01) */
+    INTERCHANGE: { E01: "K01" },
     TERMINUS_SPLIT: {
       M: [{terminus: "E12", weight: 1}],
       N: [{terminus: "E12", weight: 1}],
