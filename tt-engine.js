@@ -373,7 +373,10 @@ const TTEngine = (() => {
     const seen = new Set();
     const out  = [];
     for (const [lineId, line] of Object.entries(IZX_LINES)) {
-      for (const code of line.CANONICAL) {
+            const canonList = Array.isArray(line.CANONICAL)
+        ? line.CANONICAL
+        : [...new Set(Object.values(line.CANONICAL).flat())];
+      for (const code of canonList) {
         const key = `${lineId}:${code}`;
         if (seen.has(key)) continue;
         seen.add(key);
