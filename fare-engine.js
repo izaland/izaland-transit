@@ -1,11 +1,16 @@
 /* ================================================================
    FARE ENGINE — IZX Izaland Transit
    Estratto da izx-ticket.html (Step 2, 2026-07-21)
+   Fix Step 3b (2026-07-21): ALL_ST ora include DI_ST, SA_ST, SN_ST
 
    Dipendenze (devono essere caricate prima):
-     izx-data.js  → KE_ST, KE_SVC, KE_CP, KE_SK, RY_ST, RY_SVC,
-                    EI_ST, EI_SVC, KE_CANONICAL_ORDER,
-                    RY_CANONICAL_ORDER, EI_CANONICAL_ORDER
+     izx-data.js  → KE_ST, KE_SVC, KE_CP, KE_SK,
+                    RY_ST, DI_ST, SA_ST, RY_SVC,
+                    EI_ST, EI_SVC,
+                    SN_ST, SN_SVC,
+                    KE_CANONICAL_ORDER, RY_CANONICAL_ORDER,
+                    EI_CANONICAL_ORDER, DI_CANONICAL_ORDER,
+                    SN_CANONICAL_ORDER
      ax-data.js   → AX_ST, AX_SVC, AX_CANONICAL_ORDER
 
    Espone l'oggetto globale: IZXFare
@@ -26,16 +31,34 @@
   const HUB_E   = 'E01';
 
   /* ----------------------------------------------------------------
-     LOOKUP GLOBALI (costruiti dopo il caricamento dei data-module)
+     LOOKUP GLOBALI
+     ALL_ST copre TUTTE le stazioni di tutti i data-module:
+       KE_ST  — Keishin main + Nankai
+       RY_ST  — Ryānkai main
+       DI_ST  — Daidōn branch (DI1…DI14, DI131)
+       SA_ST  — Seibu-Naeryuku SA/SK/BL branches
+       SN_ST  — Seibu Naeryuku new line (SN01…SN08)
+       EI_ST  — Eira line
+       AX_ST  — Airport Express
   ---------------------------------------------------------------- */
-  const ALL_ST  = Object.assign({}, KE_ST, RY_ST, EI_ST, AX_ST);
-  const ALL_SVC = Object.assign({}, KE_SVC, RY_SVC, EI_SVC, AX_SVC);
+  const ALL_ST  = Object.assign(
+    {},
+    KE_ST,
+    RY_ST,
+    DI_ST,
+    SA_ST,
+    SN_ST,
+    EI_ST,
+    AX_ST,
+  );
+  const ALL_SVC = Object.assign({}, KE_SVC, RY_SVC, SN_SVC, EI_SVC, AX_SVC);
 
   const KE_MAIN_SVCS = new Set(['A','B','C','Cp']);
   const KE_SAKA_SVCS = new Set(['D','E','F']);
-  const RY_SVCS      = new Set(['L','K','J','G','I','H']);
+  const RY_SVCS      = new Set(['L','K','J','G','I','IS','IL','H']);
   const EI_SVCS      = new Set(['N','M','MF','MI','MS']);
   const AX_SVCS      = new Set(['EST','BAJ','SAK']);
+  const SN_SVCS      = new Set(['K','G_rapid','G_local']);
   const KE_SVCS      = new Set([...KE_MAIN_SVCS, ...KE_SAKA_SVCS]);
 
   /* ----------------------------------------------------------------
@@ -57,6 +80,9 @@
   function lineOf(code) {
     if (code === HUB_VAL)   return 'KE';
     if (AX_ST[code])        return 'AX';
+    if (DI_ST[code])        return 'RY';
+    if (SA_ST[code])        return 'RY';
+    if (SN_ST[code])        return 'SN';
     if (RY_ST[code])        return 'RY';
     if (EI_ST[code])        return 'EI';
     return 'KE';
@@ -88,12 +114,17 @@
   function stKm(code, svcKey) {
     const c = resolveHub(code, svcKey);
     if (AX_SVCS.has(svcKey)) return AX_ST[c] ? AX_ST[c].km : null;
-    if (RY_SVCS.has(svcKey)) return RY_ST[c] ? RY_ST[c].km : null;
+    if (SN_SVCS.has(svcKey)) return SN_ST[c] ? SN_ST[c].km : null;
+    if (RY_SVCS.has(svcKey)) {
+      if (DI_ST[c]) return DI_ST[c].km;
+      return RY_ST[c] ? RY_ST[c].km : null;
+    }
     if (EI_SVCS.has(svcKey)) return EI_ST[c] ? EI_ST[c].km : null;
+    /* KE */
     let kc = c;
     if (kc === 'K101' && KE_MAIN_SVCS.has(svcKey)) kc = 'K02';
-    if (svcKey === 'Cp')              return KE_CP[kc] !== undefined ? KE_CP[kc] : null;
-    if (KE_SAKA_SVCS.has(svcKey))    return KE_SK[kc] !== undefined ? KE_SK[kc] : null;
+    if (svcKey === 'Cp')           return KE_CP[kc] !== undefined ? KE_CP[kc] : null;
+    if (KE_SAKA_SVCS.has(svcKey)) return KE_SK[kc] !== undefined ? KE_SK[kc] : null;
     return KE_ST[kc] ? KE_ST[kc].km : null;
   }
 
@@ -156,7 +187,7 @@
      API PUBBLICA
   ---------------------------------------------------------------- */
   global.IZXFare = {
-    /* Costanti esposte */
+    /* Costanti */
     FIXED_FEE,
     USD_RATE,
     HUB_VAL,
@@ -170,6 +201,7 @@
     RY_SVCS,
     EI_SVCS,
     AX_SVCS,
+    SN_SVCS,
 
     /* Lookup */
     ALL_ST,
