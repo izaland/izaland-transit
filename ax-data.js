@@ -179,5 +179,16 @@ const AX_LINES = {
       SAK: [{terminus:"AX34", weight:1}],
     },
     OFFSETS: {EST:0, BAJ:7, SAK:12},
+    /* ── TARIFF ─────────────────────────────────────────────── */
+    tariff: {
+      operator:   "IZX",
+      zone:       "airport",
+      /* L'AX è un limited express: sovraprezzo rispetto all'intercity base */
+      category:   "limited_exp",
+      baseFixed:  4.50,
+      basePer100: 0.195,
+      /* Solo Standard: AX non dispone di Blue Seat né Yurani */
+      classes:    ["standard"],
+    },
   },
 };
