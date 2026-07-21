@@ -13,6 +13,7 @@
    STAZIONI — tratta comune + rami
    km: distanza progressiva da AX00 (Terminal 4)
    Tratta comune + ramo Est aggiornati con distanze reali.
+   Ramo Bajikoe aggiornato con distanze reali (2026-07-21).
 ---------------------------------------------------------------- */
 const AX_ST = {
   /* Tratta comune */
@@ -29,11 +30,17 @@ const AX_ST = {
   AX08: {n:"Osenude",                      k:"\u9632\u6589",                  b:"est",    km:51.653},
   AX09: {n:"Sabullan",                     k:"\u0a9f\u0ab0\u0ac3\u0ac7\u0aa7\u0acd\u0aa7\u0aaa\u0acd", b:"est", km:59.553},
 
-  /* Ramo Bajikoe: Riimibaiken → Onnojaris (km da aggiornare) */
-  AX20: {n:"Eigandan Senpyan",             k:"\u6c38\u73b5\u6bb5\u8239\u99e2", b:"baj",   km:93.98},
-  AX21: {n:"Showanul",                     k:"\u66f8\u74e6\u5d0e",            b:"baj",   km:117.87},
-  AX22: {n:"Sasatotsu",                    k:"\u4f50\u3005\u6a4b",            b:"baj",   km:131.04},
-  AX23: {n:"Onnojaris",                    k:"",                              b:"baj",   km:147.91},
+  /* Ramo Bajikoe: Riimibaiken → Onnojaris
+     Distanze reali da AX03 (km 13.493):
+       AX03→AX20  10.310 km  → 23.803 km
+       AX20→AX21   6.300 km  → 30.103 km
+       AX21→AX22  32.650 km  → 62.753 km
+       AX22→AX23  25.210 km  → 87.963 km
+  */
+  AX20: {n:"Eigandan Senpyan",             k:"\u6c38\u73b5\u6bb5\u8239\u99e2", b:"baj",   km:23.803},
+  AX21: {n:"Showanul",                     k:"\u66f8\u74e6\u5d0e",            b:"baj",   km:30.103},
+  AX22: {n:"Sasatotsu",                    k:"\u4f50\u3005\u6a4b",            b:"baj",   km:62.753},
+  AX23: {n:"Onnojaris",                    k:"",                              b:"baj",   km:87.963},
 
   /* Ramo Sakamuso: Showanul → Illashiya (km da aggiornare) */
   AX30: {n:"Shin-Erigowa",                 k:"\u65b0\u7e70\u7dca",            b:"sak",   km:119.37},
@@ -61,7 +68,8 @@ const AX_CANONICAL_ORDER = {
 /* ----------------------------------------------------------------
    TIMETABLE — offset in secondi da AX00
    Tratta comune + ramo Est: ricalcolati con vmax 130 km/h, a=1.0 m/s², dwell 30s
-   Ramo BAJ e SAK: valori provvisori (da aggiornare)
+   Ramo BAJ: aggiornato con distanze reali (da ricalcolare con cinematica)
+   Ramo SAK: valori provvisori (da aggiornare)
    Ramo SAK: offset da AX21
 ---------------------------------------------------------------- */
 const AX_TT = {
@@ -159,11 +167,11 @@ const AX_LINES = {
     PEAK:     AX_PEAK_WINDOWS,
     /* Interscambi AX ↔ IZX */
     INTERCHANGE: {
-      AX06: "K01",  /* Sain\u00f0aul Central \u2194 KE/RY/EI */
-      AX04: "K02",  /* Kasakuri \u2194 KE Niji-Sain\u00f0aul */
-      AX01: "K03",  /* Asunahama Airport \u2194 KE */
-      AX21: "K102", /* Showanul \u2194 KE Sakamuso branch */
-      AX34: "K104", /* Illashiya \u2194 KE Sakamuso branch */
+      AX06: "K01",  /* Sainðaul Central ↔ KE/RY/EI */
+      AX04: "K02",  /* Kasakuri ↔ KE Niji-Sainðaul */
+      AX01: "K03",  /* Asunahama Airport ↔ KE */
+      AX21: "K102", /* Showanul ↔ KE Sakamuso branch */
+      AX34: "K104", /* Illashiya ↔ KE Sakamuso branch */
     },
     TERMINUS_SPLIT: {
       EST: [{terminus:"AX09", weight:1}],
