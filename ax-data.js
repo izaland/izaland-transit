@@ -6,35 +6,36 @@
      · Ramo Sakamuso (AX21–AX34): Showanul → Illashiya
    Servizio omnibus unico per ramo.
    Frequenze: 15 min ramo Est, 20 min Bajikoe e Sakamuso.
-   Cinematica: EMU vmax 120 km/h, a=0.8 m/s², dwell 30s
+   Cinematica: EMU vmax 130 km/h, a=1.0 m/s², dwell 30s
 ================================================================ */
 
 /* ----------------------------------------------------------------
    STAZIONI — tratta comune + rami
    km: distanza progressiva da AX00 (Terminal 4)
+   Tratta comune + ramo Est aggiornati con distanze reali.
 ---------------------------------------------------------------- */
 const AX_ST = {
   /* Tratta comune */
   AX00: {n:"Asunahama Airport Terminal 4", k:"",                              b:"common", km:0},
-  AX01: {n:"Asunahama Airport",            k:"\u4f5c\u5b89\u6d5c\u56fd\u969b\u7a7a\u6e2f", b:"common", km:14.95},
-  AX02: {n:"Rink\u016bn City",             k:"\u0aa6\u0abe\u0aaa\u0acd\u200c\u0aa1\u0ac7\u0a83\u0aaa\u0acd \u0a9f\u0abe\u0aa0\u0abe", b:"common", km:78.63},
-  AX03: {n:"Riimibaiken",                  k:"\ud841\udf4f\u535e",             b:"common", km:84.04},
+  AX01: {n:"Asunahama Airport",            k:"\u4f5c\u5b89\u6d5c\u56fd\u969b\u7a7a\u6e2f", b:"common", km:3.094},
+  AX02: {n:"Rink\u016bn City",             k:"\u0aa6\u0abe\u0aaa\u0acd\u200c\u0aa1\u0ac7\u0a83\u0aaa\u0acd \u0a9f\u0abe\u0aa0\u0abe", b:"common", km:8.203},
+  AX03: {n:"Riimibaiken",                  k:"\ud841\udf4f\u535e",             b:"common", km:13.493},
 
   /* Ramo Est: Riimibaiken → Sabullan */
-  AX04: {n:"Kasakuri",                     k:"\u9bdb\u5dfb",                  b:"est",    km:95.85},
-  AX05: {n:"Shimamera",                    k:"\u6e20\u702c\u7530",            b:"est",    km:100.94},
-  AX07: {n:"Herubori",                     k:"\u674f\u767b",                  b:"est",    km:107.93},
-  AX06: {n:"Sain\u00f0aul Central",        k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e", b:"est",   km:117.22},
-  AX08: {n:"Osenude",                      k:"\u9632\u6589",                  b:"est",    km:119.22},
-  AX09: {n:"Sabullan",                     k:"\u0a9f\u0ab0\u0ac3\u0ac7\u0aa7\u0acd\u0aa7\u0aaa\u0acd", b:"est", km:125.77},
+  AX04: {n:"Kasakuri",                     k:"\u9bdb\u5dfb",                  b:"est",    km:26.493},
+  AX05: {n:"Shimamera",                    k:"\u6e20\u702c\u7530",            b:"est",    km:31.643},
+  AX07: {n:"Herubori",                     k:"\u674f\u767b",                  b:"est",    km:38.403},
+  AX06: {n:"Sain\u00f0aul Central",        k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e", b:"est",   km:41.793},
+  AX08: {n:"Osenude",                      k:"\u9632\u6589",                  b:"est",    km:51.653},
+  AX09: {n:"Sabullan",                     k:"\u0a9f\u0ab0\u0ac3\u0ac7\u0aa7\u0acd\u0aa7\u0aaa\u0acd", b:"est", km:59.553},
 
-  /* Ramo Bajikoe: Riimibaiken → Onnojaris */
+  /* Ramo Bajikoe: Riimibaiken → Onnojaris (km da aggiornare) */
   AX20: {n:"Eigandan Senpyan",             k:"\u6c38\u73b5\u6bb5\u8239\u99e2", b:"baj",   km:93.98},
   AX21: {n:"Showanul",                     k:"\u66f8\u74e6\u5d0e",            b:"baj",   km:117.87},
   AX22: {n:"Sasatotsu",                    k:"\u4f50\u3005\u6a4b",            b:"baj",   km:131.04},
   AX23: {n:"Onnojaris",                    k:"",                              b:"baj",   km:147.91},
 
-  /* Ramo Sakamuso: Showanul → Illashiya */
+  /* Ramo Sakamuso: Showanul → Illashiya (km da aggiornare) */
   AX30: {n:"Shin-Erigowa",                 k:"\u65b0\u7e70\u7dca",            b:"sak",   km:119.37},
   AX31: {n:"Sejisebu",                     k:"\u4e95\u7d42",                  b:"sak",   km:126.41},
   AX32: {n:"Yutsukabul",                   k:"\u67da\u9db4\u6b66\u5d0e",      b:"sak",   km:139.41},
@@ -59,26 +60,28 @@ const AX_CANONICAL_ORDER = {
 
 /* ----------------------------------------------------------------
    TIMETABLE — offset in secondi da AX00
+   Tratta comune + ramo Est: ricalcolati con vmax 130 km/h, a=1.0 m/s², dwell 30s
+   Ramo BAJ e SAK: valori provvisori (da aggiornare)
    Ramo SAK: offset da AX21
 ---------------------------------------------------------------- */
 const AX_TT = {
   EST: {
     AX00:    0,
-    AX01:  520,
-    AX02: 2502,
-    AX03: 2736,
-    AX04: 3162,
-    AX05: 3386,
-    AX07: 3667,
-    AX06: 4017,
-    AX08: 4149,
-    AX09: 4417,
+    AX01:  152,
+    AX02:  359,
+    AX03:  572,
+    AX04:  998,
+    AX05: 1207,
+    AX07: 1460,
+    AX06: 1620,
+    AX08: 1959,
+    AX09: 2244,
   },
   BAJ: {
     AX00:    0,
-    AX01:  520,
-    AX02: 2502,
-    AX03: 2736,
+    AX01:  152,
+    AX02:  359,
+    AX03:  572,
     AX20: 3106,
     AX21: 3894,
     AX22: 4361,
