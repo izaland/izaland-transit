@@ -568,6 +568,15 @@ const IZX_LINES = {
       {svcId:"F", dir:"SB", cutoff:"23:12", terminus:"K10"},
       {svcId:"F", dir:"NB", cutoff:"23:12", terminus:"K10"},
     ],
+    /* ── TARIFF ─────────────────────────────────────────────── */
+    tariff: {
+      operator:   "IZX",
+      zone:       "national",
+      category:   "intercity",   // servizio base = Semi-rapido B (coeff 1.00)
+      baseFixed:  4.50,          // quota fissa in Ė
+      basePer100: 0.195,         // tariffa per 100 km (primo scaglione)
+      classes:    ["standard","blue_seat","yurani"],
+    },
   },
 
   RY: {
@@ -608,6 +617,15 @@ const IZX_LINES = {
       {svcId:"IL", dir:"SB", cutoff:"22:54", terminus:"R15"},
       {svcId:"IL", dir:"NB", cutoff:"22:54", terminus:"R15"},
     ],
+    /* ── TARIFF ─────────────────────────────────────────────── */
+    tariff: {
+      operator:   "IZX",
+      zone:       "national",
+      category:   "intercity",   // servizio base = L All-Stop (coeff 0.92) → override per svc G/I
+      baseFixed:  4.50,
+      basePer100: 0.195,
+      classes:    ["standard","blue_seat","yurani"],
+    },
   },
 
   EI: {
@@ -633,6 +651,15 @@ const IZX_LINES = {
       {svcId:"M", dir:"SB", cutoff:"22:36", terminus:"E08"},
       {svcId:"N", dir:"SB", cutoff:"21:57", terminus:"E08"},
     ],
+    /* ── TARIFF ─────────────────────────────────────────────── */
+    tariff: {
+      operator:   "IZX",
+      zone:       "national",
+      category:   "intercity",   // servizio base = N Domestic (coeff 1.00)
+      baseFixed:  4.50,
+      basePer100: 0.195,
+      classes:    ["standard","blue_seat","yurani"],
+    },
   },
 
   SN: {
@@ -662,5 +689,14 @@ const IZX_LINES = {
       {svcId:"G_rapid", dir:"NB", cutoff:"23:05", terminus:"SN08"},
       {svcId:"G_local", dir:"NB", cutoff:"22:35", terminus:"SN08"},
     ],
+    /* ── TARIFF ─────────────────────────────────────────────── */
+    tariff: {
+      operator:   "IZX",
+      zone:       "national",
+      category:   "rapido",      // SN è linea a minor frequenza con servizi prevalentemente rapidi
+      baseFixed:  4.50,
+      basePer100: 0.195,
+      classes:    ["standard","blue_seat"],
+    },
   },
 };
