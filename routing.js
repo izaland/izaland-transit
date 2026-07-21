@@ -1,6 +1,9 @@
 /* ================================================================
    ROUTING.JS — IZX Journey Planner
-   Dipende da: izx-data.js (IZX_LINES), tt-engine.js (TTEngine)
+   Dipende da: izx-data.js  (IZX_LINES)
+               ax-data.js   (AX_LINES → incluso in IZX_LINES via tt-engine)
+               fare-engine.js (IZXFare)
+               tt-engine.js (TTEngine)
 
    API pubblica:
      IZXRouter.search(from, to, depTime, opts) → Journey[]
@@ -11,6 +14,11 @@
      - Percorso diretto (stesso servizio, stessa linea)
      - Percorso con un cambio (transfer in una stazione di interscambio)
    Tempo di interscambio: TRANSFER_MIN (default 5 minuti).
+
+   Opzioni di ricerca (opts):
+     maxResults  {number}  — max journey da restituire (default 5)
+     lines       {string}  — filtra per lineId ('KE','RY','EI','SN','AX')
+                             se omesso o 'ALL' considera tutte le linee
 
    Nota sui servizi SN:
      G_rapid e G_local sono varianti dello stesso servizio logico G;
@@ -25,6 +33,18 @@ const IZXRouter = (() => {
   const TRANSFER_SEC   = TRANSFER_MIN * 60;
   const MAX_JOURNEYS   = 5;
   const SEARCH_WINDOW  = 3 * 3600;
+
+  /* ----------------------------------------------------------------
+   * _lineFilter(opts)
+   * Restituisce un Set di lineId ammessi, o null se è tutto aperto.
+   * ---------------------------------------------------------------- */
+  function _lineFilter(opts) {
+    const raw = opts.lines;
+    if (!raw || raw === 'ALL') return null;
+    /* Accetta sia stringa singola ('KE') sia array (['KE','RY']) */
+    const list = Array.isArray(raw) ? raw : [raw];
+    return new Set(list);
+  }
 
   /* ----------------------------------------------------------------
    * interchangeNodes()
@@ -153,14 +173,12 @@ const IZXRouter = (() => {
     const { trip, boardStop, alightStop, boardSec, alightSec } = found;
     const svcLogical = svcId.replace(/_rapid$|_local$/, "");
 
-    /* Calcolo km del tratto */
     const kmBoard  = stationKm(lineId, boardCode);
     const kmAlight = stationKm(lineId, alightCode);
     const legKm = (kmBoard != null && kmAlight != null)
       ? Math.abs(kmAlight - kmBoard)
       : null;
 
-    /* Fermate intermedie */
     const canon   = IZX_LINES[lineId]?.SVC[svcId]?.stops ?? [];
     const ordered = trip.direction === 'NB' ? [...canon].reverse() : canon;
     const bi = ordered.indexOf(boardCode);
@@ -202,14 +220,16 @@ const IZXRouter = (() => {
    * search(from, to, depTime, opts)
    * ---------------------------------------------------------------- */
   function search(from, to, depTime, opts = {}) {
-    const { hmToSec, secToHM } = TTEngine;
+    const { hmToSec } = TTEngine;
     const maxResults  = opts.maxResults ?? MAX_JOURNEYS;
     const depSec      = hmToSec(depTime);
     const partnerMap  = buildPartnerMap();
     const journeys    = [];
+    const lineAllowed = _lineFilter(opts); /* null = tutte */
 
     /* ---- 1. Percorsi DIRETTI ---- */
     for (const [lineId, line] of Object.entries(IZX_LINES)) {
+      if (lineAllowed && !lineAllowed.has(lineId)) continue;
       const hasFrom = line.ST[from] !== undefined;
       const hasTo   = line.ST[to]   !== undefined;
       if (!hasFrom || !hasTo) continue;
@@ -232,6 +252,7 @@ const IZXRouter = (() => {
     /* ---- 2. Percorsi con UN CAMBIO ---- */
     const reachableInterchanges = new Set();
     for (const [lineId, line] of Object.entries(IZX_LINES)) {
+      if (lineAllowed && !lineAllowed.has(lineId)) continue;
       if (!line.ST[from]) continue;
       for (const code of line.CANONICAL) {
         if (partnerMap[code]) reachableInterchanges.add(code);
@@ -242,8 +263,10 @@ const IZXRouter = (() => {
       const partners = partnerMap[midNode] ?? [];
       for (const partnerNode of partners) {
         for (const [lineId2, line2] of Object.entries(IZX_LINES)) {
+          if (lineAllowed && !lineAllowed.has(lineId2)) continue;
           if (!line2.ST[partnerNode] || !line2.ST[to]) continue;
           for (const [lineId1, line1] of Object.entries(IZX_LINES)) {
+            if (lineAllowed && !lineAllowed.has(lineId1)) continue;
             if (!line1.ST[from] || !line1.ST[midNode]) continue;
             for (const svcId1 of Object.keys(line1.SVC)) {
               if (!line1.TT[svcId1]) continue;
@@ -297,21 +320,21 @@ const IZXRouter = (() => {
   function formatJourney(j) {
     const lines = [];
     lines.push(
-      `Partenza ${j.departureTime} → Arrivo ${j.arrivalTime}` +
+      `Partenza ${j.departureTime} \u2192 Arrivo ${j.arrivalTime}` +
       ` (${j.totalMinutes} min, ${j.transfers} cambio/i` +
       (j.totalKm != null ? `, ${j.totalKm.toFixed(1)} km` : '') + ')'
     );
     for (const [i, leg] of j.legs.entries()) {
       lines.push(
         `  Tratto ${i + 1}: [${leg.svcLogical}/${leg.svcId}] ${leg.svcName}` +
-        ` · ${leg.boardName} ${leg.boardDep} → ${leg.alightName} ${leg.alightArr}` +
-        (leg.km != null ? ` · ${leg.km.toFixed(1)} km` : '') +
-        ` · Treno ${leg.trainNumber ?? "--"}`
+        ` \u00b7 ${leg.boardName} ${leg.boardDep} \u2192 ${leg.alightName} ${leg.alightArr}` +
+        (leg.km != null ? ` \u00b7 ${leg.km.toFixed(1)} km` : '') +
+        ` \u00b7 Treno ${leg.trainNumber ?? "--"}`
       );
       if (i < j.legs.length - 1) {
         lines.push(
-          `    ↕ Cambio a ${stationName(j.transferNodes[i])}` +
-          ` — attesa ${j.transferWaitMin ?? TRANSFER_MIN} min`
+          `    \u2195 Cambio a ${stationName(j.transferNodes[i])}` +
+          ` \u2014 attesa ${j.transferWaitMin ?? TRANSFER_MIN} min`
         );
       }
     }
