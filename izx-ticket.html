@@ -627,11 +627,20 @@
     return fi !== -1 && ti !== -1 && fi !== ti;
   }
 
-  function buildSelects(){
-    const sf = document.getElementById('sel-from'), st2 = document.getElementById('sel-to');
+ function buildSelects(){
+    /* Costruisce tutto in fragment, poi rimpiazza i <select> live con cloni puliti
+       → forza Chrome a ri-renderizzare il controllo nativo con tutte le opzioni già presenti */
+    const sfOld = document.getElementById('sel-from'), st2Old = document.getElementById('sel-to');
+    const fragF = document.createDocumentFragment(), fragT = document.createDocumentFragment();
+
     function addOpt(ogs, value, label){
-      [0,1].forEach(i => { const o = document.createElement('option'); o.value=value; o.textContent=label; ogs[i].appendChild(o); });
+      [0,1].forEach(i => {
+        const o = document.createElement('option');
+        o.value = value; o.textContent = label;
+        ogs[i].appendChild(o);
+      });
     }
+
     let lastB = null, ogs = [null,null];
     KE_SELECT_ORDER.forEach(code => {
       const s = KE_ST[code]; if(!s) return;
@@ -639,20 +648,23 @@
       if(s.b !== lastB){
         ogs = [document.createElement('optgroup'),document.createElement('optgroup')];
         ogs.forEach(og => { og.label='Keishin \u2014 '+bl; });
-        sf.appendChild(ogs[0]); st2.appendChild(ogs[1]); lastB=s.b;
+        fragF.appendChild(ogs[0]); fragT.appendChild(ogs[1]); lastB=s.b;
       }
       const value = (code==='K01') ? HUB_VAL : code;
       const label = (code==='K01') ? 'K01/R01/E01 '+s.n+(s.k?' \u00b7 '+s.k:'') : code+' '+s.n+(s.k?' \u00b7 '+s.k:'');
       addOpt(ogs, value, label);
     });
+
     const ryOgs = [document.createElement('optgroup'),document.createElement('optgroup')];
     ryOgs.forEach(og => og.label='Ry\u0101nkai \u2014 Main Line');
-    sf.appendChild(ryOgs[0]); st2.appendChild(ryOgs[1]);
+    fragF.appendChild(ryOgs[0]); fragT.appendChild(ryOgs[1]);
     RY_SELECT_ORDER.forEach(code => { const s=RY_ST[code]; if(!s) return; addOpt(ryOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:'')); });
+
     const eiOgs = [document.createElement('optgroup'),document.createElement('optgroup')];
     eiOgs.forEach(og => og.label='Eira \u2014 Main Line');
-    sf.appendChild(eiOgs[0]); st2.appendChild(eiOgs[1]);
+    fragF.appendChild(eiOgs[0]); fragT.appendChild(eiOgs[1]);
     EI_SELECT_ORDER.forEach(code => { const s=EI_ST[code]; if(!s) return; addOpt(eiOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:'')); });
+
     /* Airport Express */
     const axBranches = {common:'Common',est:'Est Branch',baj:'Bajikoe Branch',sak:'Sakamuso Branch'};
     let lastAxB = null, axOgs = [null,null];
@@ -662,11 +674,21 @@
       if(s.b !== lastAxB){
         axOgs = [document.createElement('optgroup'),document.createElement('optgroup')];
         axOgs.forEach(og => { og.label='Airport Express \u2014 '+bl; });
-        sf.appendChild(axOgs[0]); st2.appendChild(axOgs[1]); lastAxB=s.b;
+        fragF.appendChild(axOgs[0]); fragT.appendChild(axOgs[1]); lastAxB=s.b;
       }
       addOpt(axOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:''));
     });
-    sf.value = HUB_VAL; st2.value = 'K17';
+
+    /* Sostituisce i <select> con cloni puliti + fragment già completo */
+    const sfNew  = sfOld.cloneNode(false);
+    const st2New = st2Old.cloneNode(false);
+    sfNew.appendChild(fragF);
+    st2New.appendChild(fragT);
+    sfOld.parentNode.replaceChild(sfNew,  sfOld);
+    st2Old.parentNode.replaceChild(st2New, st2Old);
+
+    sfNew.value  = HUB_VAL;
+    st2New.value = 'K17';
   }
 
   const CLASS_C = {standard:1.00, blue_seat:1.55, yurani:2.40};
