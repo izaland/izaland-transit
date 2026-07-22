@@ -192,3 +192,10 @@ const AX_LINES = {
     },
   },
 };
+
+/* ----------------------------------------------------------------
+   Integra AX in IZX_LINES così che TTEngine e IZXRouter
+   possano vedere le stazioni Airport Express.
+   (izx-data.js è caricato prima di ax-data.js)
+---------------------------------------------------------------- */
+Object.assign(IZX_LINES, AX_LINES);
