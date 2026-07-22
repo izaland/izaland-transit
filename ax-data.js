@@ -77,9 +77,20 @@ const AX_CANONICAL_FLAT = [
 
 /* ----------------------------------------------------------------
    TIMETABLE — offset in secondi da AX00
-   Tratta comune + ramo Est: ricalcolati con vmax 130 km/h, a=1.0 m/s², dwell 30s
-   Ramo BAJ: aggiornato con distanze reali
-   Ramo SAK: valori provvisori (da AX21)
+
+   Cinematica: vmax 130 km/h, a=1.0 m/s², dwell 30s
+
+   Ramo EST (tratta comune AX00–AX03 + ramo Est):
+     Valori ricalcolati con distanze reali.
+
+   Ramo BAJ (tratta comune AX00–AX03 + ramo Bajikoe):
+     AX00–AX03 = 572s (condiviso con EST)
+     AX03→AX20  10.310 km  352s  → AX20:  924s
+     AX20→AX21   6.300 km  241s  → AX21: 1165s
+     AX21→AX22  32.650 km  970s  → AX22: 2135s
+     AX22→AX23  25.210 km  764s  → AX23: 2899s
+
+   Ramo SAK: offset da AX21 (valori provvisori da aggiornare)
 ---------------------------------------------------------------- */
 const AX_TT = {
   EST: {
@@ -99,10 +110,10 @@ const AX_TT = {
     AX01:  152,
     AX02:  359,
     AX03:  572,
-    AX20: 3106,
-    AX21: 3894,
-    AX22: 4361,
-    AX23: 4939,
+    AX20:  924,
+    AX21: 1165,
+    AX22: 2135,
+    AX23: 2899,
   },
   SAK: {
     AX21:    0,
