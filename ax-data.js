@@ -42,7 +42,7 @@ const AX_ST = {
   AX22: {n:"Sasatotsu",                    k:"\u4f50\u3005\u6a4b",            b:"baj",   km:62.753},
   AX23: {n:"Onnojaris",                    k:"",                              b:"baj",   km:87.963},
 
-  /* Ramo Sakamuso: Showanul → Illashiya (km da aggiornare) */
+  /* Ramo Sakamuso: Showanul → Illashiya */
   AX30: {n:"Shin-Erigowa",                 k:"\u65b0\u7e70\u7dca",            b:"sak",   km:119.37},
   AX31: {n:"Sejisebu",                     k:"\u4e95\u7d42",                  b:"sak",   km:126.41},
   AX32: {n:"Yutsukabul",                   k:"\u67da\u9db4\u6b66\u5d0e",      b:"sak",   km:139.41},
@@ -51,7 +51,7 @@ const AX_ST = {
 };
 
 /* ----------------------------------------------------------------
-   CANONICAL ORDER per ogni ramo
+   CANONICAL ORDER per ogni ramo (oggetto per riferimento interno)
 ---------------------------------------------------------------- */
 const AX_CANONICAL_COMMON = ["AX00","AX01","AX02","AX03"];
 const AX_CANONICAL_EST    = ["AX03","AX04","AX05","AX07","AX06","AX08","AX09"];
@@ -65,12 +65,21 @@ const AX_CANONICAL_ORDER = {
   SAK: ["AX21","AX30","AX31","AX32","AX33","AX34"],
 };
 
+/* Array flat deduplicato: usato da TTEngine e IZXRouter che si
+   aspettano line.CANONICAL come array iterabile. */
+const AX_CANONICAL_FLAT = [
+  ...new Set([
+    ...AX_CANONICAL_ORDER.EST,
+    ...AX_CANONICAL_ORDER.BAJ,
+    ...AX_CANONICAL_ORDER.SAK,
+  ])
+];
+
 /* ----------------------------------------------------------------
    TIMETABLE — offset in secondi da AX00
    Tratta comune + ramo Est: ricalcolati con vmax 130 km/h, a=1.0 m/s², dwell 30s
-   Ramo BAJ: aggiornato con distanze reali (da ricalcolare con cinematica)
-   Ramo SAK: valori provvisori (da aggiornare)
-   Ramo SAK: offset da AX21
+   Ramo BAJ: aggiornato con distanze reali
+   Ramo SAK: valori provvisori (da AX21)
 ---------------------------------------------------------------- */
 const AX_TT = {
   EST: {
@@ -159,12 +168,12 @@ const AX_LINES = {
     inboundDir:   "NB",
     inboundLabel:  "\u2191 Inbound \u2014 Asunahama Airport",
     outboundLabel: "\u2193 Outbound",
-    ST:       AX_ST,
-    CANONICAL: AX_CANONICAL_ORDER,
-    SVC:      AX_SVC,
-    TT:       AX_TT,
-    FREQ:     AX_FREQ,
-    PEAK:     AX_PEAK_WINDOWS,
+    ST:        AX_ST,
+    CANONICAL: AX_CANONICAL_FLAT,   /* array flat: richiesto da TTEngine/IZXRouter */
+    SVC:       AX_SVC,
+    TT:        AX_TT,
+    FREQ:      AX_FREQ,
+    PEAK:      AX_PEAK_WINDOWS,
     /* Interscambi AX ↔ IZX */
     INTERCHANGE: {
       AX06: "K01",  /* Sainðaul Central ↔ KE/RY/EI */
@@ -179,15 +188,14 @@ const AX_LINES = {
       SAK: [{terminus:"AX34", weight:1}],
     },
     OFFSETS: {EST:0, BAJ:7, SAK:12},
+    SHORT_WORKING: [],
     /* ── TARIFF ─────────────────────────────────────────────── */
     tariff: {
       operator:   "IZX",
       zone:       "airport",
-      /* L'AX è un limited express: sovraprezzo rispetto all'intercity base */
       category:   "limited_exp",
       baseFixed:  4.50,
       basePer100: 0.195,
-      /* Solo Standard: AX non dispone di Blue Seat né Yurani */
       classes:    ["standard"],
     },
   },
