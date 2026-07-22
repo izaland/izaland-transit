@@ -266,70 +266,6 @@
       background:var(--border);
     }
 
-    /* ── DIRECT-ONLY TOGGLE ── */
-    .toggle-group{
-      display:flex;
-      align-items:center;
-      gap:var(--space-3);
-      height:42px;
-    }
-    .toggle-track{
-      position:relative;
-      width:40px;
-      height:22px;
-      flex-shrink:0;
-    }
-    .toggle-track input{
-      opacity:0;
-      width:0;
-      height:0;
-      position:absolute;
-    }
-    .toggle-slider{
-      position:absolute;
-      inset:0;
-      background:var(--border);
-      border-radius:999px;
-      cursor:pointer;
-      transition:background var(--transition);
-    }
-    .toggle-slider::before{
-      content:'';
-      position:absolute;
-      left:3px;
-      top:3px;
-      width:16px;
-      height:16px;
-      border-radius:50%;
-      background:#fff;
-      transition:transform var(--transition);
-    }
-    .toggle-track input:checked + .toggle-slider{
-      background:var(--accent);
-    }
-    .toggle-track input:checked + .toggle-slider::before{
-      transform:translateX(18px);
-    }
-    .toggle-label{
-      font-size:var(--text-xs);
-      font-weight:700;
-      text-transform:uppercase;
-      letter-spacing:.07em;
-      color:var(--text-muted);
-      cursor:pointer;
-      user-select:none;
-      line-height:1.3;
-    }
-    .toggle-label span{
-      display:block;
-      font-size:.62rem;
-      font-weight:400;
-      text-transform:none;
-      letter-spacing:0;
-      color:var(--text-faint);
-      margin-top:1px;
-    }
-
     @media(max-width:640px){
       .sim-row{grid-template-columns:1fr;}
       .sim-swap{width:100%;justify-content:center;}
@@ -529,18 +465,6 @@
       </div>
     </div>
 
-    <!-- Direct-only toggle: occupa tutta la larghezza sotto le sim-options -->
-    <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
-      <label class="toggle-track" for="jp-direct-only">
-        <input type="checkbox" id="jp-direct-only">
-        <span class="toggle-slider"></span>
-      </label>
-      <label class="toggle-label" for="jp-direct-only">
-        Direct only
-        <span>Hide journeys with transfers</span>
-      </label>
-    </div>
-
     <button class="sim-btn" id="jp-search">Find journeys</button>
 
     <div id="jp-results">
@@ -705,6 +629,8 @@
   }
 
  function buildSelects(){
+    /* Costruisce tutto in fragment, poi rimpiazza i <select> live con cloni puliti
+       → forza Chrome a ri-renderizzare il controllo nativo con tutte le opzioni già presenti */
     const sfOld = document.getElementById('sel-from'), st2Old = document.getElementById('sel-to');
     const fragF = document.createDocumentFragment(), fragT = document.createDocumentFragment();
 
@@ -740,6 +666,7 @@
     fragF.appendChild(eiOgs[0]); fragT.appendChild(eiOgs[1]);
     EI_SELECT_ORDER.forEach(code => { const s=EI_ST[code]; if(!s) return; addOpt(eiOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:'')); });
 
+    /* Airport Express */
     const axBranches = {common:'Common',est:'Est Branch',baj:'Bajikoe Branch',sak:'Sakamuso Branch'};
     let lastAxB = null, axOgs = [null,null];
     AX_SELECT_ORDER.forEach(code => {
@@ -753,6 +680,7 @@
       addOpt(axOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:''));
     });
 
+    /* Sostituisce i <select> con cloni puliti + fragment già completo */
     const sfNew  = sfOld.cloneNode(false);
     const st2New = st2Old.cloneNode(false);
     sfNew.appendChild(fragF);
@@ -927,4 +855,268 @@
         headerHTML=`<span class="svc-badge svc-${first.svc==='Cp'?'Cp':first.svc}">${pill}</span><span class="svc-name">${info.name}</span>`;
       }
       const priceRowsHTML=rows.map(r=>{ const isBest=r.price===minP; return `<div class="price-row${isBest?' best-price':''}"><span class="price-class">${CLASS_L[r.class]}</span><span class="price-val">${fmt(r.price)} <span class="price-usd">${fusd(r.price)}</span></span></div>`; }).join('');
-      card.innerHTML=`<div class="service-card-h
+      card.innerHTML=`<div class="service-card-header">${headerHTML}</div><div class="price-rows">${priceRowsHTML}</div><div class="card-km">${first.km.toFixed(1)} km${isCombo?' \u00b7 combined fare':''}</div>`;
+      cards.appendChild(card);
+    });
+    if(results[0].type==='combo'){
+      document.getElementById('stop-diagram').style.display='none';
+    } else {
+      const diagSvcs=[...new Set(results.map(r=>r.svc))];
+      renderDiagram(diagSvcs.map(k=>({k})), from, to);
+    }
+  }
+
+  buildSelects();
+  document.getElementById('btn-swap').addEventListener('click',()=>{ const sf=document.getElementById('sel-from'),st=document.getElementById('sel-to'),tmp=sf.value; sf.value=st.value; st.value=tmp; });
+  document.getElementById('btn-search').addEventListener('click',()=>{
+    const from=document.getElementById('sel-from').value, to=document.getElementById('sel-to').value;
+    const cls=document.getElementById('sel-class').value, svc=document.getElementById('sel-service').value;
+    if(from===to){alert('Please select two different stations.');return;}
+    renderFares(from,to,cls,svc);
+  });
+
+  /* ================================================================
+     JOURNEY PLANNER
+  ================================================================ */
+  const _jpState = {
+    from: null, to: null, lineF: null,
+    windowStart: null, windowEnd: null,
+    all: [],
+  };
+
+  function _parseMins(hhmm) {
+    const [h, m] = hhmm.split(':').map(Number);
+    return h * 60 + m;
+  }
+  function _fmtMins(total) {
+    const h = Math.floor(((total % 1440) + 1440) % 1440 / 60);
+    const m = ((total % 1440) + 1440) % 1440 % 60;
+    return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  }
+  function _nextAfter(journeys) {
+    if (!journeys.length) return null;
+    let maxMins = -Infinity;
+    journeys.forEach(j => { const m = _parseMins(j.departureTime); if (m > maxMins) maxMins = m; });
+    return _fmtMins(maxMins + 1);
+  }
+  function _prevBefore(journeys) {
+    if (!journeys.length) return null;
+    let minMins = Infinity;
+    journeys.forEach(j => { const m = _parseMins(j.departureTime); if (m < minMins) minMins = m; });
+    return _fmtMins(minMins - 180);
+  }
+
+  function buildPlannerSelects(){
+    const jpFrom = document.getElementById('jp-from');
+    const jpTo   = document.getElementById('jp-to');
+    const byLine = {};
+    TTEngine.allStations().forEach(st => {
+      if(!byLine[st.lineId]) byLine[st.lineId] = [];
+      byLine[st.lineId].push(st);
+    });
+    const lineLabels = {KE:'Keishin', RY:'Ry\u0101nkai', EI:'Eira', SN:'Seibu Naeryuku', AX:'Airport Express'};
+    Object.entries(byLine).forEach(([lineId, stations]) => {
+      const ogF = document.createElement('optgroup');
+      const ogT = document.createElement('optgroup');
+      ogF.label = ogT.label = lineLabels[lineId] || lineId;
+      stations.forEach(st => {
+        const label = st.code + ' ' + st.name + (st.kanji ? ' \u00b7 ' + st.kanji : '');
+        [ogF, ogT].forEach((og) => {
+          const opt = document.createElement('option');
+          opt.value = st.code;
+          opt.textContent = label;
+          og.appendChild(opt);
+        });
+      });
+      jpFrom.appendChild(ogF);
+      jpTo.appendChild(ogT);
+    });
+    jpFrom.value = 'R13';
+    jpTo.value   = 'SN08';
+  }
+
+  function svcBadgeHTML(svcId, svcLogical, color) {
+    const label = svcId === 'Cp' ? 'C\u2032' : (svcLogical || svcId);
+    const cls   = 'svc-' + (svcId === 'Cp' ? 'Cp' : (svcLogical || svcId));
+    return `<span class="svc-badge ${cls}" style="background:${color};color:#fff">${label}</span>`;
+  }
+
+  function renderJourneys(journeys, fromName, toName, mode) {
+    const resEl   = document.getElementById('jp-results');
+    const titleEl = document.getElementById('jp-route-title');
+    const listEl  = document.getElementById('journey-list');
+    const noteEl  = document.getElementById('jp-note');
+    const navBar  = document.getElementById('jp-nav-bar');
+    const timeChip= document.getElementById('jp-time-chip');
+
+    resEl.style.display = 'block';
+    titleEl.textContent = fromName + ' \u2192 ' + toName;
+
+    if (!journeys.length && mode === 'replace') {
+      listEl.innerHTML = '<p class="jp-no-result">No journeys found in the next 3 hours.</p>';
+      noteEl.style.display = 'none';
+      navBar.style.display = 'none';
+      return;
+    }
+
+    if (mode === 'prepend') {
+      const existingKeys = new Set(_jpState.all.map(j => j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      const fresh = journeys.filter(j => !existingKeys.has(j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      _jpState.all = [...fresh, ..._jpState.all];
+    } else if (mode === 'append') {
+      const existingKeys = new Set(_jpState.all.map(j => j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      const fresh = journeys.filter(j => !existingKeys.has(j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      _jpState.all = [..._jpState.all, ...fresh];
+    } else {
+      _jpState.all = [...journeys];
+    }
+
+    _jpState.all.sort((a,b) => _parseMins(a.departureTime) - _parseMins(b.departureTime));
+
+    const hasTransfer = _jpState.all.some(j => j.transfers > 0);
+    if (hasTransfer) {
+      noteEl.style.display = 'block';
+      noteEl.innerHTML = `\u24d8 Transfer time: minimum <strong>${IZXRouter.TRANSFER_MIN} min</strong> between trains at the same station.`;
+    } else {
+      noteEl.style.display = 'none';
+    }
+
+    if (_jpState.all.length) {
+      _jpState.windowStart = _jpState.all[0].departureTime;
+      _jpState.windowEnd   = _jpState.all[_jpState.all.length - 1].departureTime;
+    }
+
+    /* Render cards */
+    listEl.innerHTML = '';
+    _jpState.all.forEach((j, idx) => {
+      const card = document.createElement('div');
+      card.className = 'journey-card' + (idx === 0 ? ' best' : '');
+
+      const transferBadge = j.transfers > 0
+        ? `<span class="transfer-badge">${j.transfers} change</span>`
+        : '<span class="transfer-badge">Direct</span>';
+
+      let legsHTML = '<div class="journey-legs">';
+      j.legs.forEach((leg, li) => {
+        const badge = svcBadgeHTML(leg.svcId, leg.svcLogical, leg.color);
+        const intStops = leg.intermediateStops ?? [];
+        const intId = `int-${idx}-${li}`;
+        const expandBtn = intStops.length
+          ? `<button class="leg-expand-btn" data-target="${intId}">\u25b8 ${intStops.length} stop${intStops.length > 1 ? 's' : ''}</button>`
+          : '';
+        const intHTML = intStops.map(s =>
+          `<div class="leg-int-row"><span class="leg-int-time">${s.arr} \u2192 ${s.dep}</span><span>${s.name}</span></div>`
+        ).join('');
+
+        legsHTML += `
+          <div class="leg-row">
+            <div class="leg-svc">${badge} <span class="svc-name">${leg.svcName}</span></div>
+            <div class="leg-times">${leg.boardDep} \u2192 ${leg.alightArr}</div>
+            <div class="leg-stations">${leg.boardName} \u2192 ${leg.alightName} ${expandBtn}</div>
+            <div class="leg-meta">
+              <span class="leg-train">#${leg.trainNumber ?? '--'}</span>
+              ${leg.km != null ? `<span class="leg-km">${Math.round(leg.km)} km</span>` : ''}
+            </div>
+          </div>
+          ${intStops.length ? `<div class="leg-intermediates" id="${intId}">${intHTML}</div>` : ''}`;
+
+        if (li < j.legs.length - 1) {
+          const waitMin = j.transferWaitMin ?? IZXRouter.TRANSFER_MIN;
+          const node    = IZXRouter.stationName(j.transferNodes[li]);
+          legsHTML += `
+            <div class="transfer-row">
+              Change at <strong>${node}</strong> \u2014 ${waitMin} min wait
+            </div>`;
+        }
+      });
+      legsHTML += '</div>';
+
+      card.innerHTML = `
+        <div class="journey-header">
+          <div class="journey-times">${j.departureTime} \u2192 ${j.arrivalTime}</div>
+          <div class="journey-dur">${j.totalMinutes} min ${transferBadge}${j.totalKm != null ? ` <span class="journey-km">\u00b7 ${Math.round(j.totalKm)} km</span>` : ''}</div>
+        </div>` + legsHTML;
+
+      card.querySelectorAll('.leg-expand-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = card.querySelector('#' + btn.dataset.target);
+          if (!target) return;
+          const open = target.classList.toggle('open');
+          btn.textContent = open
+            ? btn.textContent.replace('\u25b8', '\u25be')
+            : btn.textContent.replace('\u25be', '\u25b8');
+        });
+      });
+
+      listEl.appendChild(card);
+    });
+
+    navBar.style.display = 'flex';
+    timeChip.textContent = _jpState.windowStart + ' \u2013 ' + _jpState.windowEnd;
+
+    if (mode === 'prepend' && journeys.length) {
+      listEl.firstElementChild?.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  }
+
+function _runSearch(from, to, depTime, lineF, directOnly) {
+  return IZXRouter.search(from, to, depTime, { 
+    lines: lineF, directOnly: !!directOnly, maxResults: 5 
+  });
+}
+
+  buildPlannerSelects();
+
+  document.getElementById('jp-swap').addEventListener('click', () => {
+    const f = document.getElementById('jp-from'), t = document.getElementById('jp-to');
+    const tmp = f.value; f.value = t.value; t.value = tmp;
+  });
+
+  document.getElementById('jp-search').addEventListener('click', () => {
+    const from       = document.getElementById('jp-from').value;
+    const to         = document.getElementById('jp-to').value;
+    const depTime    = document.getElementById('jp-time').value || '08:00';
+    const lineF      = document.getElementById('jp-line').value;
+    const directOnly = document.getElementById('jp-direct-only').checked;
+    if (from === to) { alert('Please select two different stations.'); return; }
+    _jpState.from = from; _jpState.to = to; _jpState.lineF = lineF; _jpState.directOnly = directOnly; _jpState.all = [];
+    const journeys = _runSearch(from, to, depTime, lineF, directOnly);
+    renderJourneys(journeys, IZXRouter.stationName(from), IZXRouter.stationName(to), 'replace');
+  });
+
+  document.getElementById('jp-earlier').addEventListener('click', () => {
+    if (!_jpState.from) return;
+    const anchor = _prevBefore(_jpState.all);
+    if (!anchor) return;
+    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly);
+    const cutoff = _parseMins(_jpState.windowStart);
+    const earlier = journeys.filter(j => _parseMins(j.departureTime) < cutoff);
+    if (!earlier.length) {
+      const btn = document.getElementById('jp-earlier');
+      const orig = btn.innerHTML;
+      btn.textContent = 'No earlier trains'; btn.disabled = true;
+      setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+      return;
+    }
+    renderJourneys(earlier, IZXRouter.stationName(_jpState.from), IZXRouter.stationName(_jpState.to), 'prepend');
+  });
+
+  document.getElementById('jp-later').addEventListener('click', () => {
+    if (!_jpState.from) return;
+    const anchor = _nextAfter(_jpState.all);
+    if (!anchor) return;
+    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly);
+    if (!journeys.length) {
+      const btn = document.getElementById('jp-later');
+      const orig = btn.innerHTML;
+      btn.textContent = 'No later trains'; btn.disabled = true;
+      setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+      return;
+    }
+    renderJourneys(journeys, IZXRouter.stationName(_jpState.from), IZXRouter.stationName(_jpState.to), 'append');
+  });
+
+})();
+</script>
+</body>
+</html>
