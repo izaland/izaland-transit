@@ -16,9 +16,10 @@
    Tempo di interscambio: TRANSFER_MIN (default 5 minuti).
 
    Opzioni di ricerca (opts):
-     maxResults  {number}  — max journey da restituire (default 5)
-     lines       {string}  — filtra per lineId ('KE','RY','EI','SN','AX')
-                             se omesso o 'ALL' considera tutte le linee
+     maxResults  {number}   — max journey da restituire (default 5)
+     lines       {string}   — filtra per lineId ('KE','RY','EI','SN','AX')
+                              se omesso o 'ALL' considera tutte le linee
+     directOnly  {boolean}  — se true, restituisce solo percorsi senza cambi
 
    Nota sui servizi SN:
      G_rapid e G_local sono varianti dello stesso servizio logico G;
@@ -231,10 +232,13 @@ const IZXRouter = (() => {
 
   /* ----------------------------------------------------------------
    * search(from, to, depTime, opts)
+   *
+   * opts.directOnly {boolean} — se true salta la fase dei cambi
    * ---------------------------------------------------------------- */
   function search(from, to, depTime, opts = {}) {
     const { hmToSec } = TTEngine;
     const maxResults  = opts.maxResults ?? MAX_JOURNEYS;
+    const directOnly  = !!opts.directOnly;
     const depSec      = hmToSec(depTime);
     const partnerMap  = buildPartnerMap();
     const journeys    = [];
@@ -262,49 +266,51 @@ const IZXRouter = (() => {
       }
     }
 
-    /* ---- 2. Percorsi con UN CAMBIO ---- */
-    const reachableInterchanges = new Set();
-    for (const [lineId, line] of Object.entries(IZX_LINES)) {
-      if (lineAllowed && !lineAllowed.has(lineId)) continue;
-      if (!line.ST[from]) continue;
-      for (const code of line.CANONICAL) {
-        if (partnerMap[code]) reachableInterchanges.add(code);
+    /* ---- 2. Percorsi con UN CAMBIO (saltati se directOnly) ---- */
+    if (!directOnly) {
+      const reachableInterchanges = new Set();
+      for (const [lineId, line] of Object.entries(IZX_LINES)) {
+        if (lineAllowed && !lineAllowed.has(lineId)) continue;
+        if (!line.ST[from]) continue;
+        for (const code of line.CANONICAL) {
+          if (partnerMap[code]) reachableInterchanges.add(code);
+        }
       }
-    }
 
-    for (const midNode of reachableInterchanges) {
-      const partners = partnerMap[midNode] ?? [];
-      for (const partnerNode of partners) {
-        for (const [lineId2, line2] of Object.entries(IZX_LINES)) {
-          if (lineAllowed && !lineAllowed.has(lineId2)) continue;
-          if (!line2.ST[partnerNode] || !line2.ST[to]) continue;
-          for (const [lineId1, line1] of Object.entries(IZX_LINES)) {
-            if (lineAllowed && !lineAllowed.has(lineId1)) continue;
-            if (!line1.ST[from] || !line1.ST[midNode]) continue;
-            for (const svcId1 of Object.keys(line1.SVC)) {
-              if (!line1.TT[svcId1]) continue;
-              const leg1 = buildLeg(lineId1, svcId1, from, midNode, depSec);
-              if (!leg1) continue;
-              const transferReadySec = leg1.alightArrSec + TRANSFER_SEC;
-              for (const svcId2 of Object.keys(line2.SVC)) {
-                if (!line2.TT[svcId2]) continue;
-                if (lineId1 === lineId2 && svcId1 === svcId2 && midNode === partnerNode) continue;
-                const leg2 = buildLeg(lineId2, svcId2, partnerNode, to, transferReadySec);
-                if (!leg2) continue;
-                const waitSec = leg2.boardDepSec - leg1.alightArrSec;
-                const totalKm = (leg1.km != null && leg2.km != null)
-                  ? leg1.km + leg2.km
-                  : (leg1.km ?? leg2.km ?? null);
-                journeys.push({
-                  legs:            [leg1, leg2],
-                  departureTime:   leg1.boardDep,
-                  arrivalTime:     leg2.alightArr,
-                  totalMinutes:    Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
-                  totalKm,
-                  transfers:       1,
-                  transferNodes:   [midNode],
-                  transferWaitMin: Math.round(waitSec / 60),
-                });
+      for (const midNode of reachableInterchanges) {
+        const partners = partnerMap[midNode] ?? [];
+        for (const partnerNode of partners) {
+          for (const [lineId2, line2] of Object.entries(IZX_LINES)) {
+            if (lineAllowed && !lineAllowed.has(lineId2)) continue;
+            if (!line2.ST[partnerNode] || !line2.ST[to]) continue;
+            for (const [lineId1, line1] of Object.entries(IZX_LINES)) {
+              if (lineAllowed && !lineAllowed.has(lineId1)) continue;
+              if (!line1.ST[from] || !line1.ST[midNode]) continue;
+              for (const svcId1 of Object.keys(line1.SVC)) {
+                if (!line1.TT[svcId1]) continue;
+                const leg1 = buildLeg(lineId1, svcId1, from, midNode, depSec);
+                if (!leg1) continue;
+                const transferReadySec = leg1.alightArrSec + TRANSFER_SEC;
+                for (const svcId2 of Object.keys(line2.SVC)) {
+                  if (!line2.TT[svcId2]) continue;
+                  if (lineId1 === lineId2 && svcId1 === svcId2 && midNode === partnerNode) continue;
+                  const leg2 = buildLeg(lineId2, svcId2, partnerNode, to, transferReadySec);
+                  if (!leg2) continue;
+                  const waitSec = leg2.boardDepSec - leg1.alightArrSec;
+                  const totalKm = (leg1.km != null && leg2.km != null)
+                    ? leg1.km + leg2.km
+                    : (leg1.km ?? leg2.km ?? null);
+                  journeys.push({
+                    legs:            [leg1, leg2],
+                    departureTime:   leg1.boardDep,
+                    arrivalTime:     leg2.alightArr,
+                    totalMinutes:    Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+                    totalKm,
+                    transfers:       1,
+                    transferNodes:   [midNode],
+                    transferWaitMin: Math.round(waitSec / 60),
+                  });
+                }
               }
             }
           }
