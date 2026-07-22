@@ -180,18 +180,34 @@ const AX_LINES = {
     inboundLabel:  "\u2191 Inbound \u2014 Asunahama Airport",
     outboundLabel: "\u2193 Outbound",
     ST:        AX_ST,
-    CANONICAL: AX_CANONICAL_FLAT,   /* array flat: richiesto da TTEngine/IZXRouter */
+    CANONICAL: AX_CANONICAL_FLAT,
     SVC:       AX_SVC,
     TT:        AX_TT,
     FREQ:      AX_FREQ,
     PEAK:      AX_PEAK_WINDOWS,
-    /* Interscambi AX ↔ IZX */
+    /* ----------------------------------------------------------------
+       Interscambi AX ↔ IZX
+       Ogni entry mappa il codice AX al primo partner IZX; partner
+       aggiuntivi nella stessa stazione fisica sono elencati in
+       INTERCHANGE_EXTRA e vengono letti da buildPartnerMap() in
+       routing.js per costruire il grafo completo di trasferimento.
+
+       AX06 = Sainðaul Central: interscambio con KE (K01), RY (R01), EI (E01)
+       AX01 = Asunahama Airport: interscambio con KE (K03)
+       AX21 = Showanul:          interscambio con KE Sakamuso (K102)
+       AX34 = Illashiya:         interscambio con KE Sakamuso (K104)
+    ---------------------------------------------------------------- */
     INTERCHANGE: {
-      AX06: "K01",  /* Sainðaul Central ↔ KE/RY/EI */
-      AX04: "K02",  /* Kasakuri ↔ KE Niji-Sainðaul */
-      AX01: "K03",  /* Asunahama Airport ↔ KE */
-      AX21: "K102", /* Showanul ↔ KE Sakamuso branch */
-      AX34: "K104", /* Illashiya ↔ KE Sakamuso branch */
+      AX06: "K01",  /* Sainðaul Central ↔ KE K01 (primario) */
+      AX01: "K03",  /* Asunahama Airport ↔ KE K03           */
+      AX21: "K102", /* Showanul ↔ KE Sakamuso K102           */
+      AX34: "K104", /* Illashiya ↔ KE Sakamuso K104          */
+    },
+    /* Partner aggiuntivi per stazioni con più di un nodo IZX.
+       routing.js legge questo campo in buildPartnerMap().
+       Formato: { codiceAX: ["codeA", "codeB", ...] }          */
+    INTERCHANGE_EXTRA: {
+      AX06: ["R01", "E01"],  /* Sainðaul Central ↔ RY R01 e EI E01 */
     },
     TERMINUS_SPLIT: {
       EST: [{terminus:"AX09", weight:1}],
