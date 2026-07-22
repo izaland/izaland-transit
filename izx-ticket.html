@@ -266,6 +266,64 @@
       background:var(--border);
     }
 
+    /* ── DIRECT-ONLY TOGGLE ── */
+.toggle-track{
+  position:relative;
+  width:40px;
+  height:22px;
+  flex-shrink:0;
+}
+.toggle-track input{
+  opacity:0;
+  width:0;
+  height:0;
+  position:absolute;
+}
+.toggle-slider{
+  position:absolute;
+  inset:0;
+  background:var(--border);
+  border-radius:999px;
+  cursor:pointer;
+  transition:background var(--transition);
+}
+.toggle-slider::before{
+  content:'';
+  position:absolute;
+  left:3px;
+  top:3px;
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  background:#fff;
+  transition:transform var(--transition);
+}
+.toggle-track input:checked + .toggle-slider{
+  background:var(--accent);
+}
+.toggle-track input:checked + .toggle-slider::before{
+  transform:translateX(18px);
+}
+.toggle-label{
+  font-size:var(--text-xs);
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  color:var(--text-muted);
+  cursor:pointer;
+  user-select:none;
+  line-height:1.3;
+}
+.toggle-label span{
+  display:block;
+  font-size:.62rem;
+  font-weight:400;
+  text-transform:none;
+  letter-spacing:0;
+  color:var(--text-faint);
+  margin-top:1px;
+}
+
     @media(max-width:640px){
       .sim-row{grid-template-columns:1fr;}
       .sim-swap{width:100%;justify-content:center;}
@@ -464,6 +522,18 @@
         </select>
       </div>
     </div>
+
+    <!-- Direct-only toggle -->
+<div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
+  <label class="toggle-track" for="jp-direct-only">
+    <input type="checkbox" id="jp-direct-only">
+    <span class="toggle-slider"></span>
+  </label>
+  <label class="toggle-label" for="jp-direct-only">
+    Direct only
+    <span>Hide journeys with transfers</span>
+  </label>
+</div>
 
     <button class="sim-btn" id="jp-search">Find journeys</button>
 
@@ -879,10 +949,10 @@
      JOURNEY PLANNER
   ================================================================ */
   const _jpState = {
-    from: null, to: null, lineF: null,
-    windowStart: null, windowEnd: null,
-    all: [],
-  };
+  from: null, to: null, lineF: null, directOnly: false,
+  windowStart: null, windowEnd: null,
+  all: [],
+};
 
   function _parseMins(hhmm) {
     const [h, m] = hhmm.split(':').map(Number);
