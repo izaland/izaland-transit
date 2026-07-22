@@ -56,6 +56,12 @@ const IZXRouter = (() => {
       for (const [a, b] of Object.entries(line.INTERCHANGE)) {
         nodes.add(a); nodes.add(b);
       }
+      if (line.INTERCHANGE_EXTRA) {
+        for (const [a, partners] of Object.entries(line.INTERCHANGE_EXTRA)) {
+          nodes.add(a);
+          for (const b of partners) nodes.add(b);
+        }
+      }
     }
     const nameMap = {};
     for (const [lineId, line] of Object.entries(IZX_LINES)) {
@@ -87,6 +93,13 @@ const IZXRouter = (() => {
     for (const line of Object.values(IZX_LINES)) {
       if (!line.INTERCHANGE) continue;
       for (const [a, b] of Object.entries(line.INTERCHANGE)) add(a, b);
+      /* INTERCHANGE_EXTRA: stazioni con più di un partner IZX
+         es. AX06 ↔ K01, R01, E01  (Sainðaul Central) */
+      if (line.INTERCHANGE_EXTRA) {
+        for (const [a, partners] of Object.entries(line.INTERCHANGE_EXTRA)) {
+          for (const b of partners) add(a, b);
+        }
+      }
     }
     const nameMap = {};
     for (const [lineId, line] of Object.entries(IZX_LINES)) {
