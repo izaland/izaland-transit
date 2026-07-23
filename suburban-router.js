@@ -16,6 +16,14 @@
      - Cambio a Sainðaul Central (LL01 ↔ K01/R01/E01/AX06)
        verso la rete IZX, via IZXRouter.buildLeg()
 
+   Tempi di trasferimento:
+     TRANSFER_MIN            5 min  — interscambio interno alla rete suburbana
+     CROSS_TRANSFER_MIN     10 min  — interscambio suburbana ↔ IZX/AX
+       Motivazione: le linee suburbane fermano nella sezione storica
+       sopraelevata di Sainðaul Central, mentre IZX e Airport Express
+       fermano nella sezione sotterranea. Il percorso pedonale tra le
+       due zone richiede almeno 10 minuti.
+
    Nota timetable:
      In questa fase il router genera orari sintetici basati su
      headway fisso (headwayPeak / headwayOffPeak) e tempo di
@@ -26,8 +34,10 @@
 
 const SuburbanRouter = (() => {
 
-  const TRANSFER_MIN  = 5;
-  const TRANSFER_SEC  = TRANSFER_MIN * 60;
+  const TRANSFER_MIN       = 5;   // interscambio interno rete suburbana
+  const CROSS_TRANSFER_MIN = 10;  // interscambio suburbana ↔ IZX/AX (storico sopraelevato ↔ sotterraneo)
+  const TRANSFER_SEC       = TRANSFER_MIN       * 60;
+  const CROSS_TRANSFER_SEC = CROSS_TRANSFER_MIN * 60;
   const MAX_JOURNEYS  = 5;
   const SEARCH_WINDOW = 3 * 3600; // secondi
   const AVG_SPEED_KMH = 40;       // velocità commerciale media suburbana
@@ -55,7 +65,6 @@ const SuburbanRouter = (() => {
     if (!line.circular) {
       return Math.abs(sts[iTo].km - sts[iFrom].km);
     }
-    // circolare: distanza di chiusura = totalKm − km[last]
     const total   = line.totalKm;
     const cwKm    = ((sts[iTo].km - sts[iFrom].km) + total) % total;
     const ccwKm   = total - cwKm;
@@ -80,7 +89,6 @@ const SuburbanRouter = (() => {
                    (depSec >= PEAK_START2 && depSec < PEAK_END2);
     const headwaySec = (isPeak ? line.headwayPeak : line.headwayOffPeak) * 60;
 
-    // primo treno dopo depSec
     const firstDep = Math.ceil(depSec / headwaySec) * headwaySec;
     const trips = [];
     let t = firstDep;
@@ -101,7 +109,6 @@ const SuburbanRouter = (() => {
     const travelSec = Math.round((km / AVG_SPEED_KMH) * 3600);
     const alightSec = boardSec + travelSec;
 
-    // stazioni intermedie (solo lineari per ora)
     let intermediateStops = [];
     if (!line.circular) {
       const a = Math.min(iFrom, iTo);
@@ -178,9 +185,9 @@ const SuburbanRouter = (() => {
     }
 
     /* ---- 2. Percorsi con cambio Suburbano → IZX/AX ---- */
-    // Percorso: from (rete suburbana) → nodo interscambio suburbano (es. LL01)
-    //           + trasferimento a nodo IZX (es. K01/R01/E01/AX06)
-    //           + IZXRouter.buildLeg() → to (rete IZX)
+    // Leg 1: from (suburbana) → LL01 via loop/lineare
+    // Leg 2: K01/R01/E01/AX06 → to (rete IZX/AX)
+    // Attesa cross-network: CROSS_TRANSFER_SEC (10 min)
     if (!directOnly && typeof IZXRouter !== 'undefined') {
       for (const line of Object.values(SUBURBAN_LINES)) {
         if (!line.stations.length) continue;
@@ -198,10 +205,10 @@ const SuburbanRouter = (() => {
           const leg1 = _buildLeg(line, iF, iMid, depSec);
           if (!leg1) continue;
 
-          const transferReadySec = leg1.alightArrSec + TRANSFER_SEC;
+          // 10 min: sopraelevato storico → sotterraneo IZX/AX
+          const transferReadySec = leg1.alightArrSec + CROSS_TRANSFER_SEC;
 
           for (const izxNode of izxPartners) {
-            // cerca percorso IZX da izxNode a `to`
             for (const [lineId2, line2] of Object.entries(IZX_LINES)) {
               if (!line2.ST[izxNode] || !line2.ST[to]) continue;
               for (const svcId2 of Object.keys(line2.SVC)) {
@@ -232,9 +239,9 @@ const SuburbanRouter = (() => {
     }
 
     /* ---- 3. Percorsi con cambio IZX/AX → Suburbano ---- */
-    // Percorso: from (rete IZX) → nodo IZX (es. K01)
-    //           + trasferimento a nodo suburbano (es. LL01)
-    //           + leg suburbano → to
+    // Leg 1: from (IZX/AX) → K01/R01/E01/AX06
+    // Leg 2: LL01 (suburbana) → to
+    // Attesa cross-network: CROSS_TRANSFER_SEC (10 min)
     if (!directOnly && typeof IZXRouter !== 'undefined') {
       for (const line of Object.values(SUBURBAN_LINES)) {
         if (!line.stations.length) continue;
@@ -250,7 +257,6 @@ const SuburbanRouter = (() => {
           if (iMid === -1 || iMid === iT) continue;
 
           for (const izxNode of izxPartners) {
-            // cerca percorso IZX da `from` a izxNode
             for (const [lineId1, line1] of Object.entries(IZX_LINES)) {
               if (!line1.ST[from] || !line1.ST[izxNode]) continue;
               for (const svcId1 of Object.keys(line1.SVC)) {
@@ -259,7 +265,8 @@ const SuburbanRouter = (() => {
                   ? IZXRouter.buildLeg(lineId1, svcId1, from, izxNode, depSec)
                   : null;
                 if (!leg1) continue;
-                const transferReadySec = leg1.alightArrSec + TRANSFER_SEC;
+                // 10 min: sotterraneo IZX/AX → sopraelevato storico suburbane
+                const transferReadySec = leg1.alightArrSec + CROSS_TRANSFER_SEC;
                 const leg2 = _buildLeg(line, iMid, iT, transferReadySec);
                 if (!leg2) continue;
                 const waitSec = leg2.boardDepSec - leg1.alightArrSec;
@@ -314,9 +321,6 @@ const SuburbanRouter = (() => {
 
   /* ================================================================
    * allStations()
-   * Usato da buildPlannerSelects() in izx-ticket.html per popolare
-   * i <select> del Journey Planner con le stazioni suburbane.
-   * Restituisce ogni stazione una sola volta (deduplicata per code).
    * ================================================================ */
   function allStations() {
     const seen = new Set();
@@ -345,6 +349,7 @@ const SuburbanRouter = (() => {
     allStations,
     lineColor,
     TRANSFER_MIN,
+    CROSS_TRANSFER_MIN,
   };
 
 })();
