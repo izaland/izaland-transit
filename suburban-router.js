@@ -13,9 +13,17 @@
      - Linee circolari con fermate intermedie CW e CCW
      - Filtro per lineId (opts.lines)
      - directOnly (opts.directOnly)
+     - Risoluzione alias cross-network (es. AX07 → LL17, AX06 → LL01)
      - Cambio a Sainðaul Central (LL01 ↔ K01/R01/E01/AX06)
        e Herubori (LL17 ↔ AX07) verso la rete IZX/AX,
        via IZXRouter.buildLeg()
+
+   Risoluzione alias:
+     Prima di qualsiasi ricerca, _resolveCode() controlla se il codice
+     passato è un nodo IZX/AX che ha un alias suburbano in
+     SUBURBAN_INTERCHANGE (mappa inversa). Se sì, lo sostituisce con
+     il codice suburbano equivalente, così LL12→AX07 viene trattato
+     come LL12→LL17 e trova la soluzione diretta sulla Loop Line.
 
    Tempi di trasferimento:
      TRANSFER_MIN            5 min  — interscambio interno alla rete suburbana
@@ -48,7 +56,30 @@ const SuburbanRouter = (() => {
   const MAX_JOURNEYS  = 5;
   const SEARCH_WINDOW = 3 * 3600;
   const AVG_SPEED_KMH = 40;
-  const DWELL_SEC     = 30; // sosta a ogni fermata intermedia
+  const DWELL_SEC     = 30;
+
+  /* ── mappa inversa: codice IZX/AX → codice suburbano equivalente
+     Costruita pigram da SUBURBAN_INTERCHANGE al primo accesso.
+     Es: { AX06: 'LL01', AX07: 'LL17', K01: 'LL01', R01: 'LL01', E01: 'LL01' } ── */
+  let _inverseMap = null;
+  function _getInverseMap() {
+    if (_inverseMap) return _inverseMap;
+    _inverseMap = {};
+    for (const [subCode, partners] of Object.entries(SUBURBAN_INTERCHANGE)) {
+      for (const izxCode of partners) {
+        // Se più nodi suburbani puntano allo stesso IZX (non accade ora),
+        // il primo dichiarato in SUBURBAN_INTERCHANGE vince.
+        if (!(_inverseMap[izxCode])) _inverseMap[izxCode] = subCode;
+      }
+    }
+    return _inverseMap;
+  }
+
+  /* ── risolve un codice: se è un alias IZX/AX con equivalente suburbano,
+     restituisce il codice suburbano; altrimenti il codice originale ── */
+  function _resolveCode(code) {
+    return _getInverseMap()[code] ?? code;
+  }
 
   /* ── utils tempo ── */
   function _hmToSec(hm) {
@@ -89,55 +120,35 @@ const SuburbanRouter = (() => {
 
   /* ────────────────────────────────────────────────────────────────
    * _circularIntermediateStops(line, iFrom, iTo, dir, boardSec, legKm)
-   *
-   * Restituisce le fermate intermedie di un leg circolare nel verso
-   * corretto (CW = indici crescenti con wrap, CCW = decrescenti).
-   * I tempi sono proporzionali alla distanza progressiva percorsa
-   * nel verso scelto, con dwell di DWELL_SEC a ogni fermata.
    * ──────────────────────────────────────────────────────────────── */
   function _circularIntermediateStops(line, iFrom, iTo, dir, boardSec, legKm) {
-    const sts = line.stations;
-    const n   = sts.length;
+    const sts   = line.stations;
+    const n     = sts.length;
     const total = line.totalKm;
 
-    // Sequenza ordinata degli indici nel verso dir (esclude iFrom e iTo)
     const seq = [];
     if (dir === 'CW') {
       let i = (iFrom + 1) % n;
-      while (i !== iTo) {
-        seq.push(i);
-        i = (i + 1) % n;
-      }
-    } else { // CCW
+      while (i !== iTo) { seq.push(i); i = (i + 1) % n; }
+    } else {
       let i = (iFrom - 1 + n) % n;
-      while (i !== iTo) {
-        seq.push(i);
-        i = (i - 1 + n) % n;
-      }
+      while (i !== iTo) { seq.push(i); i = (i - 1 + n) % n; }
     }
 
-    // km progressivi nel verso dir per ogni stazione della seq
-    // (distanza da iFrom a quell'indice nel verso scelto)
     function _kmFromStart(idx) {
-      if (dir === 'CW') {
-        return ((sts[idx].km - sts[iFrom].km) + total) % total;
-      } else {
-        return ((sts[iFrom].km - sts[idx].km) + total) % total;
-      }
+      if (dir === 'CW') return ((sts[idx].km - sts[iFrom].km) + total) % total;
+      else              return ((sts[iFrom].km - sts[idx].km) + total) % total;
     }
 
     const travelSec = Math.round((legKm / AVG_SPEED_KMH) * 3600);
-
     return seq.map(idx => {
       const kmElapsed = _kmFromStart(idx);
-      // tempo proporzionale alla distanza
-      const arrSec = boardSec + Math.round((kmElapsed / legKm) * travelSec);
-      const depSec = arrSec + DWELL_SEC;
+      const arrSec    = boardSec + Math.round((kmElapsed / legKm) * travelSec);
       return {
         code: sts[idx].code,
         name: sts[idx].name,
         arr:  _secToHM(arrSec),
-        dep:  _secToHM(depSec),
+        dep:  _secToHM(arrSec + DWELL_SEC),
       };
     });
   }
@@ -151,14 +162,10 @@ const SuburbanRouter = (() => {
     const isPeak = (depSec >= PEAK_START && depSec < PEAK_END1) ||
                    (depSec >= PEAK_START2 && depSec < PEAK_END2);
     const headwaySec = (isPeak ? line.headwayPeak : line.headwayOffPeak) * 60;
-
-    const firstDep = Math.ceil(depSec / headwaySec) * headwaySec;
+    const firstDep   = Math.ceil(depSec / headwaySec) * headwaySec;
     const trips = [];
     let t = firstDep;
-    while (t <= depSec + SEARCH_WINDOW) {
-      trips.push(t);
-      t += headwaySec;
-    }
+    while (t <= depSec + SEARCH_WINDOW) { trips.push(t); t += headwaySec; }
     return trips;
   }
 
@@ -177,40 +184,33 @@ const SuburbanRouter = (() => {
 
     let intermediateStops;
     if (line.circular) {
-      intermediateStops = _circularIntermediateStops(
-        line, iFrom, iTo, dir, boardSec, km
-      );
+      intermediateStops = _circularIntermediateStops(line, iFrom, iTo, dir, boardSec, km);
     } else {
       const a = Math.min(iFrom, iTo);
       const b = Math.max(iFrom, iTo);
       intermediateStops = line.stations.slice(a + 1, b).map(st => {
         const kmElapsed = Math.abs(st.km - line.stations[iFrom].km);
-        const arrSec = boardSec + Math.round((kmElapsed / km) * travelSec);
-        return {
-          code: st.code,
-          name: st.name,
-          arr:  _secToHM(arrSec),
-          dep:  _secToHM(arrSec + DWELL_SEC),
-        };
+        const arrSec    = boardSec + Math.round((kmElapsed / km) * travelSec);
+        return { code: st.code, name: st.name, arr: _secToHM(arrSec), dep: _secToHM(arrSec + DWELL_SEC) };
       });
     }
 
     return {
-      lineId:      line.id,
-      svcId:       line.id,
-      svcLogical:  line.id,
-      svcName:     line.name,
-      color:       line.color,
-      cls:         'suburban',
-      direction:   dir,
-      trainNumber: null,
-      boardCode:   line.stations[iFrom].code,
-      boardName:   line.stations[iFrom].name,
-      boardDep:    _secToHM(boardSec),
-      boardDepSec: boardSec,
-      alightCode:  line.stations[iTo].code,
-      alightName:  line.stations[iTo].name,
-      alightArr:   _secToHM(alightSec),
+      lineId:       line.id,
+      svcId:        line.id,
+      svcLogical:   line.id,
+      svcName:      line.name,
+      color:        line.color,
+      cls:          'suburban',
+      direction:    dir,
+      trainNumber:  null,
+      boardCode:    line.stations[iFrom].code,
+      boardName:    line.stations[iFrom].name,
+      boardDep:     _secToHM(boardSec),
+      boardDepSec:  boardSec,
+      alightCode:   line.stations[iTo].code,
+      alightName:   line.stations[iTo].name,
+      alightArr:    _secToHM(alightSec),
       alightArrSec: alightSec,
       km,
       intermediateStops,
@@ -229,6 +229,12 @@ const SuburbanRouter = (() => {
    * search(from, to, depTime, opts)
    * ================================================================ */
   function search(from, to, depTime, opts = {}) {
+    // Risolvi alias cross-network: AX07 → LL17, AX06 → LL01, ecc.
+    // Questo consente ricerche come LL12→AX07 di trovare la soluzione
+    // diretta sulla Loop Line senza cambio.
+    const resolvedFrom = _resolveCode(from);
+    const resolvedTo   = _resolveCode(to);
+
     const maxResults  = opts.maxResults ?? MAX_JOURNEYS;
     const directOnly  = !!opts.directOnly;
     const depSec      = _hmToSec(depTime);
@@ -239,8 +245,8 @@ const SuburbanRouter = (() => {
     for (const line of Object.values(SUBURBAN_LINES)) {
       if (!line.stations.length) continue;
       if (lineAllowed && !lineAllowed.has(line.id)) continue;
-      const iF = _idx(line, from);
-      const iT = _idx(line, to);
+      const iF = _idx(line, resolvedFrom);
+      const iT = _idx(line, resolvedTo);
       if (iF === -1 || iT === -1) continue;
       if (iF === iT) continue;
 
@@ -263,7 +269,7 @@ const SuburbanRouter = (() => {
       for (const line of Object.values(SUBURBAN_LINES)) {
         if (!line.stations.length) continue;
         if (lineAllowed && !lineAllowed.has(line.id)) continue;
-        const iF = _idx(line, from);
+        const iF = _idx(line, resolvedFrom);
         if (iF === -1) continue;
 
         for (const subNode of line.stations) {
@@ -280,6 +286,7 @@ const SuburbanRouter = (() => {
 
           for (const izxNode of izxPartners) {
             for (const [lineId2, line2] of Object.entries(IZX_LINES)) {
+              // Usa il codice originale (non risolto) per la destinazione IZX
               if (!line2.ST[izxNode] || !line2.ST[to]) continue;
               for (const svcId2 of Object.keys(line2.SVC)) {
                 if (!line2.TT[svcId2]) continue;
@@ -289,8 +296,7 @@ const SuburbanRouter = (() => {
                 if (!leg2) continue;
                 const waitSec = leg2.boardDepSec - leg1.alightArrSec;
                 const totalKm = (leg1.km != null && leg2.km != null)
-                  ? leg1.km + leg2.km
-                  : (leg1.km ?? leg2.km ?? null);
+                  ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
                 journeys.push({
                   legs:            [leg1, leg2],
                   departureTime:   leg1.boardDep,
@@ -313,7 +319,7 @@ const SuburbanRouter = (() => {
       for (const line of Object.values(SUBURBAN_LINES)) {
         if (!line.stations.length) continue;
         if (lineAllowed && !lineAllowed.has(line.id)) continue;
-        const iT = _idx(line, to);
+        const iT = _idx(line, resolvedTo);
         if (iT === -1) continue;
 
         for (const subNode of line.stations) {
@@ -325,6 +331,7 @@ const SuburbanRouter = (() => {
 
           for (const izxNode of izxPartners) {
             for (const [lineId1, line1] of Object.entries(IZX_LINES)) {
+              // Usa il codice originale (non risolto) per l'origine IZX
               if (!line1.ST[from] || !line1.ST[izxNode]) continue;
               for (const svcId1 of Object.keys(line1.SVC)) {
                 if (!line1.TT[svcId1]) continue;
@@ -337,8 +344,7 @@ const SuburbanRouter = (() => {
                 if (!leg2) continue;
                 const waitSec = leg2.boardDepSec - leg1.alightArrSec;
                 const totalKm = (leg1.km != null && leg2.km != null)
-                  ? leg1.km + leg2.km
-                  : (leg1.km ?? leg2.km ?? null);
+                  ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
                 journeys.push({
                   legs:            [leg1, leg2],
                   departureTime:   leg1.boardDep,
@@ -359,9 +365,7 @@ const SuburbanRouter = (() => {
     /* ---- deduplicazione e ordinamento ---- */
     const seen = new Set();
     const unique = journeys.filter(j => {
-      const key = j.legs.map(l =>
-        `${l.lineId}:${l.boardDep}:${l.alightArr}`
-      ).join('|');
+      const key = j.legs.map(l => `${l.lineId}:${l.boardDep}:${l.alightArr}`).join('|');
       if (seen.has(key)) return false;
       seen.add(key); return true;
     });
@@ -375,11 +379,12 @@ const SuburbanRouter = (() => {
   }
 
   /* ================================================================
-   * stationName(code)
+   * stationName(code) — risolve anche alias IZX/AX
    * ================================================================ */
   function stationName(code) {
+    const resolved = _resolveCode(code);
     for (const line of Object.values(SUBURBAN_LINES)) {
-      const st = line.stations.find(s => s.code === code);
+      const st = line.stations.find(s => s.code === resolved);
       if (st) return st.name;
     }
     return code;
