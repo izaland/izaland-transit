@@ -12,12 +12,30 @@
        stations  [ { code, name, kanji, km } ]  — km dal capolinea A
      }
 
+   INTERCHANGE:
+     Mappa codice-stazione → array di codici equivalenti su altre reti.
+     LL01 (Sainðaul Central, Loop Line) è in interscambio con:
+       K01  — IZX Keishin
+       R01  — IZX Ryānkai
+       E01  — IZX Eira
+       AX06 — Airport Express (Sainðaul Central)
+
    Nota km:
      I valori km della Loop Line sono stime proporzionali su 24.5 km
      totali di circuito. Da rivedere con dati cartografici reali.
      Per le altre linee i km sono segnaposto (0.0) in attesa dei dati.
 ================================================================ */
 'use strict';
+
+/* ================================================================
+   SUBURBAN_INTERCHANGE
+   Mappa: codice suburbano → [codici IZX/AX corrispondenti]
+   Usata da SuburbanRouter per costruire percorsi con cambio
+   tra la rete suburbana Izarail e la rete IZX/Airport Express.
+================================================================ */
+const SUBURBAN_INTERCHANGE = {
+  LL01: ['K01', 'R01', 'E01', 'AX06'],
+};
 
 const SUBURBAN_LINES = {
 

@@ -1,6 +1,6 @@
 /* ================================================================
    SUBURBAN-ROUTER.JS — Izarail Suburban Journey Planner
-   Dipende da: suburban-data.js (SUBURBAN_LINES)
+   Dipende da: suburban-data.js (SUBURBAN_LINES, SUBURBAN_INTERCHANGE)
 
    API pubblica (stesso contratto di IZXRouter):
      SuburbanRouter.search(from, to, depTime, opts) → Journey[]
@@ -13,6 +13,8 @@
      - Linee circolari (percorso minimo orario/antiorario)
      - Filtro per lineId (opts.lines)
      - directOnly (opts.directOnly)
+     - Cambio a Sainðaul Central (LL01 ↔ K01/R01/E01/AX06)
+       verso la rete IZX, via IZXRouter.buildLeg()
 
    Nota timetable:
      In questa fase il router genera orari sintetici basati su
@@ -54,7 +56,6 @@ const SuburbanRouter = (() => {
       return Math.abs(sts[iTo].km - sts[iFrom].km);
     }
     // circolare: distanza di chiusura = totalKm − km[last]
-    const closeKm = line.totalKm - sts[sts.length - 1].km;
     const total   = line.totalKm;
     const cwKm    = ((sts[iTo].km - sts[iFrom].km) + total) % total;
     const ccwKm   = total - cwKm;
@@ -90,7 +91,7 @@ const SuburbanRouter = (() => {
     return trips;
   }
 
-  /* ── costruisce un leg ── */
+  /* ── costruisce un leg suburbano ── */
   function _buildLeg(line, iFrom, iTo, depSec) {
     const trips = _syntheticTrips(line, iFrom, depSec);
     if (!trips.length) return null;
@@ -105,7 +106,7 @@ const SuburbanRouter = (() => {
     if (!line.circular) {
       const a = Math.min(iFrom, iTo);
       const b = Math.max(iFrom, iTo);
-      intermediateStops = line.stations.slice(a + 1, b).map((st, i) => ({
+      intermediateStops = line.stations.slice(a + 1, b).map((st) => ({
         code: st.code,
         name: st.name,
         arr:  _secToHM(boardSec + Math.round(((st.km - line.stations[iFrom].km) / AVG_SPEED_KMH) * 3600)),
@@ -153,7 +154,7 @@ const SuburbanRouter = (() => {
     const lineAllowed = _lineFilter(opts);
     const journeys    = [];
 
-    /* ---- 1. Percorsi DIRETTI ---- */
+    /* ---- 1. Percorsi DIRETTI (solo rete suburbana) ---- */
     for (const line of Object.values(SUBURBAN_LINES)) {
       if (!line.stations.length) continue;
       if (lineAllowed && !lineAllowed.has(line.id)) continue;
@@ -176,10 +177,111 @@ const SuburbanRouter = (() => {
       });
     }
 
-    /* ---- 2. Percorsi con UN CAMBIO (futuro) ---- */
-    // TODO: quando le stazioni di interscambio saranno definite
-    // tra linee suburbane, implementare CSA a un cambio qui,
-    // seguendo lo stesso pattern di routing.js.
+    /* ---- 2. Percorsi con cambio Suburbano → IZX/AX ---- */
+    // Percorso: from (rete suburbana) → nodo interscambio suburbano (es. LL01)
+    //           + trasferimento a nodo IZX (es. K01/R01/E01/AX06)
+    //           + IZXRouter.buildLeg() → to (rete IZX)
+    if (!directOnly && typeof IZXRouter !== 'undefined') {
+      for (const line of Object.values(SUBURBAN_LINES)) {
+        if (!line.stations.length) continue;
+        if (lineAllowed && !lineAllowed.has(line.id)) continue;
+        const iF = _idx(line, from);
+        if (iF === -1) continue;
+
+        for (const subNode of line.stations) {
+          const izxPartners = SUBURBAN_INTERCHANGE[subNode.code];
+          if (!izxPartners) continue;
+
+          const iMid = _idx(line, subNode.code);
+          if (iMid === -1 || iMid === iF) continue;
+
+          const leg1 = _buildLeg(line, iF, iMid, depSec);
+          if (!leg1) continue;
+
+          const transferReadySec = leg1.alightArrSec + TRANSFER_SEC;
+
+          for (const izxNode of izxPartners) {
+            // cerca percorso IZX da izxNode a `to`
+            for (const [lineId2, line2] of Object.entries(IZX_LINES)) {
+              if (!line2.ST[izxNode] || !line2.ST[to]) continue;
+              for (const svcId2 of Object.keys(line2.SVC)) {
+                if (!line2.TT[svcId2]) continue;
+                const leg2 = IZXRouter.buildLeg
+                  ? IZXRouter.buildLeg(lineId2, svcId2, izxNode, to, transferReadySec)
+                  : null;
+                if (!leg2) continue;
+                const waitSec = leg2.boardDepSec - leg1.alightArrSec;
+                const totalKm = (leg1.km != null && leg2.km != null)
+                  ? leg1.km + leg2.km
+                  : (leg1.km ?? leg2.km ?? null);
+                journeys.push({
+                  legs:            [leg1, leg2],
+                  departureTime:   leg1.boardDep,
+                  arrivalTime:     leg2.alightArr,
+                  totalMinutes:    Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+                  totalKm,
+                  transfers:       1,
+                  transferNodes:   [subNode.code],
+                  transferWaitMin: Math.round(waitSec / 60),
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    /* ---- 3. Percorsi con cambio IZX/AX → Suburbano ---- */
+    // Percorso: from (rete IZX) → nodo IZX (es. K01)
+    //           + trasferimento a nodo suburbano (es. LL01)
+    //           + leg suburbano → to
+    if (!directOnly && typeof IZXRouter !== 'undefined') {
+      for (const line of Object.values(SUBURBAN_LINES)) {
+        if (!line.stations.length) continue;
+        if (lineAllowed && !lineAllowed.has(line.id)) continue;
+        const iT = _idx(line, to);
+        if (iT === -1) continue;
+
+        for (const subNode of line.stations) {
+          const izxPartners = SUBURBAN_INTERCHANGE[subNode.code];
+          if (!izxPartners) continue;
+
+          const iMid = _idx(line, subNode.code);
+          if (iMid === -1 || iMid === iT) continue;
+
+          for (const izxNode of izxPartners) {
+            // cerca percorso IZX da `from` a izxNode
+            for (const [lineId1, line1] of Object.entries(IZX_LINES)) {
+              if (!line1.ST[from] || !line1.ST[izxNode]) continue;
+              for (const svcId1 of Object.keys(line1.SVC)) {
+                if (!line1.TT[svcId1]) continue;
+                const leg1 = IZXRouter.buildLeg
+                  ? IZXRouter.buildLeg(lineId1, svcId1, from, izxNode, depSec)
+                  : null;
+                if (!leg1) continue;
+                const transferReadySec = leg1.alightArrSec + TRANSFER_SEC;
+                const leg2 = _buildLeg(line, iMid, iT, transferReadySec);
+                if (!leg2) continue;
+                const waitSec = leg2.boardDepSec - leg1.alightArrSec;
+                const totalKm = (leg1.km != null && leg2.km != null)
+                  ? leg1.km + leg2.km
+                  : (leg1.km ?? leg2.km ?? null);
+                journeys.push({
+                  legs:            [leg1, leg2],
+                  departureTime:   leg1.boardDep,
+                  arrivalTime:     leg2.alightArr,
+                  totalMinutes:    Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+                  totalKm,
+                  transfers:       1,
+                  transferNodes:   [izxNode],
+                  transferWaitMin: Math.round(waitSec / 60),
+                });
+              }
+            }
+          }
+        }
+      }
+    }
 
     /* ---- deduplicazione e ordinamento ---- */
     const seen = new Set();

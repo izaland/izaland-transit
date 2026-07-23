@@ -8,12 +8,18 @@
    API pubblica:
      IZXRouter.search(from, to, depTime, opts) → Journey[]
      IZXRouter.interchangeNodes()              → Set<string>
+     IZXRouter.buildLeg(lineId, svcId, boardCode, alightCode, minDepSec)
+               → Leg | null   (usato da SuburbanRouter per cross-network)
 
    Algoritmo: Connection Scan Algorithm (CSA) semplificato.
    Supporta:
      - Percorso diretto (stesso servizio, stessa linea)
      - Percorso con un cambio (transfer in una stazione di interscambio)
    Tempo di interscambio: TRANSFER_MIN (default 5 minuti).
+
+   Interscambio LL01 ↔ K01/R01/E01/AX06:
+     buildLeg() è esposto nell'API pubblica così che SuburbanRouter
+     possa costruire il leg IZX nel percorso con cambio.
 
    Opzioni di ricerca (opts):
      maxResults  {number}   — max journey da restituire (default 5)
@@ -180,6 +186,7 @@ const IZXRouter = (() => {
 
   /* ----------------------------------------------------------------
    * buildLeg(lineId, svcId, boardCode, alightCode, minDepSec)
+   * Esposto nell'API pubblica per uso da SuburbanRouter (cross-network).
    * ---------------------------------------------------------------- */
   function buildLeg(lineId, svcId, boardCode, alightCode, minDepSec) {
     const found = nextTrip(lineId, svcId, boardCode, minDepSec, alightCode);
@@ -363,6 +370,7 @@ const IZXRouter = (() => {
   /* ---- API pubblica ---- */
   return {
     search,
+    buildLeg,          // esposto per SuburbanRouter cross-network
     interchangeNodes,
     buildPartnerMap,
     stationName,
