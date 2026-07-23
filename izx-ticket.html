@@ -353,4 +353,887 @@
         <a href="#map">Map</a>
         <div class="dropdown-divider"></div>
         <span class="dropdown-label">IZX Keishin</span>
-        <a href="keishin-timetable.html">📅 Timetab
+        <a href="keishin-timetable.html">📅 Timetable</a>
+        <a href="marcia.html">📊 Train graph</a>
+        <a href="izx-ticket.html" class="active">🎫 Tickets &amp; Fares</a>
+      </div>
+    </div>
+    <div class="nav-item">
+      <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Aviation</button>
+      <div class="dropdown">
+        <a href="airports.html">Airports</a>
+        <a href="airlines.html">Airlines</a>
+      </div>
+    </div>
+    <div class="nav-item">
+      <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Other</button>
+      <div class="dropdown">
+        <span class="dropdown-label">Coming soon</span>
+      </div>
+    </div>
+    <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="page-header">
+  <a href="izx.html" class="back-link">← Back to IZX</a>
+  <div class="page-label">IZX · Tickets &amp; Journey Planner</div>
+  <h1 class="page-title">Fares &amp; Journey Planner</h1>
+  <p class="page-desc">Look up fares or plan your journey on the IZX network. Prices are computed live from the official tariff formula. Journey times use the N700S kinematic timetable.</p>
+</div>
+
+<div class="sim-card">
+
+  <!-- ══ TAB BAR ══ -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="fares">🎫 Fares</button>
+    <button class="tab-btn" data-tab="planner">🏛️ Journey Planner</button>
+  </div>
+
+  <!-- ================================================================
+       TAB 1 — FARE CALCULATOR
+  ================================================================ -->
+  <div class="tab-panel active" id="tab-fares">
+
+    <div class="sim-row">
+      <div class="field-group">
+        <label class="field-label" for="sel-from">From</label>
+        <select id="sel-from" class="field-select"></select>
+      </div>
+      <button class="sim-swap" id="btn-swap" title="Swap">⇄</button>
+      <div class="field-group">
+        <label class="field-label" for="sel-to">To</label>
+        <select id="sel-to" class="field-select"></select>
+      </div>
+    </div>
+
+    <div class="sim-options">
+      <div class="field-group">
+        <label class="field-label" for="sel-class">Class</label>
+        <select id="sel-class" class="field-select">
+          <option value="all">All classes</option>
+          <option value="standard">Standard</option>
+          <option value="blue_seat">Blue Seat (1st class)</option>
+          <option value="yurani">Yurani (Executive)</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="sel-service">Service</label>
+        <select id="sel-service" class="field-select">
+          <option value="all">All services</option>
+          <optgroup label="IZX Keishin">
+            <option value="A">A — Nonstop Express</option>
+            <option value="B">B — Semi-rapido</option>
+            <option value="C">C — Rapido</option>
+            <option value="Cp">C′ — Airport Bypass</option>
+            <option value="D">D — Sakamuso Rapido</option>
+            <option value="E">E — Sakamuso Express</option>
+            <option value="F">F — Omnibus</option>
+          </optgroup>
+          <optgroup label="IZX Ryānkai">
+            <option value="L">L — Omnibus</option>
+            <option value="K">K — Rapido AV</option>
+            <option value="J">J — Rapido AV</option>
+            <option value="G">G — Flagship AV</option>
+            <option value="I">I — Flagship AV</option>
+            <option value="H">H — Flagship AV</option>
+          </optgroup>
+          <optgroup label="IZX Eira">
+            <option value="N">N — Nazionale</option>
+            <option value="M">M — Minarajaki Express</option>
+            <option value="MF">MF — Minarajaki Fast</option>
+            <option value="MI">MI — Minarajaki Intercity</option>
+            <option value="MS">MS — Minarajaki Super</option>
+          </optgroup>
+          <optgroup label="Airport Express">
+            <option value="EST">EST — AX Ramo Est</option>
+            <option value="BAJ">BAJ — AX Bajikoe</option>
+            <option value="SAK">SAK — AX Sakamuso</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+
+    <button class="sim-btn" id="btn-search">Search fares</button>
+
+    <div id="results">
+      <div class="sz-note" id="sz-note"></div>
+      <div class="result-header">
+        <div class="result-route" id="result-route"></div>
+        <div class="result-meta"  id="result-meta"></div>
+      </div>
+      <div class="service-cards" id="service-cards"></div>
+      <div id="stop-diagram">
+        <div class="diag-title">Stop pattern</div>
+        <div class="diag-scroll">
+          <table class="diag-table" id="diag-table"></table>
+        </div>
+        <div class="diag-legend">
+          <div class="diag-legend-item"><span style="width:10px;height:10px;border-radius:50%;background:var(--text-muted);border:2px solid var(--bg);display:inline-block;"></span> Stops</div>
+          <div class="diag-legend-item"><span style="width:3px;height:10px;border-radius:2px;background:var(--text-muted);display:inline-block;"></span> Passes through</div>
+          <div class="diag-legend-item"><span style="width:13px;height:13px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);display:inline-block;"></span> Origin / Destination</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      <strong>Fare formula:</strong><br>
+      <code>price = (Ė 4.50 + progressive_km_rate) × service_coeff × class_coeff</code><br>
+      Distance tiers: <strong>Ė 0.195/km</strong> (0–100 km) · <strong>Ė 0.165/km</strong> (101–300 km) · <strong>Ė 0.140/km</strong> (301+ km)<br>
+      Classes: Standard ×1.00 · Blue Seat ×1.55 · Yurani ×2.40<br>
+      Currency: <strong>Ė (Etsi)</strong> · 1 Ė = 0.832 USD
+    </div>
+
+  </div><!-- /tab-fares -->
+
+  <!-- ================================================================
+       TAB 2 — JOURNEY PLANNER
+  ================================================================ -->
+  <div class="tab-panel" id="tab-planner">
+
+    <div class="sim-row">
+      <div class="field-group">
+        <label class="field-label" for="jp-from">From</label>
+        <select id="jp-from" class="field-select"></select>
+      </div>
+      <button class="sim-swap" id="jp-swap" title="Swap">⇄</button>
+      <div class="field-group">
+        <label class="field-label" for="jp-to">To</label>
+        <select id="jp-to" class="field-select"></select>
+      </div>
+    </div>
+
+    <div class="sim-options">
+      <div class="field-group">
+        <label class="field-label" for="jp-time">Depart at</label>
+        <input id="jp-time" type="time" class="field-input" value="08:00">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="jp-line">Line filter</label>
+        <select id="jp-line" class="field-select">
+          <option value="ALL">All lines</option>
+          <option value="KE">Keishin</option>
+          <option value="RY">Ryānkai</option>
+          <option value="EI">Eira</option>
+          <option value="SN">Seibu Naeryuku</option>
+          <option value="AX">Airport Express</option>
+          <option value="LO">Loop Line</option>
+<option value="KD">Kidai</option>
+<option value="SK">Seishaku</option>
+<option value="KS">Kawasabu</option>
+<option value="KW">Kwōkei</option>
+<option value="M4">M4 — Metro Line 4</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Direct-only toggle -->
+<div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
+  <label class="toggle-track" for="jp-direct-only">
+    <input type="checkbox" id="jp-direct-only">
+    <span class="toggle-slider"></span>
+  </label>
+  <label class="toggle-label" for="jp-direct-only">
+    Direct only
+    <span>Hide journeys with transfers</span>
+  </label>
+</div>
+
+    <button class="sim-btn" id="jp-search">Find journeys</button>
+
+    <div id="jp-results">
+      <div class="jp-note" id="jp-note"></div>
+      <div class="jp-route-title" id="jp-route-title"></div>
+
+      <!-- Earlier / Later navigation bar -->
+      <div class="jp-nav-bar" id="jp-nav-bar" style="display:none">
+        <button class="jp-nav-btn" id="jp-earlier">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Earlier trains
+        </button>
+        <span class="jp-time-chip" id="jp-time-chip"></span>
+        <button class="jp-nav-btn" id="jp-later">
+          Later trains
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
+      <div class="journey-list" id="journey-list"></div>
+    </div>
+
+  </div><!-- /tab-planner -->
+
+</div><!-- /sim-card -->
+
+<footer>
+  <p>Izaland Transit Portal · <a href="https://opengeofiction.net" target="_blank" rel="noopener">OpenGeoFiction</a> · IZX data v2.1</p>
+</footer>
+
+<script src="suburban-data.js"></script>
+<script src="suburban-router.js"></script>
+<script src="izx-data.js"></script>
+<script src="ax-data.js"></script>
+<script src="fare-engine.js"></script> 
+<script src="tt-engine.js"></script>
+<script src="routing.js"></script>
+<script src="metro/m4-data.js"></script>
+<script src="metro/metro-router.js"></script>
+<script>
+(function(){
+
+  /* ================================================================
+     THEME + NAV
+  ================================================================ */
+  const themeBtn = document.querySelector('[data-theme-toggle]');
+  let theme = document.documentElement.getAttribute('data-theme') || 'dark';
+  themeBtn.addEventListener('click', () => {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+    themeBtn.innerHTML = theme === 'dark'
+      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+  });
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.querySelector(':scope > button').addEventListener('click', e => {
+      e.stopPropagation();
+      const open = item.classList.contains('open');
+      document.querySelectorAll('.nav-item.open').forEach(o => o.classList.remove('open'));
+      if (!open) item.classList.add('open');
+    });
+  });
+  document.addEventListener('click', () =>
+    document.querySelectorAll('.nav-item.open').forEach(o => o.classList.remove('open'))
+  );
+
+  /* ================================================================
+     TAB SWITCHER
+  ================================================================ */
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ================================================================
+     FARE ENGINE
+  ================================================================ */
+  const FIXED_FEE = 4.50;
+  const USD_RATE  = 0.832;
+  const HUB_VAL = 'HUB', HUB_K = 'K01', HUB_R = 'R01', HUB_E = 'E01';
+
+  function resolveHub(code, svcKey){
+    if(code !== HUB_VAL) return code;
+    if(RY_SVCS.has(svcKey)) return HUB_R;
+    if(EI_SVCS.has(svcKey)) return HUB_E;
+    return HUB_K;
+  }
+
+  const ALL_ST  = Object.assign({}, KE_ST, RY_ST, EI_ST, AX_ST);
+  const ALL_SVC = Object.assign({}, KE_SVC, RY_SVC, EI_SVC, AX_SVC);
+  const KE_MAIN_SVCS = new Set(['A','B','C','Cp']);
+  const KE_SAKA_SVCS = new Set(['D','E','F']);
+  const RY_SVCS      = new Set(['L','K','J','G','I','H']);
+  const EI_SVCS      = new Set(['N','M','MF','MI','MS']);
+  const AX_SVCS      = new Set(['EST','BAJ','SAK']);
+  const KE_SVCS      = new Set([...KE_MAIN_SVCS, ...KE_SAKA_SVCS]);
+
+  const KE_SELECT_ORDER = [
+    "K01","K02","K03","K04","K05","K06","K07","K08","K09","K10",
+    "K11","K12","K13","K14","K144","K15","K16","K116","K17",
+    "N1","N2","N3","N4",
+    "K101","K102","K120","K103","K104","K105","K106","K160",
+  ];
+  const RY_SELECT_ORDER = [
+    "R02","R03","R04","R05","R06","R61","R07","R08","R81",
+    "R09","R10","R11","R12","R13","R14","R15","R16","R17","R18",
+    "R19","R20","R21",
+  ];
+  const EI_SELECT_ORDER = [
+    "E02","E03","E04","E05","E06","E07","E08","E09","E10","E12",
+  ];
+  const AX_SELECT_ORDER = [
+    "AX00","AX01","AX02","AX03","AX04","AX05","AX07","AX06","AX08","AX09",
+    "AX20","AX21","AX22","AX23",
+    "AX30","AX31","AX32","AX33","AX34",
+  ];
+  const KE_BL = {main:"Main Line",saka:"Sakamuso Branch",cprime:"C\u2032 Bypass",nankai:"Nankai ext."};
+
+  function progKm(d){
+    if(d<=0) return 0;
+    let c = Math.min(d,100)*0.195;
+    if(d>100) c += Math.min(d-100,200)*0.165;
+    if(d>300) c += (d-300)*0.14;
+    return c;
+  }
+  function calcPrice(km,sc,cc){ return Math.round((FIXED_FEE+progKm(km))*sc*cc*100)/100; }
+  function lineOf(code){
+    if(code === HUB_VAL) return 'KE';
+    if(AX_ST[code])  return 'AX';
+    if(RY_ST[code])  return 'RY';
+    if(EI_ST[code])  return 'EI';
+    return 'KE';
+  }
+  function isInterline(from, to){
+    if(from === HUB_VAL && to === HUB_VAL) return false;
+    return lineOf(from) !== lineOf(to);
+  }
+  function stKm(code, svcKey){
+    const c = resolveHub(code, svcKey);
+    if(AX_SVCS.has(svcKey)) return AX_ST[c] ? AX_ST[c].km : null;
+    if(RY_SVCS.has(svcKey)) return RY_ST[c] ? RY_ST[c].km : null;
+    if(EI_SVCS.has(svcKey)) return EI_ST[c] ? EI_ST[c].km : null;
+    let kc = c;
+    if(kc === 'K101' && KE_MAIN_SVCS.has(svcKey)) kc = 'K02';
+    if(svcKey === 'Cp')           return KE_CP[kc] !== undefined ? KE_CP[kc] : null;
+    if(KE_SAKA_SVCS.has(svcKey)) return KE_SK[kc] !== undefined ? KE_SK[kc] : null;
+    return KE_ST[kc] ? KE_ST[kc].km : null;
+  }
+  function tariffKm(from, to, svcKey){
+    const kf = stKm(from, svcKey), kt = stKm(to, svcKey);
+    if(kf === null || kt === null) return null;
+    return Math.abs(kt - kf);
+  }
+  function serves(svcKey, from, to){
+    const f0 = resolveHub(from, svcKey), t0 = resolveHub(to, svcKey);
+    const info = ALL_SVC[svcKey]; if(!info) return false;
+    const stops = info.stops;
+    const f = (f0 === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : f0;
+    const t = (t0 === 'K101' && KE_MAIN_SVCS.has(svcKey)) ? 'K02' : t0;
+    const fi = stops.indexOf(f), ti = stops.indexOf(t);
+    return fi !== -1 && ti !== -1 && fi !== ti;
+  }
+
+ function buildSelects(){
+    /* Costruisce tutto in fragment, poi rimpiazza i <select> live con cloni puliti
+       → forza Chrome a ri-renderizzare il controllo nativo con tutte le opzioni già presenti */
+    const sfOld = document.getElementById('sel-from'), st2Old = document.getElementById('sel-to');
+    const fragF = document.createDocumentFragment(), fragT = document.createDocumentFragment();
+
+    function addOpt(ogs, value, label){
+      [0,1].forEach(i => {
+        const o = document.createElement('option');
+        o.value = value; o.textContent = label;
+        ogs[i].appendChild(o);
+      });
+    }
+
+    let lastB = null, ogs = [null,null];
+    KE_SELECT_ORDER.forEach(code => {
+      const s = KE_ST[code]; if(!s) return;
+      const bl = KE_BL[s.b] || s.b;
+      if(s.b !== lastB){
+        ogs = [document.createElement('optgroup'),document.createElement('optgroup')];
+        ogs.forEach(og => { og.label='Keishin \u2014 '+bl; });
+        fragF.appendChild(ogs[0]); fragT.appendChild(ogs[1]); lastB=s.b;
+      }
+      const value = (code==='K01') ? HUB_VAL : code;
+      const label = (code==='K01') ? 'K01/R01/E01 '+s.n+(s.k?' \u00b7 '+s.k:'') : code+' '+s.n+(s.k?' \u00b7 '+s.k:'');
+      addOpt(ogs, value, label);
+    });
+
+    const ryOgs = [document.createElement('optgroup'),document.createElement('optgroup')];
+    ryOgs.forEach(og => og.label='Ry\u0101nkai \u2014 Main Line');
+    fragF.appendChild(ryOgs[0]); fragT.appendChild(ryOgs[1]);
+    RY_SELECT_ORDER.forEach(code => { const s=RY_ST[code]; if(!s) return; addOpt(ryOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:'')); });
+
+    const eiOgs = [document.createElement('optgroup'),document.createElement('optgroup')];
+    eiOgs.forEach(og => og.label='Eira \u2014 Main Line');
+    fragF.appendChild(eiOgs[0]); fragT.appendChild(eiOgs[1]);
+    EI_SELECT_ORDER.forEach(code => { const s=EI_ST[code]; if(!s) return; addOpt(eiOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:'')); });
+
+    /* Airport Express */
+    const axBranches = {common:'Common',est:'Est Branch',baj:'Bajikoe Branch',sak:'Sakamuso Branch'};
+    let lastAxB = null, axOgs = [null,null];
+    AX_SELECT_ORDER.forEach(code => {
+      const s = AX_ST[code]; if(!s) return;
+      const bl = axBranches[s.b] || s.b;
+      if(s.b !== lastAxB){
+        axOgs = [document.createElement('optgroup'),document.createElement('optgroup')];
+        axOgs.forEach(og => { og.label='Airport Express \u2014 '+bl; });
+        fragF.appendChild(axOgs[0]); fragT.appendChild(axOgs[1]); lastAxB=s.b;
+      }
+      addOpt(axOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:''));
+    });
+
+    /* Sostituisce i <select> con cloni puliti + fragment già completo */
+    const sfNew  = sfOld.cloneNode(false);
+    const st2New = st2Old.cloneNode(false);
+    sfNew.appendChild(fragF);
+    st2New.appendChild(fragT);
+    sfOld.parentNode.replaceChild(sfNew,  sfOld);
+    st2Old.parentNode.replaceChild(st2New, st2Old);
+
+    sfNew.value  = HUB_VAL;
+    st2New.value = 'K17';
+  }
+
+  const CLASS_C = {standard:1.00, blue_seat:1.55, yurani:2.40};
+  const CLASS_L = {standard:"Standard", blue_seat:"Blue Seat", yurani:"Yurani"};
+  function fmt(n)  { return '\u0116\u202f'+n.toFixed(2); }
+  function fusd(n) { return '(US$\u202f'+(n*USD_RATE).toFixed(2)+')'; }
+  function stName(code){
+    if(code===HUB_VAL) return ALL_ST[HUB_K]?ALL_ST[HUB_K].n:'Sain\u00f0aul Central';
+    return ALL_ST[code]?ALL_ST[code].n:code;
+  }
+
+  function canonicalOrderFor(code){
+    const line = lineOf(code);
+    if(line==='RY') return RY_CANONICAL_ORDER;
+    if(line==='EI') return EI_CANONICAL_ORDER;
+    if(line==='AX') return AX_CANONICAL_ORDER.EST;
+    return KE_CANONICAL_ORDER;
+  }
+  function serviceRange(svcKey, from, to){
+    const fromR=resolveHub(from,svcKey), toR=resolveHub(to,svcKey);
+    const info=ALL_SVC[svcKey], svcStopList=info.stops;
+    const f=(fromR==='K101'&&KE_MAIN_SVCS.has(svcKey))?'K02':fromR;
+    const t=(toR==='K101'&&KE_MAIN_SVCS.has(svcKey))?'K02':toR;
+    let fi=svcStopList.indexOf(f), ti=svcStopList.indexOf(t);
+    if(fi===-1||ti===-1||fi===ti) return {stops:new Set(),through:new Set()};
+    if(fi>ti){const tmp=fi;fi=ti;ti=tmp;}
+    const stopsInSlice=svcStopList.slice(fi,ti+1), stopsSet=new Set(stopsInSlice);
+    const CORD=canonicalOrderFor(stopsInSlice[0]);
+    const canonFirst=CORD.indexOf(stopsInSlice[0]), canonLast=CORD.indexOf(stopsInSlice[stopsInSlice.length-1]);
+    const throughSet=new Set();
+    if(canonFirst!==-1&&canonLast!==-1){
+      const lo=Math.min(canonFirst,canonLast), hi=Math.max(canonFirst,canonLast);
+      for(let i=lo;i<=hi;i++){
+        const code=CORD[i]; if(stopsSet.has(code)) continue;
+        const s=ALL_ST[code]; if(!s) continue;
+        if((code==='K31'||code==='K32'||code==='K33')&&svcKey!=='Cp') continue;
+        if(s.b==='saka'&&!KE_SAKA_SVCS.has(svcKey)) continue;
+        throughSet.add(code);
+      }
+    }
+    return {stops:stopsSet, through:throughSet};
+  }
+  function buildCanonicalCols(activeRows, from, to){
+    const needed=new Set();
+    activeRows.forEach(({k})=>{ needed.add(resolveHub(from,k)); needed.add(resolveHub(to,k)); });
+    if(!activeRows.length){needed.add(resolveHub(from,'F'));needed.add(resolveHub(to,'F'));}
+    activeRows.forEach(({k})=>{ const {stops,through}=serviceRange(k,from,to); stops.forEach(c=>needed.add(c)); through.forEach(c=>needed.add(c)); });
+    const firstSvc=activeRows.length?activeRows[0].k:'F';
+    const CORD=canonicalOrderFor(resolveHub(from,firstSvc));
+    return CORD.filter(c=>needed.has(c));
+  }
+  function renderDiagram(activeRows, from, to){
+    const wrap=document.getElementById('stop-diagram'), tbl=document.getElementById('diag-table');
+    tbl.innerHTML='';
+    if(!activeRows.length){wrap.style.display='none';return;}
+    wrap.style.display='block';
+    const cols=buildCanonicalCols(activeRows,from,to), COL_W=28;
+    const nameTr=document.createElement('tr'); nameTr.className='diag-name-row';
+    const emptyTd=document.createElement('td'); emptyTd.className='diag-svc-col'; nameTr.appendChild(emptyTd);
+    cols.forEach(code=>{
+      const td=document.createElement('td');
+      td.style.cssText=`width:${COL_W}px;min-width:${COL_W}px;max-width:${COL_W}px;padding:0;text-align:center;vertical-align:bottom;padding-bottom:6px;`;
+      const isOD=activeRows.some(({k})=>resolveHub(from,k)===code||resolveHub(to,k)===code);
+      const s=ALL_ST[code];
+      const label=s?(code+' '+(s.n.length>13?s.n.slice(0,12)+'\u2026':s.n)):code;
+      const span=document.createElement('span'); span.className='diag-sta-name'+(isOD?' is-od':''); span.style.cssText='display:block;margin:0 auto;'; span.textContent=label;
+      td.appendChild(span); nameTr.appendChild(td);
+    });
+    tbl.appendChild(nameTr);
+    activeRows.forEach(({k})=>{
+      const info=ALL_SVC[k], color=info.color;
+      const {stops:svcStops,through:svcThrough}=serviceRange(k,from,to);
+      const svcAll=new Set([...svcStops,...svcThrough]);
+      let firstColIdx=Infinity, lastColIdx=-Infinity;
+      cols.forEach((code,ci)=>{ if(svcAll.has(code)){if(ci<firstColIdx)firstColIdx=ci;if(ci>lastColIdx)lastColIdx=ci;} });
+      const tr=document.createElement('tr'); tr.className='diag-track-row';
+      const labelTd=document.createElement('td'); labelTd.className='diag-svc-col';
+      const pill=document.createElement('span'); pill.className='diag-svc-pill svc-'+(k==='Cp'?'Cp':k); pill.textContent=k==='Cp'?'C\u2032':k;
+      labelTd.appendChild(pill); tr.appendChild(labelTd);
+      cols.forEach((code,ci)=>{
+        const td=document.createElement('td');
+        td.style.cssText=`width:${COL_W}px;min-width:${COL_W}px;max-width:${COL_W}px;height:26px;padding:0;position:relative;text-align:center;vertical-align:middle;`;
+        const inRange=svcAll.has(code), isStop=svcStops.has(code);
+        const isOD=resolveHub(from,k)===code||resolveHub(to,k)===code;
+        const isBypass=!inRange&&ci>firstColIdx&&ci<lastColIdx;
+        if(inRange){
+          if(ci>0){const sl=document.createElement('div');sl.className='seg-l';sl.style.cssText=`background:${color};opacity:0.75;`;td.appendChild(sl);}
+          if(ci<cols.length-1){const sr=document.createElement('div');sr.className='seg-r';sr.style.cssText=`background:${color};opacity:0.75;`;td.appendChild(sr);}
+          const inner=document.createElement('div'); inner.style.cssText='position:relative;z-index:3;display:flex;justify-content:center;align-items:center;height:100%;';
+          if(isStop){const dot=document.createElement('span');dot.className='dot-s'+(isOD?' od':'');dot.style.background=isOD?'var(--accent)':color;inner.appendChild(dot);}
+          else{const bar=document.createElement('span');bar.className='dot-p';bar.style.background=color;inner.appendChild(bar);}
+          td.appendChild(inner);
+        } else if(isBypass){
+          const bl=document.createElement('div');bl.className='seg-bypass-l';td.appendChild(bl);
+          const br=document.createElement('div');br.className='seg-bypass-r';td.appendChild(br);
+        }
+        tr.appendChild(td);
+      });
+      tbl.appendChild(tr);
+    });
+  }
+  function getDiscount(km){ if(km<200)return 0.05; if(km<400)return 0.08; if(km<700)return 0.10; if(km<1000)return 0.12; return 0.15; }
+  function calcSegment(from,to,svcKey,classKey){
+    if(!serves(svcKey,from,to)) return null;
+    const km=tariffKm(from,to,svcKey);
+    if(!km||km<=0) return null;
+    return {km, price:calcPrice(km,ALL_SVC[svcKey].coeff,CLASS_C[classKey])};
+  }
+
+  function renderFares(from, to, classF, svcF){
+    const res=document.getElementById('results'), cards=document.getElementById('service-cards');
+    const routeEl=document.getElementById('result-route'), metaEl=document.getElementById('result-meta');
+    const szNote=document.getElementById('sz-note');
+    res.style.display='block'; cards.innerHTML='';
+    routeEl.textContent=stName(from)+' \u2192 '+stName(to);
+    const clss=classF==='all'?['standard','blue_seat','yurani']:[classF];
+    const results=[];
+    if(!isInterline(from,to)){
+      szNote.style.display=(from==='K101'||to==='K101')?'block':'none';
+      szNote.innerHTML='\u24d8 <strong>Shutokwen-nai (SZ zone):</strong> Tickets from/to Sakamuso (K101) include the urban link to Sain\u00f0aul Central (K01) at no extra charge.';
+      const svcs=svcF==='all'?Object.keys(ALL_SVC):[svcF];
+      svcs.forEach(k=>{
+        if(!serves(k,from,to)) return;
+        const km=tariffKm(from,to,k); if(!km||km<=0) return;
+        clss.forEach(c=>{ const price=calcPrice(km,ALL_SVC[k].coeff,CLASS_C[c]); results.push({type:'direct',label:k,svc:k,class:c,km,price}); });
+      });
+    } else {
+      szNote.style.display='block';
+      const fromLine=lineOf(from), toLine=lineOf(to);
+      let hub1,hub2,svcs1,svcs2;
+      if(fromLine==='RY'&&toLine==='KE'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(RY_SVC);svcs2=Object.keys(KE_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (R01/K01). Combined fare applied.';}
+      else if(fromLine==='KE'&&toLine==='RY'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(KE_SVC);svcs2=Object.keys(RY_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (K01/R01). Combined fare applied.';}
+      else if(fromLine==='EI'&&toLine==='KE'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(EI_SVC);svcs2=Object.keys(KE_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (E01/K01). Combined fare applied.';}
+      else if(fromLine==='KE'&&toLine==='EI'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(KE_SVC);svcs2=Object.keys(EI_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (K01/E01). Combined fare applied.';}
+      else if(fromLine==='EI'&&toLine==='RY'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(EI_SVC);svcs2=Object.keys(RY_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (E01/R01). Combined fare applied.';}
+      else if(fromLine==='RY'&&toLine==='EI'){hub1=HUB_VAL;hub2=HUB_VAL;svcs1=Object.keys(RY_SVC);svcs2=Object.keys(EI_SVC);szNote.innerHTML='\u24d8 Transfer at Sain\u00f0aul Central (R01/E01). Combined fare applied.';}
+      if(svcs1&&svcs2) svcs1.forEach(s1=>{ svcs2.forEach(s2=>{
+        const t1=calcSegment(from,hub1,s1,'standard'), t2=calcSegment(hub2,to,s2,'standard');
+        if(!t1||!t2) return;
+        const totalKm=t1.km+t2.km, discount=getDiscount(totalKm), comboLabel=s1+'+'+s2;
+        clss.forEach(c=>{
+          const seg1=calcSegment(from,hub1,s1,c), seg2=calcSegment(hub2,to,s2,c);
+          const basePrice=seg1.price+seg2.price, finalPrice=Math.round(basePrice*(1-discount)*100)/100;
+          results.push({type:'combo',label:comboLabel,svc1:s1,svc2:s2,class:c,km:totalKm,price:finalPrice});
+        });
+      }); });
+    }
+    if(!results.length){ metaEl.textContent=''; cards.innerHTML='<p class="no-service">No valid route found.</p>'; document.getElementById('stop-diagram').style.display='none'; return; }
+    const labelOrder=[], grouped={};
+    results.forEach(r=>{ if(!grouped[r.label]){grouped[r.label]=[];labelOrder.push(r.label);} grouped[r.label].push(r); });
+    const kms=[...new Set(results.map(r=>r.km.toFixed(1)))];
+    metaEl.textContent=kms.length===1?kms[0]+' km':kms.join(' / ')+' km';
+    const minP=Math.min(...results.map(r=>r.price));
+    labelOrder.forEach(label=>{
+      const rows=grouped[label], first=rows[0], isCombo=first.type==='combo';
+      const card=document.createElement('div'); card.className='service-card';
+      let headerHTML;
+      if(isCombo){
+        const p1=first.svc1==='Cp'?'C\u2032':first.svc1, p2=first.svc2==='Cp'?'C\u2032':first.svc2;
+        headerHTML=`<div class="combo-badges"><span class="svc-badge svc-${first.svc1==='Cp'?'Cp':first.svc1}">${p1}</span><span class="combo-sep">+</span><span class="svc-badge svc-${first.svc2==='Cp'?'Cp':first.svc2}">${p2}</span></div><span class="svc-name">Transfer combo</span>`;
+      } else {
+        const info=ALL_SVC[first.svc], pill=first.svc==='Cp'?'C\u2032':first.svc;
+        headerHTML=`<span class="svc-badge svc-${first.svc==='Cp'?'Cp':first.svc}">${pill}</span><span class="svc-name">${info.name}</span>`;
+      }
+      const priceRowsHTML=rows.map(r=>{ const isBest=r.price===minP; return `<div class="price-row${isBest?' best-price':''}"><span class="price-class">${CLASS_L[r.class]}</span><span class="price-val">${fmt(r.price)} <span class="price-usd">${fusd(r.price)}</span></span></div>`; }).join('');
+      card.innerHTML=`<div class="service-card-header">${headerHTML}</div><div class="price-rows">${priceRowsHTML}</div><div class="card-km">${first.km.toFixed(1)} km${isCombo?' \u00b7 combined fare':''}</div>`;
+      cards.appendChild(card);
+    });
+    if(results[0].type==='combo'){
+      document.getElementById('stop-diagram').style.display='none';
+    } else {
+      const diagSvcs=[...new Set(results.map(r=>r.svc))];
+      renderDiagram(diagSvcs.map(k=>({k})), from, to);
+    }
+  }
+
+  buildSelects();
+  document.getElementById('btn-swap').addEventListener('click',()=>{ const sf=document.getElementById('sel-from'),st=document.getElementById('sel-to'),tmp=sf.value; sf.value=st.value; st.value=tmp; });
+  document.getElementById('btn-search').addEventListener('click',()=>{
+    const from=document.getElementById('sel-from').value, to=document.getElementById('sel-to').value;
+    const cls=document.getElementById('sel-class').value, svc=document.getElementById('sel-service').value;
+    if(from===to){alert('Please select two different stations.');return;}
+    renderFares(from,to,cls,svc);
+  });
+
+  /* ================================================================
+     JOURNEY PLANNER
+  ================================================================ */
+  const _jpState = {
+  from: null, to: null, lineF: null, directOnly: false,
+  windowStart: null, windowEnd: null,
+  all: [],
+};
+
+  function _parseMins(hhmm) {
+    const [h, m] = hhmm.split(':').map(Number);
+    return h * 60 + m;
+  }
+  function _fmtMins(total) {
+    const h = Math.floor(((total % 1440) + 1440) % 1440 / 60);
+    const m = ((total % 1440) + 1440) % 1440 % 60;
+    return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  }
+  function _nextAfter(journeys) {
+    if (!journeys.length) return null;
+    let maxMins = -Infinity;
+    journeys.forEach(j => { const m = _parseMins(j.departureTime); if (m > maxMins) maxMins = m; });
+    return _fmtMins(maxMins + 1);
+  }
+  function _prevBefore(journeys) {
+    if (!journeys.length) return null;
+    let minMins = Infinity;
+    journeys.forEach(j => { const m = _parseMins(j.departureTime); if (m < minMins) minMins = m; });
+    return _fmtMins(minMins - 180);
+  }
+
+  function buildPlannerSelects(){
+    const jpFrom = document.getElementById('jp-from');
+    const jpTo   = document.getElementById('jp-to');
+    const byLine = {};
+    TTEngine.allStations().forEach(st => {
+      if(!byLine[st.lineId]) byLine[st.lineId] = [];
+      byLine[st.lineId].push(st);
+    });
+    const lineLabels = {KE:'Keishin', RY:'Ry\u0101nkai', EI:'Eira', SN:'Seibu Naeryuku', AX:'Airport Express'};
+    Object.entries(byLine).forEach(([lineId, stations]) => {
+      const ogF = document.createElement('optgroup');
+      const ogT = document.createElement('optgroup');
+      ogF.label = ogT.label = lineLabels[lineId] || lineId;
+      stations.forEach(st => {
+        const label = st.code + ' ' + st.name + (st.kanji ? ' \u00b7 ' + st.kanji : '');
+        [ogF, ogT].forEach((og) => {
+          const opt = document.createElement('option');
+          opt.value = st.code;
+          opt.textContent = label;
+          og.appendChild(opt);
+        });
+      });
+      jpFrom.appendChild(ogF);
+      jpTo.appendChild(ogT);
+    });
+    // ── Suburban lines ──
+const subOg_F = document.createElement('optgroup');
+const subOg_T = document.createElement('optgroup');
+subOg_F.label = subOg_T.label = 'Izarail Suburban';
+SuburbanRouter.allStations().forEach(st => {
+  const label = st.code + ' ' + st.name + (st.kanji ? ' · ' + st.kanji : '');
+  [subOg_F, subOg_T].forEach(og => {
+    const opt = document.createElement('option');
+    opt.value = st.code;
+    opt.textContent = label;
+    og.appendChild(opt);
+  });
+});
+jpFrom.appendChild(subOg_F);
+jpTo.appendChild(subOg_T);
+    // ── Metro Line 4 ──
+if (typeof MetroRouter !== 'undefined') {
+  const metOg_F = document.createElement('optgroup');
+  const metOg_T = document.createElement('optgroup');
+  metOg_F.label = metOg_T.label = 'Metro Line 4';
+  MetroRouter.allStations().forEach(st => {
+    const label = st.code + ' ' + st.name + (st.kanji ? ' · ' + st.kanji : '');
+    [metOg_F, metOg_T].forEach(og => {
+      const opt = document.createElement('option');
+      opt.value = st.code;
+      opt.textContent = label;
+      og.appendChild(opt);
+    });
+  });
+  jpFrom.appendChild(metOg_F);
+  jpTo.appendChild(metOg_T);
+}
+    jpFrom.value = 'R13';
+    jpTo.value   = 'SN08';
+  }
+
+  function svcBadgeHTML(svcId, svcLogical, color) {
+    const label = svcId === 'Cp' ? 'C\u2032' : (svcLogical || svcId);
+    const cls   = 'svc-' + (svcId === 'Cp' ? 'Cp' : (svcLogical || svcId));
+    return `<span class="svc-badge ${cls}" style="background:${color};color:#fff">${label}</span>`;
+  }
+
+  function renderJourneys(journeys, fromName, toName, mode) {
+    const resEl   = document.getElementById('jp-results');
+    const titleEl = document.getElementById('jp-route-title');
+    const listEl  = document.getElementById('journey-list');
+    const noteEl  = document.getElementById('jp-note');
+    const navBar  = document.getElementById('jp-nav-bar');
+    const timeChip= document.getElementById('jp-time-chip');
+
+    resEl.style.display = 'block';
+    titleEl.textContent = fromName + ' \u2192 ' + toName;
+
+    if (!journeys.length && mode === 'replace') {
+      listEl.innerHTML = '<p class="jp-no-result">No journeys found in the next 3 hours.</p>';
+      noteEl.style.display = 'none';
+      navBar.style.display = 'none';
+      return;
+    }
+
+    if (mode === 'prepend') {
+      const existingKeys = new Set(_jpState.all.map(j => j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      const fresh = journeys.filter(j => !existingKeys.has(j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      _jpState.all = [...fresh, ..._jpState.all];
+    } else if (mode === 'append') {
+      const existingKeys = new Set(_jpState.all.map(j => j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      const fresh = journeys.filter(j => !existingKeys.has(j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      _jpState.all = [..._jpState.all, ...fresh];
+    } else {
+      _jpState.all = [...journeys];
+    }
+
+    _jpState.all.sort((a,b) => _parseMins(a.departureTime) - _parseMins(b.departureTime));
+
+    const hasTransfer = _jpState.all.some(j => j.transfers > 0);
+    if (hasTransfer) {
+      noteEl.style.display = 'block';
+      noteEl.innerHTML = `\u24d8 Transfer time: minimum <strong>${IZXRouter.TRANSFER_MIN} min</strong> between trains at the same station.`;
+    } else {
+      noteEl.style.display = 'none';
+    }
+
+    if (_jpState.all.length) {
+      _jpState.windowStart = _jpState.all[0].departureTime;
+      _jpState.windowEnd   = _jpState.all[_jpState.all.length - 1].departureTime;
+    }
+
+    /* Render cards */
+    listEl.innerHTML = '';
+    _jpState.all.forEach((j, idx) => {
+      const card = document.createElement('div');
+      card.className = 'journey-card' + (idx === 0 ? ' best' : '');
+
+      const transferBadge = j.transfers > 0
+        ? `<span class="transfer-badge">${j.transfers} change</span>`
+        : '<span class="transfer-badge">Direct</span>';
+
+      let legsHTML = '<div class="journey-legs">';
+      j.legs.forEach((leg, li) => {
+        const badge = svcBadgeHTML(leg.svcId, leg.svcLogical, leg.color);
+        const intStops = leg.intermediateStops ?? [];
+        const intId = `int-${idx}-${li}`;
+        const expandBtn = intStops.length
+          ? `<button class="leg-expand-btn" data-target="${intId}">\u25b8 ${intStops.length} stop${intStops.length > 1 ? 's' : ''}</button>`
+          : '';
+        const intHTML = intStops.map(s =>
+          `<div class="leg-int-row"><span class="leg-int-time">${s.arr} \u2192 ${s.dep}</span><span>${s.name}</span></div>`
+        ).join('');
+
+        legsHTML += `
+          <div class="leg-row">
+            <div class="leg-svc">${badge} <span class="svc-name">${leg.svcName}</span></div>
+            <div class="leg-times">${leg.boardDep} \u2192 ${leg.alightArr}</div>
+            <div class="leg-stations">${leg.boardName} \u2192 ${leg.alightName} ${expandBtn}</div>
+            <div class="leg-meta">
+              <span class="leg-train">#${leg.trainNumber ?? '--'}</span>
+              ${leg.km != null ? `<span class="leg-km">${Math.round(leg.km)} km</span>` : ''}
+            </div>
+          </div>
+          ${intStops.length ? `<div class="leg-intermediates" id="${intId}">${intHTML}</div>` : ''}`;
+
+        if (li < j.legs.length - 1) {
+          const waitMin = j.transferWaitMin ?? IZXRouter.TRANSFER_MIN;
+          const node    = IZXRouter.stationName(j.transferNodes[li]);
+          legsHTML += `
+            <div class="transfer-row">
+              Change at <strong>${node}</strong> \u2014 ${waitMin} min wait
+            </div>`;
+        }
+      });
+      legsHTML += '</div>';
+
+      card.innerHTML = `
+        <div class="journey-header">
+          <div class="journey-times">${j.departureTime} \u2192 ${j.arrivalTime}</div>
+          <div class="journey-dur">${j.totalMinutes} min ${transferBadge}${j.totalKm != null ? ` <span class="journey-km">\u00b7 ${Math.round(j.totalKm)} km</span>` : ''}</div>
+        </div>` + legsHTML;
+
+      card.querySelectorAll('.leg-expand-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = card.querySelector('#' + btn.dataset.target);
+          if (!target) return;
+          const open = target.classList.toggle('open');
+          btn.textContent = open
+            ? btn.textContent.replace('\u25b8', '\u25be')
+            : btn.textContent.replace('\u25be', '\u25b8');
+        });
+      });
+
+      listEl.appendChild(card);
+    });
+
+    navBar.style.display = 'flex';
+    timeChip.textContent = _jpState.windowStart + ' \u2013 ' + _jpState.windowEnd;
+
+    if (mode === 'prepend' && journeys.length) {
+      listEl.firstElementChild?.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  }
+
+function _runSearch(from, to, depTime, lineF, directOnly) {
+  const opts = { lines: lineF, directOnly: !!directOnly, maxResults: 5 };
+  const izx   = IZXRouter.search(from, to, depTime, opts);
+  const sub   = SuburbanRouter.search(from, to, depTime, opts);
+  const metro = (typeof MetroRouter !== 'undefined')
+    ? MetroRouter.search(from, to, depTime, opts) : [];
+  return [...izx, ...sub, ...metro]
+    .sort((a, b) => _parseMins(a.departureTime) - _parseMins(b.departureTime))
+    .slice(0, 8);
+}
+
+  buildPlannerSelects();
+
+  document.getElementById('jp-swap').addEventListener('click', () => {
+    const f = document.getElementById('jp-from'), t = document.getElementById('jp-to');
+    const tmp = f.value; f.value = t.value; t.value = tmp;
+  });
+
+  document.getElementById('jp-search').addEventListener('click', () => {
+    const from       = document.getElementById('jp-from').value;
+    const to         = document.getElementById('jp-to').value;
+    const depTime    = document.getElementById('jp-time').value || '08:00';
+    const lineF      = document.getElementById('jp-line').value;
+    const directOnly = document.getElementById('jp-direct-only').checked;
+    if (from === to) { alert('Please select two different stations.'); return; }
+    _jpState.from = from; _jpState.to = to; _jpState.lineF = lineF; _jpState.directOnly = directOnly; _jpState.all = [];
+    const journeys = _runSearch(from, to, depTime, lineF, directOnly);
+    renderJourneys(journeys, IZXRouter.stationName(from), IZXRouter.stationName(to), 'replace');
+  });
+
+  document.getElementById('jp-earlier').addEventListener('click', () => {
+    if (!_jpState.from) return;
+    const anchor = _prevBefore(_jpState.all);
+    if (!anchor) return;
+    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly);
+    const cutoff = _parseMins(_jpState.windowStart);
+    const earlier = journeys.filter(j => _parseMins(j.departureTime) < cutoff);
+    if (!earlier.length) {
+      const btn = document.getElementById('jp-earlier');
+      const orig = btn.innerHTML;
+      btn.textContent = 'No earlier trains'; btn.disabled = true;
+      setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+      return;
+    }
+    renderJourneys(earlier, IZXRouter.stationName(_jpState.from), IZXRouter.stationName(_jpState.to), 'prepend');
+  });
+
+  document.getElementById('jp-later').addEventListener('click', () => {
+    if (!_jpState.from) return;
+    const anchor = _nextAfter(_jpState.all);
+    if (!anchor) return;
+    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly);
+    if (!journeys.length) {
+      const btn = document.getElementById('jp-later');
+      const orig = btn.innerHTML;
+      btn.textContent = 'No later trains'; btn.disabled = true;
+      setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+      return;
+    }
+    renderJourneys(journeys, IZXRouter.stationName(_jpState.from), IZXRouter.stationName(_jpState.to), 'append');
+  });
+
+})();
+</script>
+</body>
+</html>
