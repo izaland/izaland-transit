@@ -25,10 +25,10 @@
        Loop Line sopraelevata ↔ Airport Express sotterranea
        Tempo di trasferimento raccomandato: 10 min
 
-   Nota km:
-     I valori km della Loop Line sono stime proporzionali su 24.5 km
-     totali di circuito. Da rivedere con dati cartografici reali.
-     Per le altre linee i km sono segnaposto (0.0) in attesa dei dati.
+   Nota km Loop Line:
+     Distanze progressive reali da rilievo cartografico.
+     Circuito totale: 24.41 km (LL01 → ... → LL19 → LL01).
+     Tratto di chiusura LL19→LL01: 24.41 − 23.6 = 0.81 km.
 ================================================================ */
 'use strict';
 
@@ -45,7 +45,7 @@ const SUBURBAN_LINES = {
 
   /* ────────────────────────────────────────────────
      LO — Loop Line · 環状線 (Kwanjān-sen)
-     Circolare · 24.5 km · 19 stazioni · dal 1937
+     Circolare · 24.41 km · 19 stazioni · dal 1937
   ──────────────────────────────────────────────── */
   LO: {
     id: 'LO',
@@ -55,28 +55,28 @@ const SUBURBAN_LINES = {
     circular: true,
     headwayPeak: 1.5,
     headwayOffPeak: 5,
-    totalKm: 24.5,
+    totalKm: 24.41,
     stations: [
-      { code: 'LL01', name: 'Sainðaul Central',     kanji: '作安崎中央',   km:  0.0 },
-      { code: 'LL02', name: 'Binno',                kanji: '苠喃',         km:  1.2 },
-      { code: 'LL03', name: 'Shiitehongi',          kanji: '茛本名',       km:  2.6 },
-      { code: 'LL04', name: 'Jigasūngai Kōwen',    kanji: '治ヶ僧涯公園', km:  3.9 },
-      { code: 'LL05', name: 'Jufurai Kōwen Niji',  kanji: '朱布来公園西', km:  5.1 },
-      { code: 'LL06', name: 'Punoidan',             kanji: '富硾壇',       km:  6.4 },
-      { code: 'LL07', name: 'Rupekoppe',            kanji: '孱槻',         km:  7.8 },
-      { code: 'LL08', name: 'Isenebo',              kanji: '床踔',         km:  9.3 },
-      { code: 'LL09', name: 'Igashikura',           kanji: '品霜',         km: 10.8 },
-      { code: 'LL10', name: 'Hayatogaru',           kanji: '久松',         km: 12.2 },
-      { code: 'LL11', name: 'Rakkashoni',           kanji: '鳶腳',         km: 13.5 },
-      { code: 'LL12', name: 'Sumi-Kokendake',       kanji: '隠古剣館',     km: 14.9 },
-      { code: 'LL13', name: 'Oritoku',              kanji: '壌外',         km: 16.1 },
-      { code: 'LL14', name: 'Tomiganei',            kanji: '庭ヶ汢',       km: 17.3 },
-      { code: 'LL15', name: 'Tagashiga',            kanji: '浚藻',         km: 18.6 },
-      { code: 'LL16', name: 'Oiseharu',             kanji: '粕墾',         km: 19.8 },
-      { code: 'LL17', name: 'Herubori',             kanji: '杏登',         km: 21.1 },
-      { code: 'LL18', name: 'Ōbakura',              kanji: '大砌',         km: 22.4 },
-      { code: 'LL19', name: 'Aketsue',              kanji: '薫都衛',       km: 23.6 },
-      // km[19→0] = 0.9 km per chiudere il circuito su LL01 (totale 24.5)
+      { code: 'LL01', name: 'Sainðaul Central',    kanji: '作安崎中央',   km:  0.0  },
+      { code: 'LL02', name: 'Binno',               kanji: '苠喃',         km:  1.69 },
+      { code: 'LL03', name: 'Shiitehongi',         kanji: '茛本名',       km:  4.29 },
+      { code: 'LL04', name: 'Jigasūngai Kōwen',   kanji: '治ヶ僧涯公園', km:  5.23 },
+      { code: 'LL05', name: 'Jufurai Kōwen Niji', kanji: '朱布来公園西', km:  6.93 },
+      { code: 'LL06', name: 'Punoidan',            kanji: '富硾壇',       km:  8.45 },
+      { code: 'LL07', name: 'Rupekoppe',           kanji: '孱槻',         km:  9.23 },
+      { code: 'LL08', name: 'Isenebo',             kanji: '床踔',         km: 11.76 },
+      { code: 'LL09', name: 'Igashikura',          kanji: '品霜',         km: 13.19 },
+      { code: 'LL10', name: 'Hayatogaru',          kanji: '久松',         km: 14.12 },
+      { code: 'LL11', name: 'Rakkashoni',          kanji: '鳶腳',         km: 15.5  },
+      { code: 'LL12', name: 'Sumi-Kokendake',      kanji: '隠古剣館',     km: 16.4  },
+      { code: 'LL13', name: 'Oritoku',             kanji: '壌外',         km: 17.2  },
+      { code: 'LL14', name: 'Tomiganei',           kanji: '庭ヶ汢',       km: 18.3  },
+      { code: 'LL15', name: 'Tagashiga',           kanji: '浚藻',         km: 19.2  },
+      { code: 'LL16', name: 'Oiseharu',            kanji: '粕墾',         km: 20.1  },
+      { code: 'LL17', name: 'Herubori',            kanji: '杏登',         km: 21.2  },
+      { code: 'LL18', name: 'Ōbakura',             kanji: '大砌',         km: 22.4  },
+      { code: 'LL19', name: 'Aketsue',             kanji: '薫都衛',       km: 23.6  },
+      // Tratto di chiusura LL19 → LL01: 0.81 km (totale circuito 24.41 km)
     ],
   },
 
