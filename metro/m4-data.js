@@ -42,7 +42,7 @@ const M4_ST = {
   M404: { n: 'Aguri 2-sa',          k: '阿久里二沙',   km: 18.980 },
   M405: { n: 'Anagusa Mukai',       k: '矢模武凱',     km: 20.245 },
   M406: { n: 'Kushidaru Amiya',     k: '柚艏',         km: 21.510 },
-  M407: { n: 'Tamainoki',           k: '',             km: 22.775 },
+  M407: { n: 'Tamainoki',           k: '谷伊坂',       km: 22.775 },
   M408: { n: 'Tamainoki Kokendake', k: '谷伊坂古剣館', km: 24.040 },
   M409: { n: 'Sumi-Kokendake',      k: '隠古剣館',     km: 25.305 },
   M410: { n: 'Sojo-Kokendake',      k: '',             km: 26.570 },
@@ -69,38 +69,63 @@ const M4_META = {
   code:        'M4',
   name:        'Kokendake Line',
   nameJa:      '古剣館線',
-  color:       '#B5651D',   // placeholder — da aggiornare con colore ufficiale
+  color:       '#FFEF00',   // giallo canarino
   established: 1937,
   thruSince:   1976,
   totalKm:     32.895,
   /* Sezione storica */
   originalSection: { from: 'M401', to: 'M415', stations: 15 },
   /* Thru-service */
-  thruEast:  { operator: 'Shinsabu Oitsura Line', boardingNode: 'M415' }, // futuro
-  thruWest:  { sharedWith: 'Line 6', from: 'M425', since: 2013 },
+  thruEast: { operator: 'Shinsabu Oitsura Line', boardingNode: 'M415' }, // futuro
+  thruWest: { sharedWith: 'Line 6', from: 'M425', since: 2013 },
 };
 
 /* ----------------------------------------------------------------
-   Servizi (placeholder — da popolare con TT reali)
-   A  Rapid (fermate selezionate)   — introdotto 1998
+   Profilo frequenze operative (headway in minuti)
+   Valido per entrambe le direzioni su tutta la linea.
+
+   Slot        Da      A       Headway
+   ─────────── ─────── ─────── ───────
+   early       05:00   06:30   10 min
+   pre-peak    06:30   07:00    5 min
+   peak AM     07:00   09:30    2 min
+   off-peak    09:30   17:00    4 min
+   peak PM     17:00   20:00    2 min
+   evening     20:00   22:30    5 min
+   late        22:30   24:30   10 min
+---------------------------------------------------------------- */
+const M4_HEADWAY = [
+  { from: '05:00', to: '06:30', headwayMin: 10 },
+  { from: '06:30', to: '07:00', headwayMin:  5 },
+  { from: '07:00', to: '09:30', headwayMin:  2 },
+  { from: '09:30', to: '17:00', headwayMin:  4 },
+  { from: '17:00', to: '20:00', headwayMin:  2 },
+  { from: '20:00', to: '22:30', headwayMin:  5 },
+  { from: '22:30', to: '24:30', headwayMin: 10 },
+];
+
+/* ----------------------------------------------------------------
+   Servizi
+   A  Rapid (fermate selezionate) — introdotto 1998
    B  All-stop
+   Timetable reali (M4_TT) da aggiungere in fase successiva.
 ---------------------------------------------------------------- */
 const M4_SVC = {
   A: {
-    name:  'Rapid',
-    nameJa:'急行',
-    color: '#B5651D',
-    cls:   'svc-A',
+    name:   'Rapid',
+    nameJa: '急行',
+    color:  '#FFEF00',
+    cls:    'svc-A',
     stops: [
       'M425','M421','M419','M418','M416',
       'M401','M403','M405','M407','M409','M411','M413','M415',
     ],
   },
   B: {
-    name:  'All-stop',
-    nameJa:'各駅停車',
-    color: '#8B4513',
-    cls:   'svc-B',
-    stops: M4_CANONICAL_ORDER,
+    name:   'All-stop',
+    nameJa: '各駅停車',
+    color:  '#CCB800',
+    cls:    'svc-B',
+    stops:  M4_CANONICAL_ORDER,
   },
 };
