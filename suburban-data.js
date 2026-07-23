@@ -25,6 +25,11 @@
        Loop Line sopraelevata ↔ Airport Express sotterranea
        Tempo di trasferimento raccomandato: 10 min
 
+     KD25 ↔ LL09  (Igashikura/Taishindai)
+     KD26 ↔ LL10  (Hayatogaru)
+     KD36 ↔ K101  (Sakamuso)
+     KD37 ↔ K102  (Showanul)
+
    Nota km Loop Line:
      Distanze progressive reali da rilievo cartografico.
      Circuito totale: 24.41 km (LL01 → ... → LL19 → LL01).
@@ -37,13 +42,15 @@
    Mappa: codice suburbano → [codici IZX/AX corrispondenti]
 ================================================================ */
 const SUBURBAN_INTERCHANGE = {
-  LL01: ['K01', 'R01', 'E01', 'AX06'],  // Sainðaul Central
-  LL17: ['AX07'],                         // Herubori
-  KD26: ['LL10'],                         // Hayatogaru (KD ↔ LL)
-  KD25: ['LL09'],                         // Igashikura/Taishindai (KD ↔ LL)
+  LL01: ['K01', 'R01', 'E01', 'AX06'],        // Sainðaul Central (Loop Line)
+  LL17: ['AX07'],                               // Herubori (Loop Line ↔ Airport Express)
+  KD25: ['LL09'],                               // Igashikura/Taishindai (KD ↔ LL)
+  KD26: ['LL10'],                               // Hayatogaru (KD ↔ LL)
   KD32: ['LL01', 'K01', 'R01', 'E01', 'AX06'], // Sainðaul Central (KD)
-  KD33: ['LL19'],                         // Aketsue (KD ↔ LL)
-  KD20: ["R02"],                               // Asaji Torimoshi (IZX Ryānkai —)
+  KD33: ['LL19'],                               // Aketsue (KD ↔ LL)
+  KD20: ['R02'],                                // Asaji Torimoshi (KD ↔ IZX Ryānkai)
+  KD36: ['K101'],                               // Sakamuso (KD ↔ IZX K101)
+  KD37: ['K102'],                               // Showanul (KD ↔ IZX K102)
 };
 
 const SUBURBAN_LINES = {
@@ -95,61 +102,61 @@ const SUBURBAN_LINES = {
     headwayOffPeak: 12,
     totalKm: 156.87,
     stations: [
-  { code: 'KD01', name: 'Daihanji',                   kanji: '大繁寺',       km:   0.0  },
-  { code: 'KD02', name: 'Niji-Hakenaki',              kanji: '西横畑',       km:   3.2  },
-  { code: 'KD03', name: 'Hetsannuiko',                kanji: '—',            km:   6.1  },
-  { code: 'KD04', name: 'Ronnukata Nyūngu',           kanji: '—',            km:   9.4  },
-  { code: 'KD05', name: 'Hyankama',                   kanji: '向加万',       km:  12.3  },
-  { code: 'KD06', name: 'Hakkuda',                    kanji: '箔九田',       km:  15.5  },
-  { code: 'KD07', name: 'Karinniswae',                kanji: '柯林口',       km:  18.7  },
-  { code: 'KD08', name: 'Koromuki',                   kanji: '軺鵡奇',       km:  22.0  },
-  { code: 'KD09', name: 'Hailehira',                  kanji: '半桶',         km:  25.2  },
-  { code: 'KD10', name: 'Ibaruno',                    kanji: '齒琉能',       km:  28.8  },
-  { code: 'KD11', name: 'Ibaruno Dodose',             kanji: '齒琉能土々施', km:  30.1  },
-  { code: 'KD12', name: 'Ibaruno Daigaku',            kanji: '齒琉能大學',   km:  31.4  },
-  { code: 'KD13', name: 'Nukisakidai',                kanji: '—',            km:  33.0  },
-  { code: 'KD14', name: 'Dankau',                     kanji: '檀洪',         km:  36.5  },
-  { code: 'KD15', name: 'Parisote',                   kanji: '—',            km:  39.2  },
-  { code: 'KD16', name: 'Shakihori Kinahu Daigaku',   kanji: '—',            km:  42.0  },
-  { code: 'KD17', name: 'Hokadaka',                   kanji: '—',            km:  45.1  },
-  { code: 'KD18', name: 'Raikihoshi',                 kanji: '挾浮',         km:  48.3  },
-  { code: 'KD19', name: 'Inpas',                      kanji: '院発',         km:  51.0  },
-  { code: 'KD20', name: 'Asaji Torimoshi',            kanji: '安佐寺狛篠',   km:  54.6  },
-  { code: 'KD21', name: 'Aisendawa',                  kanji: '愛仙堺',       km:  57.8  },
-  { code: 'KD22', name: 'Kikachuri',                  kanji: '筌中李',       km:  61.0  },
-  { code: 'KD23', name: 'Namitoki',                   kanji: '咲葵',         km:  64.2  },
-  { code: 'KD24', name: 'Chikurai',                   kanji: '宮鵜伊',       km:  67.5  },
-  { code: 'KD25', name: 'Igashikura (Taishindai)',    kanji: '品霜（泰進大）', km: 70.0  },
-  { code: 'KD26', name: 'Hayatogaru',                 kanji: '久松',         km:  71.8  },
-  { code: 'KD27', name: 'Kairumuka',                  kanji: '—',            km:  73.2  },
-  { code: 'KD28', name: 'Fushinose',                  kanji: '翔峴',         km:  74.9  },
-  { code: 'KD29', name: 'Tsumiji',                    kanji: '都巳治',       km:  76.8  },
-  { code: 'KD30', name: 'Anagusa Mukai',              kanji: '矢模武凱',     km:  78.5  },
-  { code: 'KD31', name: 'Rosemane',                   kanji: '酢丘',         km:  80.1  },
-  { code: 'KD32', name: 'Sainðaul Central',           kanji: '作安崎中央',   km:  82.0  },
-  { code: 'KD33', name: 'Aketsue',                    kanji: '薫都衛',       km:  83.6  },
-  { code: 'KD34', name: 'Nashikoma',                  kanji: '刖冬',         km:  85.4  },
-  { code: 'KD35', name: 'Kasakuri',                   kanji: '鯛巻',         km:  87.5  },
-  { code: 'KD36', name: 'Sakamuso',                   kanji: '沛坤',         km:  90.0  },
-  { code: 'KD37', name: 'Showanul',                   kanji: '—',            km:  93.5  },
-  { code: 'KD38', name: 'Niji-Showanul',              kanji: '—',            km:  96.2  },
-  { code: 'KD39', name: 'Jisahara',                   kanji: '治叉榎',       km:  99.0  },
-  { code: 'KD40', name: 'Minokashira',                kanji: '—',            km: 102.1  },
-  { code: 'KD41', name: 'Kōtō Satahappi',             kanji: '—',            km: 105.4  },
-  { code: 'KD42', name: 'Bibantori',                  kanji: '美潘市',       km: 109.0  },
-  { code: 'KD43', name: 'Tswankanami',                kanji: '芽咲市',       km: 113.2  },
-  { code: 'KD44', name: 'Hikkojauri',                 kanji: '—',            km: 117.5  },
-  { code: 'KD45', name: 'Seikashi',                   kanji: '西鹿市',       km: 121.8  },
-  { code: 'KD46', name: 'Pyanuza',                    kanji: '—',            km: 126.0  },
-  { code: 'KD47', name: 'Kustinomi',                  kanji: '杉桉',         km: 130.5  },
-  { code: 'KD48', name: 'Kirijima',                   kanji: '磯湧',         km: 135.0  },
-  { code: 'KD49', name: 'Tserinuma',                  kanji: '—',            km: 139.0  },
-  { code: 'KD50', name: 'Nagakata',                   kanji: '—',            km: 143.2  },
-  { code: 'KD51', name: 'Shiki-Kirijima',             kanji: '北磯湧',       km: 147.1  },
-  { code: 'KD52', name: 'Nasjangai',                  kanji: '—',            km: 150.4  },
-  { code: 'KD53', name: 'Hatsumoroge',                kanji: '—',            km: 153.5  },
-  { code: 'KD54', name: 'Nagayamatsu',                kanji: '—',            km: 156.87 },
-],
+      { code: 'KD01', name: 'Daihanji',                 kanji: '大繁寺',         km:   0.0  },
+      { code: 'KD02', name: 'Niji-Hakenaki',            kanji: '西横畑',         km:   3.2  },
+      { code: 'KD03', name: 'Hetsannuiko',              kanji: '—',              km:   6.1  },
+      { code: 'KD04', name: 'Ronnukata Nyūngu',         kanji: '—',              km:   9.4  },
+      { code: 'KD05', name: 'Hyankama',                 kanji: '向加万',         km:  12.3  },
+      { code: 'KD06', name: 'Hakkuda',                  kanji: '箔九田',         km:  15.5  },
+      { code: 'KD07', name: 'Karinniswae',              kanji: '柯林口',         km:  18.7  },
+      { code: 'KD08', name: 'Koromuki',                 kanji: '軺鵡奇',         km:  22.0  },
+      { code: 'KD09', name: 'Hailehira',                kanji: '半桶',           km:  25.2  },
+      { code: 'KD10', name: 'Ibaruno',                  kanji: '齒琉能',         km:  28.8  },
+      { code: 'KD11', name: 'Ibaruno Dodose',           kanji: '齒琉能土々施',   km:  30.1  },
+      { code: 'KD12', name: 'Ibaruno Daigaku',          kanji: '齒琉能大學',     km:  31.4  },
+      { code: 'KD13', name: 'Nukisakidai',              kanji: '—',              km:  33.0  },
+      { code: 'KD14', name: 'Dankau',                   kanji: '檀洪',           km:  36.5  },
+      { code: 'KD15', name: 'Parisote',                 kanji: '—',              km:  39.2  },
+      { code: 'KD16', name: 'Shakihori Kinahu Daigaku', kanji: '—',              km:  42.0  },
+      { code: 'KD17', name: 'Hokadaka',                 kanji: '—',              km:  45.1  },
+      { code: 'KD18', name: 'Raikihoshi',               kanji: '挾浮',           km:  48.3  },
+      { code: 'KD19', name: 'Inpas',                    kanji: '院発',           km:  51.0  },
+      { code: 'KD20', name: 'Asaji Torimoshi',          kanji: '安佐寺狛篠',     km:  54.6  },
+      { code: 'KD21', name: 'Aisendawa',                kanji: '愛仙堺',         km:  57.8  },
+      { code: 'KD22', name: 'Kikachuri',                kanji: '筌中李',         km:  61.0  },
+      { code: 'KD23', name: 'Namitoki',                 kanji: '咲葵',           km:  64.2  },
+      { code: 'KD24', name: 'Chikurai',                 kanji: '宮鵜伊',         km:  67.5  },
+      { code: 'KD25', name: 'Igashikura (Taishindai)',  kanji: '品霜（泰進大）', km:  70.0  },
+      { code: 'KD26', name: 'Hayatogaru',               kanji: '久松',           km:  71.8  },
+      { code: 'KD27', name: 'Kairumuka',                kanji: '—',              km:  73.2  },
+      { code: 'KD28', name: 'Fushinose',                kanji: '翔峴',           km:  74.9  },
+      { code: 'KD29', name: 'Tsumiji',                  kanji: '都巳治',         km:  76.8  },
+      { code: 'KD30', name: 'Anagusa Mukai',            kanji: '矢模武凱',       km:  78.5  },
+      { code: 'KD31', name: 'Rosemane',                 kanji: '酢丘',           km:  80.1  },
+      { code: 'KD32', name: 'Sainðaul Central',         kanji: '作安崎中央',     km:  82.0  },
+      { code: 'KD33', name: 'Aketsue',                  kanji: '薫都衛',         km:  83.6  },
+      { code: 'KD34', name: 'Nashikoma',                kanji: '刖冬',           km:  85.4  },
+      { code: 'KD35', name: 'Kasakuri',                 kanji: '鯛巻',           km:  87.5  },
+      { code: 'KD36', name: 'Sakamuso',                 kanji: '沛坤',           km:  90.0  },
+      { code: 'KD37', name: 'Showanul',                 kanji: '—',              km:  93.5  },
+      { code: 'KD38', name: 'Niji-Showanul',            kanji: '—',              km:  96.2  },
+      { code: 'KD39', name: 'Jisahara',                 kanji: '治叉榎',         km:  99.0  },
+      { code: 'KD40', name: 'Minokashira',              kanji: '—',              km: 102.1  },
+      { code: 'KD41', name: 'Kōtō Satahappi',           kanji: '—',              km: 105.4  },
+      { code: 'KD42', name: 'Bibantori',                kanji: '美潘市',         km: 109.0  },
+      { code: 'KD43', name: 'Tswankanami',              kanji: '芽咲市',         km: 113.2  },
+      { code: 'KD44', name: 'Hikkojauri',               kanji: '—',              km: 117.5  },
+      { code: 'KD45', name: 'Seikashi',                 kanji: '西鹿市',         km: 121.8  },
+      { code: 'KD46', name: 'Pyanuza',                  kanji: '—',              km: 126.0  },
+      { code: 'KD47', name: 'Kustinomi',                kanji: '杉桉',           km: 130.5  },
+      { code: 'KD48', name: 'Kirijima',                 kanji: '磯湧',           km: 135.0  },
+      { code: 'KD49', name: 'Tserinuma',                kanji: '—',              km: 139.0  },
+      { code: 'KD50', name: 'Nagakata',                 kanji: '—',              km: 143.2  },
+      { code: 'KD51', name: 'Shiki-Kirijima',           kanji: '北磯湧',         km: 147.1  },
+      { code: 'KD52', name: 'Nasjangai',                kanji: '—',              km: 150.4  },
+      { code: 'KD53', name: 'Hatsumoroge',              kanji: '—',              km: 153.5  },
+      { code: 'KD54', name: 'Nagayamatsu',              kanji: '—',              km: 156.87 },
+    ],
   },
 
   SK: {
