@@ -10,11 +10,12 @@
 
    Supporta:
      - Linee lineari (A → B)
-     - Linee circolari (percorso minimo orario/antiorario)
+     - Linee circolari con fermate intermedie CW e CCW
      - Filtro per lineId (opts.lines)
      - directOnly (opts.directOnly)
      - Cambio a Sainðaul Central (LL01 ↔ K01/R01/E01/AX06)
-       verso la rete IZX, via IZXRouter.buildLeg()
+       e Herubori (LL17 ↔ AX07) verso la rete IZX/AX,
+       via IZXRouter.buildLeg()
 
    Tempi di trasferimento:
      TRANSFER_MIN            5 min  — interscambio interno alla rete suburbana
@@ -23,6 +24,12 @@
        sopraelevata di Sainðaul Central, mentre IZX e Airport Express
        fermano nella sezione sotterranea. Il percorso pedonale tra le
        due zone richiede almeno 10 minuti.
+
+   Fermate intermedie (circolari):
+     CW  = indici crescenti (con wrap-around da LL19 a LL01)
+     CCW = indici decrescenti (con wrap-around da LL01 a LL19)
+     I tempi di ogni fermata sono calcolati proporzionalmente alla
+     distanza percorsa rispetto alla distanza totale del leg.
 
    Nota timetable:
      In questa fase il router genera orari sintetici basati su
@@ -39,8 +46,9 @@ const SuburbanRouter = (() => {
   const TRANSFER_SEC       = TRANSFER_MIN       * 60;
   const CROSS_TRANSFER_SEC = CROSS_TRANSFER_MIN * 60;
   const MAX_JOURNEYS  = 5;
-  const SEARCH_WINDOW = 3 * 3600; // secondi
-  const AVG_SPEED_KMH = 40;       // velocità commerciale media suburbana
+  const SEARCH_WINDOW = 3 * 3600;
+  const AVG_SPEED_KMH = 40;
+  const DWELL_SEC     = 30; // sosta a ogni fermata intermedia
 
   /* ── utils tempo ── */
   function _hmToSec(hm) {
@@ -65,18 +73,73 @@ const SuburbanRouter = (() => {
     if (!line.circular) {
       return Math.abs(sts[iTo].km - sts[iFrom].km);
     }
-    const total   = line.totalKm;
-    const cwKm    = ((sts[iTo].km - sts[iFrom].km) + total) % total;
-    const ccwKm   = total - cwKm;
+    const total = line.totalKm;
+    const cwKm  = ((sts[iTo].km - sts[iFrom].km) + total) % total;
+    const ccwKm = total - cwKm;
     return Math.min(cwKm, ccwKm);
   }
 
-  /* ── direzione ottimale (circolare) ── */
+  /* ── direzione ottimale (circolare): CW = senso orario (indici crescenti) ── */
   function _circularDir(line, iFrom, iTo) {
-    const sts    = line.stations;
-    const total  = line.totalKm;
-    const cwKm   = ((sts[iTo].km - sts[iFrom].km) + total) % total;
+    const sts   = line.stations;
+    const total = line.totalKm;
+    const cwKm  = ((sts[iTo].km - sts[iFrom].km) + total) % total;
     return cwKm <= total / 2 ? 'CW' : 'CCW';
+  }
+
+  /* ────────────────────────────────────────────────────────────────
+   * _circularIntermediateStops(line, iFrom, iTo, dir, boardSec, legKm)
+   *
+   * Restituisce le fermate intermedie di un leg circolare nel verso
+   * corretto (CW = indici crescenti con wrap, CCW = decrescenti).
+   * I tempi sono proporzionali alla distanza progressiva percorsa
+   * nel verso scelto, con dwell di DWELL_SEC a ogni fermata.
+   * ──────────────────────────────────────────────────────────────── */
+  function _circularIntermediateStops(line, iFrom, iTo, dir, boardSec, legKm) {
+    const sts = line.stations;
+    const n   = sts.length;
+    const total = line.totalKm;
+
+    // Sequenza ordinata degli indici nel verso dir (esclude iFrom e iTo)
+    const seq = [];
+    if (dir === 'CW') {
+      let i = (iFrom + 1) % n;
+      while (i !== iTo) {
+        seq.push(i);
+        i = (i + 1) % n;
+      }
+    } else { // CCW
+      let i = (iFrom - 1 + n) % n;
+      while (i !== iTo) {
+        seq.push(i);
+        i = (i - 1 + n) % n;
+      }
+    }
+
+    // km progressivi nel verso dir per ogni stazione della seq
+    // (distanza da iFrom a quell'indice nel verso scelto)
+    function _kmFromStart(idx) {
+      if (dir === 'CW') {
+        return ((sts[idx].km - sts[iFrom].km) + total) % total;
+      } else {
+        return ((sts[iFrom].km - sts[idx].km) + total) % total;
+      }
+    }
+
+    const travelSec = Math.round((legKm / AVG_SPEED_KMH) * 3600);
+
+    return seq.map(idx => {
+      const kmElapsed = _kmFromStart(idx);
+      // tempo proporzionale alla distanza
+      const arrSec = boardSec + Math.round((kmElapsed / legKm) * travelSec);
+      const depSec = arrSec + DWELL_SEC;
+      return {
+        code: sts[idx].code,
+        name: sts[idx].name,
+        arr:  _secToHM(arrSec),
+        dep:  _secToHM(depSec),
+      };
+    });
   }
 
   /* ── genera treni sintetici a headway fisso ── */
@@ -108,17 +171,28 @@ const SuburbanRouter = (() => {
     const km        = _kmBetween(line, iFrom, iTo);
     const travelSec = Math.round((km / AVG_SPEED_KMH) * 3600);
     const alightSec = boardSec + travelSec;
+    const dir       = line.circular
+      ? _circularDir(line, iFrom, iTo)
+      : (iFrom < iTo ? 'SB' : 'NB');
 
-    let intermediateStops = [];
-    if (!line.circular) {
+    let intermediateStops;
+    if (line.circular) {
+      intermediateStops = _circularIntermediateStops(
+        line, iFrom, iTo, dir, boardSec, km
+      );
+    } else {
       const a = Math.min(iFrom, iTo);
       const b = Math.max(iFrom, iTo);
-      intermediateStops = line.stations.slice(a + 1, b).map((st) => ({
-        code: st.code,
-        name: st.name,
-        arr:  _secToHM(boardSec + Math.round(((st.km - line.stations[iFrom].km) / AVG_SPEED_KMH) * 3600)),
-        dep:  _secToHM(boardSec + Math.round(((st.km - line.stations[iFrom].km) / AVG_SPEED_KMH) * 3600) + 30),
-      }));
+      intermediateStops = line.stations.slice(a + 1, b).map(st => {
+        const kmElapsed = Math.abs(st.km - line.stations[iFrom].km);
+        const arrSec = boardSec + Math.round((kmElapsed / km) * travelSec);
+        return {
+          code: st.code,
+          name: st.name,
+          arr:  _secToHM(arrSec),
+          dep:  _secToHM(arrSec + DWELL_SEC),
+        };
+      });
     }
 
     return {
@@ -128,7 +202,7 @@ const SuburbanRouter = (() => {
       svcName:     line.name,
       color:       line.color,
       cls:         'suburban',
-      direction:   line.circular ? _circularDir(line, iFrom, iTo) : (iFrom < iTo ? 'SB' : 'NB'),
+      direction:   dir,
       trainNumber: null,
       boardCode:   line.stations[iFrom].code,
       boardName:   line.stations[iFrom].name,
@@ -185,9 +259,6 @@ const SuburbanRouter = (() => {
     }
 
     /* ---- 2. Percorsi con cambio Suburbano → IZX/AX ---- */
-    // Leg 1: from (suburbana) → LL01 via loop/lineare
-    // Leg 2: K01/R01/E01/AX06 → to (rete IZX/AX)
-    // Attesa cross-network: CROSS_TRANSFER_SEC (10 min)
     if (!directOnly && typeof IZXRouter !== 'undefined') {
       for (const line of Object.values(SUBURBAN_LINES)) {
         if (!line.stations.length) continue;
@@ -205,7 +276,6 @@ const SuburbanRouter = (() => {
           const leg1 = _buildLeg(line, iF, iMid, depSec);
           if (!leg1) continue;
 
-          // 10 min: sopraelevato storico → sotterraneo IZX/AX
           const transferReadySec = leg1.alightArrSec + CROSS_TRANSFER_SEC;
 
           for (const izxNode of izxPartners) {
@@ -239,9 +309,6 @@ const SuburbanRouter = (() => {
     }
 
     /* ---- 3. Percorsi con cambio IZX/AX → Suburbano ---- */
-    // Leg 1: from (IZX/AX) → K01/R01/E01/AX06
-    // Leg 2: LL01 (suburbana) → to
-    // Attesa cross-network: CROSS_TRANSFER_SEC (10 min)
     if (!directOnly && typeof IZXRouter !== 'undefined') {
       for (const line of Object.values(SUBURBAN_LINES)) {
         if (!line.stations.length) continue;
@@ -265,7 +332,6 @@ const SuburbanRouter = (() => {
                   ? IZXRouter.buildLeg(lineId1, svcId1, from, izxNode, depSec)
                   : null;
                 if (!leg1) continue;
-                // 10 min: sotterraneo IZX/AX → sopraelevato storico suburbane
                 const transferReadySec = leg1.alightArrSec + CROSS_TRANSFER_SEC;
                 const leg2 = _buildLeg(line, iMid, iT, transferReadySec);
                 if (!leg2) continue;
