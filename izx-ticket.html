@@ -519,6 +519,11 @@
           <option value="EI">Eira</option>
           <option value="SN">Seibu Naeryuku</option>
           <option value="AX">Airport Express</option>
+          <option value="LO">Loop Line</option>
+<option value="KD">Kidai</option>
+<option value="SK">Seishaku</option>
+<option value="KS">Kawasabu</option>
+<option value="KW">Kwōkei</option>
         </select>
       </div>
     </div>
@@ -1001,6 +1006,21 @@
       jpFrom.appendChild(ogF);
       jpTo.appendChild(ogT);
     });
+    // ── Suburban lines ──
+const subOg_F = document.createElement('optgroup');
+const subOg_T = document.createElement('optgroup');
+subOg_F.label = subOg_T.label = 'Izarail Suburban';
+SuburbanRouter.allStations().forEach(st => {
+  const label = st.code + ' ' + st.name + (st.kanji ? ' · ' + st.kanji : '');
+  [subOg_F, subOg_T].forEach(og => {
+    const opt = document.createElement('option');
+    opt.value = st.code;
+    opt.textContent = label;
+    og.appendChild(opt);
+  });
+});
+jpFrom.appendChild(subOg_F);
+jpTo.appendChild(subOg_T);
     jpFrom.value = 'R13';
     jpTo.value   = 'SN08';
   }
@@ -1130,9 +1150,12 @@
   }
 
 function _runSearch(from, to, depTime, lineF, directOnly) {
-  return IZXRouter.search(from, to, depTime, { 
-    lines: lineF, directOnly: !!directOnly, maxResults: 5 
-  });
+  const opts = { lines: lineF, directOnly: !!directOnly, maxResults: 5 };
+  const izx = IZXRouter.search(from, to, depTime, opts);
+  const sub = SuburbanRouter.search(from, to, depTime, opts);
+  return [...izx, ...sub]
+    .sort((a, b) => _parseMins(a.departureTime) - _parseMins(b.departureTime))
+    .slice(0, 8);
 }
 
   buildPlannerSelects();
@@ -1188,5 +1211,7 @@ function _runSearch(from, to, depTime, lineF, directOnly) {
 
 })();
 </script>
+  <script src="suburban-data.js"></script>
+<script src="suburban-router.js"></script>
 </body>
 </html>
