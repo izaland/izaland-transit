@@ -30,6 +30,8 @@
      KD35 ↔ AX04  (Kasakuri)
      KD36 ↔ K101  (Sakamuso)
      KD37 ↔ K102, AX21  (Showanul — triangolo KD↔IZX↔AX completo)
+     KD46 ↔ K31   (Pyanuza — KD ↔ KE ramo C′)
+     KD54 ↔ K32   (Nagayamatsu — KD ↔ KE ramo C′)
 
    Nota km Loop Line:
      Distanze progressive reali da rilievo cartografico.
@@ -45,14 +47,16 @@
 const SUBURBAN_INTERCHANGE = {
   LL01: ['K01', 'R01', 'E01', 'AX06'],        // Sainðaul Central (Loop Line)
   LL17: ['AX07'],                               // Herubori (Loop Line ↔ Airport Express)
+  KD20: ['R02'],                                // Asaji Torimoshi (KD ↔ IZX Ryānkai)
   KD25: ['LL09'],                               // Igashikura/Taishindai (KD ↔ LL)
   KD26: ['LL10'],                               // Hayatogaru (KD ↔ LL)
   KD32: ['LL01', 'K01', 'R01', 'E01', 'AX06'], // Sainðaul Central (KD)
   KD33: ['LL19'],                               // Aketsue (KD ↔ LL)
-  KD20: ['R02'],                                // Asaji Torimoshi (KD ↔ IZX Ryānkai)
   KD35: ['AX04'],                               // Kasakuri (KD ↔ AX Ramo Est)
-  KD36: ['K101'],                               // Sakamuso (KD ↔ IZX K101)
-  KD37: ['K102', 'AX21'],                       // Showanul (KD ↔ IZX K102 + AX Ramo Bajikoe)
+  KD36: ['K101'],                               // Sakamuso (KD ↔ IZX KE K101)
+  KD37: ['K102', 'AX21'],                       // Showanul (KD ↔ IZX KE K102 + AX Ramo Bajikoe)
+  KD46: ['K31'],                                // Pyanuza (KD ↔ IZX KE ramo C′)
+  KD54: ['K32'],                                // Nagayamatsu (KD ↔ IZX KE ramo C′)
 };
 
 const SUBURBAN_LINES = {
