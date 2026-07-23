@@ -194,6 +194,8 @@ const AX_LINES = {
 
        AX06 = Sainðaul Central: interscambio con KE (K01), RY (R01), EI (E01)
        AX01 = Asunahama Airport: interscambio con KE (K03)
+       AX07 = Herubori:          interscambio con Loop Line (LL17)
+                                  (routing suburbano via SUBURBAN_INTERCHANGE)
        AX21 = Showanul:          interscambio con KE Sakamuso (K102)
        AX34 = Illashiya:         interscambio con KE Sakamuso (K104)
     ---------------------------------------------------------------- */
@@ -209,6 +211,9 @@ const AX_LINES = {
     INTERCHANGE_EXTRA: {
       AX06: ["R01", "E01"],  /* Sainðaul Central ↔ RY R01 e EI E01 */
     },
+    /* Nota: AX07 ↔ LL17 (Herubori) è registrato in SUBURBAN_INTERCHANGE
+       in suburban-data.js e gestito da SuburbanRouter. Non figura qui
+       perché LL17 non è un nodo IZX ma un nodo della rete suburbana.   */
     TERMINUS_SPLIT: {
       EST: [{terminus:"AX09", weight:1}],
       BAJ: [{terminus:"AX23", weight:1}],
@@ -216,7 +221,7 @@ const AX_LINES = {
     },
     OFFSETS: {EST:0, BAJ:7, SAK:12},
     SHORT_WORKING: [],
-    /* ── TARIFF ─────────────────────────────────────────────── */
+    /* ── TARIFF ────────────────────────────────────────────────── */
     tariff: {
       operator:   "IZX",
       zone:       "airport",

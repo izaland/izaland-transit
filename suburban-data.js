@@ -12,13 +12,18 @@
        stations  [ { code, name, kanji, km } ]  — km dal capolinea A
      }
 
-   INTERCHANGE:
-     Mappa codice-stazione → array di codici equivalenti su altre reti.
-     LL01 (Sainðaul Central, Loop Line) è in interscambio con:
-       K01  — IZX Keishin
-       R01  — IZX Ryānkai
-       E01  — IZX Eira
-       AX06 — Airport Express (Sainðaul Central)
+   SUBURBAN_INTERCHANGE:
+     Mappa codice-stazione suburbana → array di codici equivalenti
+     su reti IZX/AX. Usata da SuburbanRouter per costruire percorsi
+     con cambio cross-network.
+
+     LL01 (Sainðaul Central) ↔ K01, R01, E01, AX06
+       Sezione storica sopraelevata ↔ sezione sotterranea IZX/AX
+       Tempo di trasferimento raccomandato: 10 min
+
+     LL17 (Herubori) ↔ AX07
+       Loop Line sopraelevata ↔ Airport Express sotterranea
+       Tempo di trasferimento raccomandato: 10 min
 
    Nota km:
      I valori km della Loop Line sono stime proporzionali su 24.5 km
@@ -30,11 +35,10 @@
 /* ================================================================
    SUBURBAN_INTERCHANGE
    Mappa: codice suburbano → [codici IZX/AX corrispondenti]
-   Usata da SuburbanRouter per costruire percorsi con cambio
-   tra la rete suburbana Izarail e la rete IZX/Airport Express.
 ================================================================ */
 const SUBURBAN_INTERCHANGE = {
-  LL01: ['K01', 'R01', 'E01', 'AX06'],
+  LL01: ['K01', 'R01', 'E01', 'AX06'],  // Sainðaul Central
+  LL17: ['AX07'],                         // Herubori
 };
 
 const SUBURBAN_LINES = {
@@ -76,11 +80,6 @@ const SUBURBAN_LINES = {
     ],
   },
 
-  /* ────────────────────────────────────────────────
-     KD — Kidai Line · 磯大線
-     Lineare · 156.87 km · 47+ stazioni · dal 1990
-     TODO: popolare stazioni e km da commuter.html
-  ──────────────────────────────────────────────── */
   KD: {
     id: 'KD',
     name: 'Kidai Line',
@@ -90,13 +89,9 @@ const SUBURBAN_LINES = {
     headwayPeak: 7,
     headwayOffPeak: 12,
     totalKm: 156.87,
-    stations: [], // TODO
+    stations: [],
   },
 
-  /* ────────────────────────────────────────────────
-     SK — Seishaku Line · 盛石線
-     Lineare · 103.95 km · 49 stazioni · dal 1985
-  ──────────────────────────────────────────────── */
   SK: {
     id: 'SK',
     name: 'Seishaku Line',
@@ -106,13 +101,9 @@ const SUBURBAN_LINES = {
     headwayPeak: 10,
     headwayOffPeak: 20,
     totalKm: 103.95,
-    stations: [], // TODO
+    stations: [],
   },
 
-  /* ────────────────────────────────────────────────
-     KS — Kawasabu Line
-     Lineare · 47.10 km · 27 stazioni · dal 1990
-  ──────────────────────────────────────────────── */
   KS: {
     id: 'KS',
     name: 'Kawasabu Line',
@@ -122,13 +113,9 @@ const SUBURBAN_LINES = {
     headwayPeak: 5,
     headwayOffPeak: 10,
     totalKm: 47.10,
-    stations: [], // TODO
+    stations: [],
   },
 
-  /* ────────────────────────────────────────────────
-     KW — Kwōkei Line · 荒京線
-     Lineare · 84.35 km · 30 stazioni · dal 1992
-  ──────────────────────────────────────────────── */
   KW: {
     id: 'KW',
     name: 'Kwōkei Line',
@@ -138,13 +125,9 @@ const SUBURBAN_LINES = {
     headwayPeak: 5,
     headwayOffPeak: 10,
     totalKm: 84.35,
-    stations: [], // TODO
+    stations: [],
   },
 
-  /* ────────────────────────────────────────────────
-     RI — Riimiilla Line
-     Lineare · 100.56 km · 35 stazioni · dal 1985
-  ──────────────────────────────────────────────── */
   RI: {
     id: 'RI',
     name: 'Riimiilla Line',
@@ -154,13 +137,9 @@ const SUBURBAN_LINES = {
     headwayPeak: 5,
     headwayOffPeak: 10,
     totalKm: 100.56,
-    stations: [], // TODO
+    stations: [],
   },
 
-  /* ────────────────────────────────────────────────
-     SS — Shosen Line
-     Lineare · 50.19 km · 16 stazioni · dal 2008
-  ──────────────────────────────────────────────── */
   SS: {
     id: 'SS',
     name: 'Shosen Line',
@@ -170,13 +149,9 @@ const SUBURBAN_LINES = {
     headwayPeak: 5,
     headwayOffPeak: 10,
     totalKm: 50.19,
-    stations: [], // TODO
+    stations: [],
   },
 
-  /* ────────────────────────────────────────────────
-     GD — Gaekwan-Dōnbu Line · 外環東部線
-     Lineare · 78.48 km · dal 2005
-  ──────────────────────────────────────────────── */
   GD: {
     id: 'GD',
     name: 'Gaekwan-Dōnbu Line',
@@ -186,13 +161,9 @@ const SUBURBAN_LINES = {
     headwayPeak: 7,
     headwayOffPeak: 10,
     totalKm: 78.48,
-    stations: [], // TODO
+    stations: [],
   },
 
-  /* ────────────────────────────────────────────────
-     JD — Juwon-Kodōn Line · 中央湖東線
-     Lineare · 78.35 km · dal 1985
-  ──────────────────────────────────────────────── */
   JD: {
     id: 'JD',
     name: 'Juwon-Kodōn Line',
@@ -202,13 +173,9 @@ const SUBURBAN_LINES = {
     headwayPeak: 5,
     headwayOffPeak: 10,
     totalKm: 78.35,
-    stations: [], // TODO
+    stations: [],
   },
 
-  /* ────────────────────────────────────────────────
-     CK — Chukkūn Line · 竹空線
-     Lineare · 55.93 km · 31 stazioni · dal 2015
-  ──────────────────────────────────────────────── */
   CK: {
     id: 'CK',
     name: 'Chukkūn Line',
@@ -218,7 +185,7 @@ const SUBURBAN_LINES = {
     headwayPeak: 10,
     headwayOffPeak: 15,
     totalKm: 55.93,
-    stations: [], // TODO
+    stations: [],
   },
 
 };
