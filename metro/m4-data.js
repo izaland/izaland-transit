@@ -65,14 +65,16 @@ const M4_CANONICAL_ORDER = [
    Metadati linea
 ---------------------------------------------------------------- */
 const M4_META = {
-  id:          'M4',
-  code:        'M4',
-  name:        'Kokendake Line',
-  nameJa:      '古剣館線',
-  color:       '#FFEF00',   // giallo canarino
-  established: 1937,
-  thruSince:   1976,
-  totalKm:     32.895,
+  id:           'M4',
+  code:         'M4',
+  name:         'Kokendake Line',
+  nameJa:       '古剣館線',
+  color:        '#FFEF00',   // giallo canarino
+  established:  1937,
+  thruSince:    1976,
+  totalKm:      32.895,
+  avgSpeedKmh:  30,          // usato da MetroRouter per generare TT runtime
+  dwellSec:     30,          // sosta per fermata (secondi)
   /* Sezione storica */
   originalSection: { from: 'M401', to: 'M415', stations: 15 },
   /* Thru-service */
@@ -129,3 +131,7 @@ const M4_SVC = {
     stops:  M4_CANONICAL_ORDER,
   },
 };
+
+if (typeof module !== 'undefined') {
+  module.exports = { M4_META, M4_ST, M4_CANONICAL_ORDER, M4_HEADWAY, M4_SVC };
+}
