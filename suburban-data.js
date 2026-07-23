@@ -27,8 +27,9 @@
 
      KD25 ↔ LL09  (Igashikura/Taishindai)
      KD26 ↔ LL10  (Hayatogaru)
+     KD35 ↔ AX04  (Kasakuri)
      KD36 ↔ K101  (Sakamuso)
-     KD37 ↔ K102  (Showanul)
+     KD37 ↔ K102, AX21  (Showanul — triangolo KD↔IZX↔AX completo)
 
    Nota km Loop Line:
      Distanze progressive reali da rilievo cartografico.
@@ -49,8 +50,9 @@ const SUBURBAN_INTERCHANGE = {
   KD32: ['LL01', 'K01', 'R01', 'E01', 'AX06'], // Sainðaul Central (KD)
   KD33: ['LL19'],                               // Aketsue (KD ↔ LL)
   KD20: ['R02'],                                // Asaji Torimoshi (KD ↔ IZX Ryānkai)
+  KD35: ['AX04'],                               // Kasakuri (KD ↔ AX Ramo Est)
   KD36: ['K101'],                               // Sakamuso (KD ↔ IZX K101)
-  KD37: ['K102'],                               // Showanul (KD ↔ IZX K102)
+  KD37: ['K102', 'AX21'],                       // Showanul (KD ↔ IZX K102 + AX Ramo Bajikoe)
 };
 
 const SUBURBAN_LINES = {
