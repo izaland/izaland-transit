@@ -32,25 +32,35 @@ const MetroRouter = (() => {
   const LINE_ID = 'M4';
   const DEFAULT_SVC = 'B';
 
+  /* ----------------------------------------------------------------
+   * _buildNameMap()
+   * Indice nome → stazione per name-matching cross-network.
+   * ---------------------------------------------------------------- */
   let _nameMap = null;
   function _buildNameMap() {
     if (_nameMap) return _nameMap;
     _nameMap = {};
-    for (const st of Object.values(M4_ST)) {
+    for (const [code, st] of Object.entries(M4_ST)) {
       const key = String(st.n || '').trim().toLowerCase();
       if (!key) continue;
       if (!_nameMap[key]) _nameMap[key] = [];
-      _nameMap[key].push(st);
+      _nameMap[key].push({ ...st, code });
     }
     return _nameMap;
   }
 
+  /* ----------------------------------------------------------------
+   * _resolveCode(code)
+   * Se `code` non è un codice M4 valido, prova a risolverlo per nome.
+   * ---------------------------------------------------------------- */
   function _resolveCode(code) {
+    if (M4_ST[code]) return code;
     const key = String(code || '').trim().toLowerCase();
     const matches = _buildNameMap()[key] || [];
-    return matches.length ? matches[0].code || null : code;
+    return matches.length ? matches[0].code : code;
   }
 
+  /* ---- utils tempo ---- */
   function _hmToSec(hm) {
     if (!hm) return 0;
     const [h, m] = hm.split(':').map(Number);
@@ -59,7 +69,8 @@ const MetroRouter = (() => {
 
   function _secToHM(sec) {
     const s = ((sec % 86400) + 86400) % 86400;
-    return String(Math.floor(s / 3600)).padStart(2, '0') + ':' + String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+    return String(Math.floor(s / 3600)).padStart(2, '0') + ':' +
+           String(Math.floor((s % 3600) / 60)).padStart(2, '0');
   }
 
   function _idx(code) {
@@ -76,18 +87,24 @@ const MetroRouter = (() => {
     return Math.abs(b.km - a.km);
   }
 
+  /* ----------------------------------------------------------------
+   * _buildLeg(boardCode, alightCode, depSec)
+   * Costruisce una singola leg metro dall'orario di partenza.
+   * ---------------------------------------------------------------- */
   function _buildLeg(boardCode, alightCode, depSec) {
     const iF = _idx(boardCode);
     const iT = _idx(alightCode);
     if (iF === -1 || iT === -1 || iF === iT) return null;
 
-    const boardDep = _secToHM(depSec);
     const km = _segmentKm(boardCode, alightCode);
     if (km == null) return null;
 
     const travelSec = Math.round((km / AVG_SPEED_KMH) * 3600);
     const alightSec = depSec + travelSec;
-    const between = iF < iT ? M4_CANONICAL_ORDER.slice(iF + 1, iT) : M4_CANONICAL_ORDER.slice(iT + 1, iF).reverse();
+
+    const between = iF < iT
+      ? M4_CANONICAL_ORDER.slice(iF + 1, iT)
+      : M4_CANONICAL_ORDER.slice(iT + 1, iF).reverse();
 
     const intermediateStops = between.map(code => {
       const st = _station(code);
@@ -97,27 +114,31 @@ const MetroRouter = (() => {
     });
 
     return {
-      lineId: LINE_ID,
-      svcId: DEFAULT_SVC,
-      svcLogical: DEFAULT_SVC,
-      svcName: M4_SVC[DEFAULT_SVC]?.name || 'All-stop',
-      color: M4_META.color,
-      cls: 'metro',
-      direction: iF < iT ? 'EB' : 'WB',
-      trainNumber: null,
+      lineId:       LINE_ID,
+      svcId:        DEFAULT_SVC,
+      svcLogical:   DEFAULT_SVC,
+      svcName:      M4_SVC[DEFAULT_SVC]?.name || 'All-stop',
+      color:        M4_META.color,
+      cls:          'metro',
+      direction:    iF < iT ? 'EB' : 'WB',
+      trainNumber:  null,
       boardCode,
-      boardName: _station(boardCode).n,
-      boardDep: boardDep,
-      boardDepSec: depSec,
+      boardName:    _station(boardCode).n,
+      boardDep:     _secToHM(depSec),
+      boardDepSec:  depSec,
       alightCode,
-      alightName: _station(alightCode).n,
-      alightArr: _secToHM(alightSec),
+      alightName:   _station(alightCode).n,
+      alightArr:    _secToHM(alightSec),
       alightArrSec: alightSec,
       km,
       intermediateStops,
     };
   }
 
+  /* ----------------------------------------------------------------
+   * _headwaySecAt(sec)
+   * Headway in secondi per il momento del giorno dato.
+   * ---------------------------------------------------------------- */
   function _headwaySecAt(sec) {
     const hm = _secToHM(sec);
     for (const slot of M4_HEADWAY) {
@@ -126,99 +147,69 @@ const MetroRouter = (() => {
     return M4_HEADWAY[M4_HEADWAY.length - 1].headwayMin * 60;
   }
 
-  function _generateDepartures(firstDep) {
-    const depSec0 = _hmToSec(firstDep);
-    const endSec = _hmToSec('24:30');
-    const deps = [];
-    let t = depSec0;
-    while (t <= endSec) {
-      deps.push(t);
-      t += _headwaySecAt(t);
-    }
-    return deps;
-  }
-
   function _lineFilter(opts) {
     const raw = opts.lines;
     if (!raw || raw === 'ALL') return null;
     return new Set(Array.isArray(raw) ? raw : [raw]);
   }
 
+  /* ================================================================
+   * search(from, to, depTime, opts)
+   * Genera le prossime corse dalla stazione `from` a `to`
+   * a partire dall'orario `depTime`, usando headway runtime.
+   * ================================================================ */
   function search(from, to, depTime, opts = {}) {
-    const maxResults = opts.maxResults ?? MAX_JOURNEYS;
-    const directOnly = !!opts.directOnly;
-    const depSec = _hmToSec(depTime);
+    const maxResults  = opts.maxResults ?? MAX_JOURNEYS;
+    const depSec      = _hmToSec(depTime);
     const lineAllowed = _lineFilter(opts);
-    const fromCode = _resolveCode(from);
-    const toCode = _resolveCode(to);
-    const journeys = [];
+    const fromCode    = _resolveCode(from);
+    const toCode      = _resolveCode(to);
+    const journeys    = [];
 
     if (lineAllowed && !lineAllowed.has(LINE_ID)) return [];
+    if (_idx(fromCode) === -1 || _idx(toCode) === -1 || fromCode === toCode) return [];
 
-    const startNodes = [
-      { svc: 'B_W', code: 'M425' },
-      { svc: 'B_A', code: 'M416' },
-      { svc: 'B_E', code: 'M415' },
-    ];
+    // Prima partenza allineata all'headway successivo
+    const hwSec  = _headwaySecAt(depSec);
+    let t        = Math.ceil(depSec / hwSec) * hwSec;
+    const endSec = depSec + SEARCH_WINDOW;
 
-    for (const start of startNodes) {
-      if (!M4_SVC[start.svc]) continue;
-      const depList = _generateDepartures(start.dep).filter(t => t >= depSec);
-      for (const d of depList) {
-        const board = _buildLeg(start.code, toCode, d);
-        if (!board) continue;
+    while (t <= endSec && journeys.length < maxResults) {
+      const leg = _buildLeg(fromCode, toCode, t);
+      if (leg) {
         journeys.push({
-          legs: [board],
-          departureTime: board.boardDep,
-          arrivalTime: board.alightArr,
-          totalMinutes: Math.round((board.alightArrSec - board.boardDepSec) / 60),
-          totalKm: board.km,
-          transfers: 0,
+          legs:          [leg],
+          departureTime: leg.boardDep,
+          arrivalTime:   leg.alightArr,
+          totalMinutes:  Math.round((leg.alightArrSec - leg.boardDepSec) / 60),
+          totalKm:       leg.km,
+          transfers:     0,
           transferNodes: [],
         });
       }
+      t += _headwaySecAt(t);
     }
 
-    if (!directOnly) {
-      const nameFrom = _station(fromCode)?.n?.trim().toLowerCase();
-      const nameTo = _station(toCode)?.n?.trim().toLowerCase();
-      if (nameFrom && nameTo && nameFrom === nameTo) {
-        journeys.push({
-          legs: [],
-          departureTime: _secToHM(depSec),
-          arrivalTime: _secToHM(depSec),
-          totalMinutes: 0,
-          totalKm: 0,
-          transfers: 0,
-          transferNodes: []
-        });
-      }
-    }
-
-    const unique = [];
-    const seen = new Set();
-    for (const j of journeys) {
-      const key = j.legs.map(l => `${l.boardCode}:${l.alightCode}:${l.boardDep}`).join('|');
-      if (seen.has(key)) continue;
-      seen.add(key);
-      unique.push(j);
-    }
-
-    unique.sort((a, b) => _hmToSec(a.arrivalTime) - _hmToSec(b.arrivalTime));
-    return unique.slice(0, maxResults);
+    return journeys;
   }
+
+  /* ================================================================
+   * API pubblica
+   * ================================================================ */
 
   function stationName(code) {
     const resolved = _resolveCode(code);
     return _station(resolved)?.n || code;
   }
 
- function allStations() {
-  return M4_CANONICAL_ORDER.map(code => {
-    const st = M4_ST[code];
-    return { ...st, code, lineId: LINE_ID, name: st.n };
-  });
-}
+  /* allStations() espone `name` (oltre a `n`) per uniformità
+     con SuburbanRouter e IZXRouter. */
+  function allStations() {
+    return M4_CANONICAL_ORDER.map(code => {
+      const st = M4_ST[code];
+      return { ...st, code, lineId: LINE_ID, name: st.n };
+    });
+  }
 
   function lineColor(lineId) {
     return lineId === LINE_ID ? M4_META.color : '#888';
@@ -228,11 +219,9 @@ const MetroRouter = (() => {
     return [{ id: LINE_ID, name: M4_META.name, color: M4_META.color, totalKm: M4_META.totalKm }];
   }
 
-  return {
-    search,
-    stationName,
-    allStations,
-    allLines,
-    lineColor,
-  };
+  if (typeof module !== 'undefined') {
+    module.exports = { search, stationName, allStations, allLines, lineColor };
+  }
+
+  return { search, stationName, allStations, allLines, lineColor };
 })();
