@@ -1204,46 +1204,48 @@ function _runSearch(from, to, depTime, lineF, directOnly) {
         const partnerCode = entry.code ?? entry;
         const tsecEff     = (entry.transferMin ?? TRANSFER_MIN) * 60;
 
-        /* CASO A: from è su M4, to è su IZX/Suburban */
+        /* CASO A: from è su M4, to è su IZX/Suburban/AX */
         const leg1a = MetroRouter.buildLeg(from, m4code, _hmToSec(depTime));
         if (leg1a) {
           const t2hm = _secToHm(leg1a.alightArrSec + tsecEff);
           const seconds = [
-            ...IZXRouter.search(partnerCode, to, t2hm, opts),
-            ...SuburbanRouter.search(partnerCode, to, t2hm, opts),
+            ...(entry.network === 'izx'      ? IZXRouter.search(partnerCode, to, t2hm, opts)      : []),
+            ...(entry.network === 'suburban' ? SuburbanRouter.search(partnerCode, to, t2hm, opts) : []),
+            ...(entry.network === 'ax'       ? IZXRouter.search(partnerCode, to, t2hm, opts)      : []),
           ];
           seconds.forEach(j2 => {
             const leg2 = j2.legs[0];
             cross.push({
-              legs:           [leg1a, leg2],
-              departureTime:  leg1a.boardDep,
-              arrivalTime:    leg2.alightArr,
-              totalMinutes:   Math.round((leg2.alightArrSec - leg1a.boardDepSec) / 60),
-              totalKm:        (leg1a.km ?? 0) + (leg2.km ?? 0),
-              transfers:      1,
-              transferNodes:  [m4code],
+              legs:            [leg1a, leg2],
+              departureTime:   leg1a.boardDep,
+              arrivalTime:     leg2.alightArr,
+              totalMinutes:    Math.round((leg2.alightArrSec - leg1a.boardDepSec) / 60),
+              totalKm:         (leg1a.km ?? 0) + (leg2.km ?? 0),
+              transfers:       1,
+              transferNodes:   [m4code],
               transferWaitMin: Math.round((leg2.boardDepSec - leg1a.alightArrSec) / 60),
             });
           });
         }
 
-        /* CASO B: from è su IZX/Suburban, to è su M4 */
+        /* CASO B: from è su IZX/Suburban/AX, to è su M4 */
         const firstLegs = [
-          ...IZXRouter.search(from, partnerCode, depTime, opts),
-          ...SuburbanRouter.search(from, partnerCode, depTime, opts),
+          ...(entry.network === 'izx'      ? IZXRouter.search(from, partnerCode, depTime, opts)      : []),
+          ...(entry.network === 'suburban' ? SuburbanRouter.search(from, partnerCode, depTime, opts) : []),
+          ...(entry.network === 'ax'       ? IZXRouter.search(from, partnerCode, depTime, opts)      : []),
         ];
         firstLegs.forEach(j1 => {
           const leg1b = j1.legs[0];
           const leg2b = MetroRouter.buildLeg(m4code, to, leg1b.alightArrSec + tsecEff);
           if (!leg2b) return;
           cross.push({
-            legs:           [leg1b, leg2b],
-            departureTime:  leg1b.boardDep,
-            arrivalTime:    leg2b.alightArr,
-            totalMinutes:   Math.round((leg2b.alightArrSec - leg1b.boardDepSec) / 60),
-            totalKm:        (leg1b.km ?? 0) + (leg2b.km ?? 0),
-            transfers:      1,
-            transferNodes:  [partnerCode],
+            legs:            [leg1b, leg2b],
+            departureTime:   leg1b.boardDep,
+            arrivalTime:     leg2b.alightArr,
+            totalMinutes:    Math.round((leg2b.alightArrSec - leg1b.boardDepSec) / 60),
+            totalKm:         (leg1b.km ?? 0) + (leg2b.km ?? 0),
+            transfers:       1,
+            transferNodes:   [partnerCode],
             transferWaitMin: Math.round((leg2b.boardDepSec - leg1b.alightArrSec) / 60),
           });
         });
@@ -1255,7 +1257,6 @@ function _runSearch(from, to, depTime, lineF, directOnly) {
     .sort((a, b) => _parseMins(a.departureTime) - _parseMins(b.departureTime))
     .slice(0, 8);
 }
-
   buildPlannerSelects();
 
   document.getElementById('jp-swap').addEventListener('click', () => {
