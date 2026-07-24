@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Station Inspector — Izarail Debug</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #111; color: #eee; font-family: monospace; padding: 24px; }
+    h1 { font-size: 1.1rem; color: #aaa; margin-bottom: 20px; letter-spacing: 0.05em; }
+    #search-bar { display: flex; gap: 8px; margin-bottom: 24px; }
+    #query { flex: 1; background: #222; border: 1px solid #444; color: #eee;
+             padding: 10px 14px; font-size: 1rem; font-family: monospace; border-radius: 4px; }
+    #query:focus { outline: none; border-color: #888; }
+    button { background: #333; color: #eee; border: 1px solid #555; padding: 10px 18px;
+             font-family: monospace; font-size: 0.9rem; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #444; }
+    #suggestions { background: #1a1a1a; border: 1px solid #333; border-radius: 4px;
+                   margin-bottom: 20px; max-height: 200px; overflow-y: auto; display: none; }
+    .sug-item { padding: 8px 14px; cursor: pointer; font-size: 0.85rem; }
+    .sug-item:hover { background: #2a2a2a; }
+    .sug-code { color: #888; margin-left: 8px; }
+    #results { display: none; }
+    .station-header { margin-bottom: 20px; }
+    .station-name { font-size: 1.4rem; color: #fff; }
+    .station-code { font-size: 0.85rem; color: #666; margin-top: 4px; }
+    .section { margin-bottom: 20px; }
+    .section-title { font-size: 0.7rem; color: #666; letter-spacing: 0.1em;
+                     text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 6px; }
+    .line-chip { display: inline-block; padding: 4px 10px; border-radius: 3px;
+                 font-size: 0.8rem; margin: 3px; color: #000; font-weight: bold; }
+    .interchange-row { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 4px;
+                       padding: 12px 14px; margin-bottom: 8px; }
+    .irow-top { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .irow-code { font-size: 1rem; color: #eee; }
+    .irow-name { font-size: 0.85rem; color: #aaa; }
+    .irow-network { font-size: 0.7rem; color: #666; text-transform: uppercase;
+                    background: #222; padding: 2px 6px; border-radius: 2px; }
+    .irow-meta { font-size: 0.75rem; color: #555; margin-top: 4px; }
+    .ok { color: #4caf50; }
+    .warn { color: #ff9800; }
+    .err { color: #f44336; }
+    .status-row { display: flex; align-items: center; gap: 8px; margin-top: 6px;
+                  font-size: 0.78rem; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+    .dot-ok { background: #4caf50; }
+    .dot-warn { background: #ff9800; }
+    .dot-err { background: #f44336; }
+    #no-result { color: #666; font-size: 0.9rem; display: none; }
+  </style>
+</head>
+<body>
+  <h1>⚙ STATION INSPECTOR</h1>
+
+  <div id="search-bar">
+    <input id="query" type="text" placeholder="Search by name or code (e.g. M409, Kasakuri, LL01)…" autocomplete="off">
+    <button onclick="inspect()">Inspect</button>
+  </div>
+  <div id="suggestions"></div>
+  <div id="no-result">No station found.</div>
+  <div id="results"></div>
+
+  <!-- ═══ DATA FILES ═══════════════════════════════════════════════ -->
+  <script src="metro/m4-data.js"></script>
+  <script src="suburban/suburban-data.js"></script>
+  <script src="izx/izx-data.js"></script>
+
+  <script>
+  /* ── Build unified station index ───────────────────────────── */
+  const ALL_STATIONS = [];   // { code, name, network, lineId, lineColor, lineName }
+
+  /* M4 */
+  for (const [code, st] of Object.entries(M4_ST)) {
+    ALL_STATIONS.push({ code, name: st.n, network: 'metro',
+      lineId: 'M4', lineColor: M4_META.color, lineName: M4_META.name });
+  }
+
+  /* Suburban */
+  if (typeof SUBURBAN_LINES !== 'undefined') {
+    for (const line of Object.values(SUBURBAN_LINES)) {
+      for (const st of line.stations) {
+        if (ALL_STATIONS.find(s => s.code === st.code)) continue; // skip duplicates
+        ALL_STATIONS.push({ code: st.code, name: st.name, network: 'suburban',
+          lineId: line.id, lineColor: line.color, lineName: line.name });
+      }
+    }
+  }
+
+  /* IZX */
+  if (typeof IZX_LINES !== 'undefined') {
+    for (const [lineId, line] of Object.entries(IZX_LINES)) {
+      for (const [code, st] of Object.entries(line.ST || {})) {
+        if (ALL_STATIONS.find(s => s.code === code)) continue;
+        ALL_STATIONS.push({ code, name: st.n || code, network: 'izx',
+          lineId, lineColor: line.META?.color || '#888', lineName: line.META?.name || lineId });
+      }
+    }
+  }
+
+  /* ── Autocomplete ───────────────────────────────────────────── */
+  const qEl   = document.getElementById('query');
+  const sugEl = document.getElementById('suggestions');
+
+  qEl.addEventListener('input', () => {
+    const q = qEl.value.trim().toLowerCase();
+    sugEl.innerHTML = '';
+    if (q.length < 2) { sugEl.style.display = 'none'; return; }
+    const hits = ALL_STATIONS.filter(s =>
+      s.code.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)
+    ).slice(0, 12);
+    if (!hits.length) { sugEl.style.display = 'none'; return; }
+    hits.forEach(s => {
+      const div = document.createElement('div');
+      div.className = 'sug-item';
+      div.innerHTML = `${s.name} <span class="sug-code">${s.code} · ${s.lineId}</span>`;
+      div.onclick = () => { qEl.value = s.code; sugEl.style.display = 'none'; inspect(); };
+      sugEl.appendChild(div);
+    });
+    sugEl.style.display = 'block';
+  });
+
+  document.addEventListener('click', e => {
+    if (!sugEl.contains(e.target) && e.target !== qEl) sugEl.style.display = 'none';
+  });
+
+  qEl.addEventListener('keydown', e => { if (e.key === 'Enter') inspect(); });
+
+  /* ── Core inspect() ─────────────────────────────────────────── */
+  function inspect() {
+    sugEl.style.display = 'none';
+    const raw = qEl.value.trim();
+    const q   = raw.toLowerCase();
+    const resultsEl  = document.getElementById('results');
+    const noResult   = document.getElementById('no-result');
+
+    // Trova la stazione
+    const station = ALL_STATIONS.find(s =>
+      s.code.toLowerCase() === q || s.name.toLowerCase() === q
+    ) || ALL_STATIONS.find(s =>
+      s.code.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)
+    );
+
+    if (!station) {
+      resultsEl.style.display = 'none';
+      noResult.style.display  = 'block';
+      return;
+    }
+    noResult.style.display = 'none';
+
+    // Tutte le linee a cui appartiene questa stazione
+    const memberOf = ALL_STATIONS.filter(s => s.code === station.code);
+
+    // Interscambi M4
+    const m4Interchanges = [];
+    if (typeof M4_INTERCHANGE !== 'undefined') {
+      for (const [m4code, entries] of Object.entries(M4_INTERCHANGE)) {
+        for (const entry of (Array.isArray(entries) ? entries : [entries])) {
+          const pCode = entry.code ?? entry;
+          if (pCode === station.code || m4code === station.code) {
+            m4Interchanges.push({ m4code, partnerCode: pCode,
+              network: entry.network, transferMin: entry.transferMin, note: entry.note });
+          }
+        }
+      }
+    }
+
+    // Interscambi Suburban
+    const subInterchanges = [];
+    if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
+      for (const [key, partners] of Object.entries(SUBURBAN_INTERCHANGE)) {
+        for (const p of partners) {
+          if (key === station.code || p === station.code) {
+            subInterchanges.push({ from: key, to: p });
+          }
+        }
+      }
+    }
+
+    /* ── Status checks ─────────────────────────────────────────── */
+    function checkM4Reachable(code) {
+      if (typeof M4_ST === 'undefined') return 'no-data';
+      return M4_ST[code] ? 'ok' : 'missing';
+    }
+
+    function checkSubReachable(code) {
+      if (typeof SUBURBAN_LINES === 'undefined') return 'no-data';
+      for (const line of Object.values(SUBURBAN_LINES))
+        if (line.stations.find(s => s.code === code)) return 'ok';
+      return 'missing';
+    }
+
+    function checkIZXReachable(code) {
+      if (typeof IZX_LINES === 'undefined') return 'no-data';
+      for (const line of Object.values(IZX_LINES))
+        if (line.ST && line.ST[code]) return 'ok';
+      return 'missing';
+    }
+
+    /* ── Render ─────────────────────────────────────────────────── */
+    let html = `
+      <div class="station-header">
+        <div class="station-name">${station.name}</div>
+        <div class="station-code">${station.code}</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Member of lines</div>
+        ${memberOf.map(s => `
+          <span class="line-chip" style="background:${s.lineColor}">${s.lineId}</span>
+          <span style="font-size:0.8rem;color:#888;margin-right:12px">${s.lineName}</span>
+        `).join('')}
+      </div>`;
+
+    /* M4 interchanges */
+    if (m4Interchanges.length) {
+      html += `<div class="section"><div class="section-title">M4 Interchanges</div>`;
+      m4Interchanges.forEach(ix => {
+        const isM4side = ix.m4code === station.code;
+        const otherCode = isM4side ? ix.partnerCode : ix.m4code;
+        const otherNet  = isM4side ? ix.network : 'metro';
+        const statusFn  = otherNet === 'metro' ? checkM4Reachable
+                        : otherNet === 'suburban' ? checkSubReachable
+                        : checkIZXReachable;
+        const st2 = ALL_STATIONS.find(s => s.code === otherCode);
+        const status = statusFn(otherCode);
+        const dotCls = status === 'ok' ? 'dot-ok' : status === 'missing' ? 'dot-err' : 'dot-warn';
+        const txtCls = status === 'ok' ? 'ok' : status === 'missing' ? 'err' : 'warn';
+        html += `
+          <div class="interchange-row">
+            <div class="irow-top">
+              <span class="irow-code">${otherCode}</span>
+              <span class="irow-name">${st2?.name || '?'}</span>
+              <span class="irow-network">${otherNet}</span>
+            </div>
+            <div class="irow-meta">${ix.note || ''} · ${ix.transferMin ?? '?'} min walk</div>
+            <div class="status-row">
+              <span class="dot ${dotCls}"></span>
+              <span class="${txtCls}">${status === 'ok' ? 'Reachable in router' : status === 'missing' ? 'NOT FOUND in data' : 'Data unavailable'}</span>
+            </div>
+          </div>`;
+      });
+      html += `</div>`;
+    }
+
+    /* Suburban interchanges */
+    if (subInterchanges.length) {
+      html += `<div class="section"><div class="section-title">Suburban Interchanges</div>`;
+      subInterchanges.forEach(ix => {
+        const otherCode = ix.from === station.code ? ix.to : ix.from;
+        const st2 = ALL_STATIONS.find(s => s.code === otherCode);
+        const net2 = st2?.network || '?';
+        const statusFn = net2 === 'suburban' ? checkSubReachable
+                       : net2 === 'metro'    ? checkM4Reachable
+                       : checkIZXReachable;
+        const status = statusFn(otherCode);
+        const dotCls = status === 'ok' ? 'dot-ok' : status === 'missing' ? 'dot-err' : 'dot-warn';
+        const txtCls = status === 'ok' ? 'ok' : status === 'missing' ? 'err' : 'warn';
+        html += `
+          <div class="interchange-row">
+            <div class="irow-top">
+              <span class="irow-code">${otherCode}</span>
+              <span class="irow-name">${st2?.name || '?'}</span>
+              <span class="irow-network">${net2}</span>
+            </div>
+            <div class="status-row">
+              <span class="dot ${dotCls}"></span>
+              <span class="${txtCls}">${status === 'ok' ? 'Reachable in router' : status === 'missing' ? 'NOT FOUND in data' : 'Data unavailable'}</span>
+            </div>
+          </div>`;
+      });
+      html += `</div>`;
+    }
+
+    if (!m4Interchanges.length && !subInterchanges.length) {
+      html += `<div class="section"><div class="section-title">Interchanges</div>
+        <span style="color:#555;font-size:0.85rem">No interchange defined for this station.</span></div>`;
+    }
+
+    resultsEl.innerHTML = html;
+    resultsEl.style.display = 'block';
+  }
+  </script>
+</body>
+</html>
