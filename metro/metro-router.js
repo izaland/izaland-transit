@@ -213,9 +213,12 @@ const MetroRouter = (() => {
     return _station(resolved)?.n || code;
   }
 
-  function allStations() {
-    return M4_CANONICAL_ORDER.map(code => ({ ...M4_ST[code], code, lineId: LINE_ID }));
-  }
+ function allStations() {
+  return M4_CANONICAL_ORDER.map(code => {
+    const st = M4_ST[code];
+    return { ...st, code, lineId: LINE_ID, name: st.n };
+  });
+}
 
   function lineColor(lineId) {
     return lineId === LINE_ID ? M4_META.color : '#888';
