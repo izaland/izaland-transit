@@ -4,6 +4,7 @@
 
    API pubblica:
      MetroRouter.search(from, to, depTime, opts) → Journey[]
+     MetroRouter.buildLeg(boardCode, alightCode, depSec) → Leg | null
      MetroRouter.stationName(code)               → string
      MetroRouter.allStations()                   → Station[]
      MetroRouter.lineColor(lineId)               → string
@@ -16,6 +17,7 @@
      - Filtro per lineId (opts.lines)
      - directOnly (opts.directOnly)
      - Servizi generati a runtime da M4_HEADWAY
+     - buildLeg() esposto per uso cross-network da _runSearch()
 
    Nota:
      Il servizio Rapid (M4_SVC.A) è definito nei dati ma non viene
@@ -88,19 +90,26 @@ const MetroRouter = (() => {
   }
 
   /* ----------------------------------------------------------------
-   * _buildLeg(boardCode, alightCode, depSec)
+   * buildLeg(boardCode, alightCode, depSec)
    * Costruisce una singola leg metro dall'orario di partenza.
+   * Esposto nell'API pubblica per uso cross-network.
    * ---------------------------------------------------------------- */
-  function _buildLeg(boardCode, alightCode, depSec) {
-    const iF = _idx(boardCode);
-    const iT = _idx(alightCode);
+  function buildLeg(boardCode, alightCode, depSec) {
+    const resolvedBoard  = _resolveCode(boardCode);
+    const resolvedAlight = _resolveCode(alightCode);
+    const iF = _idx(resolvedBoard);
+    const iT = _idx(resolvedAlight);
     if (iF === -1 || iT === -1 || iF === iT) return null;
 
-    const km = _segmentKm(boardCode, alightCode);
+    const km = _segmentKm(resolvedBoard, resolvedAlight);
     if (km == null) return null;
 
+    /* Allinea alla prossima partenza secondo l'headway */
+    const hwSec    = _headwaySecAt(depSec);
+    const alignSec = Math.ceil(depSec / hwSec) * hwSec;
+
     const travelSec = Math.round((km / AVG_SPEED_KMH) * 3600);
-    const alightSec = depSec + travelSec;
+    const alightSec = alignSec + travelSec;
 
     const between = iF < iT
       ? M4_CANONICAL_ORDER.slice(iF + 1, iT)
@@ -108,8 +117,8 @@ const MetroRouter = (() => {
 
     const intermediateStops = between.map(code => {
       const st = _station(code);
-      const kmElapsed = Math.abs(st.km - _station(boardCode).km);
-      const arrSec = depSec + Math.round((kmElapsed / km) * travelSec);
+      const kmElapsed = Math.abs(st.km - _station(resolvedBoard).km);
+      const arrSec = alignSec + Math.round((kmElapsed / km) * travelSec);
       return { code, name: st.n, arr: _secToHM(arrSec), dep: _secToHM(arrSec + DWELL_SEC) };
     });
 
@@ -122,12 +131,12 @@ const MetroRouter = (() => {
       cls:          'metro',
       direction:    iF < iT ? 'EB' : 'WB',
       trainNumber:  null,
-      boardCode,
-      boardName:    _station(boardCode).n,
-      boardDep:     _secToHM(depSec),
-      boardDepSec:  depSec,
-      alightCode,
-      alightName:   _station(alightCode).n,
+      boardCode:    resolvedBoard,
+      boardName:    _station(resolvedBoard).n,
+      boardDep:     _secToHM(alignSec),
+      boardDepSec:  alignSec,
+      alightCode:   resolvedAlight,
+      alightName:   _station(resolvedAlight).n,
       alightArr:    _secToHM(alightSec),
       alightArrSec: alightSec,
       km,
@@ -175,7 +184,7 @@ const MetroRouter = (() => {
     const endSec = depSec + SEARCH_WINDOW;
 
     while (t <= endSec && journeys.length < maxResults) {
-      const leg = _buildLeg(fromCode, toCode, t);
+      const leg = buildLeg(fromCode, toCode, t);
       if (leg) {
         journeys.push({
           legs:          [leg],
@@ -220,8 +229,8 @@ const MetroRouter = (() => {
   }
 
   if (typeof module !== 'undefined') {
-    module.exports = { search, stationName, allStations, allLines, lineColor };
+    module.exports = { search, buildLeg, stationName, allStations, allLines, lineColor };
   }
 
-  return { search, stationName, allStations, allLines, lineColor };
+  return { search, buildLeg, stationName, allStations, allLines, lineColor };
 })();
