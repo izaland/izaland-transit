@@ -210,15 +210,17 @@ const SuburbanRouter = (() => {
     let intermediateStops;
     if (line.circular) {
       intermediateStops = _circularIntermediateStops(line, iFrom, iTo, dir, boardSec, km);
-    } else {
-      const a = Math.min(iFrom, iTo), b = Math.max(iFrom, iTo);
-      intermediateStops = line.stations.slice(a + 1, b).map(st => {
-        const kmElapsed = Math.abs(st.km - line.stations[iFrom].km);
-        const arrSec    = boardSec + Math.round((kmElapsed / km) * travelSec);
-        return { code: st.code, name: st.name,
-                 arr: _secToHM(arrSec), dep: _secToHM(arrSec + DWELL_SEC) };
-      });
-    }
+  } else {
+  const a = Math.min(iFrom, iTo), b = Math.max(iFrom, iTo);
+  const sliced = line.stations.slice(a + 1, b);
+  const ordered = iFrom < iTo ? sliced : [...sliced].reverse();
+  intermediateStops = ordered.map(st => {
+    const kmElapsed = Math.abs(st.km - line.stations[iFrom].km);
+    const arrSec    = boardSec + Math.round((kmElapsed / km) * travelSec);
+    return { code: st.code, name: st.name,
+             arr: _secToHM(arrSec), dep: _secToHM(arrSec + DWELL_SEC) };
+  });
+}
     return {
       lineId: line.id, svcId: line.id, svcLogical: line.id,
       svcName: line.name, color: line.color, cls: 'suburban',
