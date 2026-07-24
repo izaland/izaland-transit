@@ -709,8 +709,6 @@
   }
 
  function buildSelects(){
-    /* Costruisce tutto in fragment, poi rimpiazza i <select> live con cloni puliti
-       → forza Chrome a ri-renderizzare il controllo nativo con tutte le opzioni già presenti */
     const sfOld = document.getElementById('sel-from'), st2Old = document.getElementById('sel-to');
     const fragF = document.createDocumentFragment(), fragT = document.createDocumentFragment();
 
@@ -746,7 +744,6 @@
     fragF.appendChild(eiOgs[0]); fragT.appendChild(eiOgs[1]);
     EI_SELECT_ORDER.forEach(code => { const s=EI_ST[code]; if(!s) return; addOpt(eiOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:'')); });
 
-    /* Airport Express */
     const axBranches = {common:'Common',est:'Est Branch',baj:'Bajikoe Branch',sak:'Sakamuso Branch'};
     let lastAxB = null, axOgs = [null,null];
     AX_SELECT_ORDER.forEach(code => {
@@ -760,7 +757,6 @@
       addOpt(axOgs, code, code+' '+s.n+(s.k?' \u00b7 '+s.k:''));
     });
 
-    /* Sostituisce i <select> con cloni puliti + fragment già completo */
     const sfNew  = sfOld.cloneNode(false);
     const st2New = st2Old.cloneNode(false);
     sfNew.appendChild(fragF);
@@ -986,6 +982,23 @@
     return _fmtMins(minMins - 180);
   }
 
+  /* ----------------------------------------------------------------
+   * _stName(code)
+   * Risolve il nome di una stazione cercando in tutti i router
+   * disponibili: IZX → Suburban → Metro.
+   * ---------------------------------------------------------------- */
+  function _stName(code) {
+    const izxName = IZXRouter.stationName(code);
+    if (izxName && izxName !== code) return izxName;
+    const subName = SuburbanRouter.stationName(code);
+    if (subName && subName !== code) return subName;
+    if (typeof MetroRouter !== 'undefined') {
+      const metName = MetroRouter.stationName(code);
+      if (metName && metName !== code) return metName;
+    }
+    return code;
+  }
+
   function buildPlannerSelects(){
     const jpFrom = document.getElementById('jp-from');
     const jpTo   = document.getElementById('jp-to');
@@ -1134,7 +1147,7 @@ if (typeof MetroRouter !== 'undefined') {
 
         if (li < j.legs.length - 1) {
           const waitMin = j.transferWaitMin ?? IZXRouter.TRANSFER_MIN;
-          const node    = IZXRouter.stationName(j.transferNodes[li]);
+          const node    = _stName(j.transferNodes[li]);
           legsHTML += `
             <div class="transfer-row">
               Change at <strong>${node}</strong> \u2014 ${waitMin} min wait
@@ -1198,7 +1211,7 @@ function _runSearch(from, to, depTime, lineF, directOnly) {
     if (from === to) { alert('Please select two different stations.'); return; }
     _jpState.from = from; _jpState.to = to; _jpState.lineF = lineF; _jpState.directOnly = directOnly; _jpState.all = [];
     const journeys = _runSearch(from, to, depTime, lineF, directOnly);
-    renderJourneys(journeys, IZXRouter.stationName(from), IZXRouter.stationName(to), 'replace');
+    renderJourneys(journeys, _stName(from), _stName(to), 'replace');
   });
 
   document.getElementById('jp-earlier').addEventListener('click', () => {
@@ -1215,7 +1228,7 @@ function _runSearch(from, to, depTime, lineF, directOnly) {
       setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
       return;
     }
-    renderJourneys(earlier, IZXRouter.stationName(_jpState.from), IZXRouter.stationName(_jpState.to), 'prepend');
+    renderJourneys(earlier, _stName(_jpState.from), _stName(_jpState.to), 'prepend');
   });
 
   document.getElementById('jp-later').addEventListener('click', () => {
@@ -1230,7 +1243,7 @@ function _runSearch(from, to, depTime, lineF, directOnly) {
       setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
       return;
     }
-    renderJourneys(journeys, IZXRouter.stationName(_jpState.from), IZXRouter.stationName(_jpState.to), 'append');
+    renderJourneys(journeys, _stName(_jpState.from), _stName(_jpState.to), 'append');
   });
 
 })();
