@@ -14,12 +14,16 @@
 
    SUBURBAN_INTERCHANGE:
      Mappa codice-stazione suburbana → array di codici equivalenti
-     su reti IZX/AX. Usata da SuburbanRouter per costruire percorsi
-     con cambio cross-network.
+     su reti IZX/AX/Metro. Usata da SuburbanRouter per costruire
+     percorsi con cambio cross-network.
 
      LL01 (Sainðaul Central) ↔ K01, R01, E01, AX06
        Sezione storica sopraelevata ↔ sezione sotterranea IZX/AX
        Tempo di trasferimento raccomandato: 10 min
+
+     LL12 (Sumi-Kokendake) ↔ M409
+       Loop Line sopraelevata ↔ Metro Line 4 sotterranea
+       Tempo di trasferimento raccomandato: 2 min
 
      LL17 (Herubori) ↔ AX07
        Loop Line sopraelevata ↔ Airport Express sotterranea
@@ -27,7 +31,8 @@
 
      KD25 ↔ LL09  (Igashikura/Taishindai)
      KD26 ↔ LL10  (Hayatogaru)
-     KD35 ↔ AX04  (Kasakuri)
+     KD30 ↔ M405  (Anagusa Mukai — KD ↔ Metro Line 4)
+     KD35 ↔ AX04, M419  (Kasakuri — triangolo KD↔AX↔Metro completo)
      KD36 ↔ K101  (Sakamuso)
      KD37 ↔ K102, AX21  (Showanul — triangolo KD↔IZX↔AX completo)
      KD46 ↔ K31   (Pyanuza — KD ↔ KE ramo C′)
@@ -42,17 +47,19 @@
 
 /* ================================================================
    SUBURBAN_INTERCHANGE
-   Mappa: codice suburbano → [codici IZX/AX corrispondenti]
+   Mappa: codice suburbano → [codici IZX/AX/Metro corrispondenti]
 ================================================================ */
 const SUBURBAN_INTERCHANGE = {
   LL01: ['K01', 'R01', 'E01', 'AX06'],        // Sainðaul Central (Loop Line)
+  LL12: ['M409'],                               // Sumi-Kokendake (Loop Line ↔ Metro Line 4)
   LL17: ['AX07'],                               // Herubori (Loop Line ↔ Airport Express)
   KD20: ['R02'],                                // Asaji Torimoshi (KD ↔ IZX Ryānkai)
   KD25: ['LL09'],                               // Igashikura/Taishindai (KD ↔ LL)
   KD26: ['LL10'],                               // Hayatogaru (KD ↔ LL)
+  KD30: ['M405'],                               // Anagusa Mukai (KD ↔ Metro Line 4)
   KD32: ['LL01', 'K01', 'R01', 'E01', 'AX06'], // Sainðaul Central (KD)
   KD33: ['LL19'],                               // Aketsue (KD ↔ LL)
-  KD35: ['AX04'],                               // Kasakuri (KD ↔ AX Ramo Est)
+  KD35: ['AX04', 'M419'],                       // Kasakuri (KD ↔ AX Ramo Est + Metro Line 4)
   KD36: ['K101'],                               // Sakamuso (KD ↔ IZX KE K101)
   KD37: ['K102', 'AX21'],                       // Showanul (KD ↔ IZX KE K102 + AX Ramo Bajikoe)
   KD46: ['K31'],                                // Pyanuza (KD ↔ IZX KE ramo C′)

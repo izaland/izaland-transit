@@ -132,6 +132,50 @@ const M4_SVC = {
   },
 };
 
+/* ----------------------------------------------------------------
+   Interscambi Metro Line 4 ↔ altre reti
+
+   Ogni entry mappa il codice M4 ai nodi partner di altre reti
+   (IZX, AX, Suburban). Il campo transferMin indica il tempo di
+   trasferimento fisico a piedi raccomandato.
+
+   M409 Sumi-Kokendake
+     ↔ LL12 (Loop Line)       — stesso nome, banchine adiacenti  2 min
+
+   M405 Anagusa Mukai
+     ↔ KD30 (Kidai Line)      — stesso nome, uscita condivisa    3 min
+
+   M417 Shimamera
+     ↔ AX05 (Airport Express) — stesso nome, piano -1 / piano 0  5 min
+
+   M419 Kasakuri
+     ↔ AX04 (Airport Express) — stesso nome, piano -1 / piano 0  5 min
+     ↔ KD35 (Kidai Line)      — stesso nome, uscita est           5 min
+     ↔ K02  (IZX Keishin)     — walkable 10 min (uscita nord)
+---------------------------------------------------------------- */
+const M4_INTERCHANGE = {
+  M409: [
+    { code: 'LL12', network: 'suburban', transferMin: 2,
+      note: 'Loop Line — Sumi-Kokendake, banchine adiacenti' },
+  ],
+  M405: [
+    { code: 'KD30', network: 'suburban', transferMin: 3,
+      note: 'Kidai Line — Anagusa Mukai, uscita condivisa' },
+  ],
+  M417: [
+    { code: 'AX05', network: 'ax', transferMin: 5,
+      note: 'Airport Express Ramo Est — Shimamera, piano -1/0' },
+  ],
+  M419: [
+    { code: 'AX04', network: 'ax',      transferMin: 5,
+      note: 'Airport Express Ramo Est — Kasakuri, piano -1/0' },
+    { code: 'KD35', network: 'suburban', transferMin: 5,
+      note: 'Kidai Line — Kasakuri, uscita est' },
+    { code: 'K02',  network: 'izx',      transferMin: 10,
+      note: 'IZX Keishin — Niji-Sainðaul, walkable uscita nord' },
+  ],
+};
+
 if (typeof module !== 'undefined') {
-  module.exports = { M4_META, M4_ST, M4_CANONICAL_ORDER, M4_HEADWAY, M4_SVC };
+  module.exports = { M4_META, M4_ST, M4_CANONICAL_ORDER, M4_HEADWAY, M4_SVC, M4_INTERCHANGE };
 }
