@@ -27,8 +27,33 @@
     .section { margin-bottom: 20px; }
     .section-title { font-size: 0.7rem; color: #666; letter-spacing: 0.1em;
                      text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 6px; }
-    .line-chip { display: inline-block; padding: 4px 10px; border-radius: 3px;
-                 font-size: 0.8rem; margin: 3px; color: #000; font-weight: bold; }
+
+    /* ─ Badge stile pill (suburban / IZX / AX) ─────────────────── */
+    .line-chip {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin: 3px;
+      color: #000;
+      font-weight: bold;
+    }
+
+    /* ─ Badge stile cerchio (metro) ────────────────────────── */
+    .line-chip-metro {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      margin: 3px;
+      color: #000;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
     .interchange-row { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 4px;
                        padding: 12px 14px; margin-bottom: 8px; }
     .irow-top { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
@@ -82,7 +107,7 @@
   if (typeof SUBURBAN_LINES !== 'undefined') {
     for (const line of Object.values(SUBURBAN_LINES)) {
       for (const st of line.stations) {
-        if (ALL_STATIONS.find(s => s.code === st.code)) continue; // skip duplicates
+        if (ALL_STATIONS.find(s => s.code === st.code)) continue;
         ALL_STATIONS.push({ code: st.code, name: st.name, network: 'suburban',
           lineId: line.id, lineColor: line.color, lineName: line.name });
       }
@@ -100,7 +125,7 @@
     }
   }
 
-  /* AX (Airport Express) */
+  /* AX */
   if (typeof AX_LINES !== 'undefined') {
     for (const [lineId, line] of Object.entries(AX_LINES)) {
       for (const [code, st] of Object.entries(line.ST || {})) {
@@ -109,6 +134,16 @@
           lineId, lineColor: line.META?.color || '#888', lineName: line.META?.name || lineId });
       }
     }
+  }
+
+  /* ── Helper: render badge con forma giusta per network ─────────── */
+  function lineBadge(lineId, lineColor, lineName, network) {
+    if (network === 'metro') {
+      return `<span class="line-chip-metro" style="background:${lineColor}">${lineId}</span>`
+           + `<span style="font-size:0.8rem;color:#888;margin-right:12px">${lineName}</span>`;
+    }
+    return `<span class="line-chip" style="background:${lineColor}">${lineId}</span>`
+         + `<span style="font-size:0.8rem;color:#888;margin-right:12px">${lineName}</span>`;
   }
 
   /* ── Autocomplete ───────────────────────────────────────────── */
@@ -147,7 +182,6 @@
     const resultsEl  = document.getElementById('results');
     const noResult   = document.getElementById('no-result');
 
-    // Trova la stazione
     const station = ALL_STATIONS.find(s =>
       s.code.toLowerCase() === q || s.name.toLowerCase() === q
     ) || ALL_STATIONS.find(s =>
@@ -161,10 +195,9 @@
     }
     noResult.style.display = 'none';
 
-    // Tutte le linee a cui appartiene questa stazione
     const memberOf = ALL_STATIONS.filter(s => s.code === station.code);
 
-    // Interscambi M4
+    /* Interscambi M4 */
     const m4Interchanges = [];
     if (typeof M4_INTERCHANGE !== 'undefined') {
       for (const [m4code, entries] of Object.entries(M4_INTERCHANGE)) {
@@ -178,7 +211,7 @@
       }
     }
 
-    // Interscambi Suburban
+    /* Interscambi Suburban */
     const subInterchanges = [];
     if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
       for (const [key, partners] of Object.entries(SUBURBAN_INTERCHANGE)) {
@@ -190,26 +223,23 @@
       }
     }
 
-    /* ── Status checks ─────────────────────────────────────────── */
+    /* Status checks */
     function checkM4Reachable(code) {
       if (typeof M4_ST === 'undefined') return 'no-data';
       return M4_ST[code] ? 'ok' : 'missing';
     }
-
     function checkSubReachable(code) {
       if (typeof SUBURBAN_LINES === 'undefined') return 'no-data';
       for (const line of Object.values(SUBURBAN_LINES))
         if (line.stations.find(s => s.code === code)) return 'ok';
       return 'missing';
     }
-
     function checkIZXReachable(code) {
       if (typeof IZX_LINES === 'undefined') return 'no-data';
       for (const line of Object.values(IZX_LINES))
         if (line.ST && line.ST[code]) return 'ok';
       return 'missing';
     }
-
     function checkAXReachable(code) {
       if (typeof AX_LINES === 'undefined') return 'no-data';
       for (const line of Object.values(AX_LINES))
@@ -217,39 +247,38 @@
       return 'missing';
     }
 
-    /* ── Render ─────────────────────────────────────────────────── */
+    /* Render */
     let html = `
       <div class="station-header">
         <div class="station-name">${station.name}</div>
         <div class="station-code">${station.code}</div>
       </div>
-
       <div class="section">
         <div class="section-title">Member of lines</div>
-        ${memberOf.map(s => `
-          <span class="line-chip" style="background:${s.lineColor}">${s.lineId}</span>
-          <span style="font-size:0.8rem;color:#888;margin-right:12px">${s.lineName}</span>
-        `).join('')}
+        <div style="display:flex;flex-wrap:wrap;align-items:center">
+          ${memberOf.map(s => lineBadge(s.lineId, s.lineColor, s.lineName, s.network)).join('')}
+        </div>
       </div>`;
 
     /* M4 interchanges */
     if (m4Interchanges.length) {
       html += `<div class="section"><div class="section-title">M4 Interchanges</div>`;
       m4Interchanges.forEach(ix => {
-        const isM4side = ix.m4code === station.code;
+        const isM4side  = ix.m4code === station.code;
         const otherCode = isM4side ? ix.partnerCode : ix.m4code;
         const otherNet  = isM4side ? ix.network : 'metro';
-        const statusFn  = otherNet === 'metro' ? checkM4Reachable
+        const statusFn  = otherNet === 'metro'    ? checkM4Reachable
                         : otherNet === 'suburban' ? checkSubReachable
-                        : otherNet === 'ax' ? checkAXReachable
+                        : otherNet === 'ax'       ? checkAXReachable
                         : checkIZXReachable;
-        const st2 = ALL_STATIONS.find(s => s.code === otherCode);
+        const st2    = ALL_STATIONS.find(s => s.code === otherCode);
         const status = statusFn(otherCode);
         const dotCls = status === 'ok' ? 'dot-ok' : status === 'missing' ? 'dot-err' : 'dot-warn';
-        const txtCls = status === 'ok' ? 'ok' : status === 'missing' ? 'err' : 'warn';
+        const txtCls = status === 'ok' ? 'ok'     : status === 'missing' ? 'err'     : 'warn';
         html += `
           <div class="interchange-row">
             <div class="irow-top">
+              ${st2 ? lineBadge(st2.lineId, st2.lineColor, '', st2.network) : ''}
               <span class="irow-code">${otherCode}</span>
               <span class="irow-name">${st2?.name || '?'}</span>
               <span class="irow-network">${otherNet}</span>
@@ -269,7 +298,7 @@
       html += `<div class="section"><div class="section-title">Suburban Interchanges</div>`;
       subInterchanges.forEach(ix => {
         const otherCode = ix.from === station.code ? ix.to : ix.from;
-        const st2 = ALL_STATIONS.find(s => s.code === otherCode);
+        const st2  = ALL_STATIONS.find(s => s.code === otherCode);
         const net2 = st2?.network || '?';
         const statusFn = net2 === 'suburban' ? checkSubReachable
                        : net2 === 'metro'    ? checkM4Reachable
@@ -277,10 +306,11 @@
                        : checkIZXReachable;
         const status = statusFn(otherCode);
         const dotCls = status === 'ok' ? 'dot-ok' : status === 'missing' ? 'dot-err' : 'dot-warn';
-        const txtCls = status === 'ok' ? 'ok' : status === 'missing' ? 'err' : 'warn';
+        const txtCls = status === 'ok' ? 'ok'     : status === 'missing' ? 'err'     : 'warn';
         html += `
           <div class="interchange-row">
             <div class="irow-top">
+              ${st2 ? lineBadge(st2.lineId, st2.lineColor, '', st2.network) : ''}
               <span class="irow-code">${otherCode}</span>
               <span class="irow-name">${st2?.name || '?'}</span>
               <span class="irow-network">${net2}</span>
