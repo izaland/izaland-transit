@@ -1388,115 +1388,110 @@ if (!directOnly && typeof MetroRouter !== 'undefined' && typeof M4_INTERCHANGE !
       && typeof M4_INTERCHANGE !== 'undefined'
       && typeof SUBURBAN_INTERCHANGE !== 'undefined') {
 
-    /* ── CASO E: IZX/AX → Suburban → M4 ── */
+     /* ── CASO E: IZX/AX → Suburban → M4 ── */
+  if (!directOnly && typeof MetroRouter !== 'undefined'
+      && typeof M4_INTERCHANGE !== 'undefined'
+      && typeof SUBURBAN_INTERCHANGE !== 'undefined') {
+
     for (const [subCode, subPartners] of Object.entries(SUBURBAN_INTERCHANGE)) {
       const izxPartners = Array.isArray(subPartners) ? subPartners : [subPartners];
-      izxPartners.forEach(izxCode => {
-        // leg1: IZX from → izxCode
-        froms.flatMap(f => IZXRouter.search(f, izxCode, depTime, { ...opts, maxResults: 3 }))
-          .forEach(j1 => {
-            const leg1 = j1.legs[j1.legs.length - 1];
-            const t2hm = _secToHm(leg1.alightArrSec + TSEC);
-            // leg2: Suburban subCode → nodo M4
-            for (const [m4code, m4entries] of Object.entries(M4_INTERCHANGE)) {
-              for (const e of (Array.isArray(m4entries) ? m4entries : [m4entries])) {
-                if (e.network !== 'suburban') continue;
-                const tsec2 = (e.transferMin ?? TRANSFER_MIN) * 60;
-                SuburbanRouter.search(subCode, e.code, t2hm, { ...opts, maxResults: 2 })
-                  .forEach(j2 => {
-                    const leg2 = j2.legs[j2.legs.length - 1];
-                    // leg3: M4 m4code → to
-                    tos.forEach(t => {
-                      const l3 = MetroRouter.buildLeg(m4code, t, leg2.alightArrSec + tsec2);
-                      if (l3) _crossPush3(leg1, leg2, l3, [subCode, m4code]);
-                    });
-                  });
+      for (const izxCode of izxPartners) {
+        const j1list = froms.flatMap(f => IZXRouter.search(f, izxCode, depTime, { ...opts, maxResults: 3 }));
+        for (const j1 of j1list) {
+          const leg1 = j1.legs[j1.legs.length - 1];
+          const t2hm = _secToHm(leg1.alightArrSec + TSEC);
+          for (const [m4code, m4entries] of Object.entries(M4_INTERCHANGE)) {
+            for (const e of (Array.isArray(m4entries) ? m4entries : [m4entries])) {
+              if (e.network !== 'suburban') continue;
+              const tsec2 = (e.transferMin ?? TRANSFER_MIN) * 60;
+              const j2list = SuburbanRouter.search(subCode, e.code, t2hm, { ...opts, maxResults: 2 });
+              for (const j2 of j2list) {
+                const leg2 = j2.legs[j2.legs.length - 1];
+                for (const t of tos) {
+                  const leg3 = MetroRouter.buildLeg(m4code, t, leg2.alightArrSec + tsec2);
+                  if (leg3) _crossPush3(leg1, leg2, leg3, [subCode, m4code]);
+                }
               }
             }
-          });
-      });
+          }
+        }
+      }
     }
 
-    /* ── CASO F: IZX/AX → M4 → Suburban ── */
-    for (const [m4code, m4entries] of Object.entries(M4_INTERCHANGE)) {
-      for (const e of (Array.isArray(m4entries) ? m4entries : [m4entries])) {
-        const tsec1 = (e.transferMin ?? TRANSFER_MIN) * 60;
-        // leg1: IZX from → e.code (nodo partner M4, es. K02)
-        froms.flatMap(f => IZXRouter.search(f, e.code, depTime, { ...opts, maxResults: 3 }))
-          .forEach(j1 => {
-            const leg1 = j1.legs[j1.legs.length - 1];
-            // leg2: M4 m4code → nodo Suburban
-            for (const [subCode, subPartners] of Object.entries(SUBURBAN_INTERCHANGE)) {
-              const subArr = Array.isArray(subPartners) ? subPartners : [subPartners];
-              });
+    /* ── CASO F: IZX/AX → M4 → Suburban/IZX ── */
+    for (const [m4codeA, m4entriesA] of Object.entries(M4_INTERCHANGE)) {
+      for (const eA of (Array.isArray(m4entriesA) ? m4entriesA : [m4entriesA])) {
+        const tsec1 = (eA.transferMin ?? TRANSFER_MIN) * 60;
+        const j1list = froms.flatMap(f => IZXRouter.search(f, eA.code, depTime, { ...opts, maxResults: 3 }));
+        for (const j1 of j1list) {
+          const leg1 = j1.legs[j1.legs.length - 1];
+          for (const [m4codeB, m4entriesB] of Object.entries(M4_INTERCHANGE)) {
+            if (m4codeB === m4codeA) continue;
+            for (const eB of (Array.isArray(m4entriesB) ? m4entriesB : [m4entriesB])) {
+              const tsec2 = (eB.transferMin ?? TRANSFER_MIN) * 60;
+              const leg2 = MetroRouter.buildLeg(m4codeA, m4codeB, leg1.alightArrSec + tsec1);
+              if (!leg2) continue;
+              const t3hm = _secToHm(leg2.alightArrSec + tsec2);
+              const searchFn = eB.network === 'suburban'
+                ? (f, t, d, o) => SuburbanRouter.search(f, t, d, o)
+                : (f, t, d, o) => IZXRouter.search(f, t, d, o);
+              const j3list = tos.flatMap(t => searchFn(eB.code, t, t3hm, { ...opts, maxResults: 2 }));
+              for (const j3 of j3list) _crossPush3(leg1, leg2, j3.legs[0], [m4codeA, m4codeB]);
             }
-            // Approccio diretto: M4 from m4code → ogni m4code che ha partner suburban
-            for (const [m4code2, m4entries2] of Object.entries(M4_INTERCHANGE)) {
-              if (m4code2 === m4code) continue;
-              for (const e2 of (Array.isArray(m4entries2) ? m4entries2 : [m4entries2])) {
-                if (e2.network !== 'suburban' && e2.network !== 'izx' && e2.network !== 'ax') continue;
-                const tsec2 = (e2.transferMin ?? TRANSFER_MIN) * 60;
-                const leg2 = MetroRouter.buildLeg(m4code, m4code2, leg1.alightArrSec + tsec1);
-                if (!leg2) continue;
-                const t3hm = _secToHm(leg2.alightArrSec + tsec2);
-                const searchFn = e2.network === 'suburban' ? SuburbanRouter.search.bind(SuburbanRouter) : IZXRouter.search.bind(IZXRouter);
-                tos.flatMap(t => searchFn(e2.code, t, t3hm, { ...opts, maxResults: 2 }))
-                  .forEach(j3 => _crossPush3(leg1, leg2, j3.legs[0], [m4code, m4code2]));
-              }
-            }
-          });
+          }
+        }
       }
     }
 
     /* ── CASO G: Suburban → M4 → IZX/AX ── */
-    for (const [m4code, m4entries] of Object.entries(M4_INTERCHANGE)) {
-      for (const e of (Array.isArray(m4entries) ? m4entries : [m4entries])) {
-        if (e.network !== 'suburban') continue;
-        const tsec1 = (e.transferMin ?? TRANSFER_MIN) * 60;
-        froms.flatMap(f => SuburbanRouter.search(f, e.code, depTime, { ...opts, maxResults: 3 }))
-          .forEach(j1 => {
-            const leg1 = j1.legs[j1.legs.length - 1];
-            for (const [m4code2, m4entries2] of Object.entries(M4_INTERCHANGE)) {
-              if (m4code2 === m4code) continue;
-              for (const e2 of (Array.isArray(m4entries2) ? m4entries2 : [m4entries2])) {
-                if (e2.network !== 'izx' && e2.network !== 'ax') continue;
-                const tsec2 = (e2.transferMin ?? TRANSFER_MIN) * 60;
-                const leg2 = MetroRouter.buildLeg(m4code, m4code2, leg1.alightArrSec + tsec1);
-                if (!leg2) continue;
-                const t3hm = _secToHm(leg2.alightArrSec + tsec2);
-                tos.flatMap(t => IZXRouter.search(e2.code, t, t3hm, { ...opts, maxResults: 2 }))
-                  .forEach(j3 => _crossPush3(leg1, leg2, j3.legs[0], [m4code, m4code2]));
-              }
+    for (const [m4codeA, m4entriesA] of Object.entries(M4_INTERCHANGE)) {
+      for (const eA of (Array.isArray(m4entriesA) ? m4entriesA : [m4entriesA])) {
+        if (eA.network !== 'suburban') continue;
+        const tsec1 = (eA.transferMin ?? TRANSFER_MIN) * 60;
+        const j1list = froms.flatMap(f => SuburbanRouter.search(f, eA.code, depTime, { ...opts, maxResults: 3 }));
+        for (const j1 of j1list) {
+          const leg1 = j1.legs[j1.legs.length - 1];
+          for (const [m4codeB, m4entriesB] of Object.entries(M4_INTERCHANGE)) {
+            if (m4codeB === m4codeA) continue;
+            for (const eB of (Array.isArray(m4entriesB) ? m4entriesB : [m4entriesB])) {
+              if (eB.network !== 'izx' && eB.network !== 'ax') continue;
+              const tsec2 = (eB.transferMin ?? TRANSFER_MIN) * 60;
+              const leg2 = MetroRouter.buildLeg(m4codeA, m4codeB, leg1.alightArrSec + tsec1);
+              if (!leg2) continue;
+              const t3hm = _secToHm(leg2.alightArrSec + tsec2);
+              const j3list = tos.flatMap(t => IZXRouter.search(eB.code, t, t3hm, { ...opts, maxResults: 2 }));
+              for (const j3 of j3list) _crossPush3(leg1, leg2, j3.legs[0], [m4codeA, m4codeB]);
             }
-          });
+          }
+        }
       }
     }
 
     /* ── CASO H: Suburban → M4 → Suburban ── */
-    for (const [m4code, m4entries] of Object.entries(M4_INTERCHANGE)) {
-      for (const e of (Array.isArray(m4entries) ? m4entries : [m4entries])) {
-        if (e.network !== 'suburban') continue;
-        const tsec1 = (e.transferMin ?? TRANSFER_MIN) * 60;
-        froms.flatMap(f => SuburbanRouter.search(f, e.code, depTime, { ...opts, maxResults: 3 }))
-          .forEach(j1 => {
-            const leg1 = j1.legs[j1.legs.length - 1];
-            for (const [m4code2, m4entries2] of Object.entries(M4_INTERCHANGE)) {
-              if (m4code2 === m4code) continue;
-              for (const e2 of (Array.isArray(m4entries2) ? m4entries2 : [m4entries2])) {
-                if (e2.network !== 'suburban') continue;
-                const tsec2 = (e2.transferMin ?? TRANSFER_MIN) * 60;
-                const leg2 = MetroRouter.buildLeg(m4code, m4code2, leg1.alightArrSec + tsec1);
-                if (!leg2) continue;
-                const t3hm = _secToHm(leg2.alightArrSec + tsec2);
-                tos.flatMap(t => SuburbanRouter.search(e2.code, t, t3hm, { ...opts, maxResults: 2 }))
-                  .forEach(j3 => _crossPush3(leg1, leg2, j3.legs[0], [m4code, m4code2]));
-              }
+    for (const [m4codeA, m4entriesA] of Object.entries(M4_INTERCHANGE)) {
+      for (const eA of (Array.isArray(m4entriesA) ? m4entriesA : [m4entriesA])) {
+        if (eA.network !== 'suburban') continue;
+        const tsec1 = (eA.transferMin ?? TRANSFER_MIN) * 60;
+        const j1list = froms.flatMap(f => SuburbanRouter.search(f, eA.code, depTime, { ...opts, maxResults: 3 }));
+        for (const j1 of j1list) {
+          const leg1 = j1.legs[j1.legs.length - 1];
+          for (const [m4codeB, m4entriesB] of Object.entries(M4_INTERCHANGE)) {
+            if (m4codeB === m4codeA) continue;
+            for (const eB of (Array.isArray(m4entriesB) ? m4entriesB : [m4entriesB])) {
+              if (eB.network !== 'suburban') continue;
+              const tsec2 = (eB.transferMin ?? TRANSFER_MIN) * 60;
+              const leg2 = MetroRouter.buildLeg(m4codeA, m4codeB, leg1.alightArrSec + tsec1);
+              if (!leg2) continue;
+              const t3hm = _secToHm(leg2.alightArrSec + tsec2);
+              const j3list = tos.flatMap(t => SuburbanRouter.search(eB.code, t, t3hm, { ...opts, maxResults: 2 }));
+              for (const j3 of j3list) _crossPush3(leg1, leg2, j3.legs[0], [m4codeA, m4codeB]);
             }
-          });
+          }
+        }
       }
     }
-  }
-  
+
+  } 
 
 
   return [...izx, ...sub, ...metro, ...cross]
