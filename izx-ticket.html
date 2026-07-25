@@ -1263,6 +1263,58 @@ function _runSearch(from, to, depTime, lineF, directOnly) {
           });
         });
       }
+
+        /* ── CASO C: M4 → Suburban → IZX (3 legs, 2 cambi) ── */
+  if (!directOnly && typeof MetroRouter !== 'undefined'
+      && typeof M4_INTERCHANGE !== 'undefined'
+      && typeof IZXRouter !== 'undefined') {
+
+    for (const [m4code, entries] of Object.entries(M4_INTERCHANGE)) {
+      for (const entry of (Array.isArray(entries) ? entries : [entries])) {
+        if (entry.network !== 'suburban') continue;
+        const partnerSub = entry.code ?? entry;
+        const tsecEff    = (entry.transferMin ?? TRANSFER_MIN) * 60;
+
+        /* leg1: M4 from → m4code */
+        const leg1 = MetroRouter.buildLeg(from, m4code, _hmToSec(depTime));
+        if (!leg1) continue;
+        const t2sec = leg1.alightArrSec + tsecEff;
+        const t2hm  = _secToHm(t2sec);
+
+        /* leg2: Suburban partnerSub → qualsiasi nodo IZX */
+        const subJourneys = SuburbanRouter.search(partnerSub, to, t2hm, { maxResults: 3 });
+        subJourneys.forEach(sj => {
+          if (sj.transfers > 0) return; // già un cambio: saltiamo (sarebbe 3 cambi)
+          const leg2 = sj.legs[0];
+          cross.push({
+            legs:            [leg1, leg2],
+            departureTime:   leg1.boardDep,
+            arrivalTime:     leg2.alightArr,
+            totalMinutes:    Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+            totalKm:         (leg1.km ?? 0) + (leg2.km ?? 0),
+            transfers:       1,
+            transferNodes:   [m4code],
+            transferWaitMin: Math.round((leg2.boardDepSec - leg1.alightArrSec) / 60),
+          });
+        });
+
+        /* leg2+leg3: Suburban partnerSub → nodo IZX → IZX to (percorsi con cambio sub→IZX) */
+        const subCrossJourneys = SuburbanRouter.search(partnerSub, to, t2hm, { maxResults: 5 });
+        subCrossJourneys.forEach(sj => {
+          if (sj.transfers !== 1 || sj.legs.length < 2) return;
+          const [leg2, leg3] = sj.legs;
+          cross.push({
+            legs:            [leg1, leg2, leg3],
+            departureTime:   leg1.boardDep,
+            arrivalTime:     leg3.alightArr,
+            totalMinutes:    Math.round((leg3.alightArrSec - leg1.boardDepSec) / 60),
+            totalKm:         (leg1.km ?? 0) + (leg2.km ?? 0) + (leg3.km ?? 0),
+            transfers:       2,
+            transferNodes:   [m4code, sj.transferNodes[0]],
+            transferWaitMin: Math.round((leg2.boardDepSec - leg1.alightArrSec) / 60),
+          });
+        });
+      }
     }
   }
 
@@ -1272,4 +1324,56 @@ function _runSearch(from, to, depTime, lineF, directOnly) {
 }
   buildPlannerSelects();
 
-  document
+  document.getElementById('jp-swap').addEventListener('click', () => {
+    const f = document.getElementById('jp-from'), t = document.getElementById('jp-to');
+    const tmp = f.value; f.value = t.value; t.value = tmp;
+  });
+
+  document.getElementById('jp-search').addEventListener('click', () => {
+    const from       = document.getElementById('jp-from').value;
+    const to         = document.getElementById('jp-to').value;
+    const depTime    = document.getElementById('jp-time').value || '08:00';
+    const lineF      = document.getElementById('jp-line').value;
+    const directOnly = document.getElementById('jp-direct-only').checked;
+    if (from === to) { alert('Please select two different stations.'); return; }
+    _jpState.from = from; _jpState.to = to; _jpState.lineF = lineF; _jpState.directOnly = directOnly; _jpState.all = [];
+    const journeys = _runSearch(from, to, depTime, lineF, directOnly);
+    renderJourneys(journeys, _stName(from), _stName(to), 'replace');
+  });
+
+  document.getElementById('jp-earlier').addEventListener('click', () => {
+    if (!_jpState.from) return;
+    const anchor = _prevBefore(_jpState.all);
+    if (!anchor) return;
+    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly);
+    const cutoff = _parseMins(_jpState.windowStart);
+    const earlier = journeys.filter(j => _parseMins(j.departureTime) < cutoff);
+    if (!earlier.length) {
+      const btn = document.getElementById('jp-earlier');
+      const orig = btn.innerHTML;
+      btn.textContent = 'No earlier trains'; btn.disabled = true;
+      setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+      return;
+    }
+    renderJourneys(earlier, _stName(_jpState.from), _stName(_jpState.to), 'prepend');
+  });
+
+  document.getElementById('jp-later').addEventListener('click', () => {
+    if (!_jpState.from) return;
+    const anchor = _nextAfter(_jpState.all);
+    if (!anchor) return;
+    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly);
+    if (!journeys.length) {
+      const btn = document.getElementById('jp-later');
+      const orig = btn.innerHTML;
+      btn.textContent = 'No later trains'; btn.disabled = true;
+      setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+      return;
+    }
+    renderJourneys(journeys, _stName(_jpState.from), _stName(_jpState.to), 'append');
+  });
+
+})();
+</script>
+</body>
+</html>
