@@ -1380,32 +1380,6 @@ if (!directOnly && typeof MetroRouter !== 'undefined' && typeof M4_INTERCHANGE !
     }
   }
 
-        /* from è su Suburban, to è su IZX/AX */
-        const leg1SubJourneys = froms.flatMap(f =>
-          SuburbanRouter.search(f, subCode, depTime, { ...opts, lines: null, maxResults: 3 })
-        );
-        leg1SubJourneys.forEach(j1 => {
-          const leg1 = j1.legs[j1.legs.length - 1];
-          const t2hm = _secToHm(leg1.alightArrSec + TSEC);
-          tos.flatMap(t => IZXRouter.search(izxCode, t, t2hm, { ...opts, lines: null, maxResults: 3 }))
-            .forEach(j2 => {
-              const leg2 = j2.legs[0];
-              cross.push({
-                legs:            [leg1, leg2],
-                departureTime:   leg1.boardDep,
-                arrivalTime:     leg2.alightArr,
-                totalMinutes:    Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
-                totalKm:         (leg1.km ?? 0) + (leg2.km ?? 0),
-                transfers:       1,
-                transferNodes:   [izxCode],
-                transferWaitMin: Math.round((leg2.boardDepSec - leg1.alightArrSec) / 60),
-              });
-            });
-        });
-      });
-    }
-  }
-
   /* ── Helper: push journey a 3 legs ── */
   const _crossPush3 = (l1, l2, l3, nodes) => {
     cross.push({
