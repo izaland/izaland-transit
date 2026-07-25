@@ -1,53 +1,22 @@
 /* ================================================================
    M2-TT.JS — Metro Line 2 · Timetable Profile
    ================================================================
-   Linea più vecchia di Sainðaul (anni 1920).
-   Alimentazione a terza rotaia, semi-automatizzata.
-   Composizione: 6 carrozze.
-   Velocità commerciale media: 30 km/h (dwellSec: 30 s/fermata).
-
-   Quattro sottoservizi:
-
    SVC_1  — Continuativo Gawinosechi → Hintomaui    (Ramo A, ogni 12 min)
    SVC_2  — Continuativo Gawinosechi → Mokoba       (Ramo B, ogni 12 min)
    SVC_3  — Limitato     Gawinosechi ↔ Ārikkohanu   (tratta comune, ogni 12 min)
    SVC_4  — Rapido       Gawinosechi ↔ Mokoba       (ore di punta, ogni 24 min)
-             Fermate rapido: tutte M201–M218 + M230, M232, M236
-
-   Frequenza risultante sulla tratta comune M201–M218:
-     Ore normali:   SVC_1 + SVC_2 + SVC_3 → ogni ~4 min
-     Ore di punta:  + SVC_4             → ogni ~3.4 min
-
-   Il timetable effettivo viene generato runtime da MetroRouter
-   usando avgSpeedKmh e dwellSec definiti in M2_META (m2-data.js).
 ================================================================ */
 'use strict';
 
-/* ----------------------------------------------------------------
-   Profilo headway per sottoservizio
-   Ogni slot definisce la finestra oraria e il headway in minuti.
-   05:00–24:00 operativi.
----------------------------------------------------------------- */
-
-/* SVC_1 — Continuativo Ramo A (Gawinosechi → Hintomaui) */
 const M2_HEADWAY_SVC1 = [
   { from: '05:00', to: '24:00', headwayMin: 12 },
 ];
-
-/* SVC_2 — Continuativo Ramo B (Gawinosechi → Mokoba) */
 const M2_HEADWAY_SVC2 = [
   { from: '05:00', to: '24:00', headwayMin: 12 },
 ];
-
-/* SVC_3 — Limitato tratta comune (Gawinosechi ↔ Ārikkohanu Yunobu) */
 const M2_HEADWAY_SVC3 = [
   { from: '05:00', to: '24:00', headwayMin: 12 },
 ];
-
-/* SVC_4 — Rapido Ramo B (ore di punta)
-   Inbound  (Mokoba → Gawinosechi): 07:00–09:30
-   Outbound (Gawinosechi → Mokoba): 17:30–20:00
-   headwayMin: 24 (infilato fra gli altri servizi) */
 const M2_HEADWAY_SVC4_INBOUND  = [
   { from: '07:00', to: '09:30', headwayMin: 24 },
 ];
@@ -55,14 +24,6 @@ const M2_HEADWAY_SVC4_OUTBOUND = [
   { from: '17:30', to: '20:00', headwayMin: 24 },
 ];
 
-/* ----------------------------------------------------------------
-   Definizione sottoservizi
-   id: 'M2' per tutti — il badge nel journey planner mostra 'M2'
-       con il cerchio colorato metro. svcLogical discrimina
-       il sottoservizio internamente.
-   stops: array di codici stazione nell'ordine di percorrenza
-          (outbound, ovvero dalla città verso i terminus).
----------------------------------------------------------------- */
 const M2_SERVICES = [
   {
     id:          'M2',
@@ -129,6 +90,22 @@ const M2_SERVICES = [
     ],
   },
 ];
+
+/* ----------------------------------------------------------------
+   Registrazione linea M2 nel MetroRouter.
+   Dipende da: m2-data.js (M2_ST, M2_META, M2_INTERCHANGE)
+               questo file (M2_SERVICES)
+   Viene eseguito quando il browser ha caricato entrambi gli script.
+---------------------------------------------------------------- */
+if (typeof MetroRouter !== 'undefined') {
+  MetroRouter.register({
+    lineId:      'M2',
+    meta:        M2_META,
+    st:          M2_ST,
+    services:    M2_SERVICES,
+    interchange: M2_INTERCHANGE,
+  });
+}
 
 if (typeof module !== 'undefined') {
   module.exports = { M2_SERVICES, M2_HEADWAY_SVC1, M2_HEADWAY_SVC2, M2_HEADWAY_SVC3,

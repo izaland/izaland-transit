@@ -1,11 +1,8 @@
 /* ================================================================
    METRO-ROUTER.JS — Sainðaul Metro Journey Planner
    ================================================================
-   Dipende da: metro/m4-data.js  + metro/m4-tt.js
-               metro/m2-data.js  + metro/m2-tt.js
-               (+ qualsiasi futura mN-data.js / mN-tt.js)
-
    API pubblica:
+     MetroRouter.register(config)                → void
      MetroRouter.search(from, to, depTime, opts) → Journey[]
      MetroRouter.buildLeg(boardCode, alightCode, depSec) → Leg | null
      MetroRouter.stationName(code)               → string
@@ -16,12 +13,9 @@
      MetroRouter.allInterchanges()               → { codeA, codeB, transferMin }[]
 
    Per aggiungere una nuova linea metro (es. M3):
-     1. Creare metro/m3-data.js  (M3_ST, M3_META, M3_INTERCHANGE, …)
-     2. Creare metro/m3-tt.js    (M3_SERVICES)
+     1. Creare metro/m3-data.js  (chiama MetroRouter.register alla fine)
+     2. Creare metro/m3-tt.js    (opzionale, chiamata register può stare in m3-data.js)
      3. Aggiungere <script> in HTML — nessuna modifica qui.
-
-   Il registro _LINES() scopre automaticamente le linee a runtime
-   controllando se M2_ST, M3_ST, M4_ST, … sono definiti (fino a M30).
 ================================================================ */
 'use strict';
 
@@ -32,48 +26,42 @@ const MetroRouter = (() => {
   const DWELL_SEC     = 30;
 
   /* ----------------------------------------------------------------
-   * _LINES()  — scoperta automatica delle linee caricate
-   * Controlla M2_ST … M30_ST e M2_SERVICES … M30_SERVICES.
-   * Ogni linea è identificata dal suo lineId (es. 'M2', 'M4').
+   * Registro interno delle linee.
+   * Ogni linea viene aggiunta via MetroRouter.register(config).
    * ---------------------------------------------------------------- */
-  let _linesCache = null;
-  function _LINES() {
-    if (_linesCache) return _linesCache;
-    _linesCache = [];
-    for (let n = 2; n <= 30; n++) {
-      const stVar  = window[`M${n}_ST`];
-      const meta   = window[`M${n}_META`];
-      const svcs   = window[`M${n}_SERVICES`];
-      if (!stVar || !meta) continue;
+  const _registry = [];
 
-      /* Compatibilità M4: se non ha M4_SERVICES, costruiscilo da M4_SVC */
-      let services = svcs;
-      if (!services && n === 4 && typeof M4_SVC !== 'undefined') {
-        services = [{
-          id:         'M4',
-          svcLogical: 'B',
-          name:       M4_SVC.B.name,
-          color:      M4_META.color,
-          cls:        'metro',
-          rapid:      false,
-          headway:    typeof M4_HEADWAY !== 'undefined' ? M4_HEADWAY : [],
-          stops:      typeof M4_CANONICAL_ORDER !== 'undefined' ? M4_CANONICAL_ORDER : [],
-        }];
-      }
-      if (!services || !services.length) continue;
-
-      _linesCache.push({
-        lineId:      `M${n}`,
-        meta,
-        st:          stVar,
-        avgSpeedKmh: meta.avgSpeedKmh ?? 30,
-        dwellSec:    meta.dwellSec    ?? DWELL_SEC,
-        services,
-        interchange: window[`M${n}_INTERCHANGE`] ?? {},
-      });
+  /**
+   * register(config)
+   * Chiamato dai file m*-data.js / m*-tt.js per registrare una linea.
+   *
+   * config: {
+   *   lineId,          // es. 'M2'
+   *   meta,            // M2_META
+   *   st,              // M2_ST
+   *   services,        // array di service objects (formato normalizzato)
+   *   interchange,     // M2_INTERCHANGE
+   * }
+   */
+  function register(config) {
+    if (!config || !config.lineId || !config.st || !config.meta) {
+      console.warn('MetroRouter.register: config invalida', config);
+      return;
     }
-    return _linesCache;
+    /* Evita duplicati se lo script viene caricato due volte */
+    if (_registry.find(l => l.lineId === config.lineId)) return;
+    _registry.push({
+      lineId:      config.lineId,
+      meta:        config.meta,
+      st:          config.st,
+      avgSpeedKmh: config.meta.avgSpeedKmh ?? 30,
+      dwellSec:    config.meta.dwellSec    ?? DWELL_SEC,
+      services:    config.services || [],
+      interchange: config.interchange || {},
+    });
   }
+
+  function _LINES() { return _registry; }
 
   /* ---- utils tempo ---- */
   function _hmToSec(hm) {
@@ -89,8 +77,6 @@ const MetroRouter = (() => {
 
   /* ----------------------------------------------------------------
    * _headwaySecAt(svc, timeSec, direction)
-   * direction: 'inbound' | 'outbound' | undefined
-   * Restituisce null se fuori finestra operativa.
    * ---------------------------------------------------------------- */
   function _headwaySecAt(svc, timeSec, direction) {
     const hm = _secToHM(timeSec);
@@ -168,7 +154,6 @@ const MetroRouter = (() => {
 
   /* ----------------------------------------------------------------
    * buildLeg(boardCode, alightCode, depSec)
-   * Prova tutti i servizi e restituisce il leg con partenza più vicina.
    * ---------------------------------------------------------------- */
   function buildLeg(boardCode, alightCode, depSec) {
     let best = null;
@@ -232,7 +217,6 @@ const MetroRouter = (() => {
       }
     }
 
-    /* Deduplicazione + ordinamento */
     const seen   = new Set();
     const unique = journeys.filter(j => {
       const key = j.legs.map(l =>
@@ -246,10 +230,8 @@ const MetroRouter = (() => {
   }
 
   /* ================================================================
-   * networkOf(code)
-   * Restituisce il lineId della linea che contiene `code`.
-   * Es: 'M2', 'M4'. Usato da UnifiedRouter per distinguere
-   * le linee metro come reti separate ai fini del name-match.
+   * networkOf, allInterchanges, allStations, stationName,
+   * allLines, lineColor
    * ================================================================ */
   function networkOf(code) {
     for (const line of _LINES()) {
@@ -258,13 +240,6 @@ const MetroRouter = (() => {
     return null;
   }
 
-  /* ================================================================
-   * allInterchanges()
-   * Aggrega tutti i *_INTERCHANGE dichiarati nelle linee caricate
-   * e restituisce un array piatto di coppie { codeA, codeB, transferMin }.
-   * UnifiedRouter lo chiama una volta sola — nessuna modifica necessaria
-   * quando si aggiunge una nuova linea metro.
-   * ================================================================ */
   function allInterchanges() {
     const out = [];
     const seen = new Set();
@@ -282,9 +257,6 @@ const MetroRouter = (() => {
     return out;
   }
 
-  /* ================================================================
-   * allStations()
-   * ================================================================ */
   function allStations() {
     const seen = new Set();
     const out  = [];
@@ -298,9 +270,6 @@ const MetroRouter = (() => {
     return out;
   }
 
-  /* ================================================================
-   * stationName(code)
-   * ================================================================ */
   function stationName(code) {
     for (const line of _LINES()) {
       if (line.st[code]) return line.st[code].n;
@@ -308,9 +277,6 @@ const MetroRouter = (() => {
     return code;
   }
 
-  /* ================================================================
-   * allLines()
-   * ================================================================ */
   function allLines() {
     return _LINES().map(line => ({
       id:      line.lineId,
@@ -320,9 +286,6 @@ const MetroRouter = (() => {
     }));
   }
 
-  /* ================================================================
-   * lineColor(lineId)
-   * ================================================================ */
   function lineColor(lineId) {
     const line = _LINES().find(l => l.lineId === lineId);
     return line?.meta.color ?? '#888';
@@ -330,14 +293,14 @@ const MetroRouter = (() => {
 
   if (typeof module !== 'undefined') {
     module.exports = {
-      search, buildLeg, stationName, allStations, allLines, lineColor,
-      networkOf, allInterchanges,
+      register, search, buildLeg, stationName, allStations,
+      allLines, lineColor, networkOf, allInterchanges,
     };
   }
 
   return {
-    search, buildLeg, stationName, allStations, allLines, lineColor,
-    networkOf, allInterchanges,
+    register, search, buildLeg, stationName, allStations,
+    allLines, lineColor, networkOf, allInterchanges,
   };
 
 })();
