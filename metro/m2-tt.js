@@ -57,13 +57,16 @@ const M2_HEADWAY_SVC4_OUTBOUND = [
 
 /* ----------------------------------------------------------------
    Definizione sottoservizi
+   id: 'M2' per tutti — il badge nel journey planner mostra 'M2'
+       con il cerchio colorato metro. svcLogical discrimina
+       il sottoservizio internamente.
    stops: array di codici stazione nell'ordine di percorrenza
           (outbound, ovvero dalla città verso i terminus).
-   Il router genera automaticamente il senso inverso.
 ---------------------------------------------------------------- */
 const M2_SERVICES = [
   {
-    id:          'SVC_1',
+    id:          'M2',
+    svcLogical:  'SVC_1',
     name:        'for Hintomaui',
     nameJa:      '価園斐行',
     branch:      'A',
@@ -78,7 +81,8 @@ const M2_SERVICES = [
     ],
   },
   {
-    id:          'SVC_2',
+    id:          'M2',
+    svcLogical:  'SVC_2',
     name:        'for Mokoba',
     nameJa:      '母槻行',
     branch:      'B',
@@ -93,7 +97,8 @@ const M2_SERVICES = [
     ],
   },
   {
-    id:          'SVC_3',
+    id:          'M2',
+    svcLogical:  'SVC_3',
     name:        'Limited Ārikkohanu',
     nameJa:      '鶴神由見夫止まり',
     branch:      'common',
@@ -107,17 +112,16 @@ const M2_SERVICES = [
     ],
   },
   {
-    id:          'SVC_4',
+    id:          'M2',
+    svcLogical:  'SVC_4',
     name:        'Rapid for Mokoba',
     nameJa:      '母槻急行',
     branch:      'B',
     color:       '#8B0000',
     cls:         'svc-4',
     rapid:       true,
-    /* Orari asimmetrici: headway diverso per direzione */
     headwayInbound:  M2_HEADWAY_SVC4_INBOUND,
     headwayOutbound: M2_HEADWAY_SVC4_OUTBOUND,
-    /* Fermate: tutte M201–M218 (tratta comune) + M230, M232, M236 (ramo B) */
     stops: [
       'M201','M202','M203','M204','M205','M206','M207','M208',
       'M209','M210','M211','M212','M213','M214','M215','M216','M217','M218',
