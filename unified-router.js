@@ -492,9 +492,14 @@ const UnifiedRouter = (() => {
 
   /* ----------------------------------------------------------------
    * _finalise(journeys, maxResults)
-   * Deduplicazione + ordinamento per arrivo, poi per numero cambi.
+   * 1. Deduplicazione per fingerprint leg
+   * 2. Rimozione percorsi dominati (Pareto su dep/arr):
+   *    un percorso A domina B se parte uguale o dopo A
+   *    e arriva uguale o prima di A (con almeno una disuguaglianza stretta).
+   * 3. Ordinamento: prima per orario di arrivo, poi per n. cambi.
    * ---------------------------------------------------------------- */
   function _finalise(journeys, maxResults) {
+    /* step 1 — deduplicazione */
     const seen = new Set();
     const unique = journeys.filter(j => {
       const key = j.legs.map(l =>
@@ -504,12 +509,29 @@ const UnifiedRouter = (() => {
       seen.add(key);
       return true;
     });
-    unique.sort((a, b) => {
+
+    /* step 2 — filtra dominati */
+    const nonDominated = unique.filter((a, ia) => {
+      const depA = _hmToSec(a.departureTime);
+      const arrA = _hmToSec(a.arrivalTime);
+      return !unique.some((b, ib) => {
+        if (ib === ia) return false;
+        const depB = _hmToSec(b.departureTime);
+        const arrB = _hmToSec(b.arrivalTime);
+        /* b domina a se parte non prima di a E arriva non dopo a,
+           con almeno una disuguaglianza stretta */
+        return depB >= depA && arrB <= arrA && (depB > depA || arrB < arrA);
+      });
+    });
+
+    /* step 3 — ordinamento */
+    nonDominated.sort((a, b) => {
       const da = _hmToSec(a.arrivalTime), db = _hmToSec(b.arrivalTime);
       if (da !== db) return da - db;
       return a.transfers - b.transfers;
     });
-    return unique.slice(0, maxResults);
+
+    return nonDominated.slice(0, maxResults);
   }
 
   /* ================================================================
