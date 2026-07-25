@@ -450,6 +450,17 @@ const UnifiedRouter = (() => {
 
   /* ----------------------------------------------------------------
    * _finalise
+   *
+   * Regola di dominanza aggiornata:
+   *   B domina A solo se:
+   *     - parte non prima di A (depB >= depA)
+   *     - arriva non dopo di A (arrB <= arrA)
+   *     - almeno uno dei due è strettamente migliore
+   *     - E ha un numero di cambi <= a quello di A
+   *
+   * Questo garantisce che un treno diretto non venga mai eliminato
+   * da un viaggio con cambio più veloce: il comfort (0 cambi) è
+   * sempre presentato come opzione alternativa.
    * ---------------------------------------------------------------- */
   function _finalise(journeys, maxResults) {
     const seen = new Set();
@@ -460,18 +471,27 @@ const UnifiedRouter = (() => {
       if (seen.has(key)) return false;
       seen.add(key); return true;
     });
+
     const nonDominated = unique.filter((a, ia) => {
       const depA = _hmToSec(a.departureTime);
       const arrA = _hmToSec(a.arrivalTime);
+      const trA  = a.transfers;
       return !unique.some((b, ib) => {
         if (ib === ia) return false;
         const depB = _hmToSec(b.departureTime);
         const arrB = _hmToSec(b.arrivalTime);
-        return depB >= depA && arrB <= arrA && (depB > depA || arrB < arrA);
+        const trB  = b.transfers;
+        // B domina A solo se è almeno altrettanto comodo (cambi) E
+        // parte non prima E arriva non dopo (con almeno un miglioramento)
+        return depB >= depA &&
+               arrB <= arrA &&
+               trB  <= trA  &&
+               (depB > depA || arrB < arrA || trB < trA);
       });
     });
+
     nonDominated.sort((a, b) => {
-      const da = _hmToSec(a.arrivalTime), db = _hmToSec(b.arrivalTime);
+      const da = _hmToSec(a.departureTime), db = _hmToSec(b.departureTime);
       if (da !== db) return da - db;
       return a.transfers - b.transfers;
     });
