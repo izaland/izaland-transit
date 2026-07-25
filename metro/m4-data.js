@@ -147,6 +147,8 @@ const M4_SVC = {
 
    M417 Shimamera
      ↔ AX05 (Airport Express) — stesso nome, piano -1 / piano 0  5 min
+     ↔ M203 (Line 2)          — nome diverso (Shimamera Shikiniswae),
+                                300 m corridoio sotterraneo        5 min
 
    M419 Kasakuri
      ↔ AX04 (Airport Express) — stesso nome, piano -1 / piano 0  5 min
@@ -163,8 +165,10 @@ const M4_INTERCHANGE = {
       note: 'Kidai Line — Anagusa Mukai, uscita condivisa' },
   ],
   M417: [
-    { code: 'AX05', network: 'ax', transferMin: 5,
+    { code: 'AX05', network: 'ax',   transferMin: 5,
       note: 'Airport Express Ramo Est — Shimamera, piano -1/0' },
+    { code: 'M203', network: 'metro', transferMin: 5,
+      note: 'M2 Shimamera Shikiniswae — 300 m corridoio sotterraneo' },
   ],
   M419: [
     { code: 'AX04', network: 'ax',      transferMin: 5,
