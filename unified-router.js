@@ -36,11 +36,6 @@ const UnifiedRouter = (() => {
   const CROSS_TRANSFER_SEC = CROSS_TRANSFER_MIN * 60;
   const MAX_JOURNEYS = 5;
 
-  /* ----------------------------------------------------------------
-   * _routers()
-   * Registro reti non-metro. Le linee metro vengono registrate
-   * singolarmente da _metroRouters().
-   * ---------------------------------------------------------------- */
   function _routers() {
     const r = [];
     if (typeof SuburbanRouter !== 'undefined') r.push({ id: 'SUBURBAN', router: SuburbanRouter });
@@ -48,22 +43,13 @@ const UnifiedRouter = (() => {
     return r;
   }
 
-  /* ----------------------------------------------------------------
-   * _metroRouters()
-   * Una entry per ogni linea metro caricata, con id = lineId (es. 'M2').
-   * Ogni entry espone un router virtuale che delega a MetroRouter
-   * ma filtrato per lineId.
-   * ---------------------------------------------------------------- */
   function _metroRouters() {
     if (typeof MetroRouter === 'undefined') return [];
     return MetroRouter.allLines().map(line => ({
       id: line.id,
       router: {
         search: (from, to, depTime, opts) =>
-          MetroRouter.search(from, to, depTime, {
-            ...opts,
-            lines: line.id,
-          }),
+          MetroRouter.search(from, to, depTime, { ...opts, lines: line.id }),
         stationName:  MetroRouter.stationName.bind(MetroRouter),
         allStations:  () => MetroRouter.allStations().filter(s => s.lineId === line.id),
         allLines:     () => MetroRouter.allLines().filter(l => l.id === line.id),
@@ -72,14 +58,10 @@ const UnifiedRouter = (() => {
     }));
   }
 
-  /* Tutti i router (non-metro + metro) */
   function _allRouters() {
     return [..._routers(), ..._metroRouters()];
   }
 
-  /* ----------------------------------------------------------------
-   * _buildNameIndex()
-   * ---------------------------------------------------------------- */
   let _nameIndex = null;
   function _buildNameIndex() {
     if (_nameIndex) return _nameIndex;
@@ -96,11 +78,7 @@ const UnifiedRouter = (() => {
     return _nameIndex;
   }
 
-  /* ----------------------------------------------------------------
-   * _networkOf(code)
-   * ---------------------------------------------------------------- */
   function _networkOf(code) {
-    /* Metro: usa MetroRouter.networkOf() per il lineId preciso */
     if (typeof MetroRouter !== 'undefined' && typeof MetroRouter.networkOf === 'function') {
       const mNet = MetroRouter.networkOf(code);
       if (mNet) return mNet;
@@ -112,12 +90,6 @@ const UnifiedRouter = (() => {
     return null;
   }
 
-  /* ----------------------------------------------------------------
-   * _buildInterchangeIndex()
-   * Legge tutte le mappe dichiarative. Le linee metro vengono
-   * gestite da MetroRouter.allInterchanges() — nessuna modifica
-   * necessaria quando si aggiunge M3, M5, ecc.
-   * ---------------------------------------------------------------- */
   let _ixIndex = null;
   function _buildInterchangeIndex() {
     if (_ixIndex) return _ixIndex;
@@ -134,40 +106,30 @@ const UnifiedRouter = (() => {
         _ixIndex[codeB].push({ code: codeA, transferMin: t });
     }
 
-    /* 1. Metro — tutte le linee in una chiamata */
     if (typeof MetroRouter !== 'undefined' &&
         typeof MetroRouter.allInterchanges === 'function') {
-      for (const ix of MetroRouter.allInterchanges()) {
+      for (const ix of MetroRouter.allInterchanges())
         _add(ix.codeA, ix.codeB, ix.transferMin);
-      }
     }
 
-    /* 2. IZX_LINES[x].INTERCHANGE + INTERCHANGE_EXTRA */
     if (typeof IZX_LINES !== 'undefined') {
       for (const line of Object.values(IZX_LINES)) {
-        if (line.INTERCHANGE) {
+        if (line.INTERCHANGE)
           for (const [a, b] of Object.entries(line.INTERCHANGE))
             _add(a, b, CROSS_TRANSFER_MIN);
-        }
-        if (line.INTERCHANGE_EXTRA) {
+        if (line.INTERCHANGE_EXTRA)
           for (const [a, bArr] of Object.entries(line.INTERCHANGE_EXTRA))
             for (const b of bArr) _add(a, b, CROSS_TRANSFER_MIN);
-        }
       }
     }
 
-    /* 3. SUBURBAN_INTERCHANGE */
-    if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
+    if (typeof SUBURBAN_INTERCHANGE !== 'undefined')
       for (const [a, bArr] of Object.entries(SUBURBAN_INTERCHANGE))
         for (const b of bArr) _add(a, b, CROSS_TRANSFER_MIN);
-    }
 
     return _ixIndex;
   }
 
-  /* ----------------------------------------------------------------
-   * _partnersOf(code)
-   * ---------------------------------------------------------------- */
   function _partnersOf(code) {
     const myNet = _networkOf(code);
     const seen  = new Set();
@@ -181,7 +143,6 @@ const UnifiedRouter = (() => {
       out.push({ code: partnerCode, networkId: net, transferMin: transferMin ?? CROSS_TRANSFER_MIN });
     }
 
-    /* 1. name-match */
     const name = _stationNameRaw(code);
     if (name) {
       const key = name.trim().toLowerCase();
@@ -189,7 +150,6 @@ const UnifiedRouter = (() => {
         if (entry.code !== code) _push(entry.code, CROSS_TRANSFER_MIN);
     }
 
-    /* 2. interchange-index */
     for (const entry of (_buildInterchangeIndex()[code] || []))
       _push(entry.code, entry.transferMin);
 
@@ -197,7 +157,9 @@ const UnifiedRouter = (() => {
   }
 
   /* ----------------------------------------------------------------
-   * _sameLine, _safeSearch, utils
+   * _sameLine — verifica che due codici stiano sulla stessa linea
+   * (necessario solo per SUBURBAN, dove una stazione può comparire
+   *  su più linee con lo stesso nome, es. Hayatogaru su KD e LL)
    * ---------------------------------------------------------------- */
   function _sameLine(codeA, codeB, networkId) {
     if (networkId === 'SUBURBAN' && typeof SUBURBAN_LINES !== 'undefined') {
@@ -262,9 +224,6 @@ const UnifiedRouter = (() => {
     return new Set(Array.isArray(raw) ? raw.map(s => s.toUpperCase()) : [raw.toUpperCase()]);
   }
 
-  /* ----------------------------------------------------------------
-   * _buildJourney2 / _buildJourney3
-   * ---------------------------------------------------------------- */
   function _buildJourney2(j1, j2, midCode) {
     const totalKm = (j1.totalKm != null && j2.totalKm != null)
       ? j1.totalKm + j2.totalKm : null;
@@ -325,15 +284,24 @@ const UnifiedRouter = (() => {
     const tNodes = _ensureNode(to,   toNodes);
     if (!fNodes.length || !tNodes.length) return [];
 
-    /* ---- 1. Diretti ---- */
+    /* ---- 1. Diretti ----
+     * FIX: per ogni router, itera su TUTTI i fNode e tNode con quel
+     * networkId (non solo il primo). Questo evita che un nome condiviso
+     * tra più linee della stessa rete (es. Hayatogaru su KD e LL)
+     * faccia sì che il primo nodo trovato sia quello sbagliato.
+     * ---------------------------------------------------------------- */
     for (const { id, router } of _allRouters()) {
       if (netFilter && !netFilter.has(id)) continue;
       if (typeof router.search !== 'function') continue;
-      const fNode = fNodes.find(n => n.networkId === id);
-      const tNode = tNodes.find(n => n.networkId === id);
-      if (!fNode || !tNode) continue;
-      const results = _safeSearch(router, id, fNode.code, tNode.code, depTime, opts);
-      for (const j of results) journeys.push({ ...j, _src: id });
+      const fCandidates = fNodes.filter(n => n.networkId === id);
+      const tCandidates = tNodes.filter(n => n.networkId === id);
+      for (const fNode of fCandidates) {
+        for (const tNode of tCandidates) {
+          if (fNode.code === tNode.code) continue;
+          const results = _safeSearch(router, id, fNode.code, tNode.code, depTime, opts);
+          for (const j of results) journeys.push({ ...j, _src: id });
+        }
+      }
     }
 
     if (directOnly) return _finalise(journeys, maxResults);
@@ -451,16 +419,10 @@ const UnifiedRouter = (() => {
   /* ----------------------------------------------------------------
    * _finalise
    *
-   * Regola di dominanza aggiornata:
-   *   B domina A solo se:
-   *     - parte non prima di A (depB >= depA)
-   *     - arriva non dopo di A (arrB <= arrA)
-   *     - almeno uno dei due è strettamente migliore
-   *     - E ha un numero di cambi <= a quello di A
-   *
-   * Questo garantisce che un treno diretto non venga mai eliminato
-   * da un viaggio con cambio più veloce: il comfort (0 cambi) è
-   * sempre presentato come opzione alternativa.
+   * Regola di dominanza:
+   *   B domina A solo se parte non prima, arriva non dopo,
+   *   ha ≤ cambi, e almeno uno dei tre è strettamente migliore.
+   *   → un diretto non viene mai eliminato da un viaggio con cambio.
    * ---------------------------------------------------------------- */
   function _finalise(journeys, maxResults) {
     const seen = new Set();
@@ -481,8 +443,6 @@ const UnifiedRouter = (() => {
         const depB = _hmToSec(b.departureTime);
         const arrB = _hmToSec(b.arrivalTime);
         const trB  = b.transfers;
-        // B domina A solo se è almeno altrettanto comodo (cambi) E
-        // parte non prima E arriva non dopo (con almeno un miglioramento)
         return depB >= depA &&
                arrB <= arrA &&
                trB  <= trA  &&
