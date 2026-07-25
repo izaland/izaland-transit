@@ -1,6 +1,7 @@
 /* ================================================================
    SUBURBAN-ROUTER.JS — Izarail Suburban Journey Planner
-   Dipende da: suburban-data.js (SUBURBAN_LINES, SUBURBAN_INTERCHANGE)
+   Dipende da: suburban-data.js (SUBURBAN_LINES, SUBURBAN_INTERCHANGE,
+                                  SK_SERVICES)
 
    API pubblica (stesso contratto di IZXRouter):
      SuburbanRouter.search(from, to, depTime, opts) → Journey[]
@@ -20,12 +21,18 @@
      - Cambio tra due linee suburbane (es. Loop Line ↔ Kidai Line)
        tramite nodi condivisi in SUBURBAN_INTERCHANGE (fase 4)
 
+   Sottoservizi SK (Seishaku Line):
+     La linea SK usa SK_SERVICES invece del singolo headway di linea.
+     _skTrips(iFrom, iTo, depSec) trova tutti i sottoservizi che
+     coprono sia iFrom che iTo, ne genera le partenze nell'arco
+     di SEARCH_WINDOW e restituisce un array ordinato di secondi.
+     Per le linee prive di SK_SERVICES si usa _syntheticTrips() come prima.
+
    Risoluzione alias:
      Prima di qualsiasi ricerca, _resolveCode() controlla se il codice
      passato è un nodo IZX/AX che ha un alias suburbano in
      SUBURBAN_INTERCHANGE (mappa inversa). Se sì, lo sostituisce con
-     il codice suburbano equivalente, così LL12→AX07 viene trattato
-     come LL12→LL17 e trova la soluzione diretta sulla Loop Line.
+     il codice suburbano equivalente.
 
    Mappa interscambio suburbana (fase 4):
      SUBURBAN_INTERCHANGE è unidirezionale per design: le coppie LL↔KD
@@ -62,7 +69,6 @@ const SuburbanRouter = (() => {
   /* ----------------------------------------------------------------
    * _suburbansCodeSet()
    * Insieme di tutti i codici stazione delle linee suburbane.
-   * Usato da _getSuburbanPartnerMap() per escludere codici IZX/AX.
    * ---------------------------------------------------------------- */
   let _suburbanCodeSet = null;
   function _getSuburbanCodeSet() {
@@ -77,13 +83,6 @@ const SuburbanRouter = (() => {
   /* ----------------------------------------------------------------
    * _getSuburbanPartnerMap()
    * Mappa bidirezionale subCode → [subPartnerCode, ...]
-   * Considera entrambi i versi di SUBURBAN_INTERCHANGE ma include
-   * solo i codici che appartengono effettivamente alla rete suburbana
-   * (esclude K01, R01, AX06, ecc.).
-   *
-   * Esempio con KD26: ['LL10']:
-   *   subMap['KD26'] = ['LL10']   (direzione originale)
-   *   subMap['LL10'] = ['KD26']   (direzione inversa aggiunta)
    * ---------------------------------------------------------------- */
   let _suburbanPartnerMap = null;
   function _getSuburbanPartnerMap() {
@@ -101,7 +100,6 @@ const SuburbanRouter = (() => {
     for (const [key, partners] of Object.entries(SUBURBAN_INTERCHANGE)) {
       for (const p of partners) _add(key, p);
     }
-    // Converti Set → Array
     _suburbanPartnerMap = {};
     for (const [k, v] of Object.entries(map)) _suburbanPartnerMap[k] = [...v];
     return _suburbanPartnerMap;
@@ -110,7 +108,6 @@ const SuburbanRouter = (() => {
   /* ----------------------------------------------------------------
    * _getInverseMap()
    * Mappa inversa IZX/AX → codice suburbano equivalente.
-   * Es: { AX06: 'LL01', AX07: 'LL17', K01: 'LL01', ... }
    * ---------------------------------------------------------------- */
   let _inverseMap = null;
   function _getInverseMap() {
@@ -184,6 +181,11 @@ const SuburbanRouter = (() => {
     });
   }
 
+  /* ----------------------------------------------------------------
+   * _syntheticTrips(line, iFrom, depSec)
+   * Genera partenze da iFrom per le linee che usano headwayPeak/OffPeak.
+   * NON usata per SK (usa _skTrips invece).
+   * ---------------------------------------------------------------- */
   function _syntheticTrips(line, iFrom, depSec) {
     const PEAK_START  = 7 * 3600,  PEAK_END1   = 9  * 3600;
     const PEAK_START2 = 17 * 3600, PEAK_END2   = 20 * 3600;
@@ -197,8 +199,95 @@ const SuburbanRouter = (() => {
     return trips;
   }
 
+  /* ----------------------------------------------------------------
+   * _skTrips(line, iFrom, iTo, depSec)
+   * Genera partenze per la Seishaku Line usando SK_SERVICES.
+   * Trova tutti i sottoservizi che coprono sia iFrom che iTo,
+   * poi combina tutte le partenze valide nell'arco SEARCH_WINDOW.
+   *
+   * Gestione bidirezionale:
+   *   - Direzione A→B (iFrom < iTo, o comunque fromIdx ≤ iFrom e toIdx ≥ iTo):
+   *     usa firstDep/lastDep dal capolinea A.
+   *   - Direzione B→A (iFrom > iTo, o comunque toIdx ≤ iFrom e fromIdx ≥ iTo):
+   *     il capolinea B non ha un firstDep esplicito; si stima aggiungendo
+   *     il tempo di percorrenza A→B a firstDep del capolinea A.
+   *     In pratica si usa lo stesso schema di corse sfasato di travelTimeFull.
+   * ---------------------------------------------------------------- */
+  function _skTrips(line, iFrom, iTo, depSec) {
+    if (typeof SK_SERVICES === 'undefined') return _syntheticTrips(line, iFrom, depSec);
+
+    const stCodes = line.stations.map(s => s.code);
+    const goingFwd = iFrom <= iTo; // true = direzione SK01→SK58
+    const loIdx = Math.min(iFrom, iTo);
+    const hiIdx = Math.max(iFrom, iTo);
+
+    const allDeps = [];
+
+    for (const svc of SK_SERVICES) {
+      const svcFromIdx = stCodes.indexOf(svc.fromCode);
+      const svcToIdx   = stCodes.indexOf(svc.toCode);
+      if (svcFromIdx === -1 || svcToIdx === -1) continue;
+
+      // Il servizio copre la tratta richiesta?
+      if (svcFromIdx > loIdx || svcToIdx < hiIdx) continue;
+
+      const headwaySec   = svc.headway * 60;
+      const firstDepSec  = _hmToSec(svc.firstDep);
+      const lastDepSec   = _hmToSec(svc.lastDep);
+
+      // Calcola offset capolinea B (per corse B→A)
+      const fullKm       = Math.abs(line.stations[svcToIdx].km - line.stations[svcFromIdx].km);
+      const fullTravelSec = Math.round((fullKm / AVG_SPEED_KMH) * 3600);
+
+      if (goingFwd) {
+        // Corse A→B: partono da svcFromCode
+        // L'orario rilevante al punto iFrom è firstDep + tempo da svcFromIdx a iFrom
+        const kmToFrom = Math.abs(line.stations[iFrom].km - line.stations[svcFromIdx].km);
+        const offsetSec = Math.round((kmToFrom / AVG_SPEED_KMH) * 3600);
+        let t = firstDepSec + offsetSec;
+        // Allinea al prossimo multiplo di headwaySec ≥ depSec
+        if (t < depSec) {
+          t += Math.ceil((depSec - t) / headwaySec) * headwaySec;
+        }
+        const lastAtFrom = lastDepSec + offsetSec;
+        while (t <= Math.min(lastAtFrom, depSec + SEARCH_WINDOW)) {
+          allDeps.push(t);
+          t += headwaySec;
+        }
+      } else {
+        // Corse B→A: partono da svcToCode
+        // firstDep del capolinea B = firstDep A + fullTravelSec (approssimato)
+        const firstDepB = firstDepSec + fullTravelSec;
+        const lastDepB  = lastDepSec  + fullTravelSec;
+        const kmToFrom  = Math.abs(line.stations[iFrom].km - line.stations[svcToIdx].km);
+        const offsetSec = Math.round((kmToFrom / AVG_SPEED_KMH) * 3600);
+        let t = firstDepB + offsetSec;
+        if (t < depSec) {
+          t += Math.ceil((depSec - t) / headwaySec) * headwaySec;
+        }
+        const lastAtFrom = lastDepB + offsetSec;
+        while (t <= Math.min(lastAtFrom, depSec + SEARCH_WINDOW)) {
+          allDeps.push(t);
+          t += headwaySec;
+        }
+      }
+    }
+
+    // Ordina e deduplica (due servizi possono avere la stessa partenza)
+    return [...new Set(allDeps)].sort((a, b) => a - b);
+  }
+
+  /* ----------------------------------------------------------------
+   * _getTrips(line, iFrom, iTo, depSec)
+   * Dispatcher: usa _skTrips per SK, _syntheticTrips per tutte le altre.
+   * ---------------------------------------------------------------- */
+  function _getTrips(line, iFrom, iTo, depSec) {
+    if (line.id === 'SK') return _skTrips(line, iFrom, iTo, depSec);
+    return _syntheticTrips(line, iFrom, depSec);
+  }
+
   function _buildLeg(line, iFrom, iTo, depSec) {
-    const trips = _syntheticTrips(line, iFrom, depSec);
+    const trips = _getTrips(line, iFrom, iTo, depSec);
     if (!trips.length) return null;
     const boardSec  = trips[0];
     const km        = _kmBetween(line, iFrom, iTo);
@@ -210,17 +299,17 @@ const SuburbanRouter = (() => {
     let intermediateStops;
     if (line.circular) {
       intermediateStops = _circularIntermediateStops(line, iFrom, iTo, dir, boardSec, km);
-  } else {
-  const a = Math.min(iFrom, iTo), b = Math.max(iFrom, iTo);
-  const sliced = line.stations.slice(a + 1, b);
-  const ordered = iFrom < iTo ? sliced : [...sliced].reverse();
-  intermediateStops = ordered.map(st => {
-    const kmElapsed = Math.abs(st.km - line.stations[iFrom].km);
-    const arrSec    = boardSec + Math.round((kmElapsed / km) * travelSec);
-    return { code: st.code, name: st.name,
-             arr: _secToHM(arrSec), dep: _secToHM(arrSec + DWELL_SEC) };
-  });
-}
+    } else {
+      const a = Math.min(iFrom, iTo), b = Math.max(iFrom, iTo);
+      const sliced = line.stations.slice(a + 1, b);
+      const ordered = iFrom < iTo ? sliced : [...sliced].reverse();
+      intermediateStops = ordered.map(st => {
+        const kmElapsed = Math.abs(st.km - line.stations[iFrom].km);
+        const arrSec    = boardSec + Math.round((kmElapsed / km) * travelSec);
+        return { code: st.code, name: st.name,
+                 arr: _secToHM(arrSec), dep: _secToHM(arrSec + DWELL_SEC) };
+      });
+    }
     return {
       lineId: line.id, svcId: line.id, svcLogical: line.id,
       svcName: line.name, color: line.color, cls: 'suburban',
@@ -346,9 +435,6 @@ const SuburbanRouter = (() => {
     }
 
     /* ---- 4. Percorsi Suburbano → Suburbano (cross-line) ---- */
-    /* Usa _getSuburbanPartnerMap() che è bidirezionale:
-       sia KD26→['LL10'] sia LL10→['KD26'] sono presenti.
-       Così LL16→KD14 e KD14→LL16 funzionano entrambi. */
     if (!directOnly) {
       const subMap = _getSuburbanPartnerMap();
       for (const line1 of Object.values(SUBURBAN_LINES)) {

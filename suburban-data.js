@@ -18,25 +18,16 @@
      percorsi con cambio cross-network.
 
      LL01 (Sainðaul Central) ↔ K01, R01, E01, AX06
-       Sezione storica sopraelevata ↔ sezione sotterranea IZX/AX
-       Tempo di trasferimento raccomandato: 10 min
-
      LL12 (Sumi-Kokendake) ↔ M409
-       Loop Line sopraelevata ↔ Metro Line 4 sotterranea
-       Tempo di trasferimento raccomandato: 2 min
-
      LL17 (Herubori) ↔ AX07
-       Loop Line sopraelevata ↔ Airport Express sotterranea
-       Tempo di trasferimento raccomandato: 10 min
-
      KD25 ↔ LL09  (Igashikura/Taishindai)
      KD26 ↔ LL10  (Hayatogaru)
-     KD30 ↔ M405  (Anagusa Mukai — KD ↔ Metro Line 4)
-     KD35 ↔ AX04, M419  (Kasakuri — triangolo KD↔AX↔Metro completo)
+     KD30 ↔ M405  (Anagusa Mukai)
+     KD35 ↔ AX04, M419  (Kasakuri)
      KD36 ↔ K101  (Sakamuso)
-     KD37 ↔ K102, AX21  (Showanul — triangolo KD↔IZX↔AX completo)
-     KD46 ↔ K31   (Pyanuza — KD ↔ KE ramo C′)
-     KD54 ↔ K32   (Nagayamatsu — KD ↔ KE ramo C′)
+     KD37 ↔ K102, AX21  (Showanul)
+     KD46 ↔ K31   (Pyanuza)
+     KD54 ↔ K32   (Nagayamatsu)
 
      SK interchanges (Seishaku Line):
      SK12 ↔ KD14  (Dankau)
@@ -48,6 +39,11 @@
      SK35 ↔ KD35  (Kasakuri)
      SK38 ↔ KD36  (Sakamuso)
      SK43 ↔ KD38  (Showanul)
+
+   SK_SERVICES:
+     Sottoservizi della Seishaku Line, usati solo per la generazione
+     degli orari sintetici. Non vengono visualizzati nel journey
+     planner come tag o numeri di treno.
 
    Nota km Loop Line:
      Distanze progressive reali da rilievo cartografico.
@@ -122,7 +118,6 @@ const SUBURBAN_LINES = {
       { code: 'LL17', name: 'Herubori',            kanji: '杏登',         km: 21.2  },
       { code: 'LL18', name: 'Ōbakura',             kanji: '大砌',         km: 22.4  },
       { code: 'LL19', name: 'Aketsue',             kanji: '薫都衛',       km: 23.6  },
-      // Tratto di chiusura LL19 → LL01: 0.81 km (totale circuito 24.41 km)
     ],
   },
 
@@ -353,3 +348,68 @@ const SUBURBAN_LINES = {
   },
 
 };
+
+/* ================================================================
+   SK_SERVICES — sottoservizi Seishaku Line
+   Usati solo per la generazione degli orari sintetici nel router.
+   NON vengono visualizzati nel journey planner come tag o numeri.
+
+   Struttura per voce:
+     id        {string}  identificativo interno (S1…S4)
+     desc      {string}  descrizione leggibile
+     fromCode  {string}  codice capolinea A (direzione crescente)
+     toCode    {string}  codice capolinea B
+     firstDep  {string}  HH:MM — prima partenza dal capolinea A
+     lastDep   {string}  HH:MM — ultima partenza dal capolinea A
+     headway   {number}  minuti tra una corsa e la successiva
+
+   Logica bidirezionale:
+     Il router genera corse in entrambe le direzioni (A→B e B→A).
+     Per la direzione B→A, firstDep/lastDep si riferiscono alla
+     prima/ultima partenza dal capolinea B, calcolate aggiungendo
+     il tempo di percorrenza al firstDep/lastDep del capolinea A.
+
+   Copertura effettiva per stazione:
+     Una stazione è servita da un sottoservizio se il suo indice
+     in SK.stations ricade nell'intervallo [fromIdx, toIdx].
+     Il router combina le partenze di tutti i sottoservizi che
+     coprono sia la stazione di origine che quella di destinazione.
+================================================================ */
+const SK_SERVICES = [
+  {
+    id:       'S1',
+    desc:     'Igattarun Juwon ↔ Shakusa (servizio completo)',
+    fromCode: 'SK01',
+    toCode:   'SK58',
+    firstDep: '05:35',
+    lastDep:  '23:35',
+    headway:  20,
+  },
+  {
+    id:       'S2',
+    desc:     'Enikezya ↔ Waneki (rinforzo fascia centrale)',
+    fromCode: 'SK07',
+    toCode:   'SK47',
+    firstDep: '06:55',
+    lastDep:  '21:55',
+    headway:  20,
+  },
+  {
+    id:       'S3',
+    desc:     'Showanul ↔ Shakusa (locale zona Shakusa)',
+    fromCode: 'SK43',
+    toCode:   'SK58',
+    firstDep: '06:15',
+    lastDep:  '22:45',
+    headway:  20,
+  },
+  {
+    id:       'S4',
+    desc:     'Igattarun Juwon ↔ Kasakuri (locale zona nord)',
+    fromCode: 'SK01',
+    toCode:   'SK35',
+    firstDep: '06:15',
+    lastDep:  '22:45',
+    headway:  20,
+  },
+];
