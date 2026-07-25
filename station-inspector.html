@@ -175,7 +175,7 @@
     grouped.slice(0, 12).forEach(g => {
       const div = document.createElement('div');
       div.className = 'sug-item';
-      const codeList = g.codes.map(s => `${s.code} · ${s.lineId}`).join('  ');
+      const codeList = g.codes.map(s => `${s.code} · ${s.lineId}`).join('  ');
       div.innerHTML = `${g.name} <span class="sug-code">${codeList}</span>`;
       /* Al click usa il primo codice come anchor per inspect() */
       div.onclick = () => { qEl.value = g.codes[0].code; sugEl.style.display = 'none'; inspect(); };
@@ -241,8 +241,11 @@
 
     /* Status checks */
     function checkM4Reachable(code) {
-      if (typeof M4_ST === 'undefined') return 'no-data';
-      return M4_ST[code] ? 'ok' : 'missing';
+      if (typeof M4_ST !== 'undefined' && M4_ST[code]) return 'ok';
+      // Fallback: se il codice è presente in ALL_STATIONS come metro (es. M2),
+      // consideralo valido anche se il suo data file non è caricato qui.
+      if (ALL_STATIONS.find(s => s.code === code && s.network === 'metro')) return 'ok';
+      return 'missing';
     }
     function checkSubReachable(code) {
       if (typeof SUBURBAN_LINES === 'undefined') return 'no-data';
