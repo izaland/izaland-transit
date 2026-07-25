@@ -62,17 +62,20 @@
 
   <!-- ═══ DATA FILES ═══════════════════════════════════════════════ -->
   <script src="metro/m4-data.js"></script>
-  <script src="suburban/suburban-data.js"></script>
-  <script src="izx/izx-data.js"></script>
+  <script src="suburban-data.js"></script>
+  <script src="izx-data.js"></script>
+  <script src="ax-data.js"></script>
 
   <script>
   /* ── Build unified station index ───────────────────────────── */
   const ALL_STATIONS = [];   // { code, name, network, lineId, lineColor, lineName }
 
   /* M4 */
-  for (const [code, st] of Object.entries(M4_ST)) {
-    ALL_STATIONS.push({ code, name: st.n, network: 'metro',
-      lineId: 'M4', lineColor: M4_META.color, lineName: M4_META.name });
+  if (typeof M4_ST !== 'undefined') {
+    for (const [code, st] of Object.entries(M4_ST)) {
+      ALL_STATIONS.push({ code, name: st.n, network: 'metro',
+        lineId: 'M4', lineColor: M4_META.color, lineName: M4_META.name });
+    }
   }
 
   /* Suburban */
@@ -92,6 +95,17 @@
       for (const [code, st] of Object.entries(line.ST || {})) {
         if (ALL_STATIONS.find(s => s.code === code)) continue;
         ALL_STATIONS.push({ code, name: st.n || code, network: 'izx',
+          lineId, lineColor: line.META?.color || '#888', lineName: line.META?.name || lineId });
+      }
+    }
+  }
+
+  /* AX (Airport Express) */
+  if (typeof AX_LINES !== 'undefined') {
+    for (const [lineId, line] of Object.entries(AX_LINES)) {
+      for (const [code, st] of Object.entries(line.ST || {})) {
+        if (ALL_STATIONS.find(s => s.code === code)) continue;
+        ALL_STATIONS.push({ code, name: st.n || code, network: 'ax',
           lineId, lineColor: line.META?.color || '#888', lineName: line.META?.name || lineId });
       }
     }
@@ -196,6 +210,13 @@
       return 'missing';
     }
 
+    function checkAXReachable(code) {
+      if (typeof AX_LINES === 'undefined') return 'no-data';
+      for (const line of Object.values(AX_LINES))
+        if (line.ST && line.ST[code]) return 'ok';
+      return 'missing';
+    }
+
     /* ── Render ─────────────────────────────────────────────────── */
     let html = `
       <div class="station-header">
@@ -220,6 +241,7 @@
         const otherNet  = isM4side ? ix.network : 'metro';
         const statusFn  = otherNet === 'metro' ? checkM4Reachable
                         : otherNet === 'suburban' ? checkSubReachable
+                        : otherNet === 'ax' ? checkAXReachable
                         : checkIZXReachable;
         const st2 = ALL_STATIONS.find(s => s.code === otherCode);
         const status = statusFn(otherCode);
@@ -251,6 +273,7 @@
         const net2 = st2?.network || '?';
         const statusFn = net2 === 'suburban' ? checkSubReachable
                        : net2 === 'metro'    ? checkM4Reachable
+                       : net2 === 'ax'       ? checkAXReachable
                        : checkIZXReachable;
         const status = statusFn(otherCode);
         const dotCls = status === 'ok' ? 'dot-ok' : status === 'missing' ? 'dot-err' : 'dot-warn';
