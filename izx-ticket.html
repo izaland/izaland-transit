@@ -1000,63 +1000,48 @@
     return code;
   }
 
-  function buildPlannerSelects(){
+ function buildPlannerSelects(){
     const jpFrom = document.getElementById('jp-from');
     const jpTo   = document.getElementById('jp-to');
-    const byLine = {};
-    TTEngine.allStations().forEach(st => {
-      if(!byLine[st.lineId]) byLine[st.lineId] = [];
-      byLine[st.lineId].push(st);
-    });
-    const lineLabels = {KE:'Keishin', RY:'Ry\u0101nkai', EI:'Eira', SN:'Seibu Naeryuku', AX:'Airport Express'};
-    Object.entries(byLine).forEach(([lineId, stations]) => {
-      const ogF = document.createElement('optgroup');
-      const ogT = document.createElement('optgroup');
-      ogF.label = ogT.label = lineLabels[lineId] || lineId;
-      stations.forEach(st => {
-        const label = st.code + ' ' + st.name + (st.kanji ? ' \u00b7 ' + st.kanji : '');
-        [ogF, ogT].forEach((og) => {
-          const opt = document.createElement('option');
-          opt.value = st.code;
-          opt.textContent = label;
-          og.appendChild(opt);
-        });
+
+    // Raccoglie tutte le stazioni da tutti i router
+    const byName = {};
+    const addSt = (code, name, kanji) => {
+      const key = name.trim().toLowerCase();
+      if (!byName[key]) byName[key] = { name: name.trim(), kanji: kanji || '', codes: [] };
+      if (!byName[key].codes.includes(code)) byName[key].codes.push(code);
+    };
+
+    TTEngine.allStations().forEach(st => addSt(st.code, st.name, st.kanji));
+    SuburbanRouter.allStations().forEach(st => addSt(st.code, st.name, st.kanji));
+    if (typeof MetroRouter !== 'undefined') {
+      MetroRouter.allStations().forEach(st => addSt(st.code, st.name, st.kanji));
+    }
+
+    // Ordine alfabetico per nome
+    const sorted = Object.values(byName).sort((a, b) => a.name.localeCompare(b.name));
+
+    sorted.forEach(entry => {
+      // Il value è il primo codice (usato per la ricerca);
+      // se la stazione è su più linee, tutti i codici vengono
+      // memorizzati in data-codes per _runSearch
+      const primaryCode = entry.codes[0];
+      const debugCodes = entry.codes.length > 1
+        ? '  [' + entry.codes.join(', ') + ']'
+        : '';
+      const label = entry.name
+        + (entry.kanji ? ' · ' + entry.kanji : '')
+        + debugCodes;
+
+      [jpFrom, jpTo].forEach(sel => {
+        const opt = document.createElement('option');
+        opt.value = primaryCode;
+        opt.dataset.codes = entry.codes.join(',');
+        opt.textContent = label;
+        sel.appendChild(opt);
       });
-      jpFrom.appendChild(ogF);
-      jpTo.appendChild(ogT);
     });
-    // ── Suburban lines ──
-const subOg_F = document.createElement('optgroup');
-const subOg_T = document.createElement('optgroup');
-subOg_F.label = subOg_T.label = 'Izarail Suburban';
-SuburbanRouter.allStations().forEach(st => {
-  const label = st.code + ' ' + st.name + (st.kanji ? ' · ' + st.kanji : '');
-  [subOg_F, subOg_T].forEach(og => {
-    const opt = document.createElement('option');
-    opt.value = st.code;
-    opt.textContent = label;
-    og.appendChild(opt);
-  });
-});
-jpFrom.appendChild(subOg_F);
-jpTo.appendChild(subOg_T);
-    // ── Metro Line 4 ──
-if (typeof MetroRouter !== 'undefined') {
-  const metOg_F = document.createElement('optgroup');
-  const metOg_T = document.createElement('optgroup');
-  metOg_F.label = metOg_T.label = 'Metro Line 4';
-  MetroRouter.allStations().forEach(st => {
-    const label = st.code + ' ' + st.name + (st.kanji ? ' · ' + st.kanji : '');
-    [metOg_F, metOg_T].forEach(og => {
-      const opt = document.createElement('option');
-      opt.value = st.code;
-      opt.textContent = label;
-      og.appendChild(opt);
-    });
-  });
-  jpFrom.appendChild(metOg_F);
-  jpTo.appendChild(metOg_T);
-}
+
     jpFrom.value = 'R13';
     jpTo.value   = 'SN08';
   }
@@ -1190,13 +1175,15 @@ if (typeof MetroRouter !== 'undefined') {
   }
 
 function _runSearch(from, to, depTime, lineF, directOnly) {
+  const froms = Array.isArray(from) ? from : [from];
+  const tos   = Array.isArray(to)   ? to   : [to];
   const opts = { lines: lineF, directOnly: !!directOnly, maxResults: 5 };
   const TRANSFER_MIN = IZXRouter.TRANSFER_MIN ?? 5;
   const TSEC = TRANSFER_MIN * 60;
-  const izx   = IZXRouter.search(from, to, depTime, opts);
-  const sub   = SuburbanRouter.search(from, to, depTime, opts);
+    const izx   = froms.flatMap(f => tos.flatMap(t => IZXRouter.search(f, t, depTime, opts)));
+  const sub   = froms.flatMap(f => tos.flatMap(t => SuburbanRouter.search(f, t, depTime, opts)));
   const metro = (typeof MetroRouter !== 'undefined')
-    ? MetroRouter.search(from, to, depTime, opts) : [];
+    ? froms.flatMap(f => tos.flatMap(t => MetroRouter.search(f, t, depTime, opts))) : [];
 
  /* ── Cross-network: M4 ↔ IZX/Suburban/AX ── */
 const cross = [];
@@ -1325,9 +1312,11 @@ if (!directOnly && typeof MetroRouter !== 'undefined' && typeof M4_INTERCHANGE !
     const tmp = f.value; f.value = t.value; t.value = tmp;
   });
 
-  document.getElementById('jp-search').addEventListener('click', () => {
-    const from       = document.getElementById('jp-from').value;
-    const to         = document.getElementById('jp-to').value;
+    document.getElementById('jp-search').addEventListener('click', () => {
+    const fromSel    = document.getElementById('jp-from');
+    const toSel      = document.getElementById('jp-to');
+    const from       = (fromSel.selectedOptions[0]?.dataset.codes || fromSel.value).split(',');
+    const to         = (toSel.selectedOptions[0]?.dataset.codes   || toSel.value).split(',');
     const depTime    = document.getElementById('jp-time').value || '08:00';
     const lineF      = document.getElementById('jp-line').value;
     const directOnly = document.getElementById('jp-direct-only').checked;
