@@ -1140,9 +1140,11 @@
           </div>
           ${intStops.length ? `<div class="leg-intermediates" id="${intId}">${intHTML}</div>` : ''}`;
 
-        if (li < j.legs.length - 1) {
-          const waitMin = j.transferWaitMin ?? IZXRouter.TRANSFER_MIN;
-          const node    = _stName(j.transferNodes[li]);
+                if (li < j.legs.length - 1) {
+          const waitMin = Array.isArray(j.transferWaitMin)
+            ? (j.transferWaitMin[li] ?? IZXRouter.TRANSFER_MIN)
+            : (li === 0 ? (j.transferWaitMin ?? IZXRouter.TRANSFER_MIN) : IZXRouter.TRANSFER_MIN);
+          const node = _stName(j.transferNodes[li]);
           legsHTML += `
             <div class="transfer-row">
               Change at <strong>${node}</strong> \u2014 ${waitMin} min wait
@@ -1290,7 +1292,7 @@ if (!directOnly && typeof MetroRouter !== 'undefined' && typeof M4_INTERCHANGE !
         subCrossJourneys.forEach(sj => {
           if (sj.transfers !== 1 || sj.legs.length < 2) return;
           const [leg2, leg3] = sj.legs;
-          cross.push({
+                    cross.push({
             legs:            [leg1, leg2, leg3],
             departureTime:   leg1.boardDep,
             arrivalTime:     leg3.alightArr,
@@ -1298,7 +1300,10 @@ if (!directOnly && typeof MetroRouter !== 'undefined' && typeof M4_INTERCHANGE !
             totalKm:         (leg1.km ?? 0) + (leg2.km ?? 0) + (leg3.km ?? 0),
             transfers:       2,
             transferNodes:   [m4code, sj.transferNodes[0]],
-            transferWaitMin: Math.round((leg2.boardDepSec - leg1.alightArrSec) / 60),
+            transferWaitMin: [
+              Math.round((leg2.boardDepSec - leg1.alightArrSec) / 60),
+              Math.round((leg3.boardDepSec - leg2.alightArrSec) / 60),
+            ],
           });
         });
       }
