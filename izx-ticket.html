@@ -1198,13 +1198,14 @@ function _runSearch(from, to, depTime, lineF, directOnly) {
   const metro = (typeof MetroRouter !== 'undefined')
     ? MetroRouter.search(from, to, depTime, opts) : [];
 
-  /* ── Cross-network: M4 ↔ IZX/Suburban/AX ── */
-  const cross = [];
-  if (!directOnly && typeof MetroRouter !== 'undefined' && typeof M4_INTERCHANGE !== 'undefined') {
-    const _hmToSec = t => { const [h,m]=t.split(':').map(Number); return h*3600+m*60; };
-    const _secToHm = s => String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor((s%3600)/60)).padStart(2,'0');
-
+ /* ── Cross-network: M4 ↔ IZX/Suburban/AX ── */
+const cross = [];
+const _hmToSec = t => { const [h,m]=t.split(':').map(Number); return h*3600+m*60; };
+const _secToHm = s => String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor((s%3600)/60)).padStart(2,'0');
+if (!directOnly && typeof MetroRouter !== 'undefined' && typeof M4_INTERCHANGE !== 'undefined') {
+    // NON ci devono essere _hmToSec/_secToHm qui dentro
     for (const [m4code, entries] of Object.entries(M4_INTERCHANGE)) {
+      
       for (const entry of (Array.isArray(entries) ? entries : [entries])) {
         const partnerCode = entry.code ?? entry;
         const tsecEff     = (entry.transferMin ?? TRANSFER_MIN) * 60;
