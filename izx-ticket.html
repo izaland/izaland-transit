@@ -1183,11 +1183,26 @@
   }
 
   function _runSearch(from, to, depTime, lineF, directOnly) {
-    return UnifiedRouter.search(from, to, depTime, {
-      lines:      lineF,
-      directOnly: !!directOnly,
-      maxResults: 8,
-    });
+    const fromCodes = Array.isArray(from) ? from : [from];
+    const toCodes   = Array.isArray(to)   ? to   : [to];
+    const seen = new Set();
+    const all  = [];
+    for (const f of fromCodes) {
+      for (const t of toCodes) {
+        if (f === t) continue;
+        const res = UnifiedRouter.search(f, t, depTime, {
+          lines:      lineF,
+          directOnly: !!directOnly,
+          maxResults: 8,
+        });
+        for (const j of res) {
+          const key = j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '') + '|' + f + '>' + t;
+          if (!seen.has(key)) { seen.add(key); all.push(j); }
+        }
+      }
+    }
+    all.sort((a, b) => _parseMins(a.departureTime) - _parseMins(b.departureTime));
+    return all.slice(0, 8);
   }
 
   buildPlannerSelects();
@@ -1205,7 +1220,7 @@
     const depTime    = document.getElementById('jp-time').value || '08:00';
     const lineF      = document.getElementById('jp-line').value;
     const directOnly = document.getElementById('jp-direct-only').checked;
-    if (from === to) { alert('Please select two different stations.'); return; }
+    if (from[0] === to[0] && from.length === 1 && to.length === 1) { alert('Please select two different stations.'); return; }
     _jpState.from = from; _jpState.to = to; _jpState.lineF = lineF; _jpState.directOnly = directOnly; _jpState.all = [];
     const fromName = fromSel.selectedOptions[0]?.textContent.split('  [')[0].trim() || _stName(from[0]);
     const toName   = toSel.selectedOptions[0]?.textContent.split('  [')[0].trim()   || _stName(to[0]);
