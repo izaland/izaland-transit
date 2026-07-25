@@ -76,9 +76,7 @@
     .service-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:var(--space-4);}
     .service-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-4);}
     .service-card-header{display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3);}
-    /* ── Service badges — rectangular (default) ── */
     .svc-badge{font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:4px;letter-spacing:.04em;white-space:nowrap;}
-    /* ── Service badges — round (metro) ── */
     .svc-badge-metro{font-size:.7rem;font-weight:800;width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;letter-spacing:.02em;white-space:nowrap;flex-shrink:0;}
     .svc-name{font-size:var(--text-xs);color:var(--text-muted);}
     .price-rows{display:flex;flex-direction:column;}
@@ -1063,12 +1061,6 @@ if (typeof MetroRouter !== 'undefined') {
     jpTo.value   = 'SN08';
   }
 
-  /* ----------------------------------------------------------------
-   * svcBadgeHTML — sceglie automaticamente il shape del badge:
-   *   metro (network === 'metro' oppure svcId inizia con 'M4')
-   *   → tondino .svc-badge-metro
-   *   tutti gli altri → rettangolo .svc-badge
-   * ---------------------------------------------------------------- */
   function svcBadgeHTML(svcId, svcLogical, color, network) {
     const label = svcId === 'Cp' ? 'C\u2032' : (svcLogical || svcId);
     const isMetro = network === 'metro' || String(svcId).startsWith('M4');
@@ -1260,58 +1252,6 @@ function _runSearch(from, to, depTime, lineF, directOnly) {
             transfers:       1,
             transferNodes:   [partnerCode],
             transferWaitMin: Math.round((leg2b.boardDepSec - leg1b.alightArrSec) / 60),
-          });
-        });
-      }
-
-        /* ── CASO C: M4 → Suburban → IZX (3 legs, 2 cambi) ── */
-  if (!directOnly && typeof MetroRouter !== 'undefined'
-      && typeof M4_INTERCHANGE !== 'undefined'
-      && typeof IZXRouter !== 'undefined') {
-
-    for (const [m4code, entries] of Object.entries(M4_INTERCHANGE)) {
-      for (const entry of (Array.isArray(entries) ? entries : [entries])) {
-        if (entry.network !== 'suburban') continue;
-        const partnerSub = entry.code ?? entry;
-        const tsecEff    = (entry.transferMin ?? TRANSFER_MIN) * 60;
-
-        /* leg1: M4 from → m4code */
-        const leg1 = MetroRouter.buildLeg(from, m4code, _hmToSec(depTime));
-        if (!leg1) continue;
-        const t2sec = leg1.alightArrSec + tsecEff;
-        const t2hm  = _secToHm(t2sec);
-
-        /* leg2: Suburban partnerSub → qualsiasi nodo IZX */
-        const subJourneys = SuburbanRouter.search(partnerSub, to, t2hm, { maxResults: 3 });
-        subJourneys.forEach(sj => {
-          if (sj.transfers > 0) return; // già un cambio: saltiamo (sarebbe 3 cambi)
-          const leg2 = sj.legs[0];
-          cross.push({
-            legs:            [leg1, leg2],
-            departureTime:   leg1.boardDep,
-            arrivalTime:     leg2.alightArr,
-            totalMinutes:    Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
-            totalKm:         (leg1.km ?? 0) + (leg2.km ?? 0),
-            transfers:       1,
-            transferNodes:   [m4code],
-            transferWaitMin: Math.round((leg2.boardDepSec - leg1.alightArrSec) / 60),
-          });
-        });
-
-        /* leg2+leg3: Suburban partnerSub → nodo IZX → IZX to (percorsi con cambio sub→IZX) */
-        const subCrossJourneys = SuburbanRouter.search(partnerSub, to, t2hm, { maxResults: 5 });
-        subCrossJourneys.forEach(sj => {
-          if (sj.transfers !== 1 || sj.legs.length < 2) return;
-          const [leg2, leg3] = sj.legs;
-          cross.push({
-            legs:            [leg1, leg2, leg3],
-            departureTime:   leg1.boardDep,
-            arrivalTime:     leg3.alightArr,
-            totalMinutes:    Math.round((leg3.alightArrSec - leg1.boardDepSec) / 60),
-            totalKm:         (leg1.km ?? 0) + (leg2.km ?? 0) + (leg3.km ?? 0),
-            transfers:       2,
-            transferNodes:   [m4code, sj.transferNodes[0]],
-            transferWaitMin: Math.round((leg2.boardDepSec - leg1.alightArrSec) / 60),
           });
         });
       }
