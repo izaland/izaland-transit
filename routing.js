@@ -41,6 +41,9 @@ const IZXRouter = (() => {
   const MAX_JOURNEYS   = 5;
   const SEARCH_WINDOW  = 3 * 3600;
 
+  /* Servizi AX che vengono unificati nel badge "AX" */
+  const AX_SVC_VARIANTS = new Set(['EST', 'BAJ', 'SAK']);
+
   /* ----------------------------------------------------------------
    * _lineFilter(opts)
    * Restituisce un Set di lineId ammessi, o null se è tutto aperto.
@@ -192,7 +195,10 @@ const IZXRouter = (() => {
     const found = nextTrip(lineId, svcId, boardCode, minDepSec, alightCode);
     if (!found) return null;
     const { trip, boardStop, alightStop, boardSec, alightSec } = found;
-    const svcLogical = svcId.replace(/_rapid$|_local$/, "");
+    /* Servizi AX (EST/BAJ/SAK) vengono normalizzati a 'AX' per il display */
+    const svcLogical = AX_SVC_VARIANTS.has(svcId)
+      ? 'AX'
+      : svcId.replace(/_rapid$|_local$/, "");
 
     const kmBoard  = stationKm(lineId, boardCode);
     const kmAlight = stationKm(lineId, alightCode);
