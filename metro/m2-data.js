@@ -17,7 +17,7 @@
 
    Interscambi dichiarati (cross-network):
      Stazioni con lo stesso nome su altre reti vengono collegate
-     automaticamente da UnifiedRouter via name-match.
+     automaticamente da UnifiedRouter (name-match).
      Gli interscambi fisici su stazioni diverse (corridoi) sono
      dichiarati esplicitamente in M2_INTERCHANGE.
      I codici con ?? verranno aggiornati quando le linee
@@ -27,32 +27,32 @@
 
 const M2_ST = {
   /* ── Sezione comune ── */
-  M201: { n: 'Gawinosechi',                    k: 'ડૃ૮ા之溝',           km:  0.000 },
+  M201: { n: 'Gawinosechi',                    k: 'ણૃપા之溝',           km:  0.000 },
   M202: { n: 'Alkuitsa',                        k: '潮屺',               km:  1.004 },
   M203: { n: 'Shimamera Shikiniswae',           k: '渠瀬田北口',          km:  2.001 },
   M204: { n: 'Shinnibuhama',                    k: '新中島',              km:  3.150 },
-  M205: { n: 'Niji-Kumasui',                    k: '西枝水',              km:  3.880 },
+  M205: { n: 'Niji-Kumasui',                    k: '西枝水',             km:  3.880 },
   M206: { n: 'Heinomoji',                       k: '駕桃',               km:  4.920 },
   M207: { n: 'Ogiwata',                         k: '槃芳',               km:  6.570 },
   M208: { n: 'Egunsen Botanical Garden',        k: '慧群仙植物園',         km:  8.220 },
   M209: { n: 'Masuda Hibaru',                   k: '馬砅任尭',            km:  9.120 },
   M210: { n: 'Kushidaru Amiya',                 k: '柚艏',               km: 10.770 },
-  M211: { n: 'Nagida Totsu',                    k: '䲺橋',               km: 11.820 },
+  M211: { n: 'Nagida Totsu',                    k: '鑲橋',               km: 11.820 },
   M212: { n: 'National Opera House',            k: '國立歌劇院',          km: 12.840 },
   M213: { n: 'Omenika Jinatsu',                 k: '弁丹佳治芝',          km: 13.980 },
-  M214: { n: 'Rakkashoni',                      k: '鳶腳',               km: 14.910 },
+  M214: { n: 'Rakkashoni',                      k: '鳳脚',               km: 14.910 },
   M215: { n: 'Sumatake-Kyōmasa',               k: '縦館経晶',            km: 16.370 },
-  M216: { n: 'Otsumi-Hajafuki',                k: '南波社枇',            km: 17.550 },
+  M216: { n: 'Otsumi-Hajafuki',                k: '南波社果',            km: 17.550 },
   M217: { n: 'Sumatake-Nehkehama',             k: '縦館余島',            km: 18.630 },
   M218: { n: 'Ārikkohanu Yunobu',              k: '鶴神由見夫',          km: 19.450 },
   /* ── Ramo A: for Hintomaui ── */
   M219: { n: 'Otsumi-Makintoshi Meidai-adae',  k: '南馬પ્貴氾・明大前',   km: 20.760 },
-  M220: { n: 'Kanasamaki',                      k: '崔蒔',               km: 22.030 },
-  M221: { n: 'Sunbui',                          k: '栒芙依',             km: 23.310 },
-  M222: { n: 'Oitsura',                         k: '粕鵲',               km: 24.220 },
-  M223: { n: 'Oitsura Daikōwen',               k: '粕鵲大公園',          km: 25.570 },
-  M224: { n: 'Tsutsuro Uguttaya',              k: '笙呂茨貞',            km: 26.860 },
-  M225: { n: 'Obikasunde',                      k: '吾比加嵶',            km: 28.420 },
+  M220: { n: 'Kanasamaki',                      k: '崔赴',               km: 22.030 },
+  M221: { n: 'Sunbui',                          k: '栔芚依',             km: 23.310 },
+  M222: { n: 'Oitsura',                         k: '箕鵲',               km: 24.220 },
+  M223: { n: 'Oitsura Daikōwen',               k: '箕鵲大公園',          km: 25.570 },
+  M224: { n: 'Tsutsuro Uguttaya',              k: '笙呂茊貞',            km: 26.860 },
+  M225: { n: 'Obikasunde',                      k: '吾比加崶',            km: 28.420 },
   M226: { n: 'Hintomaui',                       k: '価園斐',             km: 29.410 },
   /* ── Ramo B: for Mokoba ── */
   M227: { n: 'Ōdahui Kōwen',                  k: '大世公園',            km: 20.260 },
@@ -60,9 +60,9 @@ const M2_ST = {
   M229: { n: 'Shiki-Kawaei',                   k: '北珂夬栄',            km: 21.850 },
   M230: { n: 'Kawaei',                          k: '珂夬栄',             km: 23.000 },
   M231: { n: 'Tayakure',                        k: '貞師',               km: 23.910 },
-  M232: { n: 'Shin-Tsukaso',                   k: '新鷸蘇',              km: 24.720 },
+  M232: { n: 'Shin-Tsukaso',                   k: '新鬷蒓',              km: 24.720 },
   M233: { n: 'Takejori Shimin Kōwen',          k: '館恵市民公園',         km: 25.230 },
-  M234: { n: 'Yamaiki Town',                   k: '倉琳ઠ૮ેપ્',           km: 27.760 },
+  M234: { n: 'Yamaiki Town',                   k: '倉琶ਠપેપ્',           km: 27.760 },
   M235: { n: 'Shiki-Mokoba',                   k: '北母槻',              km: 26.310 },
   M236: { n: 'Mokoba',                          k: '母槻',               km: 27.370 },
 };
@@ -150,24 +150,20 @@ const M2_SVC = {
 
    Le stazioni con lo stesso nome su altre reti sono collegate
    automaticamente da UnifiedRouter (name-match); qui si dichiarano
-   solo gli interscambi fisici su stazioni con nome diverso.
+   anche gli interscambi espliciti per simmetria e robustezza.
 
    TODO — codici con ?? da aggiornare quando disponibili:
      M201  ↔ M1??, M8??     (Gawinosechi — name-match automatico)
      M202  ↔ M1??            (Alkuitsa — name-match automatico)
-     M206  ↔ M4 M401, M8??  (Heinomoji — name-match automatico)
-     M207  ↔ M4 M402        (Ogiwata — name-match automatico)
      M208  ↔ M8??, M9??     (Egunsen Botanical Garden — name-match)
-     M210  ↔ M1??, M4 M406, SX?? (Kushidaru Amiya — name-match)
      M213  ↔ M17??, SX??    (Omenika Jinatsu — name-match)
      M214  ↔ LL??           (Rakkashoni — name-match)
      M226  ↔ M1??           (Hintomaui — name-match)
-     M230  ↔ M4 M415        (Kawaei — name-match automatico)
 
    Corridoi fisici dichiarati:
-     M203  ↔ Shimamera (AX/M4): 300 m corridoio
-     M208  ↔ Sainðaul Central:  500 m corridoio sotterraneo
-     M209  ↔ Masuda Agarai:     400 m corridoio
+     M203  ↔ M417 (M4 Shimamera): 300 m corridoio sotterraneo
+     M208  ↔ K01  (IZX Keishin):  500 m corridoio sotterraneo
+     M209  ↔ Masuda Agarai:       400 m corridoio
      M211  ↔ M18?? Nagida Kunbai (stazione diversa)
 ---------------------------------------------------------------- */
 const M2_INTERCHANGE = {
@@ -176,6 +172,16 @@ const M2_INTERCHANGE = {
     { code: 'M417', network: 'metro',    transferMin: 5,
       note: 'M4 Shimamera — 300 m corridor' },
     /* AX Shimamera: aggiungere codice quando disponibile */
+  ],
+  /* M206 ↔ M401 (Heinomoji — stesso nome, banchine separate) */
+  M206: [
+    { code: 'M401', network: 'metro', transferMin: 3,
+      note: 'M4 Heinomoji — stesso nome, banchine separate' },
+  ],
+  /* M207 ↔ M402 (Ogiwata — stesso nome, banchine separate) */
+  M207: [
+    { code: 'M402', network: 'metro', transferMin: 3,
+      note: 'M4 Ogiwata — stesso nome, banchine separate' },
   ],
   /* M208 ↔ Sainðaul Central — 500 m underground corridor */
   M208: [
@@ -187,9 +193,19 @@ const M2_INTERCHANGE = {
   M209: [
     /* Codice Masuda Agarai da aggiungere quando disponibile */
   ],
+  /* M210 ↔ M406 (Kushidaru Amiya — stesso nome, banchine separate) */
+  M210: [
+    { code: 'M406', network: 'metro', transferMin: 3,
+      note: 'M4 Kushidaru Amiya — stesso nome, banchine separate' },
+  ],
   /* M211 ↔ Nagida Kunbai (M18??) — stazione diversa */
   M211: [
     /* Codice M18 Nagida Kunbai da aggiungere quando disponibile */
+  ],
+  /* M230 ↔ M415 (Kawaei — stesso nome, banchine separate) */
+  M230: [
+    { code: 'M415', network: 'metro', transferMin: 3,
+      note: 'M4 Kawaei — stesso nome, banchine separate' },
   ],
 };
 
