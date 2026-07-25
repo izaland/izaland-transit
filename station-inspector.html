@@ -28,7 +28,7 @@
     .section-title { font-size: 0.7rem; color: #666; letter-spacing: 0.1em;
                      text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 6px; }
 
-    /* ─ Badge stile pill (suburban / IZX / AX) ─────────────────── */
+    /* ─ Badge stile pill (suburban / IZX / AX) ───────────────────── */
     .line-chip {
       display: inline-block;
       padding: 4px 10px;
@@ -39,7 +39,7 @@
       font-weight: bold;
     }
 
-    /* ─ Badge stile cerchio (metro) ────────────────────────── */
+    /* ─ Badge stile cerchio (metro) ──────────────────────── */
     .line-chip-metro {
       display: inline-flex;
       align-items: center;
@@ -85,14 +85,14 @@
   <div id="no-result">No station found.</div>
   <div id="results"></div>
 
-  <!-- ═══ DATA FILES ═══════════════════════════════════════════════ -->
+  <!-- ═══ DATA FILES ═════════════════════════════════════════════════════ -->
   <script src="metro/m4-data.js"></script>
   <script src="suburban-data.js"></script>
   <script src="izx-data.js"></script>
   <script src="ax-data.js"></script>
 
   <script>
-  /* ── Build unified station index ───────────────────────────── */
+  /* ── Build unified station index ─────────────────────────────────── */
   const ALL_STATIONS = [];   // { code, name, network, lineId, lineColor, lineName }
 
   /* M4 */
@@ -136,7 +136,7 @@
     }
   }
 
-  /* ── Helper: render badge con forma giusta per network ─────────── */
+  /* ── Helper: render badge con forma giusta per network ─────────────── */
   function lineBadge(lineId, lineColor, lineName, network) {
     if (network === 'metro') {
       return `<span class="line-chip-metro" style="background:${lineColor}">${lineId}</span>`
@@ -146,7 +146,7 @@
          + `<span style="font-size:0.8rem;color:#888;margin-right:12px">${lineName}</span>`;
   }
 
-  /* ── Autocomplete ───────────────────────────────────────────── */
+  /* ── Autocomplete ────────────────────────────────────────────── */
   const qEl   = document.getElementById('query');
   const sugEl = document.getElementById('suggestions');
 
@@ -154,15 +154,31 @@
     const q = qEl.value.trim().toLowerCase();
     sugEl.innerHTML = '';
     if (q.length < 2) { sugEl.style.display = 'none'; return; }
-    const hits = ALL_STATIONS.filter(s =>
+
+    const rawHits = ALL_STATIONS.filter(s =>
       s.code.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)
-    ).slice(0, 12);
-    if (!hits.length) { sugEl.style.display = 'none'; return; }
-    hits.forEach(s => {
+    );
+
+    /* Raggruppa per nome (case-insensitive): una riga per stazione fisica */
+    const grouped = [];
+    const seenNames = new Set();
+    for (const s of rawHits) {
+      const key = s.name.toLowerCase();
+      if (seenNames.has(key)) continue;
+      seenNames.add(key);
+      const peers = rawHits.filter(x => x.name.toLowerCase() === key);
+      grouped.push({ name: s.name, codes: peers });
+    }
+
+    if (!grouped.length) { sugEl.style.display = 'none'; return; }
+
+    grouped.slice(0, 12).forEach(g => {
       const div = document.createElement('div');
       div.className = 'sug-item';
-      div.innerHTML = `${s.name} <span class="sug-code">${s.code} · ${s.lineId}</span>`;
-      div.onclick = () => { qEl.value = s.code; sugEl.style.display = 'none'; inspect(); };
+      const codeList = g.codes.map(s => `${s.code} · ${s.lineId}`).join('  ');
+      div.innerHTML = `${g.name} <span class="sug-code">${codeList}</span>`;
+      /* Al click usa il primo codice come anchor per inspect() */
+      div.onclick = () => { qEl.value = g.codes[0].code; sugEl.style.display = 'none'; inspect(); };
       sugEl.appendChild(div);
     });
     sugEl.style.display = 'block';
@@ -174,7 +190,7 @@
 
   qEl.addEventListener('keydown', e => { if (e.key === 'Enter') inspect(); });
 
-  /* ── Core inspect() ─────────────────────────────────────────── */
+  /* ── Core inspect() ────────────────────────────────────────────── */
   function inspect() {
     sugEl.style.display = 'none';
     const raw = qEl.value.trim();
