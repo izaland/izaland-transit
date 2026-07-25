@@ -136,36 +136,64 @@ const M4_SVC = {
    Interscambi Metro Line 4 ↔ altre reti
 
    Ogni entry mappa il codice M4 ai nodi partner di altre reti
-   (IZX, AX, Suburban). Il campo transferMin indica il tempo di
+   (IZX, AX, Suburban, M2). Il campo transferMin indica il tempo di
    trasferimento fisico a piedi raccomandato.
 
-   M409 Sumi-Kokendake
-     ↔ LL12 (Loop Line)       — stesso nome, banchine adiacenti  2 min
+   M401 Heinomoji
+     ↔ M206 (Line 2)          — stesso nome, banchine separate    3 min
+
+   M402 Ogiwata
+     ↔ M207 (Line 2)          — stesso nome, banchine separate    3 min
 
    M405 Anagusa Mukai
-     ↔ KD30 (Kidai Line)      — stesso nome, uscita condivisa    3 min
+     ↔ KD30 (Kidai Line)      — stesso nome, uscita condivisa     3 min
+
+   M406 Kushidaru Amiya
+     ↔ M210 (Line 2)          — stesso nome, banchine separate    3 min
+
+   M409 Sumi-Kokendake
+     ↔ LL12 (Loop Line)       — stesso nome, banchine adiacenti   2 min
+
+   M415 Kawaei
+     ↔ M230 (Line 2 Ramo B)   — stesso nome, banchine separate    3 min
 
    M417 Shimamera
-     ↔ AX05 (Airport Express) — stesso nome, piano -1 / piano 0  5 min
+     ↔ AX05 (Airport Express) — stesso nome, piano -1 / piano 0   5 min
      ↔ M203 (Line 2)          — nome diverso (Shimamera Shikiniswae),
-                                300 m corridoio sotterraneo        5 min
+                                300 m corridoio sotterraneo         5 min
 
    M419 Kasakuri
-     ↔ AX04 (Airport Express) — stesso nome, piano -1 / piano 0  5 min
-     ↔ KD35 (Kidai Line)      — stesso nome, uscita est           5 min
+     ↔ AX04 (Airport Express) — stesso nome, piano -1 / piano 0   5 min
+     ↔ KD35 (Kidai Line)      — stesso nome, uscita est            5 min
      ↔ K02  (IZX Keishin)     — walkable 10 min (uscita nord)
 ---------------------------------------------------------------- */
 const M4_INTERCHANGE = {
-  M409: [
-    { code: 'LL12', network: 'suburban', transferMin: 2,
-      note: 'Loop Line — Sumi-Kokendake, banchine adiacenti' },
+  M401: [
+    { code: 'M206', network: 'metro', transferMin: 3,
+      note: 'M2 Heinomoji — stesso nome, banchine separate' },
+  ],
+  M402: [
+    { code: 'M207', network: 'metro', transferMin: 3,
+      note: 'M2 Ogiwata — stesso nome, banchine separate' },
   ],
   M405: [
     { code: 'KD30', network: 'suburban', transferMin: 3,
       note: 'Kidai Line — Anagusa Mukai, uscita condivisa' },
   ],
+  M406: [
+    { code: 'M210', network: 'metro', transferMin: 3,
+      note: 'M2 Kushidaru Amiya — stesso nome, banchine separate' },
+  ],
+  M409: [
+    { code: 'LL12', network: 'suburban', transferMin: 2,
+      note: 'Loop Line — Sumi-Kokendake, banchine adiacenti' },
+  ],
+  M415: [
+    { code: 'M230', network: 'metro', transferMin: 3,
+      note: 'M2 Kawaei (Ramo B) — stesso nome, banchine separate' },
+  ],
   M417: [
-    { code: 'AX05', network: 'ax',   transferMin: 5,
+    { code: 'AX05', network: 'ax',    transferMin: 5,
       note: 'Airport Express Ramo Est — Shimamera, piano -1/0' },
     { code: 'M203', network: 'metro', transferMin: 5,
       note: 'M2 Shimamera Shikiniswae — 300 m corridoio sotterraneo' },
