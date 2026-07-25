@@ -10,6 +10,8 @@
      IZXRouter.interchangeNodes()              → Set<string>
      IZXRouter.buildLeg(lineId, svcId, boardCode, alightCode, minDepSec)
                → Leg | null   (usato da SuburbanRouter per cross-network)
+     IZXRouter.allStations()                   → Station[]
+     IZXRouter.allLines()                      → Line[]
 
    Algoritmo: Connection Scan Algorithm (CSA) semplificato.
    Supporta:
@@ -140,6 +142,38 @@ const IZXRouter = (() => {
       if (line.ST[code]) return line.ST[code].n;
     }
     return code;
+  }
+
+  /* ----------------------------------------------------------------
+   * allStations()
+   * Restituisce tutte le stazioni IZX come array { code, name, kanji }
+   * senza duplicati (una stazione può comparire su più linee).
+   * ---------------------------------------------------------------- */
+  function allStations() {
+    const seen = new Set();
+    const out  = [];
+    for (const line of Object.values(IZX_LINES)) {
+      for (const code of line.CANONICAL) {
+        if (seen.has(code)) continue;
+        seen.add(code);
+        const st = line.ST[code];
+        if (!st) continue;
+        out.push({ code, name: st.n, kanji: st.k || '' });
+      }
+    }
+    return out;
+  }
+
+  /* ----------------------------------------------------------------
+   * allLines()
+   * Restituisce tutte le linee IZX come array { id, name, color }
+   * ---------------------------------------------------------------- */
+  function allLines() {
+    return Object.entries(IZX_LINES).map(([id, line]) => ({
+      id,
+      name:  line.NAME  || id,
+      color: line.COLOR || '#888',
+    }));
   }
 
   /* ----------------------------------------------------------------
@@ -380,6 +414,8 @@ const IZXRouter = (() => {
     interchangeNodes,
     buildPartnerMap,
     stationName,
+    allStations,
+    allLines,
     formatJourney,
     TRANSFER_MIN,
   };
