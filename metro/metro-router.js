@@ -1,8 +1,9 @@
 /* ================================================================
    METRO-ROUTER.JS — Sainðaul Metro Journey Planner
-   Dipende da: metro/m4-data.js
-               metro/m2-data.js
-               metro/m2-tt.js
+   ================================================================
+   Dipende da: metro/m4-data.js  + metro/m4-tt.js
+               metro/m2-data.js  + metro/m2-tt.js
+               (+ qualsiasi futura mN-data.js / mN-tt.js)
 
    API pubblica:
      MetroRouter.search(from, to, depTime, opts) → Journey[]
@@ -11,73 +12,67 @@
      MetroRouter.allStations()                   → Station[]
      MetroRouter.lineColor(lineId)               → string
      MetroRouter.allLines()                      → Line[]
+     MetroRouter.networkOf(code)                 → string  ('M2'|'M4'|…)
+     MetroRouter.allInterchanges()               → { codeA, codeB, transferMin }[]
 
-   Linee supportate:
-     M4 — Kokendake Line (25 stazioni, linea singola)
-     M2 — Line 2         (36 stazioni, biforcazione dopo M218)
-            Ramo A: → M226 Hintomaui  (SVC_1)
-            Ramo B: → M236 Mokoba     (SVC_2, SVC_3, SVC_4)
+   Per aggiungere una nuova linea metro (es. M3):
+     1. Creare metro/m3-data.js  (M3_ST, M3_META, M3_INTERCHANGE, …)
+     2. Creare metro/m3-tt.js    (M3_SERVICES)
+     3. Aggiungere <script> in HTML — nessuna modifica qui.
 
-   Per aggiungere una nuova linea metro:
-     1. Creare m<N>-data.js e m<N>-tt.js
-     2. Registrare la linea in _LINES qui sotto
-     3. Aggiungere <script src="metro/m<N>-data.js"> in HTML
-
-   Algoritmo:
-     Timetable generato runtime da headway + avgSpeedKmh.
-     Per M2 il routing considera tutti i servizi compatibili
-     con la coppia (from, to): un servizio è compatibile se
-     entrambe le stazioni compaiono nel suo array stops[],
-     nell'ordine corretto.
+   Il registro _LINES() scopre automaticamente le linee a runtime
+   controllando se M2_ST, M3_ST, M4_ST, … sono definiti (fino a M30).
 ================================================================ */
 'use strict';
 
 const MetroRouter = (() => {
 
-  const MAX_JOURNEYS   = 5;
-  const SEARCH_WINDOW  = 3 * 3600;
-  const DWELL_SEC      = 30;
+  const MAX_JOURNEYS  = 5;
+  const SEARCH_WINDOW = 3 * 3600;
+  const DWELL_SEC     = 30;
 
   /* ----------------------------------------------------------------
-   * Registro linee
-   * Ogni entry descrive una linea e i suoi sottoservizi.
+   * _LINES()  — scoperta automatica delle linee caricate
+   * Controlla M2_ST … M30_ST e M2_SERVICES … M30_SERVICES.
+   * Ogni linea è identificata dal suo lineId (es. 'M2', 'M4').
    * ---------------------------------------------------------------- */
-  function _lines() {
-    const out = [];
+  let _linesCache = null;
+  function _LINES() {
+    if (_linesCache) return _linesCache;
+    _linesCache = [];
+    for (let n = 2; n <= 30; n++) {
+      const stVar  = window[`M${n}_ST`];
+      const meta   = window[`M${n}_META`];
+      const svcs   = window[`M${n}_SERVICES`];
+      if (!stVar || !meta) continue;
 
-    /* ── M4 ── */
-    if (typeof M4_ST !== 'undefined') {
-      out.push({
-        lineId:      'M4',
-        meta:        M4_META,
-        st:          M4_ST,
-        avgSpeedKmh: M4_META.avgSpeedKmh ?? 30,
-        dwellSec:    M4_META.dwellSec    ?? DWELL_SEC,
-        services: [{
-          id:       'B',
-          name:     M4_SVC.B.name,
-          color:    M4_META.color,
-          cls:      'metro',
-          rapid:    false,
-          stops:    M4_CANONICAL_ORDER,
-          headway:  M4_HEADWAY,       // usato sia inbound che outbound
-        }],
+      /* Compatibilità M4: se non ha M4_SERVICES, costruiscilo da M4_SVC */
+      let services = svcs;
+      if (!services && n === 4 && typeof M4_SVC !== 'undefined') {
+        services = [{
+          id:         'M4',
+          svcLogical: 'B',
+          name:       M4_SVC.B.name,
+          color:      M4_META.color,
+          cls:        'metro',
+          rapid:      false,
+          headway:    typeof M4_HEADWAY !== 'undefined' ? M4_HEADWAY : [],
+          stops:      typeof M4_CANONICAL_ORDER !== 'undefined' ? M4_CANONICAL_ORDER : [],
+        }];
+      }
+      if (!services || !services.length) continue;
+
+      _linesCache.push({
+        lineId:      `M${n}`,
+        meta,
+        st:          stVar,
+        avgSpeedKmh: meta.avgSpeedKmh ?? 30,
+        dwellSec:    meta.dwellSec    ?? DWELL_SEC,
+        services,
+        interchange: window[`M${n}_INTERCHANGE`] ?? {},
       });
     }
-
-    /* ── M2 ── */
-    if (typeof M2_ST !== 'undefined' && typeof M2_SERVICES !== 'undefined') {
-      out.push({
-        lineId:      'M2',
-        meta:        M2_META,
-        st:          M2_ST,
-        avgSpeedKmh: M2_META.avgSpeedKmh ?? 30,
-        dwellSec:    M2_META.dwellSec    ?? DWELL_SEC,
-        services:    M2_SERVICES,     // già strutturati in m2-tt.js
-      });
-    }
-
-    return out;
+    return _linesCache;
   }
 
   /* ---- utils tempo ---- */
@@ -88,44 +83,29 @@ const MetroRouter = (() => {
   }
   function _secToHM(sec) {
     const s = ((sec % 86400) + 86400) % 86400;
-    return String(Math.floor(s / 3600)).padStart(2,'0') + ':' +
-           String(Math.floor((s % 3600) / 60)).padStart(2,'0');
+    return String(Math.floor(s / 3600)).padStart(2, '0') + ':' +
+           String(Math.floor((s % 3600) / 60)).padStart(2, '0');
   }
 
   /* ----------------------------------------------------------------
-   * _headwaySecAt(headwaySlots, timeSec, direction)
-   * Restituisce l'headway in secondi per il momento dato.
+   * _headwaySecAt(svc, timeSec, direction)
    * direction: 'inbound' | 'outbound' | undefined
-   * Per SVC_4 (headway asimmetrico) usa headwayInbound/Outbound.
+   * Restituisce null se fuori finestra operativa.
    * ---------------------------------------------------------------- */
   function _headwaySecAt(svc, timeSec, direction) {
     const hm = _secToHM(timeSec);
     let slots;
-    if (svc.headwayInbound && direction === 'inbound') {
-      slots = svc.headwayInbound;
-    } else if (svc.headwayOutbound && direction === 'outbound') {
-      slots = svc.headwayOutbound;
-    } else {
-      slots = svc.headway || [];
-    }
+    if (svc.headwayInbound  && direction === 'inbound')  slots = svc.headwayInbound;
+    else if (svc.headwayOutbound && direction === 'outbound') slots = svc.headwayOutbound;
+    else slots = svc.headway || [];
     for (const slot of slots) {
       if (hm >= slot.from && hm < slot.to) return slot.headwayMin * 60;
     }
-    /* Fuori finestra operativa: nessuna corsa disponibile */
     return null;
   }
 
   /* ----------------------------------------------------------------
-   * _stationKm(st, code)
-   * ---------------------------------------------------------------- */
-  function _stationKm(st, code) {
-    return st[code]?.km ?? null;
-  }
-
-  /* ----------------------------------------------------------------
    * _buildLegForService(line, svc, boardCode, alightCode, depSec)
-   * Costruisce un Leg per un servizio specifico, se compatibile.
-   * Compatibilità: entrambe le stazioni in stops[] nell'ordine giusto.
    * ---------------------------------------------------------------- */
   function _buildLegForService(line, svc, boardCode, alightCode, depSec) {
     const stops = svc.stops;
@@ -138,32 +118,39 @@ const MetroRouter = (() => {
     if (hwSec === null) return null;
 
     const alignSec = Math.ceil(depSec / hwSec) * hwSec;
-
-    const kmF = _stationKm(line.st, boardCode);
-    const kmT = _stationKm(line.st, alightCode);
+    const kmF = line.st[boardCode]?.km ?? null;
+    const kmT = line.st[alightCode]?.km ?? null;
     if (kmF === null || kmT === null) return null;
     const km = Math.abs(kmT - kmF);
 
-    const travelSec  = Math.round((km / line.avgSpeedKmh) * 3600);
-    const alightSec  = alignSec + travelSec;
+    const travelSec = Math.round((km / line.avgSpeedKmh) * 3600);
+    const alightSec = alignSec + travelSec;
 
-    const ordered = iF < iT ? stops.slice(iF, iT + 1) : stops.slice(iT, iF + 1).reverse();
+    const ordered = iF < iT
+      ? stops.slice(iF, iT + 1)
+      : stops.slice(iT, iF + 1).reverse();
     const between = ordered.slice(1, -1);
 
     const intermediateStops = between.map(code => {
       const st   = line.st[code];
       const kmEl = Math.abs((st?.km ?? kmF) - kmF);
       const arrSec = alignSec + Math.round((kmEl / km) * travelSec);
-      return { code, name: st?.n ?? code, arr: _secToHM(arrSec), dep: _secToHM(arrSec + line.dwellSec) };
+      return {
+        code,
+        name:  st?.n ?? code,
+        arr:   _secToHM(arrSec),
+        dep:   _secToHM(arrSec + line.dwellSec),
+      };
     });
 
     return {
       lineId:       line.lineId,
       svcId:        svc.id,
-      svcLogical:   svc.id,
+      svcLogical:   svc.svcLogical ?? svc.id,
       svcName:      svc.name,
       color:        svc.color || line.meta.color,
       cls:          svc.cls || 'metro',
+      network:      'metro',
       direction,
       trainNumber:  null,
       boardCode,
@@ -181,12 +168,11 @@ const MetroRouter = (() => {
 
   /* ----------------------------------------------------------------
    * buildLeg(boardCode, alightCode, depSec)
-   * Prova tutti i servizi di tutte le linee e restituisce il
-   * primo leg valido (partenza più vicina a depSec).
+   * Prova tutti i servizi e restituisce il leg con partenza più vicina.
    * ---------------------------------------------------------------- */
   function buildLeg(boardCode, alightCode, depSec) {
     let best = null;
-    for (const line of _lines()) {
+    for (const line of _LINES()) {
       for (const svc of line.services) {
         const leg = _buildLegForService(line, svc, boardCode, alightCode, depSec);
         if (!leg) continue;
@@ -210,21 +196,22 @@ const MetroRouter = (() => {
 
     const journeys = [];
 
-    for (const line of _lines()) {
+    for (const line of _LINES()) {
       if (lineAllowed && !lineAllowed.has(line.lineId)) continue;
 
       for (const svc of line.services) {
         if (svc.stops.indexOf(from) === -1 || svc.stops.indexOf(to) === -1) continue;
 
-        const direction = svc.stops.indexOf(from) < svc.stops.indexOf(to) ? 'outbound' : 'inbound';
+        const direction = svc.stops.indexOf(from) < svc.stops.indexOf(to)
+          ? 'outbound' : 'inbound';
         const hwSec = _headwaySecAt(svc, depSec, direction);
         if (hwSec === null) continue;
 
-        let t       = Math.ceil(depSec / hwSec) * hwSec;
+        let t        = Math.ceil(depSec / hwSec) * hwSec;
         const endSec = depSec + SEARCH_WINDOW;
-        let count   = 0;
+        let count    = 0;
 
-        while (t <= endSec && count < 2) {  // max 2 corse per servizio
+        while (t <= endSec && count < 2) {
           const leg = _buildLegForService(line, svc, from, to, t);
           if (leg) {
             journeys.push({
@@ -245,10 +232,12 @@ const MetroRouter = (() => {
       }
     }
 
-    /* Deduplicazione + ordinamento per arrivo */
+    /* Deduplicazione + ordinamento */
     const seen   = new Set();
     const unique = journeys.filter(j => {
-      const key = j.legs.map(l => `${l.lineId}:${l.svcId}:${l.boardDep}:${l.alightCode}`).join('|');
+      const key = j.legs.map(l =>
+        `${l.lineId}:${l.svcLogical}:${l.boardDep}:${l.alightCode}`
+      ).join('|');
       if (seen.has(key)) return false;
       seen.add(key); return true;
     });
@@ -257,12 +246,49 @@ const MetroRouter = (() => {
   }
 
   /* ================================================================
+   * networkOf(code)
+   * Restituisce il lineId della linea che contiene `code`.
+   * Es: 'M2', 'M4'. Usato da UnifiedRouter per distinguere
+   * le linee metro come reti separate ai fini del name-match.
+   * ================================================================ */
+  function networkOf(code) {
+    for (const line of _LINES()) {
+      if (line.st[code]) return line.lineId;
+    }
+    return null;
+  }
+
+  /* ================================================================
+   * allInterchanges()
+   * Aggrega tutti i *_INTERCHANGE dichiarati nelle linee caricate
+   * e restituisce un array piatto di coppie { codeA, codeB, transferMin }.
+   * UnifiedRouter lo chiama una volta sola — nessuna modifica necessaria
+   * quando si aggiunge una nuova linea metro.
+   * ================================================================ */
+  function allInterchanges() {
+    const out = [];
+    const seen = new Set();
+    for (const line of _LINES()) {
+      for (const [codeA, partners] of Object.entries(line.interchange)) {
+        for (const p of (partners || [])) {
+          if (!p.code) continue;
+          const key = [codeA, p.code].sort().join('<>');
+          if (seen.has(key)) continue;
+          seen.add(key);
+          out.push({ codeA, codeB: p.code, transferMin: p.transferMin ?? 10 });
+        }
+      }
+    }
+    return out;
+  }
+
+  /* ================================================================
    * allStations()
    * ================================================================ */
   function allStations() {
     const seen = new Set();
     const out  = [];
-    for (const line of _lines()) {
+    for (const line of _LINES()) {
       for (const [code, st] of Object.entries(line.st)) {
         if (seen.has(code)) continue;
         seen.add(code);
@@ -276,7 +302,7 @@ const MetroRouter = (() => {
    * stationName(code)
    * ================================================================ */
   function stationName(code) {
-    for (const line of _lines()) {
+    for (const line of _LINES()) {
       if (line.st[code]) return line.st[code].n;
     }
     return code;
@@ -286,7 +312,7 @@ const MetroRouter = (() => {
    * allLines()
    * ================================================================ */
   function allLines() {
-    return _lines().map(line => ({
+    return _LINES().map(line => ({
       id:      line.lineId,
       name:    line.meta.name,
       color:   line.meta.color,
@@ -298,14 +324,20 @@ const MetroRouter = (() => {
    * lineColor(lineId)
    * ================================================================ */
   function lineColor(lineId) {
-    const line = _lines().find(l => l.lineId === lineId);
+    const line = _LINES().find(l => l.lineId === lineId);
     return line?.meta.color ?? '#888';
   }
 
   if (typeof module !== 'undefined') {
-    module.exports = { search, buildLeg, stationName, allStations, allLines, lineColor };
+    module.exports = {
+      search, buildLeg, stationName, allStations, allLines, lineColor,
+      networkOf, allInterchanges,
+    };
   }
 
-  return { search, buildLeg, stationName, allStations, allLines, lineColor };
+  return {
+    search, buildLeg, stationName, allStations, allLines, lineColor,
+    networkOf, allInterchanges,
+  };
 
 })();
