@@ -38,6 +38,17 @@
      KD46 ↔ K31   (Pyanuza — KD ↔ KE ramo C′)
      KD54 ↔ K32   (Nagayamatsu — KD ↔ KE ramo C′)
 
+     SK interchanges (Seishaku Line):
+     SK12 ↔ KD14  (Dankau)
+     SK24 ↔ LL03  (Shiitehongi)
+     SK25 ↔ LL02  (Binno)
+     SK26 ↔ LL01, KD32  (Sainðaul Central)
+     SK27 ↔ KD33, LL19  (Aketsue)
+     SK28 ↔ KD34  (Nashikoma)
+     SK35 ↔ KD35  (Kasakuri)
+     SK38 ↔ KD36  (Sakamuso)
+     SK43 ↔ KD38  (Showanul)
+
    Nota km Loop Line:
      Distanze progressive reali da rilievo cartografico.
      Circuito totale: 24.41 km (LL01 → ... → LL19 → LL01).
@@ -64,6 +75,16 @@ const SUBURBAN_INTERCHANGE = {
   KD37: ['K102', 'AX21'],                       // Showanul (KD ↔ IZX KE K102 + AX Ramo Bajikoe)
   KD46: ['K31'],                                // Pyanuza (KD ↔ IZX KE ramo C′)
   KD54: ['K32'],                                // Nagayamatsu (KD ↔ IZX KE ramo C′)
+  // Seishaku Line (SK)
+  SK12: ['KD14'],                               // Dankau (SK ↔ KD)
+  SK24: ['LL03'],                               // Shiitehongi (SK ↔ LL)
+  SK25: ['LL02'],                               // Binno (SK ↔ LL)
+  SK26: ['LL01', 'KD32'],                       // Sainðaul Central (SK)
+  SK27: ['KD33', 'LL19'],                       // Aketsue (SK ↔ KD + LL)
+  SK28: ['KD34'],                               // Nashikoma (SK ↔ KD)
+  SK35: ['KD35'],                               // Kasakuri (SK ↔ KD)
+  SK38: ['KD36'],                               // Sakamuso (SK ↔ KD)
+  SK43: ['KD38'],                               // Showanul (SK ↔ KD)
 };
 
 const SUBURBAN_LINES = {
@@ -172,6 +193,10 @@ const SUBURBAN_LINES = {
     ],
   },
 
+  /* ────────────────────────────────────────────────
+     SK — Seishaku Line · 盛石線
+     58 stazioni · 105.15 km
+  ──────────────────────────────────────────────── */
   SK: {
     id: 'SK',
     name: 'Seishaku Line',
@@ -180,8 +205,67 @@ const SUBURBAN_LINES = {
     circular: false,
     headwayPeak: 10,
     headwayOffPeak: 20,
-    totalKm: 103.95,
-    stations: [],
+    totalKm: 105.15,
+    stations: [
+      { code: 'SK01', name: 'Igattarun Juwon',       kanji: '蝉陵中央',   km:   0.00 },
+      { code: 'SK02', name: 'Akatani',               kanji: '蛞滝',       km:   3.81 },
+      { code: 'SK03', name: 'Seobewa',               kanji: '—',          km:   6.81 },
+      { code: 'SK04', name: 'Tatsunuka',             kanji: '—',          km:   9.89 },
+      { code: 'SK05', name: 'Arikashi Satago',       kanji: '—',          km:  11.67 },
+      { code: 'SK06', name: 'Enikezya Shinnorin',    kanji: '—',          km:  13.50 },
+      { code: 'SK07', name: 'Enikezya',              kanji: '盛狩',       km:  14.91 },
+      { code: 'SK08', name: 'Kushinami',             kanji: '—',          km:  15.94 },
+      { code: 'SK09', name: 'Shin-Jiroidan',         kanji: '新治蕾丹',   km:  17.17 },
+      { code: 'SK10', name: 'Suðutaka',              kanji: '—',          km:  20.49 },
+      { code: 'SK11', name: 'Rippama',               kanji: '—',          km:  24.47 },
+      { code: 'SK12', name: 'Dankau',                kanji: '檀洪',       km:  25.83 },
+      { code: 'SK13', name: 'Shin-Dankau',           kanji: '新檀洪',     km:  26.72 },
+      { code: 'SK14', name: 'Moisashi',              kanji: '—',          km:  28.57 },
+      { code: 'SK15', name: 'Suhakos',               kanji: '—',          km:  30.30 },
+      { code: 'SK16', name: 'Kayahori Bunki',        kanji: '香弥登分岐', km:  31.96 },
+      { code: 'SK17', name: 'Punomowen',             kanji: '㷀園',       km:  33.03 },
+      { code: 'SK18', name: 'Awada',                 kanji: '—',          km:  33.94 },
+      { code: 'SK19', name: 'Shakihori',             kanji: '石登',       km:  35.24 },
+      { code: 'SK20', name: 'Oizato',                kanji: '粕穫',       km:  39.44 },
+      { code: 'SK21', name: 'Riyakugo',              kanji: '追句胡',     km:  40.50 },
+      { code: 'SK22', name: 'Makurigawa',            kanji: '炭畦',       km:  41.60 },
+      { code: 'SK23', name: 'Kasaraki',              kanji: '次羽',       km:  43.68 },
+      { code: 'SK24', name: 'Shiitehongi',           kanji: '茛本名',     km:  44.47 },
+      { code: 'SK25', name: 'Binno',                 kanji: '苠喃',       km:  46.87 },
+      { code: 'SK26', name: 'Sainðaul Central',      kanji: '作安崎中央', km:  48.78 },
+      { code: 'SK27', name: 'Aketsue',               kanji: '薫都衛',     km:  49.76 },
+      { code: 'SK28', name: 'Nashikoma',             kanji: '刖冬',       km:  51.47 },
+      { code: 'SK29', name: 'Chestō Toshi',          kanji: '鐡道都市',   km:  52.53 },
+      { code: 'SK30', name: 'Shiki-Tsutomaku',       kanji: '—',          km:  53.29 },
+      { code: 'SK31', name: 'Yuparaul',              kanji: '枕崎',       km:  54.92 },
+      { code: 'SK32', name: 'Takkurahama',           kanji: '琢玖羅島',   km:  57.15 },
+      { code: 'SK33', name: 'Shimamera',             kanji: '渠瀬田',     km:  58.37 },
+      { code: 'SK34', name: 'Nihkyonta',             kanji: '濱角',       km:  60.18 },
+      { code: 'SK35', name: 'Kasakuri',              kanji: '鯛巻',       km:  64.11 },
+      { code: 'SK36', name: 'Kotoshiruna',           kanji: '細荒奈',     km:  66.46 },
+      { code: 'SK37', name: 'Tsuragoi',              kanji: '汐蒲',       km:  68.71 },
+      { code: 'SK38', name: 'Sakamuso',              kanji: '沛坤',       km:  70.34 },
+      { code: 'SK39', name: 'Kashiwaka',             kanji: '—',          km:  71.87 },
+      { code: 'SK40', name: 'Togamiro',              kanji: '—',          km:  72.59 },
+      { code: 'SK41', name: 'Erifuka',               kanji: '操菴',       km:  73.67 },
+      { code: 'SK42', name: 'Kamabata',              kanji: '寺石',       km:  75.00 },
+      { code: 'SK43', name: 'Showanul',              kanji: '書瓦崎',     km:  76.78 },
+      { code: 'SK44', name: 'Chaihamosu',            kanji: '—',          km:  77.97 },
+      { code: 'SK45', name: 'Kojushire',             kanji: '—',          km:  79.12 },
+      { code: 'SK46', name: 'Kainos Ufuwani',        kanji: '—',          km:  80.39 },
+      { code: 'SK47', name: 'Waneki',                kanji: '窑名',       km:  83.06 },
+      { code: 'SK48', name: 'Shin-Waneki',           kanji: '新窑名',     km:  85.89 },
+      { code: 'SK49', name: 'Hamuchika',             kanji: '鷲宮',       km:  88.44 },
+      { code: 'SK50', name: 'Piskadoshi',            kanji: '滋氾',       km:  89.61 },
+      { code: 'SK51', name: 'Erigowa Kaiyan',        kanji: '繰緊海岸',   km:  93.83 },
+      { code: 'SK52', name: 'Erigowa Honchō',        kanji: '繰緊本町',   km:  97.00 },
+      { code: 'SK53', name: 'Kabuhane Shiyen Kōwen', kanji: '—',          km:  98.39 },
+      { code: 'SK54', name: 'Erigowa Daigaku',       kanji: '—',          km:  99.67 },
+      { code: 'SK55', name: 'Katakinu',              kanji: '—',          km: 100.93 },
+      { code: 'SK56', name: 'Otsumi-Shakusa',        kanji: '—',          km: 102.15 },
+      { code: 'SK57', name: 'Shakusa Nandoe',        kanji: '—',          km: 104.02 },
+      { code: 'SK58', name: 'Shakusa',               kanji: '—',          km: 105.15 },
+    ],
   },
 
   KS: {
