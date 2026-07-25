@@ -1005,6 +1005,16 @@
     return code;
   }
 
+  function _badgeTextColor(hex) {
+  const c = hex.replace('#','');
+  const r = parseInt(c.slice(0,2),16)/255;
+  const g = parseInt(c.slice(2,4),16)/255;
+  const b = parseInt(c.slice(4,6),16)/255;
+  const lin = v => v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4);
+  const L = 0.2126*lin(r) + 0.7152*lin(g) + 0.0722*lin(b);
+  return L > 0.179 ? '#000' : '#fff';
+}
+
  function buildPlannerSelects(){
     const jpFrom = document.getElementById('jp-from');
     const jpTo   = document.getElementById('jp-to');
@@ -1051,15 +1061,16 @@
     jpTo.value   = 'SN08';
   }
 
-  function svcBadgeHTML(svcId, svcLogical, color, network) {
-    const label = svcId === 'Cp' ? 'C\u2032' : (svcLogical || svcId);
-    const isMetro = network === 'metro' || String(svcId).startsWith('M4');
-    if (isMetro) {
-      return `<span class="svc-badge-metro" style="background:${color};color:#fff">${label}</span>`;
-    }
-    const cls = 'svc-' + (svcId === 'Cp' ? 'Cp' : (svcLogical || svcId));
-    return `<span class="svc-badge ${cls}" style="background:${color};color:#fff">${label}</span>`;
+  function svcBadgeHTML(lineId, svcLogical, color, network) {
+  const isMetro = network === 'metro';
+  if (isMetro) {
+    const textColor = _badgeTextColor(color);           // ← automatico
+    return `<span class="svc-badge-metro" style="background:${color};color:${textColor}">${lineId}</span>`; // ← lineId = 'M2'/'M4'
   }
+  const svcKey = lineId === 'Cp' ? 'Cp' : (svcLogical || lineId);
+  const label  = lineId === 'Cp' ? 'C′' : svcKey;
+  return `<span class="svc-badge svc-${svcKey}">${label}</span>`;
+}
 
   function renderJourneys(journeys, fromName, toName, mode) {
     const resEl   = document.getElementById('jp-results');
@@ -1118,7 +1129,7 @@
 
       let legsHTML = '<div class="journey-legs">';
       j.legs.forEach((leg, li) => {
-        const badge = svcBadgeHTML(leg.svcId, leg.svcLogical, leg.color, leg.network);
+        const badge = svcBadgeHTML(leg.lineId, leg.svcLogical, leg.color, leg.network);
         const intStops = leg.intermediateStops ?? [];
         const intId = `int-${idx}-${li}`;
         const expandBtn = intStops.length
