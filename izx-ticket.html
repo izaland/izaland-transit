@@ -76,7 +76,10 @@
     .service-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:var(--space-4);}
     .service-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-4);}
     .service-card-header{display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3);}
+    /* ── Service badges — rectangular (default) ── */
     .svc-badge{font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:4px;letter-spacing:.04em;white-space:nowrap;}
+    /* ── Service badges — round (metro) ── */
+    .svc-badge-metro{font-size:.7rem;font-weight:800;width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;letter-spacing:.02em;white-space:nowrap;flex-shrink:0;}
     .svc-name{font-size:var(--text-xs);color:var(--text-muted);}
     .price-rows{display:flex;flex-direction:column;}
     .price-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:var(--text-xs);}
@@ -1060,9 +1063,19 @@ if (typeof MetroRouter !== 'undefined') {
     jpTo.value   = 'SN08';
   }
 
-  function svcBadgeHTML(svcId, svcLogical, color) {
+  /* ----------------------------------------------------------------
+   * svcBadgeHTML — sceglie automaticamente il shape del badge:
+   *   metro (network === 'metro' oppure svcId inizia con 'M4')
+   *   → tondino .svc-badge-metro
+   *   tutti gli altri → rettangolo .svc-badge
+   * ---------------------------------------------------------------- */
+  function svcBadgeHTML(svcId, svcLogical, color, network) {
     const label = svcId === 'Cp' ? 'C\u2032' : (svcLogical || svcId);
-    const cls   = 'svc-' + (svcId === 'Cp' ? 'Cp' : (svcLogical || svcId));
+    const isMetro = network === 'metro' || String(svcId).startsWith('M4');
+    if (isMetro) {
+      return `<span class="svc-badge-metro" style="background:${color};color:#fff">${label}</span>`;
+    }
+    const cls = 'svc-' + (svcId === 'Cp' ? 'Cp' : (svcLogical || svcId));
     return `<span class="svc-badge ${cls}" style="background:${color};color:#fff">${label}</span>`;
   }
 
@@ -1123,7 +1136,7 @@ if (typeof MetroRouter !== 'undefined') {
 
       let legsHTML = '<div class="journey-legs">';
       j.legs.forEach((leg, li) => {
-        const badge = svcBadgeHTML(leg.svcId, leg.svcLogical, leg.color);
+        const badge = svcBadgeHTML(leg.svcId, leg.svcLogical, leg.color, leg.network);
         const intStops = leg.intermediateStops ?? [];
         const intId = `int-${idx}-${li}`;
         const expandBtn = intStops.length
@@ -1259,56 +1272,4 @@ function _runSearch(from, to, depTime, lineF, directOnly) {
 }
   buildPlannerSelects();
 
-  document.getElementById('jp-swap').addEventListener('click', () => {
-    const f = document.getElementById('jp-from'), t = document.getElementById('jp-to');
-    const tmp = f.value; f.value = t.value; t.value = tmp;
-  });
-
-  document.getElementById('jp-search').addEventListener('click', () => {
-    const from       = document.getElementById('jp-from').value;
-    const to         = document.getElementById('jp-to').value;
-    const depTime    = document.getElementById('jp-time').value || '08:00';
-    const lineF      = document.getElementById('jp-line').value;
-    const directOnly = document.getElementById('jp-direct-only').checked;
-    if (from === to) { alert('Please select two different stations.'); return; }
-    _jpState.from = from; _jpState.to = to; _jpState.lineF = lineF; _jpState.directOnly = directOnly; _jpState.all = [];
-    const journeys = _runSearch(from, to, depTime, lineF, directOnly);
-    renderJourneys(journeys, _stName(from), _stName(to), 'replace');
-  });
-
-  document.getElementById('jp-earlier').addEventListener('click', () => {
-    if (!_jpState.from) return;
-    const anchor = _prevBefore(_jpState.all);
-    if (!anchor) return;
-    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly);
-    const cutoff = _parseMins(_jpState.windowStart);
-    const earlier = journeys.filter(j => _parseMins(j.departureTime) < cutoff);
-    if (!earlier.length) {
-      const btn = document.getElementById('jp-earlier');
-      const orig = btn.innerHTML;
-      btn.textContent = 'No earlier trains'; btn.disabled = true;
-      setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
-      return;
-    }
-    renderJourneys(earlier, _stName(_jpState.from), _stName(_jpState.to), 'prepend');
-  });
-
-  document.getElementById('jp-later').addEventListener('click', () => {
-    if (!_jpState.from) return;
-    const anchor = _nextAfter(_jpState.all);
-    if (!anchor) return;
-    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly);
-    if (!journeys.length) {
-      const btn = document.getElementById('jp-later');
-      const orig = btn.innerHTML;
-      btn.textContent = 'No later trains'; btn.disabled = true;
-      setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
-      return;
-    }
-    renderJourneys(journeys, _stName(_jpState.from), _stName(_jpState.to), 'append');
-  });
-
-})();
-</script>
-</body>
-</html>
+  document
