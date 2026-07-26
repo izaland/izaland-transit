@@ -20,6 +20,8 @@
        via IZXRouter.buildLeg()
      - Cambio tra due linee suburbane (es. Loop Line ↔ Kidai Line)
        tramite nodi condivisi in SUBURBAN_INTERCHANGE (fase 4)
+     - Thru-service KW ↔ Metro (M8xx) via MetroRouter.buildLeg()
+       (fasi 2b e 3b)
 
    Velocità per segmento (segSpeedKmh):
      Le stazioni KW hanno il campo opzionale segSpeedKmh che indica
@@ -35,9 +37,13 @@
      entrambi; per SK usa la logica A↔B con firstDep/lastDep;
      per linee prive di *_SERVICES si usa _syntheticTrips().
 
+     FIX: _svcTrips() restituisce array di {sec, svcId, stops} invece
+     di semplici numeri. _buildLeg() usa svcId/stops per filtrare
+     le fermate intermedie dei treni Rapid e Commuter Rapid.
+
    Tempi di trasferimento:
      TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban
-     CROSS_TRANSFER_MIN     10 min  — interscambio suburbana ↔ IZX/AX
+     CROSS_TRANSFER_MIN     10 min  — interscambio suburbana ↔ IZX/AX/Metro
 ================================================================ */
 'use strict';
 
@@ -53,6 +59,14 @@ const SuburbanRouter = (() => {
   const DWELL_SEC     = 30;
 
   /* ----------------------------------------------------------------
+   * _isMetroCode(code)
+   * Restituisce true se il codice appartiene alla rete Metro (M + cifre).
+   * ---------------------------------------------------------------- */
+  function _isMetroCode(code) {
+    return /^M\d/.test(code);
+  }
+
+  /* ----------------------------------------------------------------
    * _segSpeed(line, iFrom, iTo)
    * Restituisce la velocità media km/h per il tragitto iFrom→iTo
    * pesando i segSpeedKmh di ogni segmento attraversato.
@@ -65,7 +79,7 @@ const SuburbanRouter = (() => {
     const step = iFrom < iTo ? 1 : -1;
     let totalKm = 0, weightedSum = 0;
     for (let i = iFrom; i !== iTo; i += step) {
-      const segIdx = step > 0 ? i : i - 1;          // indice della stazione «di partenza» del segmento
+      const segIdx = step > 0 ? i : i - 1;
       if (segIdx < 0 || segIdx >= sts.length - 1) continue;
       const km  = Math.abs(sts[segIdx + 1].km - sts[segIdx].km);
       const spd = sts[segIdx].segSpeedKmh ?? AVG_SPEED_KMH;
@@ -77,9 +91,6 @@ const SuburbanRouter = (() => {
 
   /* ----------------------------------------------------------------
    * _travelSec(line, iFrom, iTo, km)
-   * Calcola il tempo di percorrenza in secondi usando la velocità
-   * media pesata per segmento. km è già calcolato da _kmBetween.
-   * Per linee circolari usa AVG_SPEED_KMH (nessuna segSpeedKmh).
    * ---------------------------------------------------------------- */
   function _travelSec(line, iFrom, iTo, km) {
     if (line.circular) return Math.round((km / AVG_SPEED_KMH) * 3600);
@@ -88,7 +99,7 @@ const SuburbanRouter = (() => {
   }
 
   /* ----------------------------------------------------------------
-   * _suburbansCodeSet()
+   * Code-set helpers
    * ---------------------------------------------------------------- */
   let _suburbanCodeSet = null;
   function _getSuburbanCodeSet() {
@@ -100,9 +111,6 @@ const SuburbanRouter = (() => {
     return _suburbanCodeSet;
   }
 
-  /* ----------------------------------------------------------------
-   * _getSuburbanPartnerMap()
-   * ---------------------------------------------------------------- */
   let _suburbanPartnerMap = null;
   function _getSuburbanPartnerMap() {
     if (_suburbanPartnerMap) return _suburbanPartnerMap;
@@ -124,9 +132,6 @@ const SuburbanRouter = (() => {
     return _suburbanPartnerMap;
   }
 
-  /* ----------------------------------------------------------------
-   * _getInverseMap()
-   * ---------------------------------------------------------------- */
   let _inverseMap = null;
   function _getInverseMap() {
     if (_inverseMap) return _inverseMap;
@@ -201,32 +206,36 @@ const SuburbanRouter = (() => {
 
   /* ----------------------------------------------------------------
    * _syntheticTrips(line, iFrom, depSec)
-   * Per linee che usano headwayPeak/OffPeak senza *_SERVICES.
+   * Per linee senza *_SERVICES. Restituisce array di {sec, svcId, stops}.
    * ---------------------------------------------------------------- */
   function _syntheticTrips(line, iFrom, depSec) {
-    const PEAK_START  = 7 * 3600,  PEAK_END1   = 9  * 3600;
-    const PEAK_START2 = 17 * 3600, PEAK_END2   = 20 * 3600;
+    const PEAK_START  = 7 * 3600,  PEAK_END1  = 9  * 3600;
+    const PEAK_START2 = 17 * 3600, PEAK_END2  = 20 * 3600;
     const isPeak = (depSec >= PEAK_START && depSec < PEAK_END1) ||
                    (depSec >= PEAK_START2 && depSec < PEAK_END2);
     const headwaySec = (isPeak ? line.headwayPeak : line.headwayOffPeak) * 60;
     const firstDep   = Math.ceil(depSec / headwaySec) * headwaySec;
     const trips = [];
     let t = firstDep;
-    while (t <= depSec + SEARCH_WINDOW) { trips.push(t); t += headwaySec; }
+    while (t <= depSec + SEARCH_WINDOW) {
+      trips.push({ sec: t, svcId: line.id, svcDesc: line.name, stops: [] });
+      t += headwaySec;
+    }
     return trips;
   }
 
   /* ----------------------------------------------------------------
    * _svcTrips(services, line, iFrom, iTo, depSec)
    * Genera partenze usando un array *_SERVICES (SK o KW).
-   * Gestisce bidirezionalità e finestre orarie (peakWindows).
+   * FIX: restituisce array di {sec, svcId, svcDesc, stops} in modo
+   * che _buildLeg() conosca il tipo di servizio e le fermate.
    * ---------------------------------------------------------------- */
   function _svcTrips(services, line, iFrom, iTo, depSec) {
     const stCodes  = line.stations.map(s => s.code);
     const goingFwd = iFrom <= iTo;
     const loIdx    = Math.min(iFrom, iTo);
     const hiIdx    = Math.max(iFrom, iTo);
-    const allDeps  = [];
+    const allTrips = [];
 
     for (const svc of services) {
       const svcFromIdx = stCodes.indexOf(svc.fromCode);
@@ -234,10 +243,16 @@ const SuburbanRouter = (() => {
       if (svcFromIdx === -1 || svcToIdx === -1) continue;
       if (svcFromIdx > loIdx || svcToIdx < hiIdx) continue;
 
-      const headwaySec = svc.headway * 60;
+      // Per servizi con stops[] non vuoto verifica che le stazioni
+      // di origine e destinazione siano incluse nella lista fermate.
+      const svcStops = svc.stops ?? [];
+      if (svcStops.length > 0) {
+        const fromCode = line.stations[iFrom].code;
+        const toCode   = line.stations[iTo].code;
+        if (!svcStops.includes(fromCode) || !svcStops.includes(toCode)) continue;
+      }
 
-      // Finestre orarie: se il servizio ha peakWindows, genera corse
-      // solo nelle finestre attive; altrimenti usa firstDep/lastDep.
+      const headwaySec = svc.headway * 60;
       const windows = svc.peakWindows
         ? svc.peakWindows.map(w => ({ from: _hmToSec(w.from), to: _hmToSec(w.to) }))
         : [{ from: _hmToSec(svc.firstDep), to: _hmToSec(svc.lastDep) }];
@@ -253,7 +268,7 @@ const SuburbanRouter = (() => {
           const lastAtFrom = win.to + offsetSec;
           if (t < depSec) t += Math.ceil((depSec - t) / headwaySec) * headwaySec;
           while (t <= Math.min(lastAtFrom, depSec + SEARCH_WINDOW)) {
-            allDeps.push(t);
+            allTrips.push({ sec: t, svcId: svc.id, svcDesc: svc.desc, stops: svcStops });
             t += headwaySec;
           }
         } else {
@@ -265,18 +280,23 @@ const SuburbanRouter = (() => {
           const lastAtFrom = lastDepB + offsetSec;
           if (t < depSec) t += Math.ceil((depSec - t) / headwaySec) * headwaySec;
           while (t <= Math.min(lastAtFrom, depSec + SEARCH_WINDOW)) {
-            allDeps.push(t);
+            allTrips.push({ sec: t, svcId: svc.id, svcDesc: svc.desc, stops: svcStops });
             t += headwaySec;
           }
         }
       }
     }
-    return [...new Set(allDeps)].sort((a, b) => a - b);
+
+    // Deduplicazione per (sec, svcId) e ordinamento per orario
+    const seen = new Set();
+    return allTrips
+      .filter(t => { const k = `${t.sec}|${t.svcId}`; if (seen.has(k)) return false; seen.add(k); return true; })
+      .sort((a, b) => a.sec - b.sec);
   }
 
   /* ----------------------------------------------------------------
    * _getTrips(line, iFrom, iTo, depSec)
-   * Dispatcher: sceglie il generatore di corse appropriato.
+   * Dispatcher. Restituisce array di {sec, svcId, svcDesc, stops}.
    * ---------------------------------------------------------------- */
   function _getTrips(line, iFrom, iTo, depSec) {
     if (line.id === 'SK' && typeof SK_SERVICES !== 'undefined')
@@ -286,16 +306,29 @@ const SuburbanRouter = (() => {
     return _syntheticTrips(line, iFrom, depSec);
   }
 
+  /* ----------------------------------------------------------------
+   * _buildLeg(line, iFrom, iTo, depSec)
+   * FIX: usa il primo trip disponibile {sec, svcId, svcDesc, stops}
+   * e filtra le intermediateStops in base alle fermate del servizio.
+   * ---------------------------------------------------------------- */
   function _buildLeg(line, iFrom, iTo, depSec) {
     const trips = _getTrips(line, iFrom, iTo, depSec);
     if (!trips.length) return null;
-    const boardSec  = trips[0];
+
+    const trip      = trips[0];          // primo treno disponibile
+    const boardSec  = trip.sec;
+    const svcId     = trip.svcId;
+    const svcDesc   = trip.svcDesc ?? line.name;
+    const svcStops  = trip.stops ?? [];  // [] = locale (ferma ovunque)
+
     const km        = _kmBetween(line, iFrom, iTo);
-    const travelSec = _travelSec(line, iFrom, iTo, km);   // ← usa velocità per segmento
+    const travelSec = _travelSec(line, iFrom, iTo, km);
     const alightSec = boardSec + travelSec;
-    const dir       = line.circular
+
+    const dir = line.circular
       ? _circularDir(line, iFrom, iTo)
       : (iFrom < iTo ? 'SB' : 'NB');
+
     let intermediateStops;
     if (line.circular) {
       intermediateStops = _circularIntermediateStops(line, iFrom, iTo, dir, boardSec, km);
@@ -303,20 +336,32 @@ const SuburbanRouter = (() => {
       const a = Math.min(iFrom, iTo), b = Math.max(iFrom, iTo);
       const sliced  = line.stations.slice(a + 1, b);
       const ordered = iFrom < iTo ? sliced : [...sliced].reverse();
-      intermediateStops = ordered.map(st => {
-        const kmElapsed = Math.abs(st.km - line.stations[iFrom].km);
-        // velocità media dal punto di salita fino a questa stazione intermedia
-        const stIdx     = line.stations.indexOf(st);
-        const partialSpd = _segSpeed(line, iFrom, stIdx);
-        const arrSec    = boardSec + Math.round((kmElapsed / partialSpd) * 3600);
-        return { code: st.code, name: st.name,
-                 arr: _secToHM(arrSec), dep: _secToHM(arrSec + DWELL_SEC) };
-      });
+
+      intermediateStops = ordered
+        // Se il servizio ha una lista stops esplicita, includi solo
+        // le stazioni in quella lista (treni Rapid / Commuter Rapid).
+        // Lista vuota = locale, ferma in tutte le stazioni.
+        .filter(st => svcStops.length === 0 || svcStops.includes(st.code))
+        .map(st => {
+          const kmElapsed  = Math.abs(st.km - line.stations[iFrom].km);
+          const stIdx      = line.stations.indexOf(st);
+          const partialSpd = _segSpeed(line, iFrom, stIdx);
+          const arrSec     = boardSec + Math.round((kmElapsed / partialSpd) * 3600);
+          return { code: st.code, name: st.name,
+                   arr: _secToHM(arrSec), dep: _secToHM(arrSec + DWELL_SEC) };
+        });
     }
+
     return {
-      lineId: line.id, svcId: line.id, svcLogical: line.id,
-      svcName: line.name, color: line.color, cls: 'suburban',
-      direction: dir, trainNumber: null,
+      lineId: line.id,
+      svcId,
+      svcLogical: line.id,
+      svcName:    line.name,
+      svcDesc,
+      color:     line.color,
+      cls:       'suburban',
+      direction: dir,
+      trainNumber: null,
       boardCode:    line.stations[iFrom].code,
       boardName:    line.stations[iFrom].name,
       boardDep:     _secToHM(boardSec),
@@ -379,6 +424,7 @@ const SuburbanRouter = (() => {
           if (!leg1) continue;
           const transferReadySec = leg1.alightArrSec + CROSS_TRANSFER_SEC;
           for (const izxNode of izxPartners) {
+            if (_isMetroCode(izxNode)) continue;  // gestito in fase 2b
             for (const [lineId2, line2] of Object.entries(IZX_LINES)) {
               if (!line2.ST[izxNode] || !line2.ST[to]) continue;
               for (const svcId2 of Object.keys(line2.SVC)) {
@@ -400,6 +446,39 @@ const SuburbanRouter = (() => {
       }
     }
 
+    /* ---- 2b. Percorsi Suburbano → Metro ---- */
+    if (!directOnly && typeof MetroRouter !== 'undefined') {
+      for (const line of Object.values(SUBURBAN_LINES)) {
+        if (!line.stations.length) continue;
+        if (lineAllowed && !lineAllowed.has(line.id)) continue;
+        const iF = _idx(line, resolvedFrom);
+        if (iF === -1) continue;
+        for (const subNode of line.stations) {
+          const partners = SUBURBAN_INTERCHANGE[subNode.code];
+          if (!partners) continue;
+          const metroPartners = partners.filter(_isMetroCode);
+          if (!metroPartners.length) continue;
+          const iMid = _idx(line, subNode.code);
+          if (iMid === -1 || iMid === iF) continue;
+          const leg1 = _buildLeg(line, iF, iMid, depSec);
+          if (!leg1) continue;
+          const transferReadySec = leg1.alightArrSec + CROSS_TRANSFER_SEC;
+          for (const metroNode of metroPartners) {
+            const leg2 = MetroRouter.buildLeg?.(metroNode, to, transferReadySec);
+            if (!leg2) continue;
+            const waitSec = leg2.boardDepSec - leg1.alightArrSec;
+            const totalKm = (leg1.km != null && leg2.km != null) ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
+            journeys.push({
+              legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
+              totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+              totalKm, transfers: 1, transferNodes: [subNode.code],
+              transferWaitMin: Math.round(waitSec / 60),
+            });
+          }
+        }
+      }
+    }
+
     /* ---- 3. Percorsi IZX/AX → Suburbano ---- */
     if (!directOnly && typeof IZXRouter !== 'undefined') {
       for (const line of Object.values(SUBURBAN_LINES)) {
@@ -413,6 +492,7 @@ const SuburbanRouter = (() => {
           const iMid = _idx(line, subNode.code);
           if (iMid === -1 || iMid === iT) continue;
           for (const izxNode of izxPartners) {
+            if (_isMetroCode(izxNode)) continue;  // gestito in fase 3b
             for (const [lineId1, line1] of Object.entries(IZX_LINES)) {
               if (!line1.ST[from] || !line1.ST[izxNode]) continue;
               for (const svcId1 of Object.keys(line1.SVC)) {
@@ -432,6 +512,39 @@ const SuburbanRouter = (() => {
                 });
               }
             }
+          }
+        }
+      }
+    }
+
+    /* ---- 3b. Percorsi Metro → Suburbano ---- */
+    if (!directOnly && typeof MetroRouter !== 'undefined') {
+      for (const line of Object.values(SUBURBAN_LINES)) {
+        if (!line.stations.length) continue;
+        if (lineAllowed && !lineAllowed.has(line.id)) continue;
+        const iT = _idx(line, resolvedTo);
+        if (iT === -1) continue;
+        for (const subNode of line.stations) {
+          const partners = SUBURBAN_INTERCHANGE[subNode.code];
+          if (!partners) continue;
+          const metroPartners = partners.filter(_isMetroCode);
+          if (!metroPartners.length) continue;
+          const iMid = _idx(line, subNode.code);
+          if (iMid === -1 || iMid === iT) continue;
+          for (const metroNode of metroPartners) {
+            const leg1 = MetroRouter.buildLeg?.(from, metroNode, depSec);
+            if (!leg1) continue;
+            const transferReadySec = leg1.alightArrSec + CROSS_TRANSFER_SEC;
+            const leg2 = _buildLeg(line, iMid, iT, transferReadySec);
+            if (!leg2) continue;
+            const waitSec = leg2.boardDepSec - leg1.alightArrSec;
+            const totalKm = (leg1.km != null && leg2.km != null) ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
+            journeys.push({
+              legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
+              totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+              totalKm, transfers: 1, transferNodes: [metroNode],
+              transferWaitMin: Math.round(waitSec / 60),
+            });
           }
         }
       }
