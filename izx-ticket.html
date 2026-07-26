@@ -539,15 +539,27 @@
     </div>
 
     <!-- Direct-only toggle -->
-<div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
-  <label class="toggle-track" for="jp-direct-only">
-    <input type="checkbox" id="jp-direct-only">
-    <span class="toggle-slider"></span>
-  </label>
-  <label class="toggle-label" for="jp-direct-only">
-    Direct only
-    <span>Hide journeys with transfers</span>
-  </label>
+<div style="display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-6);">
+  <div style="display:flex;align-items:center;gap:var(--space-3);">
+    <label class="toggle-track" for="jp-direct-only">
+      <input type="checkbox" id="jp-direct-only">
+      <span class="toggle-slider"></span>
+    </label>
+    <label class="toggle-label" for="jp-direct-only">
+      Direct only
+      <span>Hide journeys with transfers</span>
+    </label>
+  </div>
+  <div style="display:flex;align-items:center;gap:var(--space-3);">
+    <label class="toggle-track" for="jp-exclude-izx">
+      <input type="checkbox" id="jp-exclude-izx">
+      <span class="toggle-slider"></span>
+    </label>
+    <label class="toggle-label" for="jp-exclude-izx">
+      Exclude IZX
+      <span>Only non-premium trains</span>
+    </label>
+  </div>
 </div>
 
     <button class="sim-btn" id="jp-search">Find journeys</button>
@@ -969,8 +981,8 @@
   /* ================================================================
      JOURNEY PLANNER
   ================================================================ */
-  const _jpState = {
-  from: null, to: null, lineF: null, directOnly: false,
+    const _jpState = {
+  from: null, to: null, lineF: null, directOnly: false, excludeIzx: false,
   windowStart: null, windowEnd: null,
   all: [],
 };
@@ -1235,9 +1247,10 @@
     }
   }
 
-  function _runSearch(from, to, depTime, lineF, directOnly) {
+    function _runSearch(from, to, depTime, lineF, directOnly, excludeIzx) {
     const fromCodes = Array.isArray(from) ? from : [from];
     const toCodes   = Array.isArray(to)   ? to   : [to];
+    const IZX_NETWORKS = new Set(['KE','RY','EI']);
     const seen = new Set();
     const all  = [];
     for (const f of fromCodes) {
@@ -1248,7 +1261,10 @@
           directOnly: !!directOnly,
           maxResults: 8,
         });
-        for (const j of res) {
+        const filtered = excludeIzx
+          ? res.filter(j => !j.legs.some(l => IZX_NETWORKS.has(l.network)))
+          : res;
+        for (const j of filtered) {
           const key = j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '') + '|' + f + '>' + t;
           if (!seen.has(key)) { seen.add(key); all.push(j); }
         }
@@ -1272,12 +1288,13 @@
     const to         = (toSel.selectedOptions[0]?.dataset.codes   || toSel.value).split(',');
     const depTime    = document.getElementById('jp-time').value || '08:00';
     const lineF      = document.getElementById('jp-line').value;
-    const directOnly = document.getElementById('jp-direct-only').checked;
+        const directOnly = document.getElementById('jp-direct-only').checked;
+    const excludeIzx = document.getElementById('jp-exclude-izx').checked;
     if (from[0] === to[0] && from.length === 1 && to.length === 1) { alert('Please select two different stations.'); return; }
-    _jpState.from = from; _jpState.to = to; _jpState.lineF = lineF; _jpState.directOnly = directOnly; _jpState.all = [];
+    _jpState.from = from; _jpState.to = to; _jpState.lineF = lineF; _jpState.directOnly = directOnly; _jpState.excludeIzx = excludeIzx; _jpState.all = [];
     const fromName = fromSel.selectedOptions[0]?.textContent.split('  [')[0].trim() || _stName(from[0]);
     const toName   = toSel.selectedOptions[0]?.textContent.split('  [')[0].trim()   || _stName(to[0]);
-    const journeys = _runSearch(from, to, depTime, lineF, directOnly);
+    const journeys = _runSearch(from, to, depTime, lineF, directOnly, excludeIzx);
     renderJourneys(journeys, fromName, toName, 'replace');
   });
 
@@ -1302,7 +1319,7 @@
     if (!_jpState.from) return;
     const anchor = _nextAfter(_jpState.all);
     if (!anchor) return;
-    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly);
+    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly, _jpState.excludeIzx);
     if (!journeys.length) {
       const btn = document.getElementById('jp-later');
       const orig = btn.innerHTML;
