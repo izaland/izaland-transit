@@ -1256,7 +1256,7 @@
     for (const f of fromCodes) {
       for (const t of toCodes) {
         if (f === t) continue;
-        const res = UnifiedRouter.search(f, t, depTime, {
+        const res = IZXUnifiedRouter.search(f, t, depTime, {
           lines:      lineF,
           directOnly: !!directOnly,
           maxResults: 8,
