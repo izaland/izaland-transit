@@ -36,14 +36,14 @@
 
    Mappa interscambio suburbana (fase 4):
      SUBURBAN_INTERCHANGE è unidirezionale per design: le coppie LL↔KD
-     hanno sempre la chiave sul lato KD (es. KD26: ['LL10']).
+     hanno sempre la chiave sul lato KD (es. KD26: ['LL10']).\
      _getSuburbanPartnerMap() costruisce una mappa bidirezionale
      subCode → [subPartner, ...] considerando entrambi i versi,
      filtrata ai soli codici che appartengono effettivamente a una
      linea suburbana (esclude codici IZX/AX come K01, R01, AX06...).
 
    Tempi di trasferimento:
-     TRANSFER_MIN            5 min  — interscambio interno alla rete suburbana
+     TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban
      CROSS_TRANSFER_MIN     10 min  — interscambio suburbana ↔ IZX/AX
 
    Fermate intermedie (circolari):
@@ -57,8 +57,8 @@
 
 const SuburbanRouter = (() => {
 
-  const TRANSFER_MIN       = 5;
-  const CROSS_TRANSFER_MIN = 10;
+  const TRANSFER_MIN       = 3;   // suburban ↔ suburban (stesso edificio/banchine vicine)
+  const CROSS_TRANSFER_MIN = 10;  // suburban ↔ IZX/AX
   const TRANSFER_SEC       = TRANSFER_MIN       * 60;
   const CROSS_TRANSFER_SEC = CROSS_TRANSFER_MIN * 60;
   const MAX_JOURNEYS  = 5;
