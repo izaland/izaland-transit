@@ -1,8 +1,8 @@
 /* ================================================================
    M8-TT.JS — Metro Line 8 · Sainðaul Urban Line · Timetable
    ================================================================
-   Il timetable è generato runtime da MetroRouter usando M8_HEADWAY
-   definito in m8-data.js.
+   Il timetable è generato runtime da MetroRouter usando headway slot
+   array compatibili con MetroRouter._headwaySecAt().
 
    Servizi:
      A_N  Komayunden-Dōnmus Kōwen (M824) → Kishagoi-Exhibitown (M801)  [All-stop, northbound]
@@ -18,6 +18,25 @@
    Caricato dopo m8-data.js nell'HTML.
 ================================================================ */
 'use strict';
+
+/* ================================================================
+   HEADWAY SLOT ARRAYS — formato MetroRouter
+   Ogni slot: { from: 'HH:MM', to: 'HH:MM', headwayMin: N }
+   Coprono l'intera finestra operativa del servizio.
+
+   Svc A: 05:32–24:05 · ogni 7 min
+   Svc B: 05:38–23:58 · ogni 10 min
+   Svc C: 07:35–21:45 · ogni 14 min
+================================================================ */
+const _M8_A_HW = [
+  { from: '05:32', to: '24:05', headwayMin: 7 },
+];
+const _M8_B_HW = [
+  { from: '05:38', to: '23:58', headwayMin: 10 },
+];
+const _M8_C_HW = [
+  { from: '07:35', to: '21:45', headwayMin: 14 },
+];
 
 /* ================================================================
    STOPS RAPIDO (Svc C) — 11 fermate sulla sezione M8
@@ -52,7 +71,7 @@ const M8_SERVICES_NORM = [
     color:      '#00A2D3',
     cls:        'metro',
     rapid:      false,
-    headway:    M8_HEADWAY.A,
+    headway:    _M8_A_HW,
     stops:      M8_CANONICAL_ORDER,           // M801 → M824
   },
   {
@@ -62,7 +81,7 @@ const M8_SERVICES_NORM = [
     color:      '#00A2D3',
     cls:        'metro',
     rapid:      false,
-    headway:    M8_HEADWAY.A,
+    headway:    _M8_A_HW,
     stops:      [...M8_CANONICAL_ORDER].reverse(),  // M824 → M801
   },
 
@@ -74,7 +93,7 @@ const M8_SERVICES_NORM = [
     color:      '#00A2D3',
     cls:        'metro',
     rapid:      false,
-    headway:    M8_HEADWAY.B,
+    headway:    _M8_B_HW,
     stops:      _M8_B_STOPS_S,               // M801 → M817
   },
   {
@@ -84,7 +103,7 @@ const M8_SERVICES_NORM = [
     color:      '#00A2D3',
     cls:        'metro',
     rapid:      false,
-    headway:    M8_HEADWAY.B,
+    headway:    _M8_B_HW,
     stops:      _M8_B_STOPS_N,               // M817 → M801
   },
 
@@ -96,7 +115,7 @@ const M8_SERVICES_NORM = [
     color:      '#33C4E8',
     cls:        'metro',
     rapid:      true,
-    headway:    M8_HEADWAY.C,
+    headway:    _M8_C_HW,
     stops:      _M8_C_STOPS_S,               // 11 fermate M801 → M818
   },
   {
@@ -106,7 +125,7 @@ const M8_SERVICES_NORM = [
     color:      '#33C4E8',
     cls:        'metro',
     rapid:      true,
-    headway:    M8_HEADWAY.C,
+    headway:    _M8_C_HW,
     stops:      _M8_C_STOPS_N,               // M818 → M801
   },
 ];
@@ -115,6 +134,7 @@ const M8_SERVICES_NORM = [
    Registrazione linea M8 nel MetroRouter.
    Dipende da: m8-data.js (M8_ST, M8_META, M8_HEADWAY,
                M8_CANONICAL_ORDER, M8_INTERCHANGE)
+   Questo file è caricato dopo m8-data.js nell'HTML.
 ---------------------------------------------------------------- */
 if (typeof MetroRouter !== 'undefined') {
   MetroRouter.register({
