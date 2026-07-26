@@ -96,11 +96,8 @@
     }
 
     raw.forEach(entry => {
-      if (entry.code !== code) _push(entry.code, CROSS_TRANSFER_MIN);
-    });
-    raw.forEach(entry => {
-      _push(entry.code, entry.transferMin);
-    });
+  _push(entry.code, entry.transferMin ?? CROSS_TRANSFER_MIN);
+});
 
     // deduplicate
     const seen = new Set();
@@ -259,9 +256,11 @@
 
       for (const midSt of router1.allStations()) {
         const partners = _partnersOf(midSt.code).filter(p => {
-          if (netFilter && !netFilter.has(p.networkId)) return false;
-          return tNodes.some(t => t.networkId === p.networkId);
-        });
+  if (netFilter && !netFilter.has(p.networkId)) return false;
+  // Permetti anche same-network se le stazioni non sono raggiungibili direttamente
+  return tNodes.some(t => t.networkId === p.networkId);
+  // (già ok — il filtro non esclude same-network; il problema era solo _buildIx)
+});
         if (!partners.length) continue;
 
         const j1list = _safeSearch(
