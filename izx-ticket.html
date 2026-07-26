@@ -1193,8 +1193,8 @@
 
                 if (li < j.legs.length - 1) {
                     const walkMin = Array.isArray(j.transferWalkMin)
-            ? (j.transferWalkMin[li] ?? IZXRouter.CROSS_TRANSFER_MIN)
-            : (j.transferWalkMin ?? IZXRouter.CROSS_TRANSFER_MIN);
+            ? (j.transferWalkMin[li] ?? IZXUnifiedRouter.CROSS_TRANSFER_MIN)
+            : (j.transferWalkMin ?? IZXUnifiedRouter.CROSS_TRANSFER_MIN);
           const waitMin = Array.isArray(j.transferWaitMin)
             ? (j.transferWaitMin[li] ?? 0)
             : (li === 0 ? (j.transferWaitMin ?? 0) : 0);
