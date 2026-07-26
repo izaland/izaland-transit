@@ -211,7 +211,15 @@
     .leg-int-od{color:var(--text);font-weight:700;}
     .leg-int-time{min-width:80px;color:var(--text-faint);}
     /* ── END INTERMEDIATE STOPS PANEL ── */
-        .transfer-row{display:flex;flex-direction:column;gap:3px;font-size:var(--text-xs);color:var(--text-muted);padding:6px 0 6px calc(var(--space-4) + 9px);font-weight:600;border-left:3px solid var(--accent);margin-left:4px;}
+        .transfer-row{
+  display:flex;flex-direction:column;gap:3px;
+  font-size:var(--text-xs);color:var(--text-muted);font-weight:600;
+  border-left:3px solid var(--accent);
+  /* centrata sotto il badge (26px wide): 26/2 - 3/2 = 11.5px ≈ 11px */
+  margin-left:11px;
+  /* padding-left compensa: allinea il testo con il resto della leg-row */
+  padding:6px 0 6px calc(120px + var(--space-3) - 14px);
+}
     .transfer-row-title{font-weight:700;color:var(--text);}
     .transfer-times{display:flex;gap:var(--space-4);flex-wrap:wrap;margin-top:2px;}
     .transfer-time-item{display:flex;align-items:center;gap:5px;}
