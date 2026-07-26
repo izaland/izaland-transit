@@ -15,7 +15,7 @@
    Per aggiungere una nuova linea metro (es. M3):
      1. Creare metro/m3-data.js  (chiama MetroRouter.register alla fine)
      2. Creare metro/m3-tt.js    (opzionale, chiamata register può stare in m3-data.js)
-     3. Aggiungere <script> in HTML — nessuna modifica qui.
+     3. Aggiungere &lt;script&gt; in HTML — nessuna modifica qui.
 ================================================================ */
 'use strict';
 
@@ -217,10 +217,16 @@ const MetroRouter = (() => {
       }
     }
 
+    /* ----------------------------------------------------------------
+     * Deduplicazione: chiave = lineId + boardCode + boardDep + alightCode.
+     * NON include svcLogical: servizi _S e _N sullo stesso tratto fisico
+     * producono lo stesso viaggio (stesso orario, stessa origine/dest.)
+     * e vanno collassati in un unico risultato.
+     * ---------------------------------------------------------------- */
     const seen   = new Set();
     const unique = journeys.filter(j => {
       const key = j.legs.map(l =>
-        `${l.lineId}:${l.svcLogical}:${l.boardDep}:${l.alightCode}`
+        `${l.lineId}:${l.boardCode}:${l.boardDep}:${l.alightCode}`
       ).join('|');
       if (seen.has(key)) return false;
       seen.add(key); return true;
