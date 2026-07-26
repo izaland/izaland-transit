@@ -12,18 +12,23 @@
      MetroRouter.networkOf(code)                 → string  ('M2'|'M4'|…)
      MetroRouter.allInterchanges()               → { codeA, codeB, transferMin }[]
 
+   Tempi di trasferimento di default (usati se transferMin non è specificato
+   nell'interchange del data file):
+     METRO_TRANSFER_MIN  4 min  — metro ↔ metro
+
    Per aggiungere una nuova linea metro (es. M3):
      1. Creare metro/m3-data.js  (chiama MetroRouter.register alla fine)
      2. Creare metro/m3-tt.js    (opzionale, chiamata register può stare in m3-data.js)
-     3. Aggiungere &lt;script&gt; in HTML — nessuna modifica qui.
+     3. Aggiungere <script> in HTML — nessuna modifica qui.
 ================================================================ */
 'use strict';
 
 const MetroRouter = (() => {
 
-  const MAX_JOURNEYS  = 5;
-  const SEARCH_WINDOW = 3 * 3600;
-  const DWELL_SEC     = 30;
+  const MAX_JOURNEYS        = 5;
+  const SEARCH_WINDOW       = 3 * 3600;
+  const DWELL_SEC           = 30;
+  const METRO_TRANSFER_MIN  = 4;   // default metro ↔ metro se non specificato nel data file
 
   /* ----------------------------------------------------------------
    * Registro interno delle linee.
@@ -256,7 +261,7 @@ const MetroRouter = (() => {
           const key = [codeA, p.code].sort().join('<>');
           if (seen.has(key)) continue;
           seen.add(key);
-          out.push({ codeA, codeB: p.code, transferMin: p.transferMin ?? 10 });
+          out.push({ codeA, codeB: p.code, transferMin: p.transferMin ?? METRO_TRANSFER_MIN });
         }
       }
     }
