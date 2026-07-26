@@ -340,7 +340,7 @@ const SUBURBAN_LINES = {
       { code: 'KW24', name: 'Karue',                 kanji: '松澤',    km: 51.83 },
       { code: 'KW25', name: 'Kotamari',              kanji: '細幅射',  km: 56.84 }, // ↔ IB?? (da confermare)
       { code: 'KW26', name: 'Enemui',                kanji: '—',       km: 63.93 },
-      { code: 'KW27', name: 'Kamasa Taru',           kanji: '寺嵯',    km: 67.03 },
+      { code: 'KW27', name: 'Kamasa Taru',           kanji: '寺嵯艏',    km: 67.03 },
       { code: 'KW28', name: 'Zayashuni',             kanji: '—',       km: 70.28 },
       { code: 'KW29', name: 'Abiro',                 kanji: '獏路',    km: 76.15 }, // ↔ MS01, IN03
       { code: 'KW30', name: 'Yakkais',               kanji: '—',       km: 79.94 },
