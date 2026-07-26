@@ -40,6 +40,17 @@
      SK38 ↔ KD36  (Sakamuso)
      SK43 ↔ KD37  (Showanul)
 
+     KW interchanges (Kwōkei Line):
+     KW00 (Kishagoi-Exhibitown) ↔ M801, M17??, M18??
+     KW02 (Shiki-Kiranne) ↔ IR
+     KW03 (Ottanjoe) ↔ M03?? (da confermare)
+     KW09 (Kawayatsu) ↔ E02, KY02
+     KW16 (Ibarosu) ↔ CS01
+     KW17 (Otsumi-Ibarosu) ↔ CS02
+     KW25 (Kotamari) ↔ IB?? (da confermare)
+     KW29 (Abiro) ↔ MS01, IN03
+     KW32 (Yamakoga) ↔ CS?? (da confermare)
+
    SK_SERVICES:
      Sottoservizi della Seishaku Line, usati solo per la generazione
      degli orari sintetici. Non vengono visualizzati nel journey
@@ -81,6 +92,16 @@ const SUBURBAN_INTERCHANGE = {
   SK35: ['KD35'],                               // Kasakuri (SK ↔ KD)
   SK38: ['KD36'],                               // Sakamuso (SK ↔ KD)
   SK43: ['KD37'],                               // Showanul (SK ↔ KD)
+  // Kwōkei Line (KW)
+  KW00: ['M801'],                               // Kishagoi-Exhibitown (KW ↔ M8; M17?? M18?? da confermare)
+  KW02: ['IR'],                                 // Shiki-Kiranne (KW ↔ IR)
+  KW03: [],                                     // Ottanjoe (↔ M03?? da confermare)
+  KW09: ['E02', 'KY02'],                        // Kawayatsu (KW ↔ IZX E02 + KY02)
+  KW16: ['CS01'],                               // Ibarosu (KW ↔ CS01)
+  KW17: ['CS02'],                               // Otsumi-Ibarosu (KW ↔ CS02)
+  KW25: [],                                     // Kotamari (↔ IB?? da confermare)
+  KW29: ['MS01', 'IN03'],                       // Abiro (KW ↔ MS01 + IN03)
+  KW32: [],                                     // Yamakoga (↔ CS?? da confermare)
 };
 
 const SUBURBAN_LINES = {
@@ -275,6 +296,13 @@ const SUBURBAN_LINES = {
     stations: [],
   },
 
+  /* ────────────────────────────────────────────────
+     KW — Kwōkei Line · 荒京線
+     33 stazioni · 84.35 km (km misurati da KW00 = 0)
+     Direzione: KW00 Kishagoi-Exhibitown (sud) → KW32 Yamakoga (nord)
+     Collegamento M8 (M801) a KW00.
+     Diramazione Ugutsumasa: da KW06 verso KW051 (dati da aggiungere).
+  ──────────────────────────────────────────────── */
   KW: {
     id: 'KW',
     name: 'Kwōkei Line',
@@ -284,7 +312,41 @@ const SUBURBAN_LINES = {
     headwayPeak: 5,
     headwayOffPeak: 10,
     totalKm: 84.35,
-    stations: [],
+    stations: [
+      { code: 'KW00', name: 'Kishagoi - Exhibitown', kanji: '喜舎拘',  km:  0.00 }, // ↔ M801, M17??, M18??
+      { code: 'KW01', name: 'Kiranne',               kanji: '—',       km:  1.89 },
+      { code: 'KW02', name: 'Shiki-Kiranne',         kanji: '—',       km:  3.19 }, // ↔ IR
+      { code: 'KW03', name: 'Ottanjoe',              kanji: '—',       km:  5.04 }, // ↔ M03?? (da confermare)
+      { code: 'KW04', name: 'Semukudai',             kanji: '世牧臺',  km:  6.28 },
+      { code: 'KW05', name: 'Niji-Rekuni',           kanji: '西長澤',  km:  9.35 },
+      { code: 'KW06', name: 'Agasuri-ko Ugutsumasa', kanji: '蛞珠利湖・茨察', km: 11.63 }, // diramazione verso KW051 (dati da aggiungere)
+      { code: 'KW07', name: 'Chayogate',             kanji: '蟹湊',    km: 13.42 },
+      { code: 'KW08', name: 'Shin-Kawayatsu',        kanji: '新嘉夬苫', km: 15.20 },
+      { code: 'KW09', name: 'Ukimako',               kanji: '—',       km: 16.95 },
+      { code: 'KW10', name: 'Kawayatsu',             kanji: '嘉夬苫',  km: 18.53 }, // ↔ E02, KY02
+      { code: 'KW11', name: 'Niji-Kawayatsu',        kanji: '西嘉夬苫', km: 20.61 },
+      { code: 'KW12', name: 'Neyabakuri',            kanji: '—',       km: 22.61 },
+      { code: 'KW13', name: 'Tsimoniji',             kanji: '地多寺',  km: 23.96 },
+      { code: 'KW14', name: 'Yassamo',               kanji: '—',       km: 27.82 },
+      { code: 'KW15', name: 'Ibarosu Hinnandoshi',   kanji: '歯舢花都市', km: 28.94 },
+      { code: 'KW16', name: 'Otsumi-Ibarosu',        kanji: '南歯舢',  km: 30.25 }, // ↔ CS02
+      { code: 'KW17', name: 'Ibarosu',               kanji: '歯舢',    km: 33.36 }, // ↔ CS01
+      { code: 'KW18', name: 'Nwatanui',              kanji: '—',       km: 35.18 },
+      { code: 'KW19', name: 'Abamiwa',               kanji: '弱水',    km: 38.51 },
+      { code: 'KW20', name: 'Shiwesuno',             kanji: '—',       km: 40.69 },
+      { code: 'KW21', name: 'Sogeisu',               kanji: '—',       km: 44.13 },
+      { code: 'KW22', name: 'Funoshoni',             kanji: '—',       km: 45.38 },
+      { code: 'KW23', name: 'Sārishiki',             kanji: '川北',    km: 48.43 },
+      { code: 'KW24', name: 'Karue',                 kanji: '松澤',    km: 51.83 },
+      { code: 'KW25', name: 'Kotamari',              kanji: '細幅射',  km: 56.84 }, // ↔ IB?? (da confermare)
+      { code: 'KW26', name: 'Enemui',                kanji: '—',       km: 63.93 },
+      { code: 'KW27', name: 'Kamasa Taru',           kanji: '寺嵯',    km: 67.03 },
+      { code: 'KW28', name: 'Zayashuni',             kanji: '—',       km: 70.28 },
+      { code: 'KW29', name: 'Abiro',                 kanji: '獏路',    km: 76.15 }, // ↔ MS01, IN03
+      { code: 'KW30', name: 'Yakkais',               kanji: '—',       km: 79.94 },
+      { code: 'KW31', name: 'Rinongauri',            kanji: '桉沼',    km: 84.28 },
+      { code: 'KW32', name: 'Yamakoga',              kanji: '倉湖加',  km: 84.35 }, // ↔ CS?? (da confermare)
+    ],
   },
 
   RI: {
