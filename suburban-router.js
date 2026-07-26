@@ -54,6 +54,14 @@
      e la nota «Thru service — stay on board» invece del normale
      pannello cambio.
 
+   FIX 4 (_svcTrips NB direction):
+     In _svcTrips() il blocco else (direzione NB, goingFwd=false)
+     usava fullTravelSec calcolato in direzione SB. Con segSpeedKmh
+     variabili per segmento _segSpeed() è asimmetrico, quindi i tempi
+     in NB erano errati e identici per tutti i servizi, causando
+     deduplicazione dei Rapid. Fix: fullTravelSecNB usa
+     _travelSec(line, svcToIdx, svcFromIdx, fullKm).
+
    Tempi di trasferimento:
      TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban
      CROSS_TRANSFER_MIN     10 min  — interscambio suburbana ↔ IZX/AX/Metro
@@ -256,6 +264,10 @@ const SuburbanRouter = (() => {
    * Genera partenze usando un array *_SERVICES (SK o KW).
    * FIX: restituisce array di {sec, svcId, svcDesc, stops} in modo
    * che _buildLeg() conosca il tipo di servizio e le fermate.
+   *
+   * FIX 4: in direzione NB (goingFwd=false) usa fullTravelSecNB
+   * calcolato nella direzione corretta (svcToIdx→svcFromIdx) invece
+   * di fullTravelSec (SB), poiché _segSpeed() è asimmetrico.
    * ---------------------------------------------------------------- */
   function _svcTrips(services, line, iFrom, iTo, depSec) {
     const stCodes  = line.stations.map(s => s.code);
@@ -284,8 +296,12 @@ const SuburbanRouter = (() => {
         ? svc.peakWindows.map(w => ({ from: _hmToSec(w.from), to: _hmToSec(w.to) }))
         : [{ from: _hmToSec(svc.firstDep), to: _hmToSec(svc.lastDep) }];
 
-      const fullKm        = Math.abs(line.stations[svcToIdx].km - line.stations[svcFromIdx].km);
-      const fullTravelSec = _travelSec(line, svcFromIdx, svcToIdx, fullKm);
+      const fullKm = Math.abs(line.stations[svcToIdx].km - line.stations[svcFromIdx].km);
+      // FIX 4: calcola il tempo completo nella direzione effettiva di marcia.
+      // goingFwd=true  → SB: svcFromIdx → svcToIdx
+      // goingFwd=false → NB: svcToIdx   → svcFromIdx
+      const fullTravelSec   = _travelSec(line, svcFromIdx, svcToIdx, fullKm); // usato solo in SB
+      const fullTravelSecNB = _travelSec(line, svcToIdx, svcFromIdx, fullKm); // usato solo in NB
 
       for (const win of windows) {
         if (goingFwd) {
@@ -299,8 +315,11 @@ const SuburbanRouter = (() => {
             t += headwaySec;
           }
         } else {
-          const firstDepB  = win.from + fullTravelSec;
-          const lastDepB   = win.to   + fullTravelSec;
+          // NB: il treno parte da svcToIdx (capolinea B) e va verso svcFromIdx.
+          // firstDepB = orario in cui il treno arriva a svcToIdx partendo da svcFromIdx
+          //             a win.from, più il tempo NB completo.
+          const firstDepB  = win.from + fullTravelSecNB;
+          const lastDepB   = win.to   + fullTravelSecNB;
           const kmToFrom   = Math.abs(line.stations[iFrom].km - line.stations[svcToIdx].km);
           const offsetSec  = _travelSec(line, svcToIdx, iFrom, kmToFrom);
           let t = firstDepB + offsetSec;
