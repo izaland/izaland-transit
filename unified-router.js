@@ -3,210 +3,113 @@
    ================================================================
    Aggrega IZXRouter, SuburbanRouter e MetroRouter in un'unica
    interfaccia di ricerca. Gestisce i trasferimenti cross-network
-   tramite due meccanismi complementari:
+   tra IZX, Suburban e Metro.
+   ================================================================ */
 
-   1. Name-matching — stazioni con lo stesso nome su reti diverse.
-      Le linee metro sono trattate come reti separate (M2, M4, …)
-      così il name-match funziona anche intra-metro.
+(function (root, factory) {
+  if (typeof module !== 'undefined' && module.exports) module.exports = factory();
+  else root.IZXUnifiedRouter = factory();
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
 
-   2. Interchange index — mappe dichiarative lette da:
-        MetroRouter.allInterchanges()    ← aggrega tutti i M*_INTERCHANGE
-        IZX_LINES[x].INTERCHANGE + INTERCHANGE_EXTRA
-        SUBURBAN_INTERCHANGE
-      Aggiungere una nuova linea metro NON richiede modifiche qui.
-
-   API pubblica:
-     UnifiedRouter.search(from, to, depTime, opts) → Journey[]
-     UnifiedRouter.stationName(code)               → string
-     UnifiedRouter.allStations()                   → Station[]
-     UnifiedRouter.allLines()                      → Line[]
-     UnifiedRouter.availableNetworks()             → string[]
-
-   opts supportate:
-     opts.maxResults   {number}          default 5
-     opts.directOnly   {boolean}         default false
-     opts.networks     {string|string[]} es. ['IZX','METRO','M2']
-     opts.lines        {string|string[]} passa al sotto-router
-================================================================ */
-'use strict';
-
-const UnifiedRouter = (() => {
-
+  /* ================================================================
+   * CONSTANTS
+   * ================================================================ */
+  const MAX_JOURNEYS       = 5;
   const CROSS_TRANSFER_MIN = 10;
   const CROSS_TRANSFER_SEC = CROSS_TRANSFER_MIN * 60;
-  const MAX_JOURNEYS = 5;
 
-  function _routers() {
-    const r = [];
-    if (typeof SuburbanRouter !== 'undefined') r.push({ id: 'SUBURBAN', router: SuburbanRouter });
-    if (typeof IZXRouter      !== 'undefined') r.push({ id: 'IZX',      router: IZXRouter      });
-    return r;
-  }
+  /* ================================================================
+   * NETWORK REGISTRY
+   * ================================================================ */
+  const _routers = {};
 
-  function _metroRouters() {
-    if (typeof MetroRouter === 'undefined') return [];
-    return MetroRouter.allLines().map(line => ({
-      id: line.id,
-      router: {
-        search: (from, to, depTime, opts) =>
-          MetroRouter.search(from, to, depTime, { ...opts, lines: line.id }),
-        stationName:  MetroRouter.stationName.bind(MetroRouter),
-        allStations:  () => MetroRouter.allStations().filter(s => s.lineId === line.id),
-        allLines:     () => MetroRouter.allLines().filter(l => l.id === line.id),
-        lineColor:    MetroRouter.lineColor.bind(MetroRouter),
-      },
-    }));
-  }
-
-  function _allRouters() {
-    return [..._routers(), ..._metroRouters()];
-  }
-
-  let _nameIndex = null;
-  function _buildNameIndex() {
-    if (_nameIndex) return _nameIndex;
-    _nameIndex = {};
-    for (const { id, router } of _allRouters()) {
-      if (typeof router.allStations !== 'function') continue;
-      for (const st of router.allStations()) {
-        const key = String(st.name || st.n || '').trim().toLowerCase();
-        if (!key) continue;
-        if (!_nameIndex[key]) _nameIndex[key] = [];
-        _nameIndex[key].push({ networkId: id, code: st.code, name: st.name || st.n });
-      }
-    }
-    return _nameIndex;
-  }
-
-  function _networkOf(code) {
-    if (typeof MetroRouter !== 'undefined' && typeof MetroRouter.networkOf === 'function') {
-      const mNet = MetroRouter.networkOf(code);
-      if (mNet) return mNet;
-    }
-    for (const { id, router } of _routers()) {
-      if (typeof router.allStations !== 'function') continue;
-      if (router.allStations().some(s => s.code === code)) return id;
-    }
-    return null;
-  }
-
-  let _ixIndex = null;
-  function _buildInterchangeIndex() {
-    if (_ixIndex) return _ixIndex;
-    _ixIndex = {};
-
-    function _add(codeA, codeB, transferMin) {
-      if (!codeA || !codeB || codeA === codeB) return;
-      const t = transferMin ?? CROSS_TRANSFER_MIN;
-      if (!_ixIndex[codeA]) _ixIndex[codeA] = [];
-      if (!_ixIndex[codeB]) _ixIndex[codeB] = [];
-      if (!_ixIndex[codeA].find(e => e.code === codeB))
-        _ixIndex[codeA].push({ code: codeB, transferMin: t });
-      if (!_ixIndex[codeB].find(e => e.code === codeA))
-        _ixIndex[codeB].push({ code: codeA, transferMin: t });
-    }
-
-    if (typeof MetroRouter !== 'undefined' &&
-        typeof MetroRouter.allInterchanges === 'function') {
-      for (const ix of MetroRouter.allInterchanges())
-        _add(ix.codeA, ix.codeB, ix.transferMin);
-    }
-
-    if (typeof IZX_LINES !== 'undefined') {
-      for (const line of Object.values(IZX_LINES)) {
-        if (line.INTERCHANGE)
-          for (const [a, b] of Object.entries(line.INTERCHANGE))
-            _add(a, b, CROSS_TRANSFER_MIN);
-        if (line.INTERCHANGE_EXTRA)
-          for (const [a, bArr] of Object.entries(line.INTERCHANGE_EXTRA))
-            for (const b of bArr) _add(a, b, CROSS_TRANSFER_MIN);
-      }
-    }
-
-    if (typeof SUBURBAN_INTERCHANGE !== 'undefined')
-      for (const [a, bArr] of Object.entries(SUBURBAN_INTERCHANGE))
-        for (const b of bArr) _add(a, b, CROSS_TRANSFER_MIN);
-
-    return _ixIndex;
-  }
-
-  function _partnersOf(code) {
-    const myNet = _networkOf(code);
-    const seen  = new Set();
-    const out   = [];
-
-    function _push(partnerCode, transferMin) {
-      if (seen.has(partnerCode)) return;
-      const net = _networkOf(partnerCode);
-      if (!net || net === myNet) return;
-      seen.add(partnerCode);
-      out.push({ code: partnerCode, networkId: net, transferMin: transferMin ?? CROSS_TRANSFER_MIN });
-    }
-
-    const name = _stationNameRaw(code);
-    if (name) {
-      const key = name.trim().toLowerCase();
-      for (const entry of (_buildNameIndex()[key] || []))
-        if (entry.code !== code) _push(entry.code, CROSS_TRANSFER_MIN);
-    }
-
-    for (const entry of (_buildInterchangeIndex()[code] || []))
-      _push(entry.code, entry.transferMin);
-
-    return out;
-  }
-
-  /* ----------------------------------------------------------------
-   * _sameLine — verifica che due codici stiano sulla stessa linea
-   * (necessario solo per SUBURBAN, dove una stazione può comparire
-   *  su più linee con lo stesso nome, es. Hayatogaru su KD e LL)
-   * ---------------------------------------------------------------- */
-  function _sameLine(codeA, codeB, networkId) {
-    if (networkId === 'SUBURBAN' && typeof SUBURBAN_LINES !== 'undefined') {
-      return Object.values(SUBURBAN_LINES).some(line => {
-        const ia = line.stations.findIndex(s => s.code === codeA);
-        const ib = line.stations.findIndex(s => s.code === codeB);
-        return ia !== -1 && ib !== -1;
-      });
-    }
-    return true;
-  }
-
-  function _safeSearch(router, networkId, from, to, depTime, opts) {
-    if (!_sameLine(from, to, networkId)) return [];
-    const results = router.search(from, to, depTime, opts);
-    return results.filter(j => {
-      const lastLeg = j.legs[j.legs.length - 1];
-      return lastLeg && lastLeg.alightCode === to;
-    });
-  }
-
-  function _stationNameRaw(code) {
-    for (const { router } of _allRouters()) {
-      if (typeof router.allStations !== 'function') continue;
-      const st = router.allStations().find(s => s.code === code);
-      if (st) return st.name || st.n || null;
-    }
-    return null;
-  }
-
-  function _resolveToAll(codeOrName) {
-    const idx = _buildNameIndex();
-    for (const entries of Object.values(idx)) {
-      const found = entries.find(e => e.code === codeOrName);
-      if (found) {
-        const key = found.name.trim().toLowerCase();
-        return idx[key] || [found];
-      }
-    }
-    const key = String(codeOrName).trim().toLowerCase();
-    return idx[key] || [];
+  function registerRouter(networkId, routerObj) {
+    _routers[networkId.toUpperCase()] = routerObj;
   }
 
   function _routerFor(networkId) {
-    return _allRouters().find(r => r.id === networkId)?.router ?? null;
+    return _routers[networkId ? networkId.toUpperCase() : ''] || null;
   }
 
+  /* ================================================================
+   * INTERCHANGE INDEX
+   * ================================================================ */
+  const _ixIndex = {};
+
+  function _ixAdd(code, entry) {
+    if (!_ixIndex[code]) _ixIndex[code] = [];
+    _ixIndex[code].push(entry);
+  }
+
+  function _add(codeA, codeB, transferMin) {
+    const t = transferMin ?? CROSS_TRANSFER_MIN;
+    // avoid duplicate entries
+    if (!(_ixIndex[codeA] && _ixIndex[codeA].some(e => e.code === codeB)))
+      _ixIndex[codeA] = (_ixIndex[codeA] || []);
+    if (!(_ixIndex[codeB] && _ixIndex[codeB].some(e => e.code === codeA)))
+      _ixIndex[codeB] = (_ixIndex[codeB] || []);
+    _ixIndex[codeA].push({ code: codeB, transferMin: t });
+    _ixIndex[codeB].push({ code: codeA, transferMin: t });
+  }
+
+  function buildInterchangeIndex(interchangeData) {
+    // interchangeData: array of { codeA, codeB, transferMin? }
+    // OR the merged cross-network interchange maps from data files
+    if (Array.isArray(interchangeData)) {
+      interchangeData.forEach(ix => {
+        _add(ix.codeA, ix.codeB, ix.transferMin);
+      });
+      return;
+    }
+    // Object form: { stationCode: [ { code, network, transferMin } ] }
+    Object.entries(interchangeData).forEach(([stCode, partners]) => {
+      const pArr = Array.isArray(partners) ? partners : [partners];
+      if (pArr.length === 1) {
+        for (const b of pArr) _add(stCode, b.code ?? b, CROSS_TRANSFER_MIN);
+      } else {
+        for (const b of pArr) _add(stCode, b.code ?? b, CROSS_TRANSFER_MIN);
+      }
+    });
+  }
+
+  /* ================================================================
+   * PARTNER LOOKUP
+   * ================================================================ */
+  function _partnersOf(code) {
+    // Returns [{code, networkId, transferMin}]
+    const raw = _ixIndex[code] || [];
+    const out = [];
+
+    function _push(partnerCode, transferMin) {
+      // Determine network from registered routers
+      let net = null;
+      for (const [id, r] of Object.entries(_routers)) {
+        if (typeof r.hasStation === 'function' && r.hasStation(partnerCode)) { net = id; break; }
+        if (typeof r.allStations === 'function') {
+          const all = r.allStations();
+          if (all.some(s => s.code === partnerCode)) { net = id; break; }
+        }
+      }
+      if (!net) return;
+      out.push({ code: partnerCode, networkId: net, transferMin: transferMin ?? CROSS_TRANSFER_MIN });
+    }
+
+    raw.forEach(entry => {
+      if (entry.code !== code) _push(entry.code, CROSS_TRANSFER_MIN);
+    });
+    raw.forEach(entry => {
+      _push(entry.code, entry.transferMin);
+    });
+
+    // deduplicate
+    const seen = new Set();
+    return out.filter(e => { if (seen.has(e.code)) return false; seen.add(e.code); return true; });
+  }
+
+  /* ================================================================
+   * TIME UTILITIES
+   * ================================================================ */
   function _hmToSec(hm) {
     if (!hm) return 0;
     const [h, m] = hm.split(':').map(Number);
@@ -214,51 +117,100 @@ const UnifiedRouter = (() => {
   }
   function _secToHM(sec) {
     const s = ((sec % 86400) + 86400) % 86400;
-    return String(Math.floor(s / 3600)).padStart(2, '0') + ':' +
-           String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
   }
 
+  /* ================================================================
+   * JOURNEY BUILDERS
+   * ================================================================ */
+  function _buildJourney2(j1, j2, midCode, walkMin) {
+    const totalKm = (j1.totalKm != null && j2.totalKm != null)
+      ? j1.totalKm + j2.totalKm : null;
+    const wkMin   = walkMin ?? CROSS_TRANSFER_MIN;
+    const totalGapMin = Math.round(
+      (_hmToSec(j2.departureTime) - _hmToSec(j1.arrivalTime)) / 60
+    );
+    const wtMin = Math.max(0, totalGapMin - wkMin);
+    return {
+      legs:              [...j1.legs, ...j2.legs],
+      departureTime:     j1.departureTime,
+      arrivalTime:       j2.arrivalTime,
+      totalMinutes:      Math.round((_hmToSec(j2.arrivalTime) - _hmToSec(j1.departureTime)) / 60),
+      totalKm,
+      transfers:         (j1.transfers + j2.transfers) + 1,
+      transferNodes:     [...(j1.transferNodes || []), midCode, ...(j2.transferNodes || [])],
+      transferWalkMin:   [wkMin],
+      transferWaitMin:   [wtMin],
+    };
+  }
+
+  function _buildJourney3(j1, j2, j3, midCode1, midCode2, walkMin1, walkMin2) {
+    const totalKm = (j1.totalKm != null && j2.totalKm != null && j3.totalKm != null)
+      ? j1.totalKm + j2.totalKm + j3.totalKm : null;
+    const wk1 = walkMin1 ?? CROSS_TRANSFER_MIN;
+    const wk2 = walkMin2 ?? CROSS_TRANSFER_MIN;
+    const gap1 = Math.round((_hmToSec(j2.departureTime) - _hmToSec(j1.arrivalTime)) / 60);
+    const gap2 = Math.round((_hmToSec(j3.departureTime) - _hmToSec(j2.arrivalTime)) / 60);
+    return {
+      legs:              [...j1.legs, ...j2.legs, ...j3.legs],
+      departureTime:     j1.departureTime,
+      arrivalTime:       j3.arrivalTime,
+      totalMinutes:      Math.round((_hmToSec(j3.arrivalTime) - _hmToSec(j1.departureTime)) / 60),
+      totalKm,
+      transfers:         (j1.transfers + j2.transfers + j3.transfers) + 2,
+      transferNodes:     [
+        ...(j1.transferNodes || []), midCode1,
+        ...(j2.transferNodes || []), midCode2,
+        ...(j3.transferNodes || []),
+      ],
+      transferWalkMin:   [wk1, wk2],
+      transferWaitMin:   [Math.max(0, gap1 - wk1), Math.max(0, gap2 - wk2)],
+    };
+  }
+
+  /* ================================================================
+   * SAFE SEARCH WRAPPER
+   * ================================================================ */
+  function _safeSearch(router, networkId, from, to, depTime, opts) {
+    try {
+      if (from === to) return [];
+      const fn = router.search || router.findJourneys;
+      if (typeof fn !== 'function') return [];
+      const results = fn.call(router, from, to, depTime, opts);
+      return Array.isArray(results) ? results : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /* ================================================================
+   * NETWORK FILTER
+   * ================================================================ */
   function _networkFilter(opts) {
     const raw = opts.networks;
     if (!raw) return null;
     return new Set(Array.isArray(raw) ? raw.map(s => s.toUpperCase()) : [raw.toUpperCase()]);
   }
 
-  function _buildJourney2(j1, j2, midCode) {
-    const totalKm = (j1.totalKm != null && j2.totalKm != null)
-      ? j1.totalKm + j2.totalKm : null;
-    const waitMin = Math.round(
-      (_hmToSec(j2.departureTime) - _hmToSec(j1.arrivalTime)) / 60
-    );
-    return {
-      legs:            [...j1.legs, ...j2.legs],
-      departureTime:   j1.departureTime,
-      arrivalTime:     j2.arrivalTime,
-      totalMinutes:    Math.round((_hmToSec(j2.arrivalTime) - _hmToSec(j1.departureTime)) / 60),
-      totalKm,
-      transfers:       (j1.transfers + j2.transfers) + 1,
-      transferNodes:   [...(j1.transferNodes || []), midCode, ...(j2.transferNodes || [])],
-      transferWaitMin: waitMin,
-    };
-  }
-
-  function _buildJourney3(j1, j2, j3, midCode1, midCode2) {
-    const totalKm = (j1.totalKm != null && j2.totalKm != null && j3.totalKm != null)
-      ? j1.totalKm + j2.totalKm + j3.totalKm : null;
-    return {
-      legs:            [...j1.legs, ...j2.legs, ...j3.legs],
-      departureTime:   j1.departureTime,
-      arrivalTime:     j3.arrivalTime,
-      totalMinutes:    Math.round((_hmToSec(j3.arrivalTime) - _hmToSec(j1.departureTime)) / 60),
-      totalKm,
-      transfers:       (j1.transfers + j2.transfers + j3.transfers) + 2,
-      transferNodes:   [
-        ...(j1.transferNodes || []), midCode1,
-        ...(j2.transferNodes || []), midCode2,
-        ...(j3.transferNodes || []),
-      ],
-      transferWaitMin: Math.round((_hmToSec(j2.departureTime) - _hmToSec(j1.arrivalTime)) / 60),
-    };
+  /* ================================================================
+   * STATION NODE RESOLUTION
+   * ================================================================ */
+  function _resolveNodes(code, netFilter) {
+    // Returns [{code, networkId}] for all networks that know this station
+    const out = [];
+    for (const [id, r] of Object.entries(_routers)) {
+      if (netFilter && !netFilter.has(id)) continue;
+      let found = false;
+      if (typeof r.hasStation === 'function') {
+        found = r.hasStation(code);
+      } else if (typeof r.allStations === 'function') {
+        found = r.allStations().some(s => s.code === code);
+      }
+      if (found) out.push({ code, networkId: id });
+    }
+    return out;
   }
 
   /* ================================================================
@@ -268,43 +220,36 @@ const UnifiedRouter = (() => {
     const maxResults = opts.maxResults ?? MAX_JOURNEYS;
     const directOnly = !!opts.directOnly;
     const netFilter  = _networkFilter(opts);
-    const journeys   = [];
 
-    const fromNodes = _resolveToAll(from);
-    const toNodes   = _resolveToAll(to);
-
-    function _ensureNode(codeOrName, arr) {
-      if (arr.length) return arr;
-      const net = _networkOf(codeOrName);
-      if (!net) return [];
-      const name = _stationNameRaw(codeOrName) || codeOrName;
-      return [{ networkId: net, code: codeOrName, name }];
-    }
-    const fNodes = _ensureNode(from, fromNodes);
-    const tNodes = _ensureNode(to,   toNodes);
+    const fNodes = _resolveNodes(from, netFilter);
+    const tNodes = _resolveNodes(to,   netFilter);
     if (!fNodes.length || !tNodes.length) return [];
 
-    /* ---- 1. Diretti ----
-     * FIX: per ogni router, itera su TUTTI i fNode e tNode con quel
-     * networkId (non solo il primo). Questo evita che un nome condiviso
-     * tra più linee della stessa rete (es. Hayatogaru su KD e LL)
-     * faccia sì che il primo nodo trovato sia quello sbagliato.
-     * ---------------------------------------------------------------- */
-    for (const { id, router } of _allRouters()) {
-      if (netFilter && !netFilter.has(id)) continue;
-      if (typeof router.search !== 'function') continue;
-      const fCandidates = fNodes.filter(n => n.networkId === id);
-      const tCandidates = tNodes.filter(n => n.networkId === id);
-      for (const fNode of fCandidates) {
-        for (const tNode of tCandidates) {
-          if (fNode.code === tNode.code) continue;
-          const results = _safeSearch(router, id, fNode.code, tNode.code, depTime, opts);
-          for (const j of results) journeys.push({ ...j, _src: id });
-        }
+    const journeys = [];
+
+    /* ---- 1. DIRECT ---- */
+    for (const fNode of fNodes) {
+      for (const tNode of tNodes) {
+        if (fNode.networkId !== tNode.networkId) continue;
+        const router = _routerFor(fNode.networkId);
+        if (!router) continue;
+        const results = _safeSearch(router, fNode.networkId, from, to, depTime, opts);
+        results.forEach(j => {
+          // Normalise direct journey shape
+          journeys.push({
+            ...j,
+            transfers:       j.transfers ?? 0,
+            transferNodes:   j.transferNodes ?? [],
+            transferWalkMin: j.transferWalkMin ?? [],
+            transferWaitMin: j.transferWaitMin ?? [],
+          });
+        });
       }
     }
 
-    if (directOnly) return _finalise(journeys, maxResults);
+    if (directOnly) {
+      return _dedup(journeys).slice(0, maxResults);
+    }
 
     /* ---- 2. 2-LEG ---- */
     for (const fNode of fNodes) {
@@ -341,7 +286,7 @@ const UnifiedRouter = (() => {
               { ...opts, maxResults: 2, directOnly: true }
             );
             for (const j2 of j2list)
-              journeys.push(_buildJourney2(j1, j2, midSt.code));
+              journeys.push(_buildJourney2(j1, j2, midSt.code, partner.transferMin ?? CROSS_TRANSFER_MIN));
           }
         }
       }
@@ -404,7 +349,7 @@ const UnifiedRouter = (() => {
                     { ...opts, maxResults: 2, directOnly: true }
                   );
                   for (const j3 of j3list)
-                    journeys.push(_buildJourney3(j1, j2, j3, midSt1.code, midSt2.code));
+                    journeys.push(_buildJourney3(j1, j2, j3, midSt1.code, midSt2.code, p1.transferMin ?? CROSS_TRANSFER_MIN, p2.transferMin ?? CROSS_TRANSFER_MIN));
                 }
               }
             }
@@ -413,110 +358,32 @@ const UnifiedRouter = (() => {
       }
     }
 
-    return _finalise(journeys, maxResults);
-  }
-
-  /* ----------------------------------------------------------------
-   * _finalise
-   *
-   * Regola di dominanza:
-   *   B domina A solo se parte non prima, arriva non dopo,
-   *   ha ≤ cambi, e almeno uno dei tre è strettamente migliore.
-   *   → un diretto non viene mai eliminato da un viaggio con cambio.
-   * ---------------------------------------------------------------- */
-  function _finalise(journeys, maxResults) {
-    const seen = new Set();
-    const unique = journeys.filter(j => {
-      const key = j.legs.map(l =>
-        `${l.lineId}:${l.boardDep}:${l.boardCode}:${l.alightCode}`
-      ).join('|');
-      if (seen.has(key)) return false;
-      seen.add(key); return true;
-    });
-
-    const nonDominated = unique.filter((a, ia) => {
-      const depA = _hmToSec(a.departureTime);
-      const arrA = _hmToSec(a.arrivalTime);
-      const trA  = a.transfers;
-      return !unique.some((b, ib) => {
-        if (ib === ia) return false;
-        const depB = _hmToSec(b.departureTime);
-        const arrB = _hmToSec(b.arrivalTime);
-        const trB  = b.transfers;
-        return depB >= depA &&
-               arrB <= arrA &&
-               trB  <= trA  &&
-               (depB > depA || arrB < arrA || trB < trA);
-      });
-    });
-
-    nonDominated.sort((a, b) => {
-      const da = _hmToSec(a.departureTime), db = _hmToSec(b.departureTime);
-      if (da !== db) return da - db;
-      return a.transfers - b.transfers;
-    });
-    return nonDominated.slice(0, maxResults);
+    return _dedup(journeys).slice(0, maxResults);
   }
 
   /* ================================================================
-   * API pubblica
+   * DEDUP
    * ================================================================ */
-  function stationName(code) {
-    for (const { router } of _allRouters()) {
-      if (typeof router.stationName !== 'function') continue;
-      const name = router.stationName(code);
-      if (name && name !== code) return name;
-    }
-    return code;
-  }
-
-  function allStations() {
+  function _dedup(journeys) {
     const seen = new Set();
-    const out  = [];
-    for (const { id, router } of _allRouters()) {
-      if (typeof router.allStations !== 'function') continue;
-      for (const st of router.allStations()) {
-        if (seen.has(st.code)) continue;
-        seen.add(st.code);
-        out.push({ ...st, networkId: id });
-      }
-    }
-    return out;
+    return journeys
+      .sort((a, b) => _hmToSec(a.departureTime) - _hmToSec(b.departureTime) ||
+                      a.totalMinutes - b.totalMinutes)
+      .filter(j => {
+        const key = j.departureTime + '|' + j.arrivalTime + '|' + (j.legs || []).map(l => l.network + l.service).join(',');
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
   }
 
-  function allLines() {
-    const out = [];
-    for (const { id, router } of _allRouters()) {
-      if (typeof router.allLines !== 'function') continue;
-      for (const line of router.allLines()) out.push({ ...line, networkId: id });
-    }
-    return out;
-  }
-
-  function lineColor(lineId) {
-    for (const { router } of _allRouters()) {
-      if (typeof router.lineColor !== 'function') continue;
-      const c = router.lineColor(lineId);
-      if (c && c !== '#888') return c;
-    }
-    return '#888';
-  }
-
-  function availableNetworks() {
-    return _allRouters().map(r => r.id);
-  }
-
-  if (typeof module !== 'undefined') {
-    module.exports = {
-      search, stationName, allStations, allLines,
-      lineColor, availableNetworks,
-    };
-  }
-
+  /* ================================================================
+   * PUBLIC API
+   * ================================================================ */
   return {
-    search, stationName, allStations, allLines,
-    lineColor, availableNetworks,
+    registerRouter,
+    buildInterchangeIndex,
+    search,
     CROSS_TRANSFER_MIN,
   };
-
-})();
+});
