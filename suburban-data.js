@@ -49,9 +49,9 @@
      KW00 (Kishagoi-Exhibitown) ↔ M801, M17??, M18??
      KW02 (Shiki-Kiranne) ↔ IR
      KW03 (Ottanjoe) ↔ M03?? (da confermare)
-     KW09 (Kawayatsu) ↔ E02, KY02
-     KW16 (Ibarosu) ↔ CS01
-     KW17 (Otsumi-Ibarosu) ↔ CS02
+     KW10 (Kawayatsu) ↔ E02, KY02          ← era KW09 per errore
+     KW16 (Otsumi-Ibarosu) ↔ CS02          ← era CS01 per errore (swap)
+     KW17 (Ibarosu) ↔ CS01                 ← era CS02 per errore (swap)
      KW25 (Kotamari) ↔ IB?? (da confermare)
      KW29 (Abiro) ↔ MS01, IN03
      KW32 (Yamakoga) ↔ CS?? (da confermare)
@@ -100,9 +100,9 @@ const SUBURBAN_INTERCHANGE = {
   KW00: ['M801'],                               // Kishagoi-Exhibitown (KW ↔ M8; M17?? M18?? da confermare)
   KW02: ['IR'],                                 // Shiki-Kiranne (KW ↔ IR)
   KW03: [],                                     // Ottanjoe (↔ M03?? da confermare)
-  KW09: ['E02', 'KY02'],                        // Kawayatsu (KW ↔ IZX E02 + KY02)
-  KW16: ['CS01'],                               // Ibarosu (KW ↔ CS01)
-  KW17: ['CS02'],                               // Otsumi-Ibarosu (KW ↔ CS02)
+  KW10: ['E02', 'KY02'],                        // Kawayatsu (KW ↔ IZX E02 + KY02) — fix: era KW09 (Ukimako)
+  KW16: ['CS02'],                               // Otsumi-Ibarosu (KW ↔ CS02) — fix: era CS01 (swap)
+  KW17: ['CS01'],                               // Ibarosu (KW ↔ CS01) — fix: era CS02 (swap)
   KW25: [],                                     // Kotamari (↔ IB?? da confermare)
   KW29: ['MS01', 'IN03'],                       // Abiro (KW ↔ MS01 + IN03)
   KW32: [],                                     // Yamakoga (↔ CS?? da confermare)
@@ -487,7 +487,7 @@ const KW_SERVICES = [
     firstDep: '05:30',
     lastDep:  '23:30',
     headway:  20,
-    stops:    [],
+    stops:    null,   // null = ferma a tutte le stazioni (Local)
   },
   {
     id:       'W2',
@@ -497,7 +497,7 @@ const KW_SERVICES = [
     firstDep: '05:30',
     lastDep:  '23:30',
     headway:  20,
-    stops:    [],
+    stops:    null,   // null = ferma a tutte le stazioni (Local)
   },
   {
     id:       'W3',
