@@ -1008,6 +1008,18 @@ if (typeof MetroRouter !== 'undefined')
     for (const [a, arr] of Object.entries(SUBURBAN_INTERCHANGE))
       for (const e of arr) pairs.push({ codeA: a, codeB: e.code ?? e, transferMin: e.transferMin });
   }
+  // Metro interchanges (M4_INTERCHANGE + MetroRouter.allInterchanges())
+if (typeof MetroRouter !== 'undefined') {
+  MetroRouter.allInterchanges().forEach(ix =>
+    pairs.push({ codeA: ix.codeA, codeB: ix.codeB, transferMin: ix.transferMin })
+  );
+}
+// M4_INTERCHANGE (cross-network: metro ↔ IZX/suburban)
+if (typeof M4_INTERCHANGE !== 'undefined') {
+  for (const [a, arr] of Object.entries(M4_INTERCHANGE))
+    for (const e of arr)
+      pairs.push({ codeA: a, codeB: e.code ?? e, transferMin: e.transferMin });
+}
   IZXUnifiedRouter.buildInterchangeIndex(pairs);
 })();
 
