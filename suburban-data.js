@@ -474,16 +474,17 @@ const SK_SERVICES = [
      W2  Local limitato    KW00–KW17  ogni 20 min, 05:30–23:30
          (W1+W2 insieme: freq. 10 min su KW00–KW17, 20 min su KW17–KW32)
      W3  Rapid             KW00–KW32  ogni 20 min, 09:30–17:00
-         Fermate: KW00 KW01 KW03 KW06 KW10 KW11 KW17 KW22 KW29 KW32
-         Tratto KW22→KW29 (30.77 km) percorso a 120 km/h → ~15 min
+         Fermate: KW00 KW01 KW03 KW06 KW10 KW11 KW17 KW18 KW22 KW29 KW32
      W4  Commuter Rapid    KW00–KW32  ogni 20 min, 07:30–09:30 e 17:00–22:30
-         Fermate: KW00 KW01 KW06 KW10 KW11 KW17 KW22–KW32
+         Fermate: KW00 KW01 KW06 KW10 KW11 KW17 KW18 KW22 KW23 KW24 KW25
+                  KW26 KW27 KW28 KW29 KW30 KW31 KW32
 
    FIX:
-     - W1/W2: stops: [] invece di null (array vuoto = Local, ferma ovunque;
-       null causava ambiguità con la logica svc.stops ?? [] del router).
-     - W4: aggiunto lastDep: '22:30'. Senza di esso _hmToSec(undefined)
-       restituiva 0, e il loop while(t <= 0) non generava mai trip W4.
+     - W1/W2: stops: [] (array vuoto = Local, ferma ovunque).
+     - W3/W4: corretti stops[] — aggiunto KW00 (terminus Kishagoi,
+       mancante causava scarto del servizio per ricerche da/verso KW00)
+       e KW18 (Nwatanui, prima fermata extraurbana dopo Ibarosu).
+     - W4: lastDep: '22:30' (evita _hmToSec(undefined)=0).
 ================================================================ */
 const KW_SERVICES = [
   {
@@ -494,7 +495,7 @@ const KW_SERVICES = [
     firstDep: '05:30',
     lastDep:  '23:30',
     headway:  20,
-    stops:    [],     // [] = Local, ferma a tutte le stazioni
+    stops:    [],
   },
   {
     id:       'W2',
@@ -504,7 +505,7 @@ const KW_SERVICES = [
     firstDep: '05:30',
     lastDep:  '23:30',
     headway:  20,
-    stops:    [],     // [] = Local, ferma a tutte le stazioni
+    stops:    [],
   },
   {
     id:       'W3',
@@ -514,20 +515,20 @@ const KW_SERVICES = [
     firstDep: '09:30',
     lastDep:  '17:00',
     headway:  20,
-    stops:    ['KW00','KW01','KW03','KW06','KW10','KW11','KW17','KW22','KW29','KW32'],
+    stops:    ['KW00','KW01','KW03','KW06','KW10','KW11','KW17','KW18','KW22','KW29','KW32'],
   },
   {
     id:       'W4',
     desc:     'Commuter Rapid — Kishagoi-Exhibitown ↔ Yamakoga (punta mattina/sera)',
     fromCode: 'KW00',
     toCode:   'KW32',
-    lastDep:  '22:30',  // FIX: aggiunto — mancava, causava _hmToSec(undefined)=0 → zero trip
+    lastDep:  '22:30',
     peakWindows: [
       { from: '07:30', to: '09:30' },
       { from: '17:00', to: '22:30' },
     ],
     headway:  20,
-    stops:    ['KW00','KW01','KW06','KW10','KW11','KW17','KW22','KW23','KW24','KW25',
-               'KW26','KW27','KW28','KW29','KW30','KW31','KW32'],
+    stops:    ['KW00','KW01','KW06','KW10','KW11','KW17','KW18','KW22','KW23','KW24',
+               'KW25','KW26','KW27','KW28','KW29','KW30','KW31','KW32'],
   },
 ];
