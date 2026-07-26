@@ -81,6 +81,7 @@ const SUBURBAN_INTERCHANGE = {
   KD30: ['M405'],                               // Anagusa Mukai (KD ↔ Metro Line 4)
   KD32: ['LL01', 'K01', 'R01', 'E01', 'AX06'], // Sainðaul Central (KD)
   KD33: ['LL19'],                               // Aketsue (KD ↔ LL)
+  KD34: [],                                     // Nashikoma placeholder
   KD35: ['AX04', 'M419'],                       // Kasakuri (KD ↔ AX Ramo Est + Metro Line 4)
   KD36: ['K101'],                               // Sakamuso (KD ↔ IZX KE K101)
   KD37: ['K102', 'AX21'],                       // Showanul (KD ↔ IZX KE K102 + AX Ramo Bajikoe)
@@ -477,6 +478,12 @@ const SK_SERVICES = [
          Tratto KW22→KW29 (30.77 km) percorso a 120 km/h → ~15 min
      W4  Commuter Rapid    KW00–KW32  ogni 20 min, 07:30–09:30 e 17:00–22:30
          Fermate: KW00 KW01 KW06 KW10 KW11 KW17 KW22–KW32
+
+   FIX:
+     - W1/W2: stops: [] invece di null (array vuoto = Local, ferma ovunque;
+       null causava ambiguità con la logica svc.stops ?? [] del router).
+     - W4: aggiunto lastDep: '22:30'. Senza di esso _hmToSec(undefined)
+       restituiva 0, e il loop while(t <= 0) non generava mai trip W4.
 ================================================================ */
 const KW_SERVICES = [
   {
@@ -487,7 +494,7 @@ const KW_SERVICES = [
     firstDep: '05:30',
     lastDep:  '23:30',
     headway:  20,
-    stops:    null,   // null = ferma a tutte le stazioni (Local)
+    stops:    [],     // [] = Local, ferma a tutte le stazioni
   },
   {
     id:       'W2',
@@ -497,7 +504,7 @@ const KW_SERVICES = [
     firstDep: '05:30',
     lastDep:  '23:30',
     headway:  20,
-    stops:    null,   // null = ferma a tutte le stazioni (Local)
+    stops:    [],     // [] = Local, ferma a tutte le stazioni
   },
   {
     id:       'W3',
@@ -514,8 +521,7 @@ const KW_SERVICES = [
     desc:     'Commuter Rapid — Kishagoi-Exhibitown ↔ Yamakoga (punta mattina/sera)',
     fromCode: 'KW00',
     toCode:   'KW32',
-    firstDep: '07:30',
-    lastDep:  '22:30',
+    lastDep:  '22:30',  // FIX: aggiunto — mancava, causava _hmToSec(undefined)=0 → zero trip
     peakWindows: [
       { from: '07:30', to: '09:30' },
       { from: '17:00', to: '22:30' },
