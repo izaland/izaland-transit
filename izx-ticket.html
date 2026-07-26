@@ -229,7 +229,31 @@
     .transfer-time-val.is-zero{color:var(--text-faint);font-weight:400;}
     .jp-no-result{color:var(--text-faint);font-size:var(--text-xs);font-style:italic;padding:var(--space-4) 0;text-align:center;}
     .jp-note{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);font-size:var(--text-xs);color:#93c5fd;margin-bottom:var(--space-4);display:none;}
-
+    /* ── THRU-SERVICE ROW (cambio operatore, stay on board) ── */
+.thru-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  border-left: 3px solid var(--accent);
+  margin-left: 11px;
+  padding: 6px 0 6px calc(120px + var(--space-3) - 14px);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-weight: 500;
+  font-style: italic;
+}
+.thru-row .thru-arrows {
+  font-size: 1rem;
+  color: var(--accent);
+  flex-shrink: 0;
+  font-style: normal;
+  opacity: 0.75;
+}
+.thru-row .thru-label {
+  font-weight: 700;
+  color: var(--text);
+  font-style: normal;
+}
     /* ── EARLIER / LATER NAVIGATION ── */
     .jp-nav-bar{
       display:flex;
@@ -1242,30 +1266,41 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
           ${intStops.length ? `<div class="leg-intermediates" id="${intId}">${intHTML}</div>` : ''}`;
 
                 if (li < j.legs.length - 1) {
-                    const walkMin = Array.isArray(j.transferWalkMin)
-            ? (j.transferWalkMin[li] ?? IZXUnifiedRouter.CROSS_TRANSFER_MIN)
-            : (j.transferWalkMin ?? IZXUnifiedRouter.CROSS_TRANSFER_MIN);
-          const waitMin = Array.isArray(j.transferWaitMin)
-            ? (j.transferWaitMin[li] ?? 0)
-            : (li === 0 ? (j.transferWaitMin ?? 0) : 0);
-          const node = _stName(j.transferNodes[li]);
-          legsHTML += `
-            <div class="transfer-row">
-              <span class="transfer-row-title">Change at <strong>${node}</strong></span>
-              <div class="transfer-times">
-                <span class="transfer-time-item">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="5" r="2"/><path d="M12 7l-2 5h4l-1 5"/><path d="M10 12l-3 5"/><path d="M14 12l3 5"/></svg>
-                  <span class="transfer-time-label">Walk</span>
-                  <span class="transfer-time-val">${walkMin} min</span>
-                </span>
-                <span class="transfer-time-item">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
-                  <span class="transfer-time-label">Wait</span>
-                  <span class="transfer-time-val${waitMin === 0 ? ' is-zero' : ''}">${waitMin > 0 ? waitMin + ' min' : '—'}</span>
-                </span>
-              </div>
-            </div>`;
-        }
+  const node = _stName(j.transferNodes[li]);
+
+  if (j.thruService) {
+    // Thru-service: cambio operatore, i passeggeri restano a bordo
+    legsHTML += `
+      <div class="thru-row">
+        <span class="thru-arrows">⇄</span>
+        <span class="thru-label">Thru service</span>
+        <span>&mdash; operator changes at ${node}, stay on board</span>
+      </div>`;
+  } else {
+    const walkMin = Array.isArray(j.transferWalkMin)
+      ? (j.transferWalkMin[li] ?? IZXUnifiedRouter.CROSS_TRANSFER_MIN)
+      : (j.transferWalkMin ?? IZXUnifiedRouter.CROSS_TRANSFER_MIN);
+    const waitMin = Array.isArray(j.transferWaitMin)
+      ? (j.transferWaitMin[li] ?? 0)
+      : (li === 0 ? (j.transferWaitMin ?? 0) : 0);
+    legsHTML += `
+      <div class="transfer-row">
+        <span class="transfer-row-title">Change at <strong>${node}</strong></span>
+        <div class="transfer-times">
+          <span class="transfer-time-item">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="5" r="2"/><path d="M12 7l-2 5h4l-1 5"/><path d="M10 12l-3 5"/><path d="M14 12l3 5"/></svg>
+            <span class="transfer-time-label">Walk</span>
+            <span class="transfer-time-val">${walkMin} min</span>
+          </span>
+          <span class="transfer-time-item">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+            <span class="transfer-time-label">Wait</span>
+            <span class="transfer-time-val${waitMin === 0 ? ' is-zero' : ''}">${waitMin > 0 ? waitMin + ' min' : '—'}</span>
+          </span>
+        </div>
+      </div>`;
+  }
+}
       });
       legsHTML += '</div>';
 
