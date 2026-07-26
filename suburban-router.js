@@ -106,7 +106,7 @@ const SuburbanRouter = (() => {
     const step = iFrom < iTo ? 1 : -1;
     let totalKm = 0, weightedSum = 0;
     for (let i = iFrom; i !== iTo; i += step) {
-      const segIdx = step > 0 ? i : i - 1;
+      const segIdx = Math.min(i, i + step);
       if (segIdx < 0 || segIdx >= sts.length - 1) continue;
       const km  = Math.abs(sts[segIdx + 1].km - sts[segIdx].km);
       const spd = sts[segIdx].segSpeedKmh ?? AVG_SPEED_KMH;
