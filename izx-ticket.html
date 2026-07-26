@@ -1302,7 +1302,7 @@
     if (!_jpState.from) return;
     const anchor = _prevBefore(_jpState.all);
     if (!anchor) return;
-    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly);
+    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly, _jpState.excludeIzx);
     const cutoff = _parseMins(_jpState.windowStart);
     const earlier = journeys.filter(j => _parseMins(j.departureTime) < cutoff);
     if (!earlier.length) {
