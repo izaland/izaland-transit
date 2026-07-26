@@ -1257,10 +1257,9 @@
       for (const t of toCodes) {
         if (f === t) continue;
         const res = IZXUnifiedRouter.search(f, t, depTime, {
-          networks:   lineF || undefined,
+          networks:   (lineF && lineF !== 'ALL') ? lineF : undefined,
           directOnly: !!directOnly,
           maxResults: 8,
-        });
         });
         const filtered = excludeIzx
           ? res.filter(j => !j.legs.some(l => IZX_NETWORKS.has(l.network)))
