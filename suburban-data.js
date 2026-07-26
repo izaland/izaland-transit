@@ -9,7 +9,12 @@
        circular  {boolean}  — true per la Loop Line,
        headwayPeak       {number}  minuti,
        headwayOffPeak    {number}  minuti,
-       stations  [ { code, name, kanji, km } ]  — km dal capolinea A
+       stations  [ { code, name, kanji, km, segSpeedKmh? } ]
+         km            — distanza progressiva dal capolinea A
+         segSpeedKmh   — (opzionale) velocità commerciale media km/h
+                         sul segmento DA questa stazione ALLA successiva.
+                         Se assente il router usa AVG_SPEED_KMH globale.
+                         L'ultima stazione di ogni linea non ha segSpeedKmh.
      }
 
    SUBURBAN_INTERCHANGE:
@@ -301,6 +306,14 @@ const SUBURBAN_LINES = {
      Direzione: KW00 Kishagoi-Exhibitown (sud) → KW32 Yamakoga (nord)
      Collegamento M8 (M801) a KW00.
      Diramazione Ugutsumasa: da KW06 verso KW051 (dati da aggiungere).
+
+     Velocità per segmento (segSpeedKmh):
+       KW00–KW06  35–50 km/h  zona urbana densa, stazioni ravvicinate
+       KW06–KW17  55–75 km/h  suburbano, stazioni ogni 1–4 km
+       KW17–KW22  80–95 km/h  extraurbano, tratto aperto in progressiva accelerazione
+       KW22–KW29 120    km/h  tratto ad alta velocità (punta 130 km/h);
+                              il Rapid percorre KW22→KW29 (30.77 km) in ~15 min
+       KW29–KW32  80–88 km/h  zona terminale Yamakoga
   ──────────────────────────────────────────────── */
   KW: {
     id: 'KW',
@@ -312,39 +325,39 @@ const SUBURBAN_LINES = {
     headwayOffPeak: 10,
     totalKm: 84.35,
     stations: [
-      { code: 'KW00', name: 'Kishagoi - Exhibitown', kanji: '喜舎拘',        km:  0.00 }, // ↔ M801, M17??, M18??
-      { code: 'KW01', name: 'Kiranne',               kanji: '—',             km:  1.89 },
-      { code: 'KW02', name: 'Shiki-Kiranne',         kanji: '—',             km:  3.19 }, // ↔ IR
-      { code: 'KW03', name: 'Ottanjoe',              kanji: '—',             km:  5.04 }, // ↔ M03?? (da confermare)
-      { code: 'KW04', name: 'Semukudai',             kanji: '世牧臺',        km:  6.28 },
-      { code: 'KW05', name: 'Niji-Rekuni',           kanji: '西長澤',        km:  9.35 },
-      { code: 'KW06', name: 'Agasuri-ko Ugutsumasa', kanji: '蛞珠利湖・茨察', km: 11.63 }, // diramazione verso KW051 (dati da aggiungere)
-      { code: 'KW07', name: 'Chayogate',             kanji: '蟹湊',         km: 13.42 },
-      { code: 'KW08', name: 'Shin-Kawayatsu',        kanji: '新嘉夬苫',    km: 15.20 },
-      { code: 'KW09', name: 'Ukimako',               kanji: '—',             km: 16.95 },
-      { code: 'KW10', name: 'Kawayatsu',             kanji: '嘉夬苫',       km: 18.53 }, // ↔ E02, KY02
-      { code: 'KW11', name: 'Niji-Kawayatsu',        kanji: '西嘉夬苫',    km: 20.61 },
-      { code: 'KW12', name: 'Neyabakuri',            kanji: '—',             km: 22.61 },
-      { code: 'KW13', name: 'Tsimoniji',             kanji: '地多寺',        km: 23.96 },
-      { code: 'KW14', name: 'Yassamo',               kanji: '—',             km: 27.82 },
-      { code: 'KW15', name: 'Ibarosu Hinnandoshi',   kanji: '歯舢花都市',   km: 28.94 },
-      { code: 'KW16', name: 'Otsumi-Ibarosu',        kanji: '南歯舢',        km: 30.25 }, // ↔ CS02
-      { code: 'KW17', name: 'Ibarosu',               kanji: '歯舢',          km: 33.36 }, // ↔ CS01
-      { code: 'KW18', name: 'Nwatanui',              kanji: '—',             km: 35.18 },
-      { code: 'KW19', name: 'Abamiwa',               kanji: '弱水',          km: 38.51 },
-      { code: 'KW20', name: 'Shiwesuno',             kanji: '—',             km: 40.69 },
-      { code: 'KW21', name: 'Sogeisu',               kanji: '—',             km: 44.13 },
-      { code: 'KW22', name: 'Funoshoni',             kanji: '—',             km: 45.38 },
-      { code: 'KW23', name: 'Sārishiki',             kanji: '川北',          km: 48.43 },
-      { code: 'KW24', name: 'Karue',                 kanji: '松澤',          km: 51.83 },
-      { code: 'KW25', name: 'Kotamari',              kanji: '細幅射',        km: 56.84 }, // ↔ IB?? (da confermare)
-      { code: 'KW26', name: 'Enemui',                kanji: '—',             km: 63.93 },
-      { code: 'KW27', name: 'Kamasa Taru',           kanji: '寺嵯舟',        km: 67.03 },
-      { code: 'KW28', name: 'Zayashuni',             kanji: '—',             km: 70.28 },
-      { code: 'KW29', name: 'Abiro',                 kanji: '獏路',          km: 76.15 }, // ↔ MS01, IN03
-      { code: 'KW30', name: 'Yakkais',               kanji: '—',             km: 79.94 },
-      { code: 'KW31', name: 'Rinongauri',            kanji: '桉沼',          km: 84.28 },
-      { code: 'KW32', name: 'Yamakoga',              kanji: '倉湖加',        km: 84.35 }, // ↔ CS?? (da confermare)
+      { code: 'KW00', name: 'Kishagoi - Exhibitown', kanji: '喜舎拘',         km:  0.00, segSpeedKmh:  35 }, // ↔ M801
+      { code: 'KW01', name: 'Kiranne',               kanji: '—',              km:  1.89, segSpeedKmh:  38 },
+      { code: 'KW02', name: 'Shiki-Kiranne',         kanji: '—',              km:  3.19, segSpeedKmh:  40 }, // ↔ IR
+      { code: 'KW03', name: 'Ottanjoe',              kanji: '—',              km:  5.04, segSpeedKmh:  42 }, // ↔ M03??
+      { code: 'KW04', name: 'Semukudai',             kanji: '世牧臺',         km:  6.28, segSpeedKmh:  45 },
+      { code: 'KW05', name: 'Niji-Rekuni',           kanji: '西長澤',         km:  9.35, segSpeedKmh:  50 },
+      { code: 'KW06', name: 'Agasuri-ko Ugutsumasa', kanji: '蛞珠利湖・茨察', km: 11.63, segSpeedKmh:  55 },
+      { code: 'KW07', name: 'Chayogate',             kanji: '蟹湊',           km: 13.42, segSpeedKmh:  58 },
+      { code: 'KW08', name: 'Shin-Kawayatsu',        kanji: '新嘉夬苫',       km: 15.20, segSpeedKmh:  60 },
+      { code: 'KW09', name: 'Ukimako',               kanji: '—',              km: 16.95, segSpeedKmh:  60 },
+      { code: 'KW10', name: 'Kawayatsu',             kanji: '嘉夬苫',         km: 18.53, segSpeedKmh:  62 }, // ↔ E02, KY02
+      { code: 'KW11', name: 'Niji-Kawayatsu',        kanji: '西嘉夬苫',       km: 20.61, segSpeedKmh:  65 },
+      { code: 'KW12', name: 'Neyabakuri',            kanji: '—',              km: 22.61, segSpeedKmh:  65 },
+      { code: 'KW13', name: 'Tsimoniji',             kanji: '地多寺',         km: 23.96, segSpeedKmh:  68 },
+      { code: 'KW14', name: 'Yassamo',               kanji: '—',              km: 27.82, segSpeedKmh:  70 },
+      { code: 'KW15', name: 'Ibarosu Hinnandoshi',   kanji: '歯舢花都市',     km: 28.94, segSpeedKmh:  72 },
+      { code: 'KW16', name: 'Otsumi-Ibarosu',        kanji: '南歯舢',         km: 30.25, segSpeedKmh:  75 }, // ↔ CS02
+      { code: 'KW17', name: 'Ibarosu',               kanji: '歯舢',           km: 33.36, segSpeedKmh:  80 }, // ↔ CS01 — fine zona suburbana
+      { code: 'KW18', name: 'Nwatanui',              kanji: '—',              km: 35.18, segSpeedKmh:  85 },
+      { code: 'KW19', name: 'Abamiwa',               kanji: '弱水',           km: 38.51, segSpeedKmh:  88 },
+      { code: 'KW20', name: 'Shiwesuno',             kanji: '—',              km: 40.69, segSpeedKmh:  90 },
+      { code: 'KW21', name: 'Sogeisu',               kanji: '—',             km: 44.13, segSpeedKmh:  95 },
+      { code: 'KW22', name: 'Funoshoni',             kanji: '—',              km: 45.38, segSpeedKmh: 120 }, // tratto ad alta velocità, punta 130 km/h
+      { code: 'KW23', name: 'Sārishiki',             kanji: '川北',           km: 48.43, segSpeedKmh:  95 },
+      { code: 'KW24', name: 'Karue',                 kanji: '松澤',           km: 51.83, segSpeedKmh:  92 },
+      { code: 'KW25', name: 'Kotamari',              kanji: '細幅射',         km: 56.84, segSpeedKmh:  90 }, // ↔ IB??
+      { code: 'KW26', name: 'Enemui',                kanji: '—',              km: 63.93, segSpeedKmh:  88 },
+      { code: 'KW27', name: 'Kamasa Taru',           kanji: '寺嵯舟',         km: 67.03, segSpeedKmh:  85 },
+      { code: 'KW28', name: 'Zayashuni',             kanji: '—',              km: 70.28, segSpeedKmh:  85 },
+      { code: 'KW29', name: 'Abiro',                 kanji: '獏路',           km: 76.15, segSpeedKmh:  88 }, // ↔ MS01, IN03
+      { code: 'KW30', name: 'Yakkais',               kanji: '—',              km: 79.94, segSpeedKmh:  85 },
+      { code: 'KW31', name: 'Rinongauri',            kanji: '桉沼',           km: 84.28, segSpeedKmh:  80 },
+      { code: 'KW32', name: 'Yamakoga',              kanji: '倉湖加',         km: 84.35 },                   // capolinea, nessun segmento successivo
     ],
   },
 
@@ -412,29 +425,6 @@ const SUBURBAN_LINES = {
 
 /* ================================================================
    SK_SERVICES — sottoservizi Seishaku Line
-   Usati solo per la generazione degli orari sintetici nel router.
-   NON vengono visualizzati nel journey planner come tag o numeri.
-
-   Struttura per voce:
-     id        {string}  identificativo interno (S1…S4)
-     desc      {string}  descrizione leggibile
-     fromCode  {string}  codice capolinea A (direzione crescente)
-     toCode    {string}  codice capolinea B
-     firstDep  {string}  HH:MM — prima partenza dal capolinea A
-     lastDep   {string}  HH:MM — ultima partenza dal capolinea A
-     headway   {number}  minuti tra una corsa e la successiva
-
-   Logica bidirezionale:
-     Il router genera corse in entrambe le direzioni (A→B e B→A).
-     Per la direzione B→A, firstDep/lastDep si riferiscono alla
-     prima/ultima partenza dal capolinea B, calcolate aggiungendo
-     il tempo di percorrenza al firstDep/lastDep del capolinea A.
-
-   Copertura effettiva per stazione:
-     Una stazione è servita da un sottoservizio se il suo indice
-     in SK.stations ricade nell'intervallo [fromIdx, toIdx].
-     Il router combina le partenze di tutti i sottoservizi che
-     coprono sia la stazione di origine che quella di destinazione.
 ================================================================ */
 const SK_SERVICES = [
   {
@@ -477,8 +467,6 @@ const SK_SERVICES = [
 
 /* ================================================================
    KW_SERVICES — sottoservizi Kwōkei Line
-   Usati solo per la generazione degli orari sintetici nel router.
-   NON vengono visualizzati nel journey planner come tag o numeri.
 
    Pattern di servizio:
      W1  Local completo    KW00–KW32  ogni 20 min, 05:30–23:30
@@ -486,14 +474,9 @@ const SK_SERVICES = [
          (W1+W2 insieme: freq. 10 min su KW00–KW17, 20 min su KW17–KW32)
      W3  Rapid             KW00–KW32  ogni 20 min, 09:30–17:00
          Fermate: KW00 KW01 KW03 KW06 KW10 KW11 KW17 KW22 KW29 KW32
+         Tratto KW22→KW29 (30.77 km) percorso a 120 km/h → ~15 min
      W4  Commuter Rapid    KW00–KW32  ogni 20 min, 07:30–09:30 e 17:00–22:30
-         Fermate: KW00 KW01 KW06 KW10 KW11 KW17 KW22 KW23 KW24 KW25
-                  KW26 KW27 KW28 KW29 KW30 KW31 KW32
-
-   Nota sulle fermate selettive (W3/W4):
-     Il campo stops[] elenca i codici delle fermate effettive.
-     Il router deve ignorare le stazioni intermedie non incluse.
-     Se stops è assente o vuoto, il servizio ferma ovunque.
+         Fermate: KW00 KW01 KW06 KW10 KW11 KW17 KW22–KW32
 ================================================================ */
 const KW_SERVICES = [
   {
@@ -504,7 +487,7 @@ const KW_SERVICES = [
     firstDep: '05:30',
     lastDep:  '23:30',
     headway:  20,
-    stops:    [], // ferma a tutte le stazioni
+    stops:    [],
   },
   {
     id:       'W2',
@@ -514,7 +497,7 @@ const KW_SERVICES = [
     firstDep: '05:30',
     lastDep:  '23:30',
     headway:  20,
-    stops:    [], // ferma a tutte le stazioni del tratto KW00–KW17
+    stops:    [],
   },
   {
     id:       'W3',
@@ -531,8 +514,6 @@ const KW_SERVICES = [
     desc:     'Commuter Rapid — Kishagoi-Exhibitown ↔ Yamakoga (punta mattina/sera)',
     fromCode: 'KW00',
     toCode:   'KW32',
-    // Fascia mattutina: 07:30–09:30 | Fascia serale: 17:00–22:30
-    // Il router deve gestire le due finestre orarie separatamente.
     firstDep: '07:30',
     lastDep:  '22:30',
     peakWindows: [
