@@ -38,7 +38,7 @@
      SK28 ↔ KD34  (Nashikoma)
      SK35 ↔ KD35  (Kasakuri)
      SK38 ↔ KD36  (Sakamuso)
-     SK43 ↔ KD38  (Showanul)
+     SK43 ↔ KD37  (Showanul)
 
    SK_SERVICES:
      Sottoservizi della Seishaku Line, usati solo per la generazione
@@ -80,7 +80,7 @@ const SUBURBAN_INTERCHANGE = {
   SK28: ['KD34'],                               // Nashikoma (SK ↔ KD)
   SK35: ['KD35'],                               // Kasakuri (SK ↔ KD)
   SK38: ['KD36'],                               // Sakamuso (SK ↔ KD)
-  SK43: ['KD38'],                               // Showanul (SK ↔ KD)
+  SK43: ['KD37'],                               // Showanul (SK ↔ KD)
 };
 
 const SUBURBAN_LINES = {
