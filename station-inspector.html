@@ -39,7 +39,7 @@
       font-weight: bold;
     }
 
-    /* ─ Badge stile cerchio (metro) ──────────────────────── */
+    /* ─ Badge stile cerchio (metro) ────────────────────────── */
     .line-chip-metro {
       display: inline-flex;
       align-items: center;
@@ -85,14 +85,16 @@
   <div id="no-result">No station found.</div>
   <div id="results"></div>
 
-  <!-- ═══ DATA FILES ═════════════════════════════════════════════════════ -->
+  <!-- ═══ DATA FILES ════════════════════════════════════════════════════════════ -->
   <script src="metro/m4-data.js"></script>
+  <script src="metro/m8-data.js"></script>
+  <script src="metro/m8-tt.js"></script>
   <script src="suburban-data.js"></script>
   <script src="izx-data.js"></script>
   <script src="ax-data.js"></script>
 
   <script>
-  /* ── Build unified station index ─────────────────────────────────── */
+  /* ── Build unified station index ──────────────────────────────────── */
   const ALL_STATIONS = [];   // { code, name, network, lineId, lineColor, lineName }
 
   /* M4 */
@@ -100,6 +102,14 @@
     for (const [code, st] of Object.entries(M4_ST)) {
       ALL_STATIONS.push({ code, name: st.n, network: 'metro',
         lineId: 'M4', lineColor: M4_META.color, lineName: M4_META.name });
+    }
+  }
+
+  /* M8 */
+  if (typeof M8_ST !== 'undefined') {
+    for (const [code, st] of Object.entries(M8_ST)) {
+      ALL_STATIONS.push({ code, name: st.n, network: 'metro',
+        lineId: 'M8', lineColor: M8_META.color, lineName: M8_META.name });
     }
   }
 
@@ -136,7 +146,7 @@
     }
   }
 
-  /* ── Helper: render badge con forma giusta per network ─────────────── */
+  /* ── Helper: render badge con forma giusta per network ───────────────── */
   function lineBadge(lineId, lineColor, lineName, network) {
     if (network === 'metro') {
       return `<span class="line-chip-metro" style="background:${lineColor}">${lineId}</span>`
@@ -146,7 +156,7 @@
          + `<span style="font-size:0.8rem;color:#888;margin-right:12px">${lineName}</span>`;
   }
 
-  /* ── Autocomplete ────────────────────────────────────────────── */
+  /* ── Autocomplete ─────────────────────────────────────────── */
   const qEl   = document.getElementById('query');
   const sugEl = document.getElementById('suggestions');
 
@@ -190,7 +200,7 @@
 
   qEl.addEventListener('keydown', e => { if (e.key === 'Enter') inspect(); });
 
-  /* ── Core inspect() ────────────────────────────────────────────── */
+  /* ── Core inspect() ────────────────────────────────────────── */
   function inspect() {
     sugEl.style.display = 'none';
     const raw = qEl.value.trim();
@@ -227,6 +237,20 @@
       }
     }
 
+    /* Interscambi M8 */
+    const m8Interchanges = [];
+    if (typeof M8_INTERCHANGE !== 'undefined') {
+      for (const [m8code, entries] of Object.entries(M8_INTERCHANGE)) {
+        for (const entry of (Array.isArray(entries) ? entries : [entries])) {
+          const pCode = entry.code ?? entry;
+          if (pCode === station.code || m8code === station.code) {
+            m8Interchanges.push({ m8code, partnerCode: pCode,
+              network: entry.network, transferMin: entry.transferMin, note: entry.note });
+          }
+        }
+      }
+    }
+
     /* Interscambi Suburban */
     const subInterchanges = [];
     if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
@@ -240,10 +264,9 @@
     }
 
     /* Status checks */
-    function checkM4Reachable(code) {
+    function checkMetroReachable(code) {
       if (typeof M4_ST !== 'undefined' && M4_ST[code]) return 'ok';
-      // Fallback: se il codice è presente in ALL_STATIONS come metro (es. M2),
-      // consideralo valido anche se il suo data file non è caricato qui.
+      if (typeof M8_ST !== 'undefined' && M8_ST[code]) return 'ok';
       if (ALL_STATIONS.find(s => s.code === code && s.network === 'metro')) return 'ok';
       return 'missing';
     }
@@ -266,29 +289,17 @@
       return 'missing';
     }
 
-    /* Render */
-    let html = `
-      <div class="station-header">
-        <div class="station-name">${station.name}</div>
-        <div class="station-code">${station.code}</div>
-      </div>
-      <div class="section">
-        <div class="section-title">Member of lines</div>
-        <div style="display:flex;flex-wrap:wrap;align-items:center">
-          ${memberOf.map(s => lineBadge(s.lineId, s.lineColor, s.lineName, s.network)).join('')}
-        </div>
-      </div>`;
-
-    /* M4 interchanges */
-    if (m4Interchanges.length) {
-      html += `<div class="section"><div class="section-title">M4 Interchanges</div>`;
-      m4Interchanges.forEach(ix => {
-        const isM4side  = ix.m4code === station.code;
-        const otherCode = isM4side ? ix.partnerCode : ix.m4code;
-        const otherNet  = isM4side ? ix.network : 'metro';
-        const statusFn  = otherNet === 'metro'    ? checkM4Reachable
+    /* Helper: render sezione interscambi generica */
+    function renderInterchangeSection(title, items, getOtherCode, getNetwork, getNote, getTransferMin) {
+      if (!items.length) return '';
+      let html = `<div class="section"><div class="section-title">${title}</div>`;
+      items.forEach(ix => {
+        const otherCode = getOtherCode(ix);
+        const otherNet  = getNetwork(ix);
+        const statusFn  = otherNet === 'metro'    ? checkMetroReachable
                         : otherNet === 'suburban' ? checkSubReachable
                         : otherNet === 'ax'       ? checkAXReachable
+                        : otherNet === 'ibaches'  ? () => 'ok'
                         : checkIZXReachable;
         const st2    = ALL_STATIONS.find(s => s.code === otherCode);
         const status = statusFn(otherCode);
@@ -302,15 +313,44 @@
               <span class="irow-name">${st2?.name || '?'}</span>
               <span class="irow-network">${otherNet}</span>
             </div>
-            <div class="irow-meta">${ix.note || ''} · ${ix.transferMin ?? '?'} min walk</div>
+            <div class="irow-meta">${getNote(ix) || ''} · ${getTransferMin(ix) ?? '?'} min walk</div>
             <div class="status-row">
               <span class="dot ${dotCls}"></span>
               <span class="${txtCls}">${status === 'ok' ? 'Reachable in router' : status === 'missing' ? 'NOT FOUND in data' : 'Data unavailable'}</span>
             </div>
           </div>`;
       });
-      html += `</div>`;
+      return html + `</div>`;
     }
+
+    /* Render */
+    let html = `
+      <div class="station-header">
+        <div class="station-name">${station.name}</div>
+        <div class="station-code">${station.code}</div>
+      </div>
+      <div class="section">
+        <div class="section-title">Member of lines</div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center">
+          ${memberOf.map(s => lineBadge(s.lineId, s.lineColor, s.lineName, s.network)).join('')}
+        </div>
+      </div>`;
+
+    html += renderInterchangeSection(
+      'M4 Interchanges', m4Interchanges,
+      ix => ix.m4code === station.code ? ix.partnerCode : ix.m4code,
+      ix => ix.m4code === station.code ? ix.network : 'metro',
+      ix => ix.note,
+      ix => ix.transferMin
+    );
+
+    html += renderInterchangeSection(
+      'M8 Interchanges', m8Interchanges,
+      ix => ix.m8code === station.code ? ix.partnerCode : ix.m8code,
+      ix => ix.m8code === station.code ? ix.network : 'metro',
+      ix => ix.note,
+      ix => ix.transferMin
+    );
 
     /* Suburban interchanges */
     if (subInterchanges.length) {
@@ -320,7 +360,7 @@
         const st2  = ALL_STATIONS.find(s => s.code === otherCode);
         const net2 = st2?.network || '?';
         const statusFn = net2 === 'suburban' ? checkSubReachable
-                       : net2 === 'metro'    ? checkM4Reachable
+                       : net2 === 'metro'    ? checkMetroReachable
                        : net2 === 'ax'       ? checkAXReachable
                        : checkIZXReachable;
         const status = statusFn(otherCode);
@@ -343,7 +383,7 @@
       html += `</div>`;
     }
 
-    if (!m4Interchanges.length && !subInterchanges.length) {
+    if (!m4Interchanges.length && !m8Interchanges.length && !subInterchanges.length) {
       html += `<div class="section"><div class="section-title">Interchanges</div>
         <span style="color:#555;font-size:0.85rem">No interchange defined for this station.</span></div>`;
     }
