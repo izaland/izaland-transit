@@ -123,25 +123,34 @@
    * JOURNEY BUILDERS
    * ================================================================ */
   function _buildJourney2(j1, j2, midCode, walkMin) {
-    const totalKm = (j1.totalKm != null && j2.totalKm != null)
-      ? j1.totalKm + j2.totalKm : null;
-    const wkMin   = walkMin ?? CROSS_TRANSFER_MIN;
-    const totalGapMin = Math.round(
-      (_hmToSec(j2.departureTime) - _hmToSec(j1.arrivalTime)) / 60
-    );
-    const wtMin = Math.max(0, totalGapMin - wkMin);
-    return {
-      legs:              [...j1.legs, ...j2.legs],
-      departureTime:     j1.departureTime,
-      arrivalTime:       j2.arrivalTime,
-      totalMinutes:      Math.round((_hmToSec(j2.arrivalTime) - _hmToSec(j1.departureTime)) / 60),
-      totalKm,
-      transfers:         (j1.transfers + j2.transfers) + 1,
-      transferNodes:     [...(j1.transferNodes || []), midCode, ...(j2.transferNodes || [])],
-      transferWalkMin:   [wkMin],
-      transferWaitMin:   [wtMin],
-    };
+  const totalKm = (j1.totalKm != null && j2.totalKm != null)
+    ? j1.totalKm + j2.totalKm : null;
+  const wkMin   = walkMin ?? CROSS_TRANSFER_MIN;
+  const totalGapMin = Math.round(
+    (_hmToSec(j2.departureTime) - _hmToSec(j1.arrivalTime)) / 60
+  );
+  const wtMin = Math.max(0, totalGapMin - wkMin);
+
+  // Propaga thruService/thruNode se presenti nel primo journey (es. KW→M8)
+  const thruFields = {};
+  if (j1.thruService) {
+    thruFields.thruService = true;
+    thruFields.thruNode    = j1.thruNode;
   }
+
+  return {
+    legs:              [...j1.legs, ...j2.legs],
+    departureTime:     j1.departureTime,
+    arrivalTime:       j2.arrivalTime,
+    totalMinutes:      Math.round((_hmToSec(j2.arrivalTime) - _hmToSec(j1.departureTime)) / 60),
+    totalKm,
+    transfers:         (j1.transfers + j2.transfers) + 1,
+    transferNodes:     [...(j1.transferNodes || []), midCode, ...(j2.transferNodes || [])],
+    transferWalkMin:   [wkMin],
+    transferWaitMin:   [wtMin],
+    ...thruFields,
+  };
+}
 
   function _buildJourney3(j1, j2, j3, midCode1, midCode2, walkMin1, walkMin2) {
     const totalKm = (j1.totalKm != null && j2.totalKm != null && j3.totalKm != null)
