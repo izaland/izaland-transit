@@ -979,6 +979,333 @@
   });
 
   /* ================================================================
+   JOURNEY PLANNER — init
+================================================================ */
+
+// 1. Registra i router
+IZXUnifiedRouter.registerRouter('IZX', IZXRouter);
+if (typeof SuburbanRouter !== 'undefined')
+  IZXUnifiedRouter.registerRouter('SUB', SuburbanRouter);
+if (typeof MetroRouter !== 'undefined')
+  IZXUnifiedRouter.registerRouter('METRO', MetroRouter);
+
+// 2. Costruisci l'interchange index cross-network
+(function _buildIx() {
+  const pairs = [];
+  // IZX_LINES interchange
+  for (const line of Object.values(IZX_LINES)) {
+    if (line.INTERCHANGE) {
+      for (const [a, b] of Object.entries(line.INTERCHANGE))
+        pairs.push({ codeA: a, codeB: b });
+    }
+    if (line.INTERCHANGE_EXTRA) {
+      for (const [a, partners] of Object.entries(line.INTERCHANGE_EXTRA))
+        for (const b of partners) pairs.push({ codeA: a, codeB: b });
+    }
+  }
+  // Suburban interchange
+  if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
+    for (const [a, arr] of Object.entries(SUBURBAN_INTERCHANGE))
+      for (const e of arr) pairs.push({ codeA: a, codeB: e.code ?? e, transferMin: e.transferMin });
+  }
+  IZXUnifiedRouter.buildInterchangeIndex(pairs);
+})();
+
+// 3. Popola i <select> del Journey Planner
+function buildJpSelects() {
+  const selFrom = document.getElementById('jp-from');
+  const selTo   = document.getElementById('jp-to');
+  if (!selFrom || !selTo) return;
+
+  function makeOptgroup(label) {
+    const og = document.createElement('optgroup');
+    og.label = label;
+    return og;
+  }
+  function addOpt(og, value, text) {
+    const o = document.createElement('option');
+    o.value = value; o.textContent = text;
+    og.appendChild(o);
+  }
+
+  const fragF = document.createDocumentFragment();
+  const fragT = document.createDocumentFragment();
+
+  // IZX stations (reuse same order as fare selects)
+  const izxGroups = [
+    { label: 'IZX Keishin — Main Line',      codes: KE_SELECT_ORDER, st: KE_ST },
+    { label: 'IZX Ryānkai — Main Line',      codes: RY_SELECT_ORDER, st: RY_ST },
+    { label: 'IZX Eira — Main Line',         codes: EI_SELECT_ORDER, st: EI_ST },
+    { label: 'Airport Express',              codes: AX_SELECT_ORDER, st: AX_ST },
+  ];
+  izxGroups.forEach(({ label, codes, st }) => {
+    const ogF = makeOptgroup(label), ogT = makeOptgroup(label);
+    codes.forEach(code => {
+      const s = st[code]; if (!s) return;
+      const val = (code === 'K01') ? HUB_VAL : code;
+      const txt = code + ' ' + s.n + (s.k ? ' · ' + s.k : '');
+      addOpt(ogF, val, txt); addOpt(ogT, val, txt);
+    });
+    fragF.appendChild(ogF); fragT.appendChild(ogT);
+  });
+
+  // Suburban stations
+  if (typeof SUBURBAN_LINES !== 'undefined') {
+    for (const [lineId, line] of Object.entries(SUBURBAN_LINES)) {
+      const ogF = makeOptgroup('Suburban — ' + line.name);
+      const ogT = makeOptgroup('Suburban — ' + line.name);
+      (line.stations || []).forEach(s => {
+        addOpt(ogF, s.code, s.code + ' ' + s.name);
+        addOpt(ogT, s.code, s.code + ' ' + s.name);
+      });
+      fragF.appendChild(ogF); fragT.appendChild(ogT);
+    }
+  }
+
+  // Metro stations (M4 + M2 + M8)
+  const metroSets = [
+    { obj: typeof M4_ST !== 'undefined' ? M4_ST : null, label: 'Metro M4' },
+    { obj: typeof M2_ST !== 'undefined' ? M2_ST : null, label: 'Metro M2' },
+    { obj: typeof M8_ST !== 'undefined' ? M8_ST : null, label: 'Metro M8' },
+  ];
+  metroSets.forEach(({ obj, label }) => {
+    if (!obj) return;
+    const ogF = makeOptgroup(label), ogT = makeOptgroup(label);
+    Object.entries(obj).forEach(([code, s]) => {
+      addOpt(ogF, code, code + ' ' + s.n); addOpt(ogT, code, code + ' ' + s.n);
+    });
+    fragF.appendChild(ogF); fragT.appendChild(ogT);
+  });
+
+  const newF = selFrom.cloneNode(false); newF.appendChild(fragF);
+  const newT = selTo.cloneNode(false);   newT.appendChild(fragT);
+  selFrom.parentNode.replaceChild(newF, selFrom);
+  selTo.parentNode.replaceChild(newT, selTo);
+
+  newF.value = HUB_VAL;
+  newT.value = 'K17';
+}
+
+buildJpSelects();
+
+// 4. Journey Planner state
+let _jpDepTime = null;  // HH:MM corrente (per Earlier/Later)
+
+function _hmToSec(hm) {
+  const [h, m] = hm.split(':').map(Number);
+  return h * 3600 + m * 60;
+}
+function _secToHM(sec) {
+  const s = ((sec % 86400) + 86400) % 86400;
+  return String(Math.floor(s / 3600)).padStart(2, '0') + ':' +
+         String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+}
+
+function _svcBadgeHTML(leg) {
+  const color = leg.color || '#888';
+  const svc   = leg.svcLogical || leg.svcId || leg.service || '';
+  const net   = (leg.network || leg.lineId || '').toUpperCase();
+  if (net === 'METRO' || /^M\d/.test(svc)) {
+    return `<span class="svc-badge-metro" style="background:${color};color:#fff">${svc}</span>`;
+  }
+  return `<span class="svc-badge svc-${svc}" style="background:${color};color:#fff">${svc}</span>`;
+}
+
+function _renderJourneys(journeys, from, to) {
+  const resultsDiv = document.getElementById('jp-results');
+  const list       = document.getElementById('journey-list');
+  const navBar     = document.getElementById('jp-nav-bar');
+  const timeChip   = document.getElementById('jp-time-chip');
+  const routeTitle = document.getElementById('jp-route-title');
+
+  list.innerHTML = '';
+
+  // Station name helpers
+  function nameOf(code) {
+    if (code === HUB_VAL) return ALL_ST[HUB_K] ? ALL_ST[HUB_K].n : 'Sainðaul Central';
+    if (ALL_ST[code]) return ALL_ST[code].n;
+    // Suburban
+    if (typeof SUBURBAN_LINES !== 'undefined') {
+      for (const line of Object.values(SUBURBAN_LINES)) {
+        const s = (line.stations || []).find(s => s.code === code);
+        if (s) return s.name;
+      }
+    }
+    // Metro
+    for (const obj of [
+      typeof M4_ST !== 'undefined' ? M4_ST : null,
+      typeof M2_ST !== 'undefined' ? M2_ST : null,
+      typeof M8_ST !== 'undefined' ? M8_ST : null,
+    ]) {
+      if (obj && obj[code]) return obj[code].n;
+    }
+    return code;
+  }
+
+  resultsDiv.style.display = 'block';
+  routeTitle.textContent = nameOf(from) + ' → ' + nameOf(to);
+
+  if (!journeys.length) {
+    list.innerHTML = '<div class="jp-no-result">No journeys found for this time. Try a different departure time.</div>';
+    navBar.style.display = 'none';
+    return;
+  }
+
+  // Show Earlier/Later nav
+  navBar.style.display = 'flex';
+  timeChip.textContent = 'Showing from ' + _jpDepTime;
+
+  // Render each journey
+  journeys.forEach((j, idx) => {
+    const card = document.createElement('div');
+    card.className = 'journey-card' + (idx === 0 ? ' best' : '');
+
+    const transfers = j.transfers ?? 0;
+    const tBadge = transfers > 0
+      ? `<span class="transfer-badge">${transfers} change${transfers > 1 ? 's' : ''}</span>`
+      : '<span class="transfer-badge">Direct</span>';
+    const kmStr = j.totalKm != null ? `${j.totalKm.toFixed(1)} km` : '';
+
+    card.innerHTML = `
+      <div class="journey-header">
+        <div class="journey-times">${j.departureTime} → ${j.arrivalTime}</div>
+        <div class="journey-dur">${j.totalMinutes} min ${tBadge}</div>
+      </div>
+      <div class="journey-km">${kmStr}</div>
+      <div class="journey-legs" id="legs-${idx}"></div>`;
+
+    const legsDiv = card.querySelector(`#legs-${idx}`);
+
+    (j.legs || []).forEach((leg, li) => {
+      const svc    = leg.svcLogical || leg.svcId || leg.service || '';
+      const color  = leg.color || '#888';
+      const badge  = _svcBadgeHTML(leg);
+      const from_  = leg.boardName   || leg.boardCode   || leg.from || '';
+      const to_    = leg.alightName  || leg.alightCode  || leg.to   || '';
+      const depT   = leg.boardDep    || leg.dep  || '';
+      const arrT   = leg.alightArr   || leg.arr  || '';
+      const km_    = leg.km != null  ? leg.km.toFixed(1) + ' km' : '';
+      const train_ = leg.trainNumber ? `<span class="leg-train">#${leg.trainNumber}</span>` : '';
+      const ints   = leg.intermediateStops || [];
+      const intId  = `int-${idx}-${li}`;
+      const expandBtn = ints.length > 0
+        ? `<button class="leg-expand-btn" data-target="${intId}">${ints.length} stops ▾</button>`
+        : '';
+
+      const legRow = document.createElement('div');
+      legRow.className = 'leg-row';
+      legRow.innerHTML = `
+        <div class="leg-svc">${badge}<span style="font-size:.7rem;color:var(--text-muted)">${svc}</span></div>
+        <div class="leg-times">${depT} → ${arrT}</div>
+        <div class="leg-stations">${from_} → ${to_}</div>
+        <div class="leg-meta">${train_}<span class="leg-km">${km_}</span>${expandBtn}</div>`;
+      legsDiv.appendChild(legRow);
+
+      // Intermediate stops panel
+      if (ints.length > 0) {
+        const intPanel = document.createElement('div');
+        intPanel.className = 'leg-intermediates';
+        intPanel.id = intId;
+        ints.forEach(st => {
+          const row = document.createElement('div');
+          row.className = 'leg-int-row';
+          row.innerHTML = `<span class="leg-int-time">${st.arr || st.dep || ''}</span><span>${st.name || st.code}</span>`;
+          intPanel.appendChild(row);
+        });
+        legsDiv.appendChild(intPanel);
+
+        legRow.querySelector('.leg-expand-btn').addEventListener('click', function () {
+          const panel = document.getElementById(this.dataset.target);
+          panel.classList.toggle('open');
+          this.textContent = panel.classList.contains('open')
+            ? `${ints.length} stops ▴`
+            : `${ints.length} stops ▾`;
+        });
+      }
+
+      // Transfer row between legs
+      const transfers_ = j.transferNodes || [];
+      if (li < (j.legs.length - 1)) {
+        const midCode   = transfers_[li] || '';
+        const midName   = midCode ? nameOf(midCode) : '';
+        const walkMin   = Array.isArray(j.transferWalkMin) ? (j.transferWalkMin[li] ?? 10) : (j.transferWalkMin ?? 10);
+        const waitMin   = Array.isArray(j.transferWaitMin) ? (j.transferWaitMin[li] ?? 0)  : (j.transferWaitMin ?? 0);
+        const transferRow = document.createElement('div');
+        transferRow.className = 'transfer-row';
+        transferRow.innerHTML = `
+          <div class="transfer-row-title">Change at ${midName || 'interchange'}</div>
+          <div class="transfer-times">
+            <div class="transfer-time-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span class="transfer-time-label">Walk</span>
+              <span class="transfer-time-val">${walkMin} min</span>
+            </div>
+            <div class="transfer-time-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span class="transfer-time-label">Wait</span>
+              <span class="transfer-time-val ${waitMin === 0 ? 'is-zero' : ''}">${waitMin} min</span>
+            </div>
+          </div>`;
+        legsDiv.appendChild(transferRow);
+      }
+    });
+
+    list.appendChild(card);
+  });
+}
+
+function _runJP(depTimeHM) {
+  const selFrom    = document.getElementById('jp-from');
+  const selTo      = document.getElementById('jp-to');
+  const lineFilter = document.getElementById('jp-line').value;
+  const directOnly = document.getElementById('jp-direct-only').checked;
+  const excludeIZX = document.getElementById('jp-exclude-izx').checked;
+
+  const from = selFrom.value;
+  const to   = selTo.value;
+  if (!from || !to || from === to) {
+    document.getElementById('jp-results').style.display = 'none';
+    return;
+  }
+
+  _jpDepTime = depTimeHM;
+
+  const opts = {
+    maxResults: 5,
+    directOnly,
+  };
+  if (lineFilter !== 'ALL') opts.networks = [lineFilter];
+  if (excludeIZX) opts.networks = (opts.networks || []).filter(n => n !== 'IZX');
+
+  const journeys = IZXUnifiedRouter.search(from, to, depTimeHM, opts);
+  _renderJourneys(journeys, from, to);
+}
+
+// 5. Handlers
+document.getElementById('jp-search').addEventListener('click', () => {
+  const t = document.getElementById('jp-time').value || '08:00';
+  _runJP(t);
+});
+
+document.getElementById('jp-swap').addEventListener('click', () => {
+  const sf = document.getElementById('jp-from');
+  const st = document.getElementById('jp-to');
+  const tmp = sf.value; sf.value = st.value; st.value = tmp;
+});
+
+document.getElementById('jp-earlier').addEventListener('click', () => {
+  if (!_jpDepTime) return;
+  const newSec = Math.max(0, _hmToSec(_jpDepTime) - 60 * 30);
+  _runJP(_secToHM(newSec));
+});
+
+document.getElementById('jp-later').addEventListener('click', () => {
+  if (!_jpDepTime) return;
+  const newSec = _hmToSec(_jpDepTime) + 60 * 30;
+  _runJP(_secToHM(newSec));
+});
+
+  /* ================================================================
      JOURNEY PLANNER
   ================================================================ */
     const _jpState = {
