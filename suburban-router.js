@@ -41,18 +41,34 @@
      di semplici numeri. _buildLeg() usa svcId/stops per filtrare
      le fermate intermedie dei treni Rapid e Commuter Rapid.
 
+   FIX 2 (Rapid in fase 1):
+     La fase 1 ora chiama _buildLegsAllSvcs() che costruisce un leg
+     per ogni svcId distinto disponibile, invece di uno solo.
+     Così W1 (Local), W3 (Rapid) e W4 (Commuter Rapid) appaiono
+     come journey separati quando coprono il tratto richiesto.
+
+   FIX 3 (Thru-service KW↔M8):
+     I journey costruiti in fase 2b/3b dove il nodo di interscambio
+     è M8xx ricevono il flag thruService: true. Il rendering in
+     izx-ticket.html usa questo flag per mostrare il simbolo ↔
+     e la nota «Thru service — stay on board» invece del normale
+     pannello cambio.
+
    Tempi di trasferimento:
      TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban
      CROSS_TRANSFER_MIN     10 min  — interscambio suburbana ↔ IZX/AX/Metro
+     THRU_TRANSFER_MIN       2 min  — thru-service KW↔Metro (solo cambio operatore)
 ================================================================ */
 'use strict';
 
 const SuburbanRouter = (() => {
 
-  const TRANSFER_MIN       = 3;
-  const CROSS_TRANSFER_MIN = 10;
-  const TRANSFER_SEC       = TRANSFER_MIN       * 60;
-  const CROSS_TRANSFER_SEC = CROSS_TRANSFER_MIN * 60;
+  const TRANSFER_MIN        = 3;
+  const CROSS_TRANSFER_MIN  = 10;
+  const THRU_TRANSFER_MIN   = 2;   // thru-service: cambio operatore senza scendere
+  const TRANSFER_SEC        = TRANSFER_MIN       * 60;
+  const CROSS_TRANSFER_SEC  = CROSS_TRANSFER_MIN * 60;
+  const THRU_TRANSFER_SEC   = THRU_TRANSFER_MIN  * 60;
   const MAX_JOURNEYS  = 5;
   const SEARCH_WINDOW = 3 * 3600;
   const AVG_SPEED_KMH = 40;   // fallback globale per linee senza segSpeedKmh
@@ -64,6 +80,17 @@ const SuburbanRouter = (() => {
    * ---------------------------------------------------------------- */
   function _isMetroCode(code) {
     return /^M\d/.test(code);
+  }
+
+  /* ----------------------------------------------------------------
+   * _isThruNode(subCode, metroCode)
+   * Restituisce true se la coppia subCode↔metroCode è un thru-service
+   * (il treno prosegue senza che i passeggeri debbano scendere).
+   * Attualmente: KW00 ↔ M801 (Kwōkei Line ↔ Metro Line 8).
+   * ---------------------------------------------------------------- */
+  const THRU_PAIRS = new Set(['KW00|M801', 'M801|KW00']);
+  function _isThruNode(subCode, metroCode) {
+    return THRU_PAIRS.has(`${subCode}|${metroCode}`);
   }
 
   /* ----------------------------------------------------------------
@@ -307,15 +334,18 @@ const SuburbanRouter = (() => {
   }
 
   /* ----------------------------------------------------------------
-   * _buildLeg(line, iFrom, iTo, depSec)
-   * FIX: usa il primo trip disponibile {sec, svcId, svcDesc, stops}
-   * e filtra le intermediateStops in base alle fermate del servizio.
+   * _buildLeg(line, iFrom, iTo, depSec, trip?)
+   * FIX: accetta un trip opzionale {sec, svcId, svcDesc, stops}.
+   * Se non fornito usa il primo disponibile (comportamento legacy).
+   * Filtra le intermediateStops in base alle fermate del servizio.
    * ---------------------------------------------------------------- */
-  function _buildLeg(line, iFrom, iTo, depSec) {
-    const trips = _getTrips(line, iFrom, iTo, depSec);
-    if (!trips.length) return null;
+  function _buildLeg(line, iFrom, iTo, depSec, trip) {
+    if (!trip) {
+      const trips = _getTrips(line, iFrom, iTo, depSec);
+      if (!trips.length) return null;
+      trip = trips[0];
+    }
 
-    const trip      = trips[0];          // primo treno disponibile
     const boardSec  = trip.sec;
     const svcId     = trip.svcId;
     const svcDesc   = trip.svcDesc ?? line.name;
@@ -374,6 +404,30 @@ const SuburbanRouter = (() => {
     };
   }
 
+  /* ----------------------------------------------------------------
+   * _buildLegsAllSvcs(line, iFrom, iTo, depSec)
+   * FIX Rapid: costruisce un leg per ogni svcId distinto disponibile
+   * nell'arco depSec..depSec+SEARCH_WINDOW, invece di prendere solo
+   * il primo trip in assoluto. Ritorna array di leg (uno per svcId).
+   * ---------------------------------------------------------------- */
+  function _buildLegsAllSvcs(line, iFrom, iTo, depSec) {
+    const trips = _getTrips(line, iFrom, iTo, depSec);
+    if (!trips.length) return [];
+
+    // Raggruppa per svcId e prendi il primo trip di ogni gruppo
+    const byId = new Map();
+    for (const trip of trips) {
+      if (!byId.has(trip.svcId)) byId.set(trip.svcId, trip);
+    }
+
+    const legs = [];
+    for (const trip of byId.values()) {
+      const leg = _buildLeg(line, iFrom, iTo, depSec, trip);
+      if (leg) legs.push(leg);
+    }
+    return legs;
+  }
+
   function _lineFilter(opts) {
     const raw = opts.lines;
     if (!raw || raw === 'ALL') return null;
@@ -393,19 +447,22 @@ const SuburbanRouter = (() => {
     const journeys     = [];
 
     /* ---- 1. Percorsi DIRETTI ---- */
+    /* FIX Rapid: _buildLegsAllSvcs() genera un journey per svcId distinto
+       (W1 Local, W3 Rapid, W4 Commuter Rapid appaiono separatamente). */
     for (const line of Object.values(SUBURBAN_LINES)) {
       if (!line.stations.length) continue;
       if (lineAllowed && !lineAllowed.has(line.id)) continue;
       const iF = _idx(line, resolvedFrom);
       const iT = _idx(line, resolvedTo);
       if (iF === -1 || iT === -1 || iF === iT) continue;
-      const leg = _buildLeg(line, iF, iT, depSec);
-      if (!leg) continue;
-      journeys.push({
-        legs: [leg], departureTime: leg.boardDep, arrivalTime: leg.alightArr,
-        totalMinutes: Math.round((leg.alightArrSec - leg.boardDepSec) / 60),
-        totalKm: leg.km, transfers: 0, transferNodes: [],
-      });
+      const legs = _buildLegsAllSvcs(line, iF, iT, depSec);
+      for (const leg of legs) {
+        journeys.push({
+          legs: [leg], departureTime: leg.boardDep, arrivalTime: leg.alightArr,
+          totalMinutes: Math.round((leg.alightArrSec - leg.boardDepSec) / 60),
+          totalKm: leg.km, transfers: 0, transferNodes: [],
+        });
+      }
     }
 
     /* ---- 2. Percorsi Suburbano → IZX/AX ---- */
@@ -462,8 +519,10 @@ const SuburbanRouter = (() => {
           if (iMid === -1 || iMid === iF) continue;
           const leg1 = _buildLeg(line, iF, iMid, depSec);
           if (!leg1) continue;
-          const transferReadySec = leg1.alightArrSec + CROSS_TRANSFER_SEC;
           for (const metroNode of metroPartners) {
+            const isThru = _isThruNode(subNode.code, metroNode);
+            const xferSec = isThru ? THRU_TRANSFER_SEC : CROSS_TRANSFER_SEC;
+            const transferReadySec = leg1.alightArrSec + xferSec;
             const leg2 = MetroRouter.buildLeg?.(metroNode, to, transferReadySec);
             if (!leg2) continue;
             const waitSec = leg2.boardDepSec - leg1.alightArrSec;
@@ -473,6 +532,8 @@ const SuburbanRouter = (() => {
               totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
               totalKm, transfers: 1, transferNodes: [subNode.code],
               transferWaitMin: Math.round(waitSec / 60),
+              thruService: isThru,
+              thruNode: isThru ? subNode.code : undefined,
             });
           }
         }
@@ -534,7 +595,9 @@ const SuburbanRouter = (() => {
           for (const metroNode of metroPartners) {
             const leg1 = MetroRouter.buildLeg?.(from, metroNode, depSec);
             if (!leg1) continue;
-            const transferReadySec = leg1.alightArrSec + CROSS_TRANSFER_SEC;
+            const isThru = _isThruNode(subNode.code, metroNode);
+            const xferSec = isThru ? THRU_TRANSFER_SEC : CROSS_TRANSFER_SEC;
+            const transferReadySec = leg1.alightArrSec + xferSec;
             const leg2 = _buildLeg(line, iMid, iT, transferReadySec);
             if (!leg2) continue;
             const waitSec = leg2.boardDepSec - leg1.alightArrSec;
@@ -544,6 +607,8 @@ const SuburbanRouter = (() => {
               totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
               totalKm, transfers: 1, transferNodes: [metroNode],
               transferWaitMin: Math.round(waitSec / 60),
+              thruService: isThru,
+              thruNode: isThru ? subNode.code : undefined,
             });
           }
         }
@@ -597,7 +662,7 @@ const SuburbanRouter = (() => {
     /* ---- deduplicazione e ordinamento ---- */
     const seen = new Set();
     const unique = journeys.filter(j => {
-      const key = j.legs.map(l => `${l.lineId}:${l.boardDep}:${l.alightArr}`).join('|');
+      const key = j.legs.map(l => `${l.lineId}:${l.svcId}:${l.boardDep}:${l.alightArr}`).join('|');
       if (seen.has(key)) return false;
       seen.add(key); return true;
     });
@@ -637,6 +702,6 @@ const SuburbanRouter = (() => {
     return SUBURBAN_LINES[lineId]?.color ?? '#888';
   }
 
-  return { search, stationName, allStations, lineColor, TRANSFER_MIN, CROSS_TRANSFER_MIN };
+  return { search, stationName, allStations, lineColor, TRANSFER_MIN, CROSS_TRANSFER_MIN, THRU_TRANSFER_MIN };
 
 })();
