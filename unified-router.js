@@ -378,7 +378,7 @@
       .sort((a, b) => _hmToSec(a.departureTime) - _hmToSec(b.departureTime) ||
                       a.totalMinutes - b.totalMinutes)
       .filter(j => {
-        const key = j.departureTime + '|' + j.arrivalTime + '|' + (j.legs || []).map(l => l.network + l.service).join(',');
+        const key = j.departureTime + '|' + j.arrivalTime + '|' +  (j.legs || []).map(l =>  (l.lineId ?? l.network ?? '') + ':' + (l.svcId ?? l.service ?? '')  ).join(',');
         if (seen.has(key)) return false;
         seen.add(key);
         return true;
