@@ -307,6 +307,20 @@
       background:var(--border);
     }
 
+    /* ── KW service-type pill ── */
+.kw-svc-pill {
+  font-size: .62rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  border: 1px solid currentColor;
+  line-height: 1.5;
+}
+.kw-svc-pill.rapid          { color: #e07b00; border-color: #e07b00; }
+.kw-svc-pill.commuter-rapid { color: #c0392b; border-color: #c0392b; }
+
     /* ── DIRECT-ONLY TOGGLE ── */
 .toggle-track{
   position:relative;
@@ -1156,6 +1170,16 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
     jpTo.value   = 'SN08';
   }
 
+  function kwSvcPillHTML(svcDesc) {
+  if (!svcDesc) return '';
+  const d = svcDesc.toLowerCase();
+  if (d.includes('commuter rapid'))
+    return '<span class="kw-svc-pill commuter-rapid">Commuter Rapid</span>';
+  if (d.includes('rapid'))
+    return '<span class="kw-svc-pill rapid">Rapid</span>';
+  return '';
+}
+
   function svcBadgeHTML(lineId, svcLogical, color, network) {
   const isMetro = network === 'metro';
   if (isMetro) {
@@ -1240,6 +1264,7 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
       let legsHTML = '<div class="journey-legs">';
       j.legs.forEach((leg, li) => {
         const badge = svcBadgeHTML(leg.lineId, leg.svcLogical, leg.color, leg.network);
+        const kwPill = leg.lineId === 'KW' ? kwSvcPillHTML(leg.svcDesc) : '';
         const intStops = leg.intermediateStops ?? [];
         const intId = `int-${idx}-${li}`;
         const expandBtn = intStops.length
@@ -1255,7 +1280,7 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
 
         legsHTML += `
           <div class="leg-row">
-            <div class="leg-svc">${badge} <span class="svc-name">${leg.svcName}</span></div>
+            <div class="leg-svc">${badge}${kwPill} <span class="svc-name">${leg.svcName}</span></div>
             <div class="leg-times">${leg.boardDep} \u2192 ${leg.alightArr}</div>
             <div class="leg-stations">${leg.boardName} \u2192 ${leg.alightName} ${expandBtn}</div>
             <div class="leg-meta">
