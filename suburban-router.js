@@ -90,7 +90,7 @@ const SuburbanRouter = (() => {
   const TRANSFER_SEC        = TRANSFER_MIN       * 60;
   const CROSS_TRANSFER_SEC  = CROSS_TRANSFER_MIN * 60;
   const THRU_TRANSFER_SEC   = THRU_TRANSFER_MIN  * 60;
-  const MAX_JOURNEYS  = 5;
+  const MAX_JOURNEYS  = 12;
   const SEARCH_WINDOW = 3 * 3600;
   const AVG_SPEED_KMH = 40;   // fallback globale per linee senza segSpeedKmh
   const DWELL_SEC     = 30;
@@ -517,14 +517,16 @@ const SuburbanRouter = (() => {
       const iF = _idx(line, resolvedFrom);
       const iT = _idx(line, resolvedTo);
       if (iF === -1 || iT === -1 || iF === iT) continue;
-      const legs = _buildLegsAllSvcs(line, iF, iT, depSec);
-      for (const leg of legs) {
-        journeys.push({
-          legs: [leg], departureTime: leg.boardDep, arrivalTime: leg.alightArr,
-          totalMinutes: Math.round((leg.alightArrSec - leg.boardDepSec) / 60),
-          totalKm: leg.km, transfers: 0, transferNodes: [],
-        });
-      }
+      const trips = _getTrips(line, iF, iT, depSec);
+for (const trip of trips) {
+  const leg = _buildLeg(line, iF, iT, depSec, trip);
+  if (!leg) continue;
+  journeys.push({
+    legs: [leg], departureTime: leg.boardDep, arrivalTime: leg.alightArr,
+    totalMinutes: Math.round((leg.alightArrSec - leg.boardDepSec) / 60),
+    totalKm: leg.km, transfers: 0, transferNodes: [],
+  });
+}
     }
 
     /* ---- 2. Percorsi Suburbano → IZX/AX ---- */
