@@ -62,6 +62,19 @@
      deduplicazione dei Rapid. Fix: fullTravelSecNB usa
      _travelSec(line, svcToIdx, svcFromIdx, fullKm).
 
+   FIX 5 (dwell time in _buildLeg):
+     alightSec ora include le soste nelle fermate intermedie effettive
+     del servizio (stopCount * DWELL_SEC). Prima tutti i servizi
+     (W1/W3/W4) restituivano lo stesso tempo di percorrenza perché
+     _travelSec modella solo la velocità in marcia, ignorando le
+     soste. Con la fix:
+       Local  (~31 intermedie) → ~15 min extra su rotta completa
+       Commuter Rapid          → proporzionale alle sue fermate
+       Rapid  (~9 intermedie)  → ~5 min extra
+     Le fermate intermedie usate per l'interpolazione degli orari
+     nei leg circolari usano totalTravelSec (già comprensivo delle
+     soste) per evitare doppio conteggio.
+
    Tempi di trasferimento:
      TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban
      CROSS_TRANSFER_MIN     10 min  — interscambio suburbana ↔ IZX/AX/Metro
@@ -126,11 +139,26 @@ const SuburbanRouter = (() => {
 
   /* ----------------------------------------------------------------
    * _travelSec(line, iFrom, iTo, km)
+   * Tempo di marcia puro (senza soste). Le soste vengono aggiunte
+   * separatamente in _buildLeg() tramite stopCount * DWELL_SEC.
    * ---------------------------------------------------------------- */
   function _travelSec(line, iFrom, iTo, km) {
     if (line.circular) return Math.round((km / AVG_SPEED_KMH) * 3600);
     const spd = _segSpeed(line, iFrom, iTo);
     return Math.round((km / spd) * 3600);
+  }
+
+  /* ----------------------------------------------------------------
+   * _countIntermediateStops(line, iFrom, iTo, svcStops)
+   * Conta le fermate intermedie effettive tra iFrom e iTo (escluse)
+   * per il servizio dato. svcStops=[] significa Local (ferma tutto).
+   * ---------------------------------------------------------------- */
+  function _countIntermediateStops(line, iFrom, iTo, svcStops) {
+    const a = Math.min(iFrom, iTo);
+    const b = Math.max(iFrom, iTo);
+    const sliced = line.stations.slice(a + 1, b);
+    if (svcStops.length === 0) return sliced.length;
+    return sliced.filter(st => svcStops.includes(st.code)).length;
   }
 
   /* ----------------------------------------------------------------
@@ -214,7 +242,7 @@ const SuburbanRouter = (() => {
     return cwKm <= total / 2 ? 'CW' : 'CCW';
   }
 
-  function _circularIntermediateStops(line, iFrom, iTo, dir, boardSec, legKm) {
+  function _circularIntermediateStops(line, iFrom, iTo, dir, boardSec, legKm, totalTravelSec) {
     const sts = line.stations;
     const n   = sts.length;
     const total = line.totalKm;
@@ -230,10 +258,11 @@ const SuburbanRouter = (() => {
       if (dir === 'CW') return ((sts[idx].km - sts[iFrom].km) + total) % total;
       else              return ((sts[iFrom].km - sts[idx].km) + total) % total;
     }
-    const travelSec = _travelSec(line, iFrom, iTo, legKm);
+    // Usa totalTravelSec (marcia + soste) per l'interpolazione degli orari
+    // così i passaggi intermedi risultano coerenti con alightSec.
     return seq.map(idx => {
       const kmElapsed = _kmFromStart(idx);
-      const arrSec    = boardSec + Math.round((kmElapsed / legKm) * travelSec);
+      const arrSec    = boardSec + Math.round((kmElapsed / legKm) * totalTravelSec);
       return { code: sts[idx].code, name: sts[idx].name,
                arr: _secToHM(arrSec), dep: _secToHM(arrSec + DWELL_SEC) };
     });
@@ -316,8 +345,6 @@ const SuburbanRouter = (() => {
           }
         } else {
           // NB: il treno parte da svcToIdx (capolinea B) e va verso svcFromIdx.
-          // firstDepB = orario in cui il treno arriva a svcToIdx partendo da svcFromIdx
-          //             a win.from, più il tempo NB completo.
           const firstDepB  = win.from + fullTravelSecNB;
           const lastDepB   = win.to   + fullTravelSecNB;
           const kmToFrom   = Math.abs(line.stations[iFrom].km - line.stations[svcToIdx].km);
@@ -357,6 +384,10 @@ const SuburbanRouter = (() => {
    * FIX: accetta un trip opzionale {sec, svcId, svcDesc, stops}.
    * Se non fornito usa il primo disponibile (comportamento legacy).
    * Filtra le intermediateStops in base alle fermate del servizio.
+   *
+   * FIX 5: alightSec include le soste nelle fermate intermedie.
+   *   totalTravelSec = travelSec (marcia) + stopCount * DWELL_SEC
+   * così Local, Commuter Rapid e Rapid mostrano tempi differenziati.
    * ---------------------------------------------------------------- */
   function _buildLeg(line, iFrom, iTo, depSec, trip) {
     if (!trip) {
@@ -371,8 +402,14 @@ const SuburbanRouter = (() => {
     const svcStops  = trip.stops ?? [];  // [] = locale (ferma ovunque)
 
     const km        = _kmBetween(line, iFrom, iTo);
-    const travelSec = _travelSec(line, iFrom, iTo, km);
-    const alightSec = boardSec + travelSec;
+    const runSec    = _travelSec(line, iFrom, iTo, km);  // solo marcia, no soste
+
+    // FIX 5: somma DWELL_SEC per ogni fermata intermedia effettiva.
+    const stopCount    = line.circular
+      ? 0   // le linee circolari già interpolano correttamente
+      : _countIntermediateStops(line, iFrom, iTo, svcStops);
+    const totalTravelSec = runSec + stopCount * DWELL_SEC;
+    const alightSec      = boardSec + totalTravelSec;
 
     const dir = line.circular
       ? _circularDir(line, iFrom, iTo)
@@ -380,22 +417,28 @@ const SuburbanRouter = (() => {
 
     let intermediateStops;
     if (line.circular) {
-      intermediateStops = _circularIntermediateStops(line, iFrom, iTo, dir, boardSec, km);
+      intermediateStops = _circularIntermediateStops(
+        line, iFrom, iTo, dir, boardSec, km, totalTravelSec
+      );
     } else {
       const a = Math.min(iFrom, iTo), b = Math.max(iFrom, iTo);
       const sliced  = line.stations.slice(a + 1, b);
       const ordered = iFrom < iTo ? sliced : [...sliced].reverse();
 
+      // Accumula il tempo progressivo tenendo conto delle soste già percorse.
+      let elapsed = 0;
       intermediateStops = ordered
-        // Se il servizio ha una lista stops esplicita, includi solo
-        // le stazioni in quella lista (treni Rapid / Commuter Rapid).
-        // Lista vuota = locale, ferma in tutte le stazioni.
         .filter(st => svcStops.length === 0 || svcStops.includes(st.code))
         .map(st => {
-          const kmElapsed  = Math.abs(st.km - line.stations[iFrom].km);
           const stIdx      = line.stations.indexOf(st);
-          const partialSpd = _segSpeed(line, iFrom, stIdx);
-          const arrSec     = boardSec + Math.round((kmElapsed / partialSpd) * 3600);
+          const kmElapsed  = Math.abs(st.km - line.stations[iFrom].km);
+          const partialRun = Math.round((kmElapsed / _segSpeed(line, iFrom, stIdx)) * 3600);
+          // Quante soste precedenti ha già accumulato questo treno?
+          const stopsBefore = line.stations
+            .slice(Math.min(iFrom, stIdx) + 1, Math.max(iFrom, stIdx))
+            .filter(s => svcStops.length === 0 || svcStops.includes(s.code))
+            .length;
+          const arrSec = boardSec + partialRun + stopsBefore * DWELL_SEC;
           return { code: st.code, name: st.name,
                    arr: _secToHM(arrSec), dep: _secToHM(arrSec + DWELL_SEC) };
         });
