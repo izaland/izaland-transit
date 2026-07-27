@@ -490,6 +490,61 @@ const SuburbanRouter = (() => {
     return legs;
   }
 
+   /* ----------------------------------------------------------------
+ * _buildIntraLineTransfers(line, iFrom, iTo, depSec)
+ * Fase 1b: cerca connessioni Rapid→Local sulla stessa linea.
+ * Per ogni servizio "express" (svcStops non vuoto) che copre iFrom
+ * ma non si ferma a iTo, cerca una fermata intermedia dove il treno
+ * si ferma E da cui un Local successivo raggiunge iTo.
+ * ---------------------------------------------------------------- */
+function _buildIntraLineTransfers(line, iFrom, iTo, depSec) {
+  const trips = _getTrips(line, iFrom, iTo, depSec);
+  const results = [];
+
+  for (const trip of trips) {
+    // Solo servizi express (stops[] non vuoto = non-Local)
+    if (!trip.stops || trip.stops.length === 0) continue;
+    // Il servizio deve fermarsi a iFrom ma NON a iTo
+    const fromCode = line.stations[iFrom].code;
+    const toCode   = line.stations[iTo].code;
+    if (!trip.stops.includes(fromCode)) continue;
+    if (trip.stops.includes(toCode)) continue;
+
+    // Trova fermate intermedie dove il Rapid si ferma
+    // (tra iFrom e iTo, nella direzione giusta)
+    const lo = Math.min(iFrom, iTo), hi = Math.max(iFrom, iTo);
+    const xferCandidates = line.stations
+      .slice(lo + 1, hi)
+      .filter(st => trip.stops.includes(st.code));
+
+    for (const xferSt of xferCandidates) {
+      const iXfer = line.stations.indexOf(xferSt);
+      // Leg 1: Rapid da iFrom a iXfer
+      const leg1 = _buildLeg(line, iFrom, iXfer, depSec, trip);
+      if (!leg1) continue;
+      // Leg 2: qualsiasi servizio che ferma a iXfer e iTo
+      const transferReadySec = leg1.alightArrSec + TRANSFER_SEC;
+      const localTrips = _getTrips(line, iXfer, iTo, transferReadySec)
+        .filter(t => t.stops.length === 0 || t.stops.includes(toCode));
+      if (!localTrips.length) continue;
+      const leg2 = _buildLeg(line, iXfer, iTo, transferReadySec, localTrips[0]);
+      if (!leg2) continue;
+      const waitSec = leg2.boardDepSec - leg1.alightArrSec;
+      const totalKm = leg1.km + leg2.km;
+      results.push({
+        legs: [leg1, leg2],
+        departureTime: leg1.boardDep,
+        arrivalTime:   leg2.alightArr,
+        totalMinutes:  Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+        totalKm, transfers: 1,
+        transferNodes: [xferSt.code],
+        transferWaitMin: Math.round(waitSec / 60),
+      });
+    }
+  }
+  return results;
+}
+
   function _lineFilter(opts) {
     const raw = opts.lines;
     if (!raw || raw === 'ALL') return null;
@@ -528,6 +583,20 @@ for (const trip of trips) {
   });
 }
     }
+
+         /* ---- 1b. Intra-line Rapid→Local connections ---- */
+    for (const line of Object.values(SUBURBAN_LINES)) {
+      if (!line.stations.length) continue;
+      if (lineAllowed && !lineAllowed.has(line.id)) continue;
+      const iF = _idx(line, resolvedFrom);
+      const iT = _idx(line, resolvedTo);
+      if (iF === -1 || iT === -1 || iF === iT) continue;
+      for (const j of _buildIntraLineTransfers(line, iF, iT, depSec)) {
+        journeys.push(j);
+      }
+    }
+
+    /* ---- 2. Percorsi Suburbano → IZX/AX ---- */
 
     /* ---- 2. Percorsi Suburbano → IZX/AX ---- */
     if (!directOnly && typeof IZXRouter !== 'undefined') {
