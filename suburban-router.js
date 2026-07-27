@@ -75,6 +75,19 @@
      nei leg circolari usano totalTravelSec (già comprensivo delle
      soste) per evitare doppio conteggio.
 
+   FIX 6 (_buildIntraLineTransfers direzione NB):
+     Due bug nella fase 1b (Rapid→Local intra-linea):
+     a) xferCandidates era sempre slice(lo+1, hi) in ordine crescente;
+        per viaggi NB (iFrom > iTo) l'array non veniva invertito,
+        quindi si tentava prima la fermata più lontana da iTo.
+        Fix: candidates.reverse() quando goingFwd=false.
+     b) _getTrips(line, iXfer, iTo, ...) per il leg 2 passava iXfer e
+        iTo nell'ordine corretto MA _svcTrips usa iFrom<=iTo per
+        determinare goingFwd internamente — con iXfer > iTo in NB
+        il viaggio veniva trattato come SB e nessun trip veniva
+        trovato. Fix: _getTrips riceve ora gli indici as-is (iXfer,
+        iTo) che preservano la direzione reale.
+
    Tempi di trasferimento:
      TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban
      CROSS_TRANSFER_MIN     10 min  — interscambio suburbana ↔ IZX/AX/Metro
@@ -490,60 +503,78 @@ const SuburbanRouter = (() => {
     return legs;
   }
 
-   /* ----------------------------------------------------------------
- * _buildIntraLineTransfers(line, iFrom, iTo, depSec)
- * Fase 1b: cerca connessioni Rapid→Local sulla stessa linea.
- * Per ogni servizio "express" (svcStops non vuoto) che copre iFrom
- * ma non si ferma a iTo, cerca una fermata intermedia dove il treno
- * si ferma E da cui un Local successivo raggiunge iTo.
- * ---------------------------------------------------------------- */
-function _buildIntraLineTransfers(line, iFrom, iTo, depSec) {
-  const trips = _getTrips(line, iFrom, iTo, depSec);
-  const results = [];
+  /* ----------------------------------------------------------------
+   * _buildIntraLineTransfers(line, iFrom, iTo, depSec)
+   * Fase 1b: cerca connessioni Rapid→Local sulla stessa linea.
+   * Per ogni servizio "express" (svcStops non vuoto) che copre iFrom
+   * ma non si ferma a iTo, cerca una fermata intermedia dove il treno
+   * si ferma E da cui un Local successivo raggiunge iTo.
+   *
+   * FIX 6: corretto il bug di direzione NB:
+   *   a) xferCandidates invertiti quando goingFwd=false
+   *   b) _getTrips per leg 2 riceve iXfer/iTo as-is (non ordinati)
+   *      così _svcTrips calcola goingFwd correttamente.
+   * ---------------------------------------------------------------- */
+  function _buildIntraLineTransfers(line, iFrom, iTo, depSec) {
+    const goingFwd = iFrom < iTo;
+    const lo = Math.min(iFrom, iTo);
+    const hi = Math.max(iFrom, iTo);
 
-  for (const trip of trips) {
-    // Solo servizi express (stops[] non vuoto = non-Local)
-    if (!trip.stops || trip.stops.length === 0) continue;
-    // Il servizio deve fermarsi a iFrom ma NON a iTo
-    const fromCode = line.stations[iFrom].code;
-    const toCode   = line.stations[iTo].code;
-    if (!trip.stops.includes(fromCode)) continue;
-    if (trip.stops.includes(toCode)) continue;
+    const allTrips = _getTrips(line, iFrom, iTo, depSec);
+    const results = [];
 
-    // Trova fermate intermedie dove il Rapid si ferma
-    // (tra iFrom e iTo, nella direzione giusta)
-    const lo = Math.min(iFrom, iTo), hi = Math.max(iFrom, iTo);
-    const xferCandidates = line.stations
-      .slice(lo + 1, hi)
-      .filter(st => trip.stops.includes(st.code));
+    for (const trip of allTrips) {
+      // Solo servizi express (stops[] non vuoto = non-Local)
+      if (!trip.stops || trip.stops.length === 0) continue;
 
-    for (const xferSt of xferCandidates) {
-      const iXfer = line.stations.indexOf(xferSt);
-      // Leg 1: Rapid da iFrom a iXfer
-      const leg1 = _buildLeg(line, iFrom, iXfer, depSec, trip);
-      if (!leg1) continue;
-      // Leg 2: qualsiasi servizio che ferma a iXfer e iTo
-      const transferReadySec = leg1.alightArrSec + TRANSFER_SEC;
-      const localTrips = _getTrips(line, iXfer, iTo, transferReadySec)
-        .filter(t => t.stops.length === 0 || t.stops.includes(toCode));
-      if (!localTrips.length) continue;
-      const leg2 = _buildLeg(line, iXfer, iTo, transferReadySec, localTrips[0]);
-      if (!leg2) continue;
-      const waitSec = leg2.boardDepSec - leg1.alightArrSec;
-      const totalKm = leg1.km + leg2.km;
-      results.push({
-        legs: [leg1, leg2],
-        departureTime: leg1.boardDep,
-        arrivalTime:   leg2.alightArr,
-        totalMinutes:  Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
-        totalKm, transfers: 1,
-        transferNodes: [xferSt.code],
-        transferWaitMin: Math.round(waitSec / 60),
-      });
+      const fromCode = line.stations[iFrom].code;
+      const toCode   = line.stations[iTo].code;
+
+      // Il servizio deve fermarsi a iFrom ma NON a iTo
+      if (!trip.stops.includes(fromCode)) continue;
+      if (trip.stops.includes(toCode))   continue;
+
+      // Fermate intermedie dove il Rapid si ferma, tra iFrom e iTo
+      const candidates = line.stations
+        .slice(lo + 1, hi)
+        .filter(st => trip.stops.includes(st.code));
+
+      // FIX 6a: in NB invertiamo per tentare prima la fermata più vicina a iTo
+      if (!goingFwd) candidates.reverse();
+
+      for (const xferSt of candidates) {
+        const iXfer = line.stations.indexOf(xferSt);
+
+        // Leg 1: express da iFrom a iXfer
+        const leg1 = _buildLeg(line, iFrom, iXfer, depSec, trip);
+        if (!leg1) continue;
+
+        const transferReadySec = leg1.alightArrSec + TRANSFER_SEC;
+
+        // FIX 6b: passa iXfer e iTo as-is — _svcTrips determina goingFwd
+        // internamente da (iXfer <= iTo), che in NB sarà false correttamente.
+        const localTrips = _getTrips(line, iXfer, iTo, transferReadySec)
+          .filter(t => t.stops.length === 0 || t.stops.includes(toCode));
+        if (!localTrips.length) continue;
+
+        const leg2 = _buildLeg(line, iXfer, iTo, transferReadySec, localTrips[0]);
+        if (!leg2) continue;
+
+        const waitSec = leg2.boardDepSec - leg1.alightArrSec;
+        results.push({
+          legs: [leg1, leg2],
+          departureTime:   leg1.boardDep,
+          arrivalTime:     leg2.alightArr,
+          totalMinutes:    Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+          totalKm:         leg1.km + leg2.km,
+          transfers:       1,
+          transferNodes:   [xferSt.code],
+          transferWaitMin: Math.round(waitSec / 60),
+        });
+      }
     }
+    return results;
   }
-  return results;
-}
 
   function _lineFilter(opts) {
     const raw = opts.lines;
@@ -573,18 +604,18 @@ function _buildIntraLineTransfers(line, iFrom, iTo, depSec) {
       const iT = _idx(line, resolvedTo);
       if (iF === -1 || iT === -1 || iF === iT) continue;
       const trips = _getTrips(line, iF, iT, depSec);
-for (const trip of trips) {
-  const leg = _buildLeg(line, iF, iT, depSec, trip);
-  if (!leg) continue;
-  journeys.push({
-    legs: [leg], departureTime: leg.boardDep, arrivalTime: leg.alightArr,
-    totalMinutes: Math.round((leg.alightArrSec - leg.boardDepSec) / 60),
-    totalKm: leg.km, transfers: 0, transferNodes: [],
-  });
-}
+      for (const trip of trips) {
+        const leg = _buildLeg(line, iF, iT, depSec, trip);
+        if (!leg) continue;
+        journeys.push({
+          legs: [leg], departureTime: leg.boardDep, arrivalTime: leg.alightArr,
+          totalMinutes: Math.round((leg.alightArrSec - leg.boardDepSec) / 60),
+          totalKm: leg.km, transfers: 0, transferNodes: [],
+        });
+      }
     }
 
-         /* ---- 1b. Intra-line Rapid→Local connections ---- */
+    /* ---- 1b. Intra-line Rapid→Local connections ---- */
     for (const line of Object.values(SUBURBAN_LINES)) {
       if (!line.stations.length) continue;
       if (lineAllowed && !lineAllowed.has(line.id)) continue;
@@ -595,8 +626,6 @@ for (const trip of trips) {
         journeys.push(j);
       }
     }
-
-    /* ---- 2. Percorsi Suburbano → IZX/AX ---- */
 
     /* ---- 2. Percorsi Suburbano → IZX/AX ---- */
     if (!directOnly && typeof IZXRouter !== 'undefined') {
