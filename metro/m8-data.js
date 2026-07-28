@@ -328,6 +328,8 @@ const M8_INTERCHANGE = {
   M806: [
     { code: 'M401', network: 'metro',    transferMin: 3,
       note: 'M4 Heinomoji — stesso nome, banchine separate' },
+     { code: 'M206', network: 'metro', transferMin: 5,
+    note: 'M2 Heinomoji — stesso nome, banchine separate' },
   ],
 
   M810: [
