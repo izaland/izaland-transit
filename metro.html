@@ -877,8 +877,8 @@
         </div>
         <div class="line-card-body">
           <div class="line-meta-row">
-            <div class="line-meta-item"><div class="line-meta-value">16.05</div><div class="line-meta-label">km</div></div>
-            <div class="line-meta-item"><div class="line-meta-value">13</div><div class="line-meta-label">stations</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">13.73</div><div class="line-meta-label">km</div></div>
+            <div class="line-meta-item"><div class="line-meta-value">14</div><div class="line-meta-label">stations</div></div>
             <div class="line-meta-item"><div class="line-meta-value">180</div><div class="line-meta-label">km/h max</div></div>
           </div>
           <div class="line-termini">
@@ -899,13 +899,22 @@
               Stations
               <span class="stn-count-chip">13 stn</span>
             </summary>
-            <div class="stations-body">
+                     <div class="stations-body">
               <ul class="stn-list">
-                <li class="stn-item terminus"><span class="stn-name">Jisahara</span></li>
-                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
-                <li class="stn-item"><span class="stn-name">Station TBD</span></li>
-                <li class="stn-item"><span class="stn-name" style="color:var(--text-faint);font-style:italic">· · · +9 stations TBD · · ·</span></li>
-                <li class="stn-item terminus"><span class="stn-name">Tsuragoi</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Tsuragoi <span style="color:var(--text-faint);font-size:10px">汐蒲</span></span></li>
+                <li class="stn-item"><span class="stn-name">Mundōzan <span style="color:var(--text-faint);font-size:10px">門道山</span></span></li>
+                <li class="stn-item"><span class="stn-name">Konegisa Eigandan <span style="color:var(--text-faint);font-size:10px">干鮃永玵段</span></span></li>
+                <li class="stn-item"><span class="stn-name">Jaihonmu 3sa <span style="color:var(--text-faint);font-size:10px">際笨武3沙</span></span></li>
+                <li class="stn-item"><span class="stn-name">Kirifunu Kukubān <span style="color:var(--text-faint);font-size:10px">礒判國防</span></span></li>
+                <li class="stn-item"><span class="stn-name">Sakanemoto <span style="color:var(--text-faint);font-size:10px">沛岬斗</span></span></li>
+                <li class="stn-item"><span class="stn-name">Akagae Nosori <span style="color:var(--text-faint);font-size:10px">蛞外見祖里</span></span></li>
+                <li class="stn-item"><span class="stn-name">Pentorawi Kirifunu <span style="color:var(--text-faint);font-size:10px">篇土碪礒判</span></span></li>
+                <li class="stn-item"><span class="stn-name">Riihisano <span style="color:var(--text-faint);font-size:10px">尾本</span></span></li>
+                <li class="stn-item"><span class="stn-name">Eonogi Kōwen</span></li>
+                <li class="stn-item"><span class="stn-name">Kadokamahiwa</span></li>
+                <li class="stn-item"><span class="stn-name">Tswikei Daigaku <span style="color:var(--text-faint);font-size:10px">追渓大學</span></span></li>
+                <li class="stn-item"><span class="stn-name">Pwakkobe</span></li>
+                <li class="stn-item terminus"><span class="stn-name">Jisahara <span style="color:var(--text-faint);font-size:10px">治叉榎</span></span></li>
               </ul>
             </div>
           </details>
@@ -2052,7 +2061,14 @@
       document.querySelectorAll('.nav-item.open').forEach(o => o.classList.remove('open'));
     });
   </script>
+   <script src="metro/m2-data.js"></script>
+  <script src="metro/m2-tt.js"></script>
   <script src="metro/m4-data.js"></script>
+  <script src="metro/m4-tt.js"></script>
+  <script src="metro/m5-data.js"></script>
+  <script src="metro/m5-tt.js"></script>
+  <script src="metro/m8-data.js"></script>
+  <script src="metro/m8-tt.js"></script>
   <script src="metro/metro-router.js"></script>
   <script src="unified-router.js"></script>
 </body>
