@@ -330,7 +330,7 @@ const RY_PEAK_WINDOWS = [
 ---------------------------------------------------------------- */
 const EI_ST = {
   E01: {n:"Sainðaul Central",        k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e",  b:"main", km:0},
-  E02: {n:"Kawayatsu",                    k:"\u5609\u592c\u82eb",               b:"main", km:19.16},
+  E02: {n:"Kawayatsu",                    k:"\u5609\u592c\u82fb",               b:"main", km:19.16},
   E03: {n:"Shin-Abiro Kung\u014dsan",     k:"\u65b0\u736f\u8def\u30fb\u52f3\u525b\u5c71", b:"main", km:65.43},
   E04: {n:"Sahnajima Juwon",              k:"\u5f4c\u6e67\u4e2d\u592e",         b:"main", km:98.41},
   E05: {n:"Shirukami",                    k:"\u8352\u991f",                      b:"main", km:126.78},
@@ -545,7 +545,8 @@ const IZX_LINES = {
     ST:KE_ST, CANONICAL:KE_CANONICAL_ORDER, SVC:KE_SVC,
     TT:KE_TT, FREQ:KE_FREQ, PEAK:KE_PEAK_WINDOWS,
     /* Sainðaul Central (K01) è in interscambio con RY (R01) ed EI (E01) */
-    INTERCHANGE: { K01: "R01" },
+    /* Asunahama Int'l Airport (K03) è in interscambio con AX (AX01)     */
+    INTERCHANGE: { K01: "R01", K03: "AX01" },
     TERMINUS_SPLIT:{
       A:[{terminus:"K17",weight:2},{terminus:"N4",weight:1}],
       B:[{terminus:"K17",weight:2},{terminus:"N4",weight:1}],
