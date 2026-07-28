@@ -101,10 +101,21 @@
      usa questi trip per trovare la fermata di trasferimento, poi
      usa _getTrips(line, iXfer, iTo) correttamente per il Local.
 
+   FIX 8 (same-platform intra-line walk time):
+     I journey prodotti da _buildIntraLineTransfers (Rapid→Local
+     sulla stessa linea KW) ricevono ora transferWalkMin: 0 invece
+     di TRANSFER_MIN. Il cambio avviene sulla stessa banchina: non
+     c'è spostamento fisico, solo attesa del treno successivo.
+     Il renderer deve usare transferWalkMin (0) per il pannello Walk
+     e transferWaitMin (calcolato dall'orario reale) per il pannello
+     Wait. La costante interna INTRA_TRANSFER_SEC = 0 è usata
+     esclusivamente in _buildIntraLineTransfers.
+
    Tempi di trasferimento:
      TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban
      CROSS_TRANSFER_MIN     10 min  — interscambio suburbana ↔ IZX/AX/Metro
      THRU_TRANSFER_MIN       2 min  — thru-service KW↔Metro (solo cambio operatore)
+     INTRA_TRANSFER_SEC      0 sec  — same-platform intra-line (Rapid→Local KW)
 ================================================================ */
 'use strict';
 
@@ -116,6 +127,7 @@ const SuburbanRouter = (() => {
   const TRANSFER_SEC        = TRANSFER_MIN       * 60;
   const CROSS_TRANSFER_SEC  = CROSS_TRANSFER_MIN * 60;
   const THRU_TRANSFER_SEC   = THRU_TRANSFER_MIN  * 60;
+  const INTRA_TRANSFER_SEC  = 0;   // same-platform intra-line (Rapid→Local)
   const MAX_JOURNEYS  = 12;
   const SEARCH_WINDOW = 3 * 3600;
   const AVG_SPEED_KMH = 40;   // fallback globale per linee senza segSpeedKmh
@@ -501,13 +513,15 @@ const SuburbanRouter = (() => {
   }
 
   /* ----------------------------------------------------------------
-   * _buildIntraLineTransfers(line, iFrom, iTo, depSec)     FIX 6+7
+   * _buildIntraLineTransfers(line, iFrom, iTo, depSec)   FIX 6+7+8
    * Fase 1b: Rapid→Local intra-linea.
    *
    * FIX 7: usa _getExpressTrips(line, iFrom) invece di
    * _getTrips(line, iFrom, iTo) così W3/W4 vengono trovati anche
    * quando iTo non è una loro fermata.
    * FIX 6: direzione NB corretta (candidates.reverse + iXfer/iTo as-is).
+   * FIX 8: cambio same-platform → transferWalkMin: 0, nessuna attesa
+   * fittizia aggiunta; transferWaitMin riflette l'orario reale.
    * ---------------------------------------------------------------- */
   function _buildIntraLineTransfers(line, iFrom, iTo, depSec) {
     const goingFwd = iFrom < iTo;
@@ -549,7 +563,8 @@ const SuburbanRouter = (() => {
         const leg1 = _buildLeg(line, iFrom, iXfer, depSec, trip);
         if (!leg1) continue;
 
-        const transferReadySec = leg1.alightArrSec + TRANSFER_SEC;
+        // FIX 8: same-platform — nessun tempo a piedi aggiunto
+        const transferReadySec = leg1.alightArrSec + INTRA_TRANSFER_SEC;
 
         // FIX 6b: iXfer/iTo as-is — _svcTrips calcola goingFwd internamente
         const localTrips = _getTrips(line, iXfer, iTo, transferReadySec)
@@ -562,13 +577,14 @@ const SuburbanRouter = (() => {
         const waitSec = leg2.boardDepSec - leg1.alightArrSec;
         results.push({
           legs: [leg1, leg2],
-          departureTime:   leg1.boardDep,
-          arrivalTime:     leg2.alightArr,
-          totalMinutes:    Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
-          totalKm:         leg1.km + leg2.km,
-          transfers:       1,
-          transferNodes:   [xferSt.code],
-          transferWaitMin: Math.round(waitSec / 60),
+          departureTime:    leg1.boardDep,
+          arrivalTime:      leg2.alightArr,
+          totalMinutes:     Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+          totalKm:          leg1.km + leg2.km,
+          transfers:        1,
+          transferNodes:    [xferSt.code],
+          transferWalkMin:  0,          // FIX 8: same-platform, zero a piedi
+          transferWaitMin:  Math.round(waitSec / 60),
         });
       }
     }
@@ -689,7 +705,7 @@ const SuburbanRouter = (() => {
             journeys.push({
               legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
               totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
-              totalKm, transfers: 1, transferNodes: [subNode.code],
+              totalKm, transfers: 1, transferNodes: [metroNode],
               transferWaitMin: Math.round(waitSec / 60),
               thruService: isThru,
               thruNode: isThru ? subNode.code : undefined,
