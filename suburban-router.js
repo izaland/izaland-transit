@@ -698,7 +698,11 @@ const SuburbanRouter = (() => {
             const isThru = _isThruNode(subNode.code, metroNode);
             const xferSec = isThru ? THRU_TRANSFER_SEC : CROSS_TRANSFER_SEC;
             const transferReadySec = leg1.alightArrSec + xferSec;
-            const leg2 = MetroRouter.buildLeg?.(metroNode, to, transferReadySec);
+            const _mResult2 = MetroRouter.buildMultiLeg?.(metroNode, to, transferReadySec);
+if (!_mResult2) continue;
+const leg2 = _mResult2.legs.at(-1); // ultimo leg metro verso la destinazione
+// NB: se _mResult2.legs.length > 1 il rendering mostrerà solo il leg KW,
+// i leg metro interni vanno aggiunti al journey se vuoi mostrarli separatamente.
             if (!leg2) continue;
             const waitSec = leg2.boardDepSec - leg1.alightArrSec;
             const totalKm = (leg1.km != null && leg2.km != null) ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
@@ -768,7 +772,9 @@ const SuburbanRouter = (() => {
           const iMid = _idx(line, subNode.code);
           if (iMid === -1 || iMid === iT) continue;
           for (const metroNode of metroPartners) {
-            const leg1 = MetroRouter.buildLeg?.(from, metroNode, depSec);
+           const _mResult1 = MetroRouter.buildMultiLeg?.(from, metroNode, depSec);
+if (!_mResult1) continue;
+const leg1 = _mResult1.legs.at(-1);
             if (!leg1) continue;
             const isThru = _isThruNode(subNode.code, metroNode);
             const xferSec = isThru ? THRU_TRANSFER_SEC : CROSS_TRANSFER_SEC;
