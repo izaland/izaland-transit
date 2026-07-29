@@ -1,7 +1,7 @@
 /* ================================================================
    SUBURBAN-ROUTER.JS — Izarail Suburban Journey Planner
    Dipende da: suburban-data.js (SUBURBAN_LINES, SUBURBAN_INTERCHANGE,
-                                  SK_SERVICES, KW_SERVICES)
+                                  SK_SERVICES, KW_SERVICES, TS_SERVICES)
 
    API pubblica (stesso contratto di IZXRouter):
      SuburbanRouter.search(from, to, depTime, opts) → Journey[]
@@ -31,11 +31,11 @@
      Questo permette di modellare la progressione urbano→extraurbano
      della Kwōkei Line senza toccare le altre linee.
 
-   Sottoservizi SK / KW:
-     Le linee SK e KW usano rispettivamente SK_SERVICES e KW_SERVICES
-     invece del singolo headway di linea. _svcTrips() gestisce
-     entrambi; per SK usa la logica A↔B con firstDep/lastDep;
-     per linee prive di *_SERVICES si usa _syntheticTrips().
+   Sottoservizi SK / KW / TS:
+     Le linee SK, KW e TS usano rispettivamente SK_SERVICES,
+     KW_SERVICES e TS_SERVICES invece del singolo headway di linea.
+     _svcTrips() gestisce tutti e tre; per linee prive di *_SERVICES
+     si usa _syntheticTrips().
 
      FIX: _svcTrips() restituisce array di {sec, svcId, stops} invece
      di semplici numeri. _buildLeg() usa svcId/stops per filtrare
@@ -110,6 +110,12 @@
      e transferWaitMin (calcolato dall'orario reale) per il pannello
      Wait. La costante interna INTRA_TRANSFER_SEC = 0 è usata
      esclusivamente in _buildIntraLineTransfers.
+
+   FIX 9 (_getTrips — dead code TS branch):
+     Il branch `if (line.id === 'TS')` in _getTrips() era irraggiungibile
+     perché il `return _syntheticTrips(...)` fallback lo precedeva.
+     Fix: i branch SK, KW e TS vengono tutti valutati prima del return
+     del fallback. Stesso fix applicato a _getExpressTrips() per TS.
 
    Tempi di trasferimento:
      TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban
@@ -246,7 +252,7 @@ const SuburbanRouter = (() => {
   function _secToHM(sec) {
     const s = ((sec % 86400) + 86400) % 86400;
     return String(Math.floor(s / 3600)).padStart(2, '0') + ':' +
-           String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+           String(Math.floor((s % 3600) / 60)).padStart(2, '00');
   }
 
   function _idx(line, code) {
@@ -313,7 +319,7 @@ const SuburbanRouter = (() => {
 
   /* ----------------------------------------------------------------
    * _svcTrips(services, line, iFrom, iTo, depSec)
-   * Genera partenze usando un array *_SERVICES (SK o KW).
+   * Genera partenze usando un array *_SERVICES (SK, KW o TS).
    * Se iTo === null salta il controllo sulla destinazione (usato da
    * _getExpressTrips per la fase 1b).
    * ---------------------------------------------------------------- */
@@ -392,23 +398,28 @@ const SuburbanRouter = (() => {
   /* ----------------------------------------------------------------
    * _getTrips(line, iFrom, iTo, depSec)
    * Dispatcher normale — iTo deve essere un indice valido.
+   *
+   * FIX 9: i branch SK, KW e TS vengono tutti valutati PRIMA del
+   * return del fallback sintetico. In precedenza il branch TS era
+   * posizionato dopo il return e risultava irraggiungibile (dead code).
    * ---------------------------------------------------------------- */
   function _getTrips(line, iFrom, iTo, depSec) {
     if (line.id === 'SK' && typeof SK_SERVICES !== 'undefined')
       return _svcTrips(SK_SERVICES, line, iFrom, iTo, depSec);
     if (line.id === 'KW' && typeof KW_SERVICES !== 'undefined')
       return _svcTrips(KW_SERVICES, line, iFrom, iTo, depSec);
+    if (line.id === 'TS' && typeof TS_SERVICES !== 'undefined')
+      return _svcTrips(TS_SERVICES, line, iFrom, iTo, depSec);
     return _syntheticTrips(line, iFrom, depSec);
-     if (line.id === 'TS' && typeof TS_SERVICES !== 'undefined')
-  return _svcTrips(TS_SERVICES, line, iFrom, iTo, depSec);
   }
 
   /* ----------------------------------------------------------------
-   * _getExpressTrips(line, iFrom, depSec)                  FIX 7
+   * _getExpressTrips(line, iFrom, depSec)                  FIX 7+9
    * Restituisce tutti i trip EXPRESS (stops[] non vuoto) che partono
    * da iFrom, senza vincolo sulla destinazione.
    * Usato da _buildIntraLineTransfers per trovare Rapid/CR che
    * servono iFrom indipendentemente dalla destinazione finale.
+   * FIX 9: aggiunto branch TS (era assente).
    * ---------------------------------------------------------------- */
   function _getExpressTrips(line, iFrom, depSec) {
     let raw = [];
@@ -416,6 +427,8 @@ const SuburbanRouter = (() => {
       raw = _svcTrips(SK_SERVICES, line, iFrom, null, depSec);
     else if (line.id === 'KW' && typeof KW_SERVICES !== 'undefined')
       raw = _svcTrips(KW_SERVICES, line, iFrom, null, depSec);
+    else if (line.id === 'TS' && typeof TS_SERVICES !== 'undefined')
+      raw = _svcTrips(TS_SERVICES, line, iFrom, null, depSec);
     // Per linee sintetiche non ci sono express distinti: restituisce []
     return raw.filter(t => t.stops && t.stops.length > 0);
   }
@@ -701,10 +714,8 @@ const SuburbanRouter = (() => {
             const xferSec = isThru ? THRU_TRANSFER_SEC : CROSS_TRANSFER_SEC;
             const transferReadySec = leg1.alightArrSec + xferSec;
             const _mResult2 = MetroRouter.buildMultiLeg?.(metroNode, to, transferReadySec);
-if (!_mResult2) continue;
-const leg2 = _mResult2.legs.at(-1); // ultimo leg metro verso la destinazione
-// NB: se _mResult2.legs.length > 1 il rendering mostrerà solo il leg KW,
-// i leg metro interni vanno aggiunti al journey se vuoi mostrarli separatamente.
+            if (!_mResult2) continue;
+            const leg2 = _mResult2.legs.at(-1);
             if (!leg2) continue;
             const waitSec = leg2.boardDepSec - leg1.alightArrSec;
             const totalKm = (leg1.km != null && leg2.km != null) ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
@@ -774,9 +785,9 @@ const leg2 = _mResult2.legs.at(-1); // ultimo leg metro verso la destinazione
           const iMid = _idx(line, subNode.code);
           if (iMid === -1 || iMid === iT) continue;
           for (const metroNode of metroPartners) {
-           const _mResult1 = MetroRouter.buildMultiLeg?.(from, metroNode, depSec);
-if (!_mResult1) continue;
-const leg1 = _mResult1.legs.at(-1);
+            const _mResult1 = MetroRouter.buildMultiLeg?.(from, metroNode, depSec);
+            if (!_mResult1) continue;
+            const leg1 = _mResult1.legs.at(-1);
             if (!leg1) continue;
             const isThru = _isThruNode(subNode.code, metroNode);
             const xferSec = isThru ? THRU_TRANSFER_SEC : CROSS_TRANSFER_SEC;
