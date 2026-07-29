@@ -69,10 +69,6 @@ const TS_SERVICES = [
     desc:     'Completo — Aikami Eigau ↔ Ikotsuha (via Sainðaul Central)',
     fromCode: 'AI01',
     toCode:   'TS21',
-    // Direzione SB (AI01→TS21): prima partenza 05:30 da AI01
-    // Direzione NB (TS21→AI01): prima partenza 07:00 da TS20
-    // Il router usa firstDep come offset da capolinea "from":
-    // registriamo due entry direzionali esplicite sotto.
     firstDep: '05:30',
     lastDep:  '21:45',
     headway:  20,
@@ -103,7 +99,7 @@ const TS_SERVICES = [
     desc:     'Rinforzo NB — Kawayatsu ↔ Shutazai',
     fromCode: 'TS07',
     toCode:   'TS20',
-    firstDep: '07:40',   // +20 min offset (T2 parte da TS07 ~20 min dopo da TS20)
+    firstDep: '07:40',
     lastDep:  '21:20',
     headway:  40,
     stops:    _TS_T2_STOPS_NB,
@@ -117,3 +113,32 @@ const TS_SERVICES = [
   Risultato: su TS01–TS09 passa un treno ogni ~10 min in fascia 09:25–16:55.
   Fuori questa fascia il T1 circola solo (headway 20 min).
 */
+
+/* ================================================================
+   REGISTRAZIONE nel SuburbanRouter
+   Dipende da: ts-data.js (TS_AI_STATIONS, TS_MAIN_STATIONS,
+               TS_KW_STATIONS, TS_INTERCHANGE)
+   Questo file è caricato dopo ts-data.js nell'HTML.
+================================================================ */
+if (typeof SuburbanRouter !== 'undefined') {
+  SuburbanRouter.register({
+    lineId:      'TS',
+    meta:        {
+      name:  'Tandan-Senpyan Line',
+      kanji: '丹淡船駢線',
+      color: '#F5EE27',
+      cls:   'suburban',
+    },
+    stations:    [
+      ...TS_AI_STATIONS,
+      ...TS_MAIN_STATIONS,
+      ...TS_KW_STATIONS,
+    ],
+    services:    TS_SERVICES,
+    interchange: TS_INTERCHANGE,
+  });
+}
+
+if (typeof module !== 'undefined') {
+  module.exports = { TS_SERVICES };
+}
