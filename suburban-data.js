@@ -56,7 +56,16 @@
      KW29 (Abiro) ↔ MS01, IN03
      KW32 (Yamakoga) ↔ CS?? (da confermare)
 
-   SK_SERVICES / KW_SERVICES:
+     TS interchanges (Tandan-Senpyan Line):
+     TS07 ↔ KW10, E02  (Kawayatsu — thru KW)
+     TS12 ↔ LL02, SK25  (Binno)
+     TS13 ↔ LL01, SK26, M814, K01, R01, E01, AX06  (Sainðaul Central)
+     TS14 ↔ SK33, M417, M203  (Shimamera)
+     TS15 ↔ SK34, M418  (Nihkyonta)
+     TS16 ↔ SK35, M419, AX04  (Kasakuri)
+     TS18 ↔ M425  (Ipporai-Senpyan)
+
+   SK_SERVICES / KW_SERVICES / TS_SERVICES:
      Sottoservizi per la generazione degli orari sintetici nel router.
      NON vengono visualizzati nel journey planner come tag o numeri.
 
@@ -107,13 +116,15 @@ const SUBURBAN_INTERCHANGE = {
   KW25: [],                                     // Kotamari (↔ IB?? da confermare)
   KW29: ['MS01', 'IN03'],                       // Abiro (KW ↔ MS01 + IN03)
   KW32: [],                                     // Yamakoga (↔ CS?? da confermare)
-   // Tandan-Senpyan Line (TS)
-  TS12: ['LL02', 'SK25'],
-  TS13: ['LL01', 'SK26', 'M814', 'K01', 'R01', 'E01', 'AX06'],
-  TS14: ['SK33', 'M417', 'M203'],
-  TS15: ['SK34', 'M418'],
-  TS16: ['SK35', 'M419', 'AX04'],
-  TS18: ['M425'],
+  // Tandan-Senpyan Line (TS)
+  TS07: ['KW10', 'E02'],                        // Kawayatsu (TS ↔ KW + IZX E02)
+  TS12: ['LL02', 'SK25'],                       // Binno (TS ↔ LL + SK)
+  TS13: ['LL01', 'SK26', 'M814',
+         'K01',  'R01',  'E01', 'AX06'],        // Sainðaul Central (TS)
+  TS14: ['SK33', 'M417', 'M203'],               // Shimamera (TS ↔ SK + M4 + M2)
+  TS15: ['SK34', 'M418'],                       // Nihkyonta (TS ↔ SK + M4)
+  TS16: ['SK35', 'M419', 'AX04'],              // Kasakuri (TS ↔ SK + M4 + AX)
+  TS18: ['M425'],                               // Ipporai-Senpyan (TS ↔ M4 capolinea ovest)
 };
 
 const SUBURBAN_LINES = {
@@ -354,7 +365,7 @@ const SUBURBAN_LINES = {
       { code: 'KW18', name: 'Nwatanui',              kanji: '—',              km: 35.18, segSpeedKmh:  85 },
       { code: 'KW19', name: 'Abamiwa',               kanji: '弱水',           km: 38.51, segSpeedKmh:  88 },
       { code: 'KW20', name: 'Shiwesuno',             kanji: '—',              km: 40.69, segSpeedKmh:  90 },
-      { code: 'KW21', name: 'Sogeisu',               kanji: '—',             km: 44.13, segSpeedKmh:  95 },
+      { code: 'KW21', name: 'Sogeisu',               kanji: '—',              km: 44.13, segSpeedKmh:  95 },
       { code: 'KW22', name: 'Funoshoni',             kanji: '—',              km: 45.38, segSpeedKmh: 120 }, // tratto ad alta velocità, punta 130 km/h
       { code: 'KW23', name: 'Sārishiki',             kanji: '川北',           km: 48.43, segSpeedKmh:  95 },
       { code: 'KW24', name: 'Karue',                 kanji: '松澤',           km: 51.83, segSpeedKmh:  92 },
@@ -365,7 +376,61 @@ const SUBURBAN_LINES = {
       { code: 'KW29', name: 'Abiro',                 kanji: '獏路',           km: 76.15, segSpeedKmh:  88 }, // ↔ MS01, IN03
       { code: 'KW30', name: 'Yakkais',               kanji: '—',              km: 79.94, segSpeedKmh:  85 },
       { code: 'KW31', name: 'Rinongauri',            kanji: '桉沼',           km: 84.28, segSpeedKmh:  80 },
-      { code: 'KW32', name: 'Yamakoga',              kanji: '倉湖加',         km: 84.35 },                   // capolinea, nessun segmento successivo
+      { code: 'KW32', name: 'Yamakoga',              kanji: '倉湖加',         km: 84.35 },
+    ],
+  },
+
+  /* ────────────────────────────────────────────────
+     TS — Tandan-Senpyan Line · 丹淡船駢線
+     Stazioni: AI01–AI04 (ramo Aikami) + TS10–TS24 (tronco principale)
+               + TS01–TS09 (tratto condiviso KW, binari Rapid)
+               + TS21–TS23 (prosecuzione nord oltre Yamakoga)
+     Capilinea: AI01 Aikami Eigau ↔ TS21 Ikotsuha
+     km: progressiva continua da AI01 (km 0.00)
+     Tratto KW condiviso: TS09/KW04 Semukudai → TS01/KW32 Yamakoga
+     I treni TS sono sfasati di +10 min rispetto a KW W3 Rapid.
+  ──────────────────────────────────────────────── */
+  TS: {
+    id: 'TS',
+    name: 'Tandan-Senpyan Line',
+    nameJa: '丹淡船駢線',
+    color: '#F5EE27',
+    circular: false,
+    headwayPeak: 20,
+    headwayOffPeak: 20,
+    totalKm: 100.37,
+    stations: [
+      // ── Ramo Aikami ──
+      { code: 'AI01', name: 'Aikami Eigau',           kanji: '—',             km:   0.00 },
+      { code: 'AI02', name: 'Tomahashi',              kanji: '—',             km:   1.73 },
+      { code: 'AI03', name: 'Kukaðuka',               kanji: '—',             km:   2.81 },
+      { code: 'TS24', name: 'Moto-Aikami',            kanji: '—',             km:   4.01 },
+      // ── Tronco principale (Sainðaul → Senpyan) ──
+      { code: 'TS10', name: 'Nekunno',                kanji: '牒ᐢ見',         km:   5.52 },
+      { code: 'TS11', name: 'Kiikudai-adae',          kanji: '熈育大前',      km:   8.37 },
+      { code: 'TS12', name: 'Binno',                  kanji: '苠喃',          km:  10.97 },
+      { code: 'TS13', name: 'Sainðaul Central',       kanji: '作安崎中央',    km:  12.79 },
+      { code: 'TS14', name: 'Shimamera',              kanji: '渠瀬田',        km:  21.59 },
+      { code: 'TS15', name: 'Nihkyonta',              kanji: '濱角',          km:  23.38 },
+      { code: 'TS16', name: 'Kasakuri',               kanji: '鯛巻',          km:  27.28 },
+      { code: 'TS17', name: 'Rismyonjen',             kanji: '—',             km:  33.17 },
+      { code: 'TS18', name: 'Ipporai-Senpyan',        kanji: '一蒲崍船駢',    km:  36.82 },
+      { code: 'TS19', name: 'Eigandan Senpyan',       kanji: '永玵段船駢',    km:  39.52 },
+      { code: 'TS20', name: 'Shutazai',               kanji: '守多彩',        km:  43.57 },
+      // ── Tratto condiviso KW (binari Rapid) ──
+      { code: 'TS09', name: 'Semukudai',              kanji: '世牧臺',        km:  17.40 },
+      { code: 'TS08', name: 'Agasuri-ko Ugutsumasa',  kanji: '蛞珠利湖・茨察', km: 22.60 },
+      { code: 'TS07', name: 'Kawayatsu',              kanji: '嘉夬苫',        km:  24.88 },
+      { code: 'TS06', name: 'Niji-Kawayatsu',         kanji: '西嘉夬苫',      km:  27.16 },
+      { code: 'TS05', name: 'Ibarosu',                kanji: '歯舢',          km:  38.41 },
+      { code: 'TS04', name: 'Nwatanui',               kanji: '—',             km:  40.23 },
+      { code: 'TS03', name: 'Funoshoni',              kanji: '—',             km:  49.87 },
+      { code: 'TS02', name: 'Abiro',                  kanji: '獏路',          km:  75.56 },
+      { code: 'TS01', name: 'Yamakoga',               kanji: '倉湖加',        km:  90.91 },
+      // ── Prosecuzione nord oltre Yamakoga ──
+      { code: 'TS23', name: 'Yuriyama',               kanji: '油里倉',        km:  92.54 },
+      { code: 'TS22', name: 'Sāryarasa',              kanji: '河霧',          km:  96.65 },
+      { code: 'TS21', name: 'Ikotsuha',               kanji: '梧戦',          km: 100.37 },
     ],
   },
 
