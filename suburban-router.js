@@ -399,6 +399,8 @@ const SuburbanRouter = (() => {
     if (line.id === 'KW' && typeof KW_SERVICES !== 'undefined')
       return _svcTrips(KW_SERVICES, line, iFrom, iTo, depSec);
     return _syntheticTrips(line, iFrom, depSec);
+     if (line.id === 'TS' && typeof TS_SERVICES !== 'undefined')
+  return _svcTrips(TS_SERVICES, line, iFrom, iTo, depSec);
   }
 
   /* ----------------------------------------------------------------
