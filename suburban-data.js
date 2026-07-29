@@ -107,6 +107,13 @@ const SUBURBAN_INTERCHANGE = {
   KW25: [],                                     // Kotamari (↔ IB?? da confermare)
   KW29: ['MS01', 'IN03'],                       // Abiro (KW ↔ MS01 + IN03)
   KW32: [],                                     // Yamakoga (↔ CS?? da confermare)
+   // Tandan-Senpyan Line (TS)
+  TS12: ['LL02', 'SK25'],
+  TS13: ['LL01', 'SK26', 'M814', 'K01', 'R01', 'E01', 'AX06'],
+  TS14: ['SK33', 'M417', 'M203'],
+  TS15: ['SK34', 'M418'],
+  TS16: ['SK35', 'M419', 'AX04'],
+  TS18: ['M425'],
 };
 
 const SUBURBAN_LINES = {
