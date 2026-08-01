@@ -141,12 +141,14 @@ const M4_SVC = {
 
    M401 Heinomoji
      ↔ M206 (Line 2)          — stesso nome, banchine separate    3 min
+     ↔ M806 (Line 8)          — stesso nome, banchine separate    2 min
 
    M402 Ogiwata
      ↔ M207 (Line 2)          — stesso nome, banchine separate    3 min
 
    M405 Anagusa Mukai
      ↔ KD30 (Kidai Line)      — stesso nome, uscita condivisa     3 min
+     ↔ M817 (Line 8)          — Anagusa Mukai, banchine separate  3 min
 
    M406 Kushidaru Amiya
      ↔ M210 (Line 2)          — stesso nome, banchine separate    3 min
@@ -169,11 +171,10 @@ const M4_SVC = {
 ---------------------------------------------------------------- */
 const M4_INTERCHANGE = {
   M401: [
-  { code: 'M206', network: 'metro', transferMin: 4,
-    note: 'M2 Heinomoji — stesso nome, banchine separate' },
-  { code: 'M806', network: 'metro', transferMin: 2,
-    note: 'M8 Heinomoji — stesso nome, banchine separate' },
-],
+    { code: 'M206', network: 'metro', transferMin: 4,
+      note: 'M2 Heinomoji — stesso nome, banchine separate' },
+    { code: 'M806', network: 'metro', transferMin: 2,
+      note: 'M8 Heinomoji — stesso nome, banchine separate' },
   ],
   M402: [
     { code: 'M207', network: 'metro', transferMin: 3,
@@ -183,7 +184,7 @@ const M4_INTERCHANGE = {
     { code: 'KD30', network: 'suburban', transferMin: 5,
       note: 'Kidai Line — Anagusa Mukai, uscita condivisa' },
     { code: 'M817', network: 'metro', transferMin: 3,
-    note: 'M2 Heinomoji — Anagusa Mukai, banchine separate' },
+      note: 'M8 Anagusa Mukai — banchine separate' },
   ],
   M406: [
     { code: 'M210', network: 'metro', transferMin: 3,
