@@ -382,27 +382,7 @@
    * transfers. This eliminates multi-leg roundabout routes that reach the
    * destination at the same time as a direct service.
    * ================================================================ */
-  function _dedup(journeys) {
-    const seen = new Set();
-
-    // Step 1: sort
-    const sorted = journeys
-      .sort((a, b) =>
-        _hmToSec(a.arrivalTime)   - _hmToSec(b.arrivalTime)   ||
-        (a.transfers ?? 0)        - (b.transfers ?? 0)         ||
-        _hmToSec(b.departureTime) - _hmToSec(a.departureTime)
-      );
-
-    // Step 2: dedup by exact key (same dep+arr+legs)
-    const deduped = sorted.filter(j => {
-      const key = j.departureTime + '|' + j.arrivalTime + '|' +
-        (j.legs || []).map(l =>
-          (l.lineId ?? l.network ?? '') + ':' + (l.svcId ?? l.service ?? '')
-        ).join(',');
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+function _dedup(journeys) {
 
     // Step 3: dominance pruning
     // A journey B is dominated by A if:
