@@ -370,13 +370,21 @@
   }
 
   /* ================================================================
-   * DEDUP
+   * DEDUP + SORT
+   *
+   * Correct journey planner ordering:
+   *   1. Earliest arrival time  — get there sooner
+   *   2. Fewest transfers       — simpler journey wins at equal arrival
+   *   3. Latest departure time  — least waiting at origin, at equal arrival+transfers
    * ================================================================ */
   function _dedup(journeys) {
     const seen = new Set();
     return journeys
-      .sort((a, b) => _hmToSec(a.departureTime) - _hmToSec(b.departureTime) ||
-                      a.totalMinutes - b.totalMinutes)
+      .sort((a, b) =>
+        _hmToSec(a.arrivalTime)   - _hmToSec(b.arrivalTime)   ||
+        (a.transfers ?? 0)        - (b.transfers ?? 0)         ||
+        _hmToSec(b.departureTime) - _hmToSec(a.departureTime)
+      )
       .filter(j => {
         const key = j.departureTime + '|' + j.arrivalTime + '|' +  (j.legs || []).map(l =>  (l.lineId ?? l.network ?? '') + ':' + (l.svcId ?? l.service ?? '')  ).join(',');
         if (seen.has(key)) return false;
