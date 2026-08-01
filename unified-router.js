@@ -376,21 +376,61 @@
    *   1. Earliest arrival time  — get there sooner
    *   2. Fewest transfers       — simpler journey wins at equal arrival
    *   3. Latest departure time  — least waiting at origin, at equal arrival+transfers
+   *
+   * After sorting, a second "dominance pruning" pass removes any journey
+   * that arrives no earlier than an already-accepted journey AND has more
+   * transfers. This eliminates multi-leg roundabout routes that reach the
+   * destination at the same time as a direct service.
    * ================================================================ */
   function _dedup(journeys) {
     const seen = new Set();
-    return journeys
+
+    // Step 1: sort
+    const sorted = journeys
       .sort((a, b) =>
         _hmToSec(a.arrivalTime)   - _hmToSec(b.arrivalTime)   ||
         (a.transfers ?? 0)        - (b.transfers ?? 0)         ||
         _hmToSec(b.departureTime) - _hmToSec(a.departureTime)
-      )
-      .filter(j => {
-        const key = j.departureTime + '|' + j.arrivalTime + '|' +  (j.legs || []).map(l =>  (l.lineId ?? l.network ?? '') + ':' + (l.svcId ?? l.service ?? '')  ).join(',');
-        if (seen.has(key)) return false;
-        seen.add(key);
+      );
+
+    // Step 2: dedup by exact key (same dep+arr+legs)
+    const deduped = sorted.filter(j => {
+      const key = j.departureTime + '|' + j.arrivalTime + '|' +
+        (j.legs || []).map(l =>
+          (l.lineId ?? l.network ?? '') + ':' + (l.svcId ?? l.service ?? '')
+        ).join(',');
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    // Step 3: dominance pruning
+    // A journey B is dominated by A if:
+    //   arrivalTime(B) >= arrivalTime(A)  AND  transfers(B) > transfers(A)
+    // We iterate in sorted order (earliest arrival first), tracking the minimum
+    // transfers seen for each arrival bucket. Any later journey with more
+    // transfers than the best-so-far at an equal-or-earlier arrival is pruned.
+    let bestArrSec = -Infinity;
+    let bestTransfersAtBestArr = Infinity;
+
+    return deduped.filter(j => {
+      const arrSec = _hmToSec(j.arrivalTime);
+      const tr = j.transfers ?? 0;
+
+      if (arrSec > bestArrSec) {
+        // New (later) arrival bucket — reset best
+        bestArrSec = arrSec;
+        bestTransfersAtBestArr = tr;
         return true;
-      });
+      }
+      // Same arrival bucket (arrSec === bestArrSec, can't be less since sorted)
+      if (tr <= bestTransfersAtBestArr) {
+        bestTransfersAtBestArr = tr;
+        return true;
+      }
+      // More transfers at same arrival — dominated, prune
+      return false;
+    });
   }
 
   /* ================================================================
