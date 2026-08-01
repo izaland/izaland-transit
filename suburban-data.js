@@ -62,7 +62,7 @@
      TS13 ↔ LL01, SK26, M814, K01, R01, E01, AX06  (Sainðaul Central)
      TS14 ↔ SK33, M417, M203  (Shimamera)
      TS15 ↔ SK34, M418  (Nihkyonta)
-     TS16 ↔ SK35, M419, AX04  (Kasakuri)
+     TS16 ↔ SK35, M419, AX04, K02  (Kasakuri ↔ Niji-Sainðaul IZX Keishin)
      TS18 ↔ M425  (Ipporai-Senpyan)
 
    SK_SERVICES / KW_SERVICES:
@@ -130,7 +130,8 @@ const SUBURBAN_INTERCHANGE = {
   TS13: ['LL01', 'SK26', 'M814', 'K01', 'R01', 'E01', 'AX06'],
   TS14: ['SK33', 'M417', 'M203'],
   TS15: ['SK34', 'M418'],
-  TS16: ['SK35', 'M419', 'AX04'],
+  // TS16 Kasakuri ↔ K02 Niji-Sainðaul (IZX Keishin) — stesso nodo di interscambio
+  TS16: ['SK35', 'M419', 'AX04', 'K02'],
   TS18: ['M425'],
 };
 
@@ -416,173 +417,21 @@ const SUBURBAN_LINES = {
       { code: 'TS05', name: 'Ibarosu',                kanji: '歯舢',           km:  66.09 },
       { code: 'TS06', name: 'Niji-Kawayatsu',         kanji: '西嘉夬苫',       km:  78.84 },
       { code: 'TS07', name: 'Kawayatsu',              kanji: '嘉夬苫',         km:  80.92 },
-      { code: 'TS08', name: 'Agasuri-ko Ugutsumasa',  kanji: '蛞珠利湖・茨察', km:  87.82 },
-      { code: 'TS09', name: 'Semukudai',              kanji: '世牧臺',         km:  93.17 },
-      // ── Tronco principale (Sainðaul → Senpyan) ──
-      { code: 'TS10', name: 'Nekunno',                kanji: '牒ᐢ見',          km:  98.37 },
-      { code: 'TS11', name: 'Kiikudai-adae',          kanji: '熈育大前',       km:  99.88 },
-      { code: 'TS12', name: 'Binno',                  kanji: '苠喃',           km: 102.73 },
-      { code: 'TS13', name: 'Sainðaul Central',       kanji: '作安崎中央',     km: 105.33 },
-      { code: 'TS14', name: 'Shimamera',              kanji: '渠瀬田',         km: 107.15 },
-      { code: 'TS15', name: 'Nihkyonta',              kanji: '濱角',           km: 115.95 },
-      { code: 'TS16', name: 'Kasakuri',               kanji: '鯛巻',           km: 117.74 },
-      { code: 'TS17', name: 'Rismyonjen',             kanji: '—',              km: 121.64 },
-      { code: 'TS18', name: 'Ipporai-Senpyan',        kanji: '一蒲崍船駢',     km: 127.53 },
-      { code: 'TS19', name: 'Eigandan Senpyan',       kanji: '永玵段船駢',     km: 131.18 },
+      { code: 'TS08', name: 'Shin-Kawayatsu',         kanji: '新嘉夬苫',       km:  84.49 },
+      { code: 'TS09', name: 'Semukudai',              kanji: '世牧臺',         km:  86.06 },
+      // ── Tronco principale Senpyan (verso Shutazai) ──
+      { code: 'TS10', name: 'Eigandan Senpyan',       kanji: '永玵段船駢',     km:  89.08 },
+      { code: 'TS11', name: 'Rismyonjen',             kanji: '—',              km:  94.18 },
+      { code: 'TS12', name: 'Binno',                  kanji: '苠喃',           km:  97.43 },
+      { code: 'TS13', name: 'Sainðaul Central',       kanji: '作安崎中央',     km: 100.43 },
+      { code: 'TS14', name: 'Shimamera',              kanji: '渠瀬田',         km: 103.43 },
+      { code: 'TS15', name: 'Nihkyonta',              kanji: '濱角',           km: 106.43 },
+      // TS16 Kasakuri: stesso nodo di interscambio di K02 Niji-Sainðaul (IZX Keishin)
+      { code: 'TS16', name: 'Kasakuri',               kanji: '鯛巻',           km: 109.43 },
+      { code: 'TS17', name: 'Rismyonjen',             kanji: '—',              km: 113.43 },
+      { code: 'TS18', name: 'Ipporai-Senpyan',        kanji: '—',              km: 119.43 },
+      { code: 'TS19', name: 'Eigandan Senpyan',       kanji: '永玵段船駢',     km: 125.43 },
       { code: 'TS20', name: 'Shutazai',               kanji: '守多彩',         km: 133.88 },
     ],
   },
-
-  RI: {
-    id: 'RI',
-    name: 'Riimiilla Line',
-    nameJa: '---線',
-    color: '#ffd320',
-    circular: false,
-    headwayPeak: 5,
-    headwayOffPeak: 10,
-    totalKm: 100.56,
-    stations: [],
-  },
-
-  SS: {
-    id: 'SS',
-    name: 'Shosen Line',
-    nameJa: '--線',
-    color: '#D2B48C',
-    circular: false,
-    headwayPeak: 5,
-    headwayOffPeak: 10,
-    totalKm: 50.19,
-    stations: [],
-  },
-
-  GD: {
-    id: 'GD',
-    name: 'Gaekwan-Dōnbu Line',
-    nameJa: '外環東部線',
-    color: '#B16B48',
-    circular: false,
-    headwayPeak: 7,
-    headwayOffPeak: 10,
-    totalKm: 78.48,
-    stations: [],
-  },
-
-  JD: {
-    id: 'JD',
-    name: 'Juwon-Kodōn Line',
-    nameJa: '中央湖東線',
-    color: '#FF66CC',
-    circular: false,
-    headwayPeak: 5,
-    headwayOffPeak: 10,
-    totalKm: 78.35,
-    stations: [],
-  },
-
-  CK: {
-    id: 'CK',
-    name: 'Chukkūn Line',
-    nameJa: '竹空線',
-    color: '#B8B895',
-    circular: false,
-    headwayPeak: 10,
-    headwayOffPeak: 15,
-    totalKm: 55.93,
-    stations: [],
-  },
-
 };
-
-/* ================================================================
-   SK_SERVICES — sottoservizi Seishaku Line
-================================================================ */
-const SK_SERVICES = [
-  {
-    id:       'S1',
-    desc:     'Igattarun Juwon ↔ Shakusa (servizio completo)',
-    fromCode: 'SK01',
-    toCode:   'SK58',
-    firstDep: '05:35',
-    lastDep:  '23:35',
-    headway:  20,
-  },
-  {
-    id:       'S2',
-    desc:     'Enikezya ↔ Waneki (rinforzo fascia centrale)',
-    fromCode: 'SK07',
-    toCode:   'SK47',
-    firstDep: '06:55',
-    lastDep:  '21:55',
-    headway:  20,
-  },
-  {
-    id:       'S3',
-    desc:     'Showanul ↔ Shakusa (locale zona Shakusa)',
-    fromCode: 'SK43',
-    toCode:   'SK58',
-    firstDep: '06:15',
-    lastDep:  '22:45',
-    headway:  20,
-  },
-  {
-    id:       'S4',
-    desc:     'Igattarun Juwon ↔ Kasakuri (locale zona nord)',
-    fromCode: 'SK01',
-    toCode:   'SK35',
-    firstDep: '06:15',
-    lastDep:  '22:45',
-    headway:  20,
-  },
-];
-
-/* ================================================================
-   KW_SERVICES — sottoservizi Kwōkei Line
-================================================================ */
-const KW_SERVICES = [
-  {
-    id:       'W1',
-    desc:     'Local — Kishagoi-Exhibitown ↔ Yamakoga (servizio completo)',
-    fromCode: 'KW00',
-    toCode:   'KW32',
-    firstDep: '05:30',
-    lastDep:  '23:30',
-    headway:  20,
-    stops:    [],
-  },
-  {
-    id:       'W2',
-    desc:     'Local Ltd — Kishagoi-Exhibitown ↔ Ibarosu (rinforzo tratto sud)',
-    fromCode: 'KW00',
-    toCode:   'KW17',
-    firstDep: '05:50',
-    lastDep:  '23:20',
-    headway:  20,
-    stops:    [],
-  },
-  {
-    id:       'W3',
-    desc:     'Rapid — Kishagoi-Exhibitown ↔ Yamakoga (fuori punta)',
-    fromCode: 'KW00',
-    toCode:   'KW32',
-    firstDep: '09:25',
-    lastDep:  '16:55',
-    headway:  20,
-    stops:    ['KW00','KW01','KW03','KW06','KW10','KW11','KW17','KW18','KW22','KW29','KW32'],
-  },
-  {
-    id:       'W4',
-    desc:     'Commuter Rapid — Kishagoi-Exhibitown ↔ Yamakoga (punta mattina/sera)',
-    fromCode: 'KW00',
-    toCode:   'KW32',
-    lastDep:  '22:30',
-    peakWindows: [
-      { from: '07:25', to: '09:25' },
-      { from: '16:55', to: '22:25' },
-    ],
-    headway:  20,
-    stops:    ['KW00','KW01','KW06','KW10','KW11','KW17','KW18','KW22','KW23','KW24',
-               'KW25','KW26','KW27','KW28','KW29','KW30','KW31','KW32'],
-  },
-];
