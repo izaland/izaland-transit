@@ -78,6 +78,15 @@
      Km calcolati come progressiva cumulativa dalle distanze
      interstazione reali. AI04→TS23 = 1.63 km. totalKm = 133.88 km.
 
+   FIX 11 (disambiguazione nomi duplicati sulla linea TS):
+     TS10 e TS19 avevano entrambe il nome 'Eigandan Senpyan'.
+     TS11 e TS17 avevano entrambe il nome 'Rismyonjen'.
+     I duplicati causavano la risoluzione ambigua del codice stazione:
+     il router trovava TS10 (a metà linea, vicina ai nodi AX/IZX
+     via TS13) invece di TS19 (quella corretta, vicina a Shutazai),
+     generando percorsi 3-leg spuri AX+A+TS invece del diretto TS.
+     Fix: TS10 → 'Eigandan Senpyan (Semukudai)'; TS11 → 'Rismyonjen (Eigandan)'.
+
    Nota km Loop Line:
      Distanze progressive reali da rilievo cartografico.
      Circuito totale: 24.41 km (LL01 → ... → LL19 → LL01).
@@ -389,6 +398,12 @@ const SUBURBAN_LINES = {
        → TS10 → TS20 Shutazai (tronco principale Senpyan)
      km: progressiva cumulativa da AI01=0.00, calcolata dalle
          distanze interstazione reali. AI04→TS23 = 1.63 km.
+
+     NOTA nomi duplicati (FIX 11):
+       TS10 'Eigandan Senpyan (Semukudai)' — giunzione TS↔KW, tratto nord
+       TS19 'Eigandan Senpyan'             — fermata tronco sud, capolinea prossimo
+       TS11 'Rismyonjen (Eigandan)'        — tratto nord
+       TS17 'Rismyonjen'                   — tratto sud
   ──────────────────────────────────────────────── */
   TS: {
     id: 'TS',
@@ -401,37 +416,39 @@ const SUBURBAN_LINES = {
     totalKm: 133.88,
     stations: [
       // ── Ramo Aikami ──
-      { code: 'AI01', name: 'Aikami Eigau',           kanji: '—',              km:   0.00 },
-      { code: 'AI02', name: 'Tomahashi',              kanji: '—',              km:   1.73 },
-      { code: 'AI03', name: 'Kukaðuka',               kanji: '—',              km:   2.81 },
-      { code: 'AI04', name: 'Moto-Aikami',            kanji: '—',              km:   4.01 },
+      { code: 'AI01', name: 'Aikami Eigau',                    kanji: '—',          km:   0.00 },
+      { code: 'AI02', name: 'Tomahashi',                       kanji: '—',          km:   1.73 },
+      { code: 'AI03', name: 'Kukaðuka',                        kanji: '—',          km:   2.81 },
+      { code: 'AI04', name: 'Moto-Aikami',                     kanji: '—',          km:   4.01 },
       // ── Prosecuzione nord (giunzione Aikami → Yuriyama → Ikotsuha) ──
-      { code: 'TS23', name: 'Yuriyama',               kanji: '油里倉',         km:   5.64 },
-      { code: 'TS22', name: 'Sāryarasa',              kanji: '河霧',           km:   9.36 },
-      { code: 'TS21', name: 'Ikotsuha',               kanji: '梧戦',           km:  13.47 },
+      { code: 'TS23', name: 'Yuriyama',                        kanji: '油里倉',     km:   5.64 },
+      { code: 'TS22', name: 'Sāryarasa',                       kanji: '河霧',       km:   9.36 },
+      { code: 'TS21', name: 'Ikotsuha',                        kanji: '梧戦',       km:  13.47 },
       // ── Yamakoga e tratto condiviso KW (verso Sainðaul) ──
-      { code: 'TS01', name: 'Yamakoga',               kanji: '倉湖加',         km:  15.10 },
-      { code: 'TS02', name: 'Abiro',                  kanji: '獏路',           km:  23.30 },
-      { code: 'TS03', name: 'Funoshoni',              kanji: '—',              km:  54.07 },
-      { code: 'TS04', name: 'Nwatanui',               kanji: '—',              km:  64.27 },
-      { code: 'TS05', name: 'Ibarosu',                kanji: '歯舢',           km:  66.09 },
-      { code: 'TS06', name: 'Niji-Kawayatsu',         kanji: '西嘉夬苫',       km:  78.84 },
-      { code: 'TS07', name: 'Kawayatsu',              kanji: '嘉夬苫',         km:  80.92 },
-      { code: 'TS08', name: 'Shin-Kawayatsu',         kanji: '新嘉夬苫',       km:  84.49 },
-      { code: 'TS09', name: 'Semukudai',              kanji: '世牧臺',         km:  86.06 },
+      { code: 'TS01', name: 'Yamakoga',                        kanji: '倉湖加',     km:  15.10 },
+      { code: 'TS02', name: 'Abiro',                           kanji: '獏路',       km:  23.30 },
+      { code: 'TS03', name: 'Funoshoni',                       kanji: '—',          km:  54.07 },
+      { code: 'TS04', name: 'Nwatanui',                        kanji: '—',          km:  64.27 },
+      { code: 'TS05', name: 'Ibarosu',                         kanji: '歯舢',       km:  66.09 },
+      { code: 'TS06', name: 'Niji-Kawayatsu',                  kanji: '西嘉夬苫',   km:  78.84 },
+      { code: 'TS07', name: 'Kawayatsu',                       kanji: '嘉夬苫',     km:  80.92 },
+      { code: 'TS08', name: 'Shin-Kawayatsu',                  kanji: '新嘉夬苫',   km:  84.49 },
+      { code: 'TS09', name: 'Semukudai',                       kanji: '世牧臺',     km:  86.06 },
       // ── Tronco principale Senpyan (verso Shutazai) ──
-      { code: 'TS10', name: 'Eigandan Senpyan',       kanji: '永玵段船駢',     km:  89.08 },
-      { code: 'TS11', name: 'Rismyonjen',             kanji: '—',              km:  94.18 },
-      { code: 'TS12', name: 'Binno',                  kanji: '苠喃',           km:  97.43 },
-      { code: 'TS13', name: 'Sainðaul Central',       kanji: '作安崎中央',     km: 100.43 },
-      { code: 'TS14', name: 'Shimamera',              kanji: '渠瀬田',         km: 103.43 },
-      { code: 'TS15', name: 'Nihkyonta',              kanji: '濱角',           km: 106.43 },
+      // FIX 11: rinominato da 'Eigandan Senpyan' per disambiguare da TS19
+      { code: 'TS10', name: 'Eigandan Senpyan (Semukudai)',     kanji: '永玵段船駢（世牧臺）', km:  89.08 },
+      // FIX 11: rinominato da 'Rismyonjen' per disambiguare da TS17
+      { code: 'TS11', name: 'Rismyonjen (Eigandan)',           kanji: '—',          km:  94.18 },
+      { code: 'TS12', name: 'Binno',                           kanji: '苠喃',       km:  97.43 },
+      { code: 'TS13', name: 'Sainðaul Central',                kanji: '作安崎中央', km: 100.43 },
+      { code: 'TS14', name: 'Shimamera',                       kanji: '渠瀬田',     km: 103.43 },
+      { code: 'TS15', name: 'Nihkyonta',                       kanji: '濱角',       km: 106.43 },
       // TS16 Kasakuri: stesso nodo di interscambio di K02 Niji-Sainðaul (IZX Keishin)
-      { code: 'TS16', name: 'Kasakuri',               kanji: '鯛巻',           km: 109.43 },
-      { code: 'TS17', name: 'Rismyonjen',             kanji: '—',              km: 113.43 },
-      { code: 'TS18', name: 'Ipporai-Senpyan',        kanji: '—',              km: 119.43 },
-      { code: 'TS19', name: 'Eigandan Senpyan',       kanji: '永玵段船駢',     km: 125.43 },
-      { code: 'TS20', name: 'Shutazai',               kanji: '守多彩',         km: 133.88 },
+      { code: 'TS16', name: 'Kasakuri',                        kanji: '鯛巻',       km: 109.43 },
+      { code: 'TS17', name: 'Rismyonjen',                      kanji: '—',          km: 113.43 },
+      { code: 'TS18', name: 'Ipporai-Senpyan',                 kanji: '—',          km: 119.43 },
+      { code: 'TS19', name: 'Eigandan Senpyan',                kanji: '永玵段船駢', km: 125.43 },
+      { code: 'TS20', name: 'Shutazai',                        kanji: '守多彩',     km: 133.88 },
     ],
   },
 };
