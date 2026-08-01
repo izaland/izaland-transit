@@ -37,39 +37,24 @@
    * ================================================================ */
   const _ixIndex = {};
 
-  function _ixAdd(code, entry) {
-    if (!_ixIndex[code]) _ixIndex[code] = [];
-    _ixIndex[code].push(entry);
-  }
-
   function _add(codeA, codeB, transferMin) {
     const t = transferMin ?? CROSS_TRANSFER_MIN;
-    // avoid duplicate entries
-    if (!(_ixIndex[codeA] && _ixIndex[codeA].some(e => e.code === codeB)))
-      _ixIndex[codeA] = (_ixIndex[codeA] || []);
-    if (!(_ixIndex[codeB] && _ixIndex[codeB].some(e => e.code === codeA)))
-      _ixIndex[codeB] = (_ixIndex[codeB] || []);
-    _ixIndex[codeA].push({ code: codeB, transferMin: t });
-    _ixIndex[codeB].push({ code: codeA, transferMin: t });
+    if (!_ixIndex[codeA]) _ixIndex[codeA] = [];
+    if (!_ixIndex[codeB]) _ixIndex[codeB] = [];
+    if (!_ixIndex[codeA].some(e => e.code === codeB))
+      _ixIndex[codeA].push({ code: codeB, transferMin: t });
+    if (!_ixIndex[codeB].some(e => e.code === codeA))
+      _ixIndex[codeB].push({ code: codeA, transferMin: t });
   }
 
   function buildInterchangeIndex(interchangeData) {
-    // interchangeData: array of { codeA, codeB, transferMin? }
-    // OR the merged cross-network interchange maps from data files
     if (Array.isArray(interchangeData)) {
-      interchangeData.forEach(ix => {
-        _add(ix.codeA, ix.codeB, ix.transferMin);
-      });
+      interchangeData.forEach(ix => _add(ix.codeA, ix.codeB, ix.transferMin));
       return;
     }
-    // Object form: { stationCode: [ { code, network, transferMin } ] }
     Object.entries(interchangeData).forEach(([stCode, partners]) => {
       const pArr = Array.isArray(partners) ? partners : [partners];
-      if (pArr.length === 1) {
-        for (const b of pArr) _add(stCode, b.code ?? b, CROSS_TRANSFER_MIN);
-      } else {
-        for (const b of pArr) _add(stCode, b.code ?? b, CROSS_TRANSFER_MIN);
-      }
+      for (const b of pArr) _add(stCode, b.code ?? b, b.transferMin ?? CROSS_TRANSFER_MIN);
     });
   }
 
@@ -77,29 +62,23 @@
    * PARTNER LOOKUP
    * ================================================================ */
   function _partnersOf(code) {
-    // Returns [{code, networkId, transferMin}]
     const raw = _ixIndex[code] || [];
     const out = [];
 
     function _push(partnerCode, transferMin) {
-      // Determine network from registered routers
       let net = null;
       for (const [id, r] of Object.entries(_routers)) {
         if (typeof r.hasStation === 'function' && r.hasStation(partnerCode)) { net = id; break; }
         if (typeof r.allStations === 'function') {
-          const all = r.allStations();
-          if (all.some(s => s.code === partnerCode)) { net = id; break; }
+          if (r.allStations().some(s => s.code === partnerCode)) { net = id; break; }
         }
       }
       if (!net) return;
       out.push({ code: partnerCode, networkId: net, transferMin: transferMin ?? CROSS_TRANSFER_MIN });
     }
 
-    raw.forEach(entry => {
-  _push(entry.code, entry.transferMin ?? CROSS_TRANSFER_MIN);
-});
+    raw.forEach(entry => _push(entry.code, entry.transferMin ?? CROSS_TRANSFER_MIN));
 
-    // deduplicate
     const seen = new Set();
     return out.filter(e => { if (seen.has(e.code)) return false; seen.add(e.code); return true; });
   }
@@ -123,34 +102,31 @@
    * JOURNEY BUILDERS
    * ================================================================ */
   function _buildJourney2(j1, j2, midCode, walkMin) {
-  const totalKm = (j1.totalKm != null && j2.totalKm != null)
-    ? j1.totalKm + j2.totalKm : null;
-  const wkMin   = walkMin ?? CROSS_TRANSFER_MIN;
-  const totalGapMin = Math.round(
-    (_hmToSec(j2.departureTime) - _hmToSec(j1.arrivalTime)) / 60
-  );
-  const wtMin = Math.max(0, totalGapMin - wkMin);
-
-  // Propaga thruService/thruNode se presenti nel primo journey (es. KW→M8)
-  const thruFields = {};
-  if (j1.thruService) {
-    thruFields.thruService = true;
-    thruFields.thruNode    = j1.thruNode;
+    const totalKm = (j1.totalKm != null && j2.totalKm != null)
+      ? j1.totalKm + j2.totalKm : null;
+    const wkMin = walkMin ?? CROSS_TRANSFER_MIN;
+    const totalGapMin = Math.round(
+      (_hmToSec(j2.departureTime) - _hmToSec(j1.arrivalTime)) / 60
+    );
+    const wtMin = Math.max(0, totalGapMin - wkMin);
+    const thruFields = {};
+    if (j1.thruService) {
+      thruFields.thruService = true;
+      thruFields.thruNode    = j1.thruNode;
+    }
+    return {
+      legs:              [...j1.legs, ...j2.legs],
+      departureTime:     j1.departureTime,
+      arrivalTime:       j2.arrivalTime,
+      totalMinutes:      Math.round((_hmToSec(j2.arrivalTime) - _hmToSec(j1.departureTime)) / 60),
+      totalKm,
+      transfers:         (j1.transfers + j2.transfers) + 1,
+      transferNodes:     [...(j1.transferNodes || []), midCode, ...(j2.transferNodes || [])],
+      transferWalkMin:   [wkMin],
+      transferWaitMin:   [wtMin],
+      ...thruFields,
+    };
   }
-
-  return {
-    legs:              [...j1.legs, ...j2.legs],
-    departureTime:     j1.departureTime,
-    arrivalTime:       j2.arrivalTime,
-    totalMinutes:      Math.round((_hmToSec(j2.arrivalTime) - _hmToSec(j1.departureTime)) / 60),
-    totalKm,
-    transfers:         (j1.transfers + j2.transfers) + 1,
-    transferNodes:     [...(j1.transferNodes || []), midCode, ...(j2.transferNodes || [])],
-    transferWalkMin:   [wkMin],
-    transferWaitMin:   [wtMin],
-    ...thruFields,
-  };
-}
 
   function _buildJourney3(j1, j2, j3, midCode1, midCode2, walkMin1, walkMin2) {
     const totalKm = (j1.totalKm != null && j2.totalKm != null && j3.totalKm != null)
@@ -204,7 +180,6 @@
    * STATION NODE RESOLUTION
    * ================================================================ */
   function _resolveNodes(code, netFilter) {
-    // Returns [{code, networkId}] for all networks that know this station
     const out = [];
     for (const [id, r] of Object.entries(_routers)) {
       if (netFilter && !netFilter.has(id)) continue;
@@ -217,6 +192,88 @@
       if (found) out.push({ code, networkId: id });
     }
     return out;
+  }
+
+  /* ================================================================
+   * JOURNEY KEY
+   * Fingerprint stabile e robusto, non dipende da campi opzionali.
+   * Usa depTime+arrTime+transfers+from+to come fallback sicuro.
+   * ================================================================ */
+  function _journeyKey(j) {
+    // Chiave primaria: struttura dei leg
+    const legKey = j.legs.map(l => [
+      l.lineId  || l.line  || '',
+      l.svcId   || l.serviceId || l.tripId || '',
+      l.from    || l.boardCode  || l.fromCode || '',
+      l.to      || l.alightCode || l.toCode   || '',
+      l.boardDep  || l.departureTime || '',
+      l.alightArr || l.arrivalTime   || '',
+    ].join(':')).join('|');
+
+    // Se i leg sono tutti vuoti (campi mancanti), usa il fingerprint
+    // depTime+arrTime+transfers come fallback per evitare che tutto
+    // collassi sulla stessa chiave ''
+    const blank = legKey.replace(/[:|]/g, '').trim() === '';
+    if (blank) {
+      return `${j.departureTime}~${j.arrivalTime}~${j.transfers ?? 0}~${j.totalMinutes ?? 0}`;
+    }
+    return legKey;
+  }
+
+  /* ================================================================
+   * DEDUP + SORT
+   *
+   * Ordering:
+   *   1. Earliest arrival time
+   *   2. Fewest transfers
+   *   3. Latest departure time
+   *
+   * Dominance pruning: rimuove un journey solo se esiste già
+   * nell'output un journey che arriva PRIMA (non uguale) con meno
+   * o ugual numero di cambi. Questo assicura che il diretto (08:48)
+   * non venga mai scavalcato dal con-cambio (09:01) anche quando
+   * quest'ultimo viene generato prima nell'array.
+   * ================================================================ */
+  function _dedup(journeys) {
+    // Step 1: dedup per chiave robusta
+    const seen = new Set();
+    const deduped = journeys.filter(j => {
+      const key = _journeyKey(j);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    // Step 2: sort — arrivo prima, poi meno cambi, poi partenza più tarda
+    deduped.sort((a, b) => {
+      const da = _hmToSec(a.arrivalTime), db = _hmToSec(b.arrivalTime);
+      if (da !== db) return da - db;
+      const ta = a.transfers ?? 0, tb = b.transfers ?? 0;
+      if (ta !== tb) return ta - tb;
+      return _hmToSec(b.departureTime) - _hmToSec(a.departureTime);
+    });
+
+    // Step 3: dominance pruning
+    // Un journey B è dominato da A se:
+    //   arrivalTime(B) > arrivalTime(A)  [strettamente maggiore]
+    //   AND transfers(B) >= transfers(A)
+    // NON si pruna mai un journey con arrivo uguale ma più cambi
+    // (verrebbe tolto dal sort+slice, non qui).
+    // Questo evita il caso in cui il 2-leg (09:01, 1 cambio) elimini
+    // il diretto (08:48, 0 cambi) perché "stesso bucket".
+    const kept = [];
+    for (const j of deduped) {
+      const arrJ  = _hmToSec(j.arrivalTime);
+      const trJ   = j.transfers ?? 0;
+      // dominated se esiste già in kept un journey con arrivo MINORE e cambi <= trJ
+      const dominated = kept.some(k => {
+        const arrK = _hmToSec(k.arrivalTime);
+        const trK  = k.transfers ?? 0;
+        return arrK < arrJ && trK <= trJ;
+      });
+      if (!dominated) kept.push(j);
+    }
+    return kept;
   }
 
   /* ================================================================
@@ -241,7 +298,6 @@
         if (!router) continue;
         const results = _safeSearch(router, fNode.networkId, from, to, depTime, opts);
         results.forEach(j => {
-          // Normalise direct journey shape
           journeys.push({
             ...j,
             transfers:       j.transfers ?? 0,
@@ -265,11 +321,9 @@
 
       for (const midSt of router1.allStations()) {
         const partners = _partnersOf(midSt.code).filter(p => {
-  if (netFilter && !netFilter.has(p.networkId)) return false;
-  // Permetti anche same-network se le stazioni non sono raggiungibili direttamente
-  return tNodes.some(t => t.networkId === p.networkId);
-  // (già ok — il filtro non esclude same-network; il problema era solo _buildIx)
-});
+          if (netFilter && !netFilter.has(p.networkId)) return false;
+          return tNodes.some(t => t.networkId === p.networkId);
+        });
         if (!partners.length) continue;
 
         const j1list = _safeSearch(
@@ -357,7 +411,12 @@
                     { ...opts, maxResults: 2, directOnly: true }
                   );
                   for (const j3 of j3list)
-                    journeys.push(_buildJourney3(j1, j2, j3, midSt1.code, midSt2.code, p1.transferMin ?? CROSS_TRANSFER_MIN, p2.transferMin ?? CROSS_TRANSFER_MIN));
+                    journeys.push(_buildJourney3(
+                      j1, j2, j3,
+                      midSt1.code, midSt2.code,
+                      p1.transferMin ?? CROSS_TRANSFER_MIN,
+                      p2.transferMin ?? CROSS_TRANSFER_MIN
+                    ));
                 }
               }
             }
@@ -367,64 +426,6 @@
     }
 
     return _dedup(journeys).slice(0, maxResults);
-  }
-
-  /* ================================================================
-   * DEDUP + SORT
-   *
-   * Correct journey planner ordering:
-   *   1. Earliest arrival time  — get there sooner
-   *   2. Fewest transfers       — simpler journey wins at equal arrival
-   *   3. Latest departure time  — least waiting at origin, at equal arrival+transfers
-   *
-   * After sorting, a dominance pruning pass removes any journey
-   * that arrives no earlier than an already-accepted journey AND has more
-   * transfers. This eliminates multi-leg roundabout routes that reach the
-   * destination at the same time as a direct service.
-   * ================================================================ */
-  function _dedup(journeys) {
-    // Step 1: deduplicate by key
-    const seen = new Set();
-    const deduped = journeys.filter(j => {
-      const key = j.legs.map(l => `${l.lineId}:${l.svcId}:${l.boardDep}:${l.alightArr}`).join('|');
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-
-    // Step 2: sort — earliest arrival, then fewest transfers, then latest departure
-    deduped.sort((a, b) => {
-      const da = _hmToSec(a.arrivalTime), db = _hmToSec(b.arrivalTime);
-      if (da !== db) return da - db;
-      const ta = a.transfers ?? 0, tb = b.transfers ?? 0;
-      if (ta !== tb) return ta - tb;
-      return _hmToSec(b.departureTime) - _hmToSec(a.departureTime);
-    });
-
-    // Step 3: dominance pruning
-    // A journey B is dominated by A if:
-    //   arrivalTime(B) >= arrivalTime(A)  AND  transfers(B) > transfers(A)
-    let bestArrSec = -Infinity;
-    let bestTransfersAtBestArr = Infinity;
-
-    return deduped.filter(j => {
-      const arrSec = _hmToSec(j.arrivalTime);
-      const tr = j.transfers ?? 0;
-
-      if (arrSec > bestArrSec) {
-        // New (later) arrival bucket — reset best
-        bestArrSec = arrSec;
-        bestTransfersAtBestArr = tr;
-        return true;
-      }
-      // Same arrival bucket (arrSec === bestArrSec, can't be less since sorted)
-      if (tr <= bestTransfersAtBestArr) {
-        bestTransfersAtBestArr = tr;
-        return true;
-      }
-      // More transfers at same arrival — dominated, prune
-      return false;
-    });
   }
 
   /* ================================================================
