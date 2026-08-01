@@ -377,19 +377,33 @@
    *   2. Fewest transfers       — simpler journey wins at equal arrival
    *   3. Latest departure time  — least waiting at origin, at equal arrival+transfers
    *
-   * After sorting, a second "dominance pruning" pass removes any journey
+   * After sorting, a dominance pruning pass removes any journey
    * that arrives no earlier than an already-accepted journey AND has more
    * transfers. This eliminates multi-leg roundabout routes that reach the
    * destination at the same time as a direct service.
    * ================================================================ */
-function _dedup(journeys) {
+  function _dedup(journeys) {
+    // Step 1: deduplicate by key
+    const seen = new Set();
+    const deduped = journeys.filter(j => {
+      const key = j.legs.map(l => `${l.lineId}:${l.svcId}:${l.boardDep}:${l.alightArr}`).join('|');
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    // Step 2: sort — earliest arrival, then fewest transfers, then latest departure
+    deduped.sort((a, b) => {
+      const da = _hmToSec(a.arrivalTime), db = _hmToSec(b.arrivalTime);
+      if (da !== db) return da - db;
+      const ta = a.transfers ?? 0, tb = b.transfers ?? 0;
+      if (ta !== tb) return ta - tb;
+      return _hmToSec(b.departureTime) - _hmToSec(a.departureTime);
+    });
 
     // Step 3: dominance pruning
     // A journey B is dominated by A if:
     //   arrivalTime(B) >= arrivalTime(A)  AND  transfers(B) > transfers(A)
-    // We iterate in sorted order (earliest arrival first), tracking the minimum
-    // transfers seen for each arrival bucket. Any later journey with more
-    // transfers than the best-so-far at an equal-or-earlier arrival is pruned.
     let bestArrSec = -Infinity;
     let bestTransfersAtBestArr = Infinity;
 
