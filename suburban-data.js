@@ -65,6 +65,26 @@
      TS16 ↔ SK35, M419, AX04, K02  (Kasakuri ↔ Niji-Sainðaul IZX Keishin)
      TS18 ↔ M425  (Ipporai-Senpyan)
 
+     CK interchanges (Chukkūn Line):
+     CK01 ↔ AX00  (Asunahama Airport Terminal 4)
+     CK02 ↔ AX01, KE03  (Sainðaul International Airport)
+     CK04 ↔ AX02  (Rinkūn City)
+     CK08 ↔ AX03  (Riimibaiken)
+     CK13 ↔ TS17  (Rismyonjen)
+     CK16 ↔ TS16, AX04, M419, SK35, KD35  (Kasakuri)
+     CK17 ↔ TS15, SK34  (Nihkyonta)
+     CK18 ↔ TS14, M202  (Alkuitsa/Shimamera)
+     CK19 ↔ M805  (Tajamōri)
+     CK22 ↔ LL03, SK24  (Shiitehongi)
+     CK23 ↔ SK23  (Kasaraki)
+     CK24 ↔ SK22  (Makurigawa)
+     CK25 ↔ SK21  (Riyakugo)
+     CK26 ↔ SK20  (Oizato)
+     CK27 ↔ SK19  (Shakihori)
+     CK28 ↔ SK18  (Awada)
+     CK29 ↔ SK17  (Punomowen)
+     CK30 ↔ SK16  (Kayahori Bunki)
+
    SK_SERVICES / KW_SERVICES:
      Sottoservizi per la generazione degli orari sintetici nel router.
 
@@ -139,9 +159,28 @@ const SUBURBAN_INTERCHANGE = {
   TS13: ['LL01', 'SK26', 'M814', 'K01', 'R01', 'E01', 'AX06'],
   TS14: ['SK33', 'M417', 'M203'],
   TS15: ['SK34', 'M418'],
-  // TS16 Kasakuri ↔ K02 Niji-Sainðaul (IZX Keishin) — stesso nodo di interscambio
+  // TS16 Kasakuri: stesso nodo di interscambio di K02 Niji-Sainðaul (IZX Keishin)
   TS16: ['SK35', 'M419', 'AX04', 'K02'],
   TS18: ['M425'],
+  // Chukkūn Line (CK)
+  CK01: ['AX00'],
+  CK02: ['AX01', 'KE03'],
+  CK04: ['AX02'],
+  CK08: ['AX03'],
+  CK13: ['TS17'],
+  CK16: ['TS16', 'AX04', 'M419', 'SK35', 'KD35'],
+  CK17: ['TS15', 'SK34'],
+  CK18: ['TS14', 'M202'],
+  CK19: ['M805'],
+  CK22: ['LL03', 'SK24'],
+  CK23: ['SK23'],
+  CK24: ['SK22'],
+  CK25: ['SK21'],
+  CK26: ['SK20'],
+  CK27: ['SK19'],
+  CK28: ['SK18'],
+  CK29: ['SK17'],
+  CK30: ['SK16'],
 };
 
 const SUBURBAN_LINES = {
@@ -449,6 +488,62 @@ const SUBURBAN_LINES = {
       { code: 'TS18', name: 'Ipporai-Senpyan',                 kanji: '—',          km: 119.43 },
       { code: 'TS19', name: 'Eigandan Senpyan',                kanji: '永玵段船駢', km: 125.43 },
       { code: 'TS20', name: 'Shutazai',                        kanji: '守多彩',     km: 133.88 },
+    ],
+  },
+
+  /* ────────────────────────────────────────────────
+     CK — Chukkūn Line · 竹空線
+     33 stazioni · 57.92 km
+     Capolinea: CK01 Asunahama Airport Terminal 4
+              ↔ CK33 Moriyose
+     Passa per: Sainðaul Int'l Airport, Rinkūn City,
+     Riimibaiken, corridoio Seishaku (SK16–SK24)
+     Cinematica: EMU vmax 100 km/h, a=0.9 m/s², dwell 30s
+     Frequenza: 15 min peak · 30 min off-peak
+  ──────────────────────────────────────────────── */
+  CK: {
+    id: 'CK',
+    name: 'Chukkūn Line',
+    nameJa: '竹空線',
+    color: '#6B9E3E',
+    circular: false,
+    headwayPeak: 15,
+    headwayOffPeak: 30,
+    totalKm: 57.92,
+    stations: [
+      { code: 'CK01', name: 'Asunahama Airport Terminal 4',   kanji: '',             km:  0.00 },
+      { code: 'CK02', name: 'Sainðaul International Airport', kanji: '作安崎國際空港', km:  3.11 },
+      { code: 'CK03', name: 'Shinseibijān',                   kanji: '新整備場',      km:  5.56 },
+      { code: 'CK04', name: 'Rinkūn City',                    kanji: 'རིན་ཟེང་པ་ཊཱ',  km:  8.21 },
+      { code: 'CK05', name: 'Ikisawa',                        kanji: '琴空',          km:  9.46 },
+      { code: 'CK06', name: 'Togara',                         kanji: '焦羅',          km: 10.44 },
+      { code: 'CK07', name: 'Toibotsuta',                     kanji: '蚧垣',          km: 12.15 },
+      { code: 'CK08', name: 'Riimibaiken',                    kanji: '𠝏別',          km: 13.64 },
+      { code: 'CK09', name: 'Shin-Tsuruna',                   kanji: '新鳰',          km: 14.85 },
+      { code: 'CK10', name: 'Tsaibako',                       kanji: '済鴒',          km: 15.75 },
+      { code: 'CK11', name: 'Tsurunarikki',                   kanji: '鳰陸起',        km: 16.96 },
+      { code: 'CK12', name: 'Eikunna',                        kanji: '栄勳那',        km: 18.13 },
+      { code: 'CK13', name: 'Rismyonjen',                     kanji: '',             km: 19.90 },
+      { code: 'CK14', name: 'Dodonuka',                       kanji: '登戸降',        km: 22.05 },
+      { code: 'CK15', name: 'Toemonjaru',                     kanji: '',             km: 23.74 },
+      { code: 'CK16', name: 'Kasakuri',                       kanji: '鯛巻',          km: 26.47 },
+      { code: 'CK17', name: 'Nihkyonta',                      kanji: '濱角',          km: 30.28 },
+      { code: 'CK18', name: 'Alkuitsa',                       kanji: '潮尾',          km: 31.88 },
+      { code: 'CK19', name: 'Tajamōri',                       kanji: '宰毛利',        km: 33.87 },
+      { code: 'CK20', name: 'Tobeskauri',                     kanji: '鴨沼',          km: 35.13 },
+      { code: 'CK21', name: 'Makkeriya',                      kanji: '平追',          km: 36.10 },
+      { code: 'CK22', name: 'Shiitehongi',                    kanji: '茛本名',        km: 37.80 },
+      { code: 'CK23', name: 'Kasaraki',                       kanji: '次羽',          km: 39.54 },
+      { code: 'CK24', name: 'Makurigawa',                     kanji: '炭界',          km: 40.55 },
+      { code: 'CK25', name: 'Riyakugo',                       kanji: '追句胡',        km: 41.77 },
+      { code: 'CK26', name: 'Oizato',                         kanji: '粕穫',          km: 42.83 },
+      { code: 'CK27', name: 'Shakihori',                      kanji: '石登',          km: 47.03 },
+      { code: 'CK28', name: 'Awada',                          kanji: '邊太',          km: 48.33 },
+      { code: 'CK29', name: 'Punomowen',                      kanji: '㷀園',          km: 49.24 },
+      { code: 'CK30', name: 'Kayahori Bunki',                 kanji: '香弥登分岐',    km: 50.36 },
+      { code: 'CK31', name: 'Irumanpi',                       kanji: '',             km: 52.80 },
+      { code: 'CK32', name: 'Moriyose Isamata',               kanji: '竹峰安伸',      km: 55.86 },
+      { code: 'CK33', name: 'Moriyose',                       kanji: '竹峰',          km: 57.92 },
     ],
   },
 };
