@@ -118,20 +118,34 @@
      del fallback. Stesso fix applicato a _getExpressTrips() per TS.
 
    Tempi di trasferimento:
-     TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban
+     TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban (stazione normale)
+     HUB_TRANSFER_MIN        8 min  — interscambio suburban ↔ suburban (grande nodo)
      CROSS_TRANSFER_MIN     10 min  — interscambio suburbana ↔ IZX/AX/Metro
+     METRO_TRANSFER_MIN      5 min  — interscambio Metro ↔ Metro (riserva; oggi gestito in MetroRouter)
      THRU_TRANSFER_MIN       2 min  — thru-service KW↔Metro (solo cambio operatore)
      INTRA_TRANSFER_SEC      0 sec  — same-platform intra-line (Rapid→Local KW)
+
+   Per-node transferMin in SUBURBAN_INTERCHANGE (fase 4):
+     Le entry di SUBURBAN_INTERCHANGE possono essere semplici stringhe
+     (usa TRANSFER_SEC) oppure oggetti { code, transferMin } per
+     sovrascrivere il tempo di camminata su quel nodo specifico.
+     Esempio:
+       'TS16': [{ code: 'KE04', transferMin: HUB_TRANSFER_MIN }]
+     → 8 minuti di cammino tra TS Kasakuri e IZX Keishin Niji-Sainðaul.
 ================================================================ */
 'use strict';
 
 const SuburbanRouter = (() => {
 
   const TRANSFER_MIN        = 3;
+  const HUB_TRANSFER_MIN    = 8;   // grande nodo di scambio suburban↔suburban
   const CROSS_TRANSFER_MIN  = 10;
+  const METRO_TRANSFER_MIN  = 5;   // metro↔metro (riserva; oggi gestito in MetroRouter)
   const THRU_TRANSFER_MIN   = 2;   // thru-service: cambio operatore senza scendere
   const TRANSFER_SEC        = TRANSFER_MIN       * 60;
+  const HUB_TRANSFER_SEC    = HUB_TRANSFER_MIN   * 60;
   const CROSS_TRANSFER_SEC  = CROSS_TRANSFER_MIN * 60;
+  const METRO_TRANSFER_SEC  = METRO_TRANSFER_MIN * 60;  // eslint-disable-line no-unused-vars
   const THRU_TRANSFER_SEC   = THRU_TRANSFER_MIN  * 60;
   const INTRA_TRANSFER_SEC  = 0;   // same-platform intra-line (Rapid→Local)
   const MAX_JOURNEYS  = 12;
@@ -206,6 +220,15 @@ const SuburbanRouter = (() => {
     return _suburbanCodeSet;
   }
 
+  /* ----------------------------------------------------------------
+   * _getSuburbanPartnerMap()
+   * Restituisce { stationCode → [partnerCode, ...] } per la fase 4.
+   *
+   * Le entry di SUBURBAN_INTERCHANGE possono essere:
+   *   - stringhe semplici:          'K02'
+   *   - oggetti con transferMin:    { code: 'K02', transferMin: 8 }
+   * Il codice viene estratto in entrambi i casi.
+   * ---------------------------------------------------------------- */
   let _suburbanPartnerMap = null;
   function _getSuburbanPartnerMap() {
     if (_suburbanPartnerMap) return _suburbanPartnerMap;
@@ -220,11 +243,41 @@ const SuburbanRouter = (() => {
       map[b].add(a);
     }
     for (const [key, partners] of Object.entries(SUBURBAN_INTERCHANGE)) {
-      for (const p of partners) _add(key, p);
+      for (const p of partners) {
+        const code = (typeof p === 'object' && p !== null) ? p.code : p;
+        _add(key, code);
+      }
     }
     _suburbanPartnerMap = {};
     for (const [k, v] of Object.entries(map)) _suburbanPartnerMap[k] = [...v];
     return _suburbanPartnerMap;
+  }
+
+  /* ----------------------------------------------------------------
+   * _subTransferSec(nodeCode, partnerCode)
+   * Restituisce il tempo di cammino in secondi tra nodeCode e
+   * partnerCode per un interscambio suburban↔suburban (fase 4).
+   * Cerca prima in SUBURBAN_INTERCHANGE se esiste una entry oggetto
+   * { code, transferMin }; altrimenti usa TRANSFER_SEC.
+   * ---------------------------------------------------------------- */
+  function _subTransferSec(nodeCode, partnerCode) {
+    // Cerca in SUBURBAN_INTERCHANGE[nodeCode]
+    const partnersA = SUBURBAN_INTERCHANGE[nodeCode];
+    if (partnersA) {
+      for (const p of partnersA) {
+        if (typeof p === 'object' && p !== null && p.code === partnerCode && p.transferMin != null)
+          return p.transferMin * 60;
+      }
+    }
+    // Cerca simmetrico: SUBURBAN_INTERCHANGE[partnerCode]
+    const partnersB = SUBURBAN_INTERCHANGE[partnerCode];
+    if (partnersB) {
+      for (const p of partnersB) {
+        if (typeof p === 'object' && p !== null && p.code === nodeCode && p.transferMin != null)
+          return p.transferMin * 60;
+      }
+    }
+    return TRANSFER_SEC;
   }
 
   let _inverseMap = null;
@@ -232,7 +285,8 @@ const SuburbanRouter = (() => {
     if (_inverseMap) return _inverseMap;
     _inverseMap = {};
     for (const [subCode, partners] of Object.entries(SUBURBAN_INTERCHANGE)) {
-      for (const izxCode of partners) {
+      for (const p of partners) {
+        const izxCode = (typeof p === 'object' && p !== null) ? p.code : p;
         if (!_inverseMap[izxCode]) _inverseMap[izxCode] = subCode;
       }
     }
@@ -670,7 +724,8 @@ const SuburbanRouter = (() => {
           const leg1 = _buildLeg(line, iF, iMid, depSec);
           if (!leg1) continue;
           const transferReadySec = leg1.alightArrSec + CROSS_TRANSFER_SEC;
-          for (const izxNode of izxPartners) {
+          for (const p of izxPartners) {
+            const izxNode = (typeof p === 'object' && p !== null) ? p.code : p;
             if (_isMetroCode(izxNode)) continue;
             for (const [lineId2, line2] of Object.entries(IZX_LINES)) {
               if (!line2.ST[izxNode] || !line2.ST[to]) continue;
@@ -703,7 +758,9 @@ const SuburbanRouter = (() => {
         for (const subNode of line.stations) {
           const partners = SUBURBAN_INTERCHANGE[subNode.code];
           if (!partners) continue;
-          const metroPartners = partners.filter(_isMetroCode);
+          const metroPartners = partners
+            .map(p => (typeof p === 'object' && p !== null) ? p.code : p)
+            .filter(_isMetroCode);
           if (!metroPartners.length) continue;
           const iMid = _idx(line, subNode.code);
           if (iMid === -1 || iMid === iF) continue;
@@ -744,7 +801,8 @@ const SuburbanRouter = (() => {
           if (!izxPartners) continue;
           const iMid = _idx(line, subNode.code);
           if (iMid === -1 || iMid === iT) continue;
-          for (const izxNode of izxPartners) {
+          for (const p of izxPartners) {
+            const izxNode = (typeof p === 'object' && p !== null) ? p.code : p;
             if (_isMetroCode(izxNode)) continue;
             for (const [lineId1, line1] of Object.entries(IZX_LINES)) {
               if (!line1.ST[from] || !line1.ST[izxNode]) continue;
@@ -780,7 +838,9 @@ const SuburbanRouter = (() => {
         for (const subNode of line.stations) {
           const partners = SUBURBAN_INTERCHANGE[subNode.code];
           if (!partners) continue;
-          const metroPartners = partners.filter(_isMetroCode);
+          const metroPartners = partners
+            .map(p => (typeof p === 'object' && p !== null) ? p.code : p)
+            .filter(_isMetroCode);
           if (!metroPartners.length) continue;
           const iMid = _idx(line, subNode.code);
           if (iMid === -1 || iMid === iT) continue;
@@ -826,9 +886,12 @@ const SuburbanRouter = (() => {
 
           const leg1 = _buildLeg(line1, iF, iMid, depSec);
           if (!leg1) continue;
-          const transferReadySec = leg1.alightArrSec + TRANSFER_SEC;
 
           for (const partnerCode of partners) {
+            // Usa transferMin per-nodo se definito, altrimenti TRANSFER_SEC
+            const xferSec = _subTransferSec(subNode.code, partnerCode);
+            const transferReadySec = leg1.alightArrSec + xferSec;
+
             for (const line2 of Object.values(SUBURBAN_LINES)) {
               if (!line2.stations.length) continue;
               if (line2.id === line1.id) continue;
@@ -896,6 +959,10 @@ const SuburbanRouter = (() => {
     return SUBURBAN_LINES[lineId]?.color ?? '#888';
   }
 
-  return { search, stationName, allStations, lineColor, TRANSFER_MIN, CROSS_TRANSFER_MIN, THRU_TRANSFER_MIN };
+  return {
+    search, stationName, allStations, lineColor,
+    TRANSFER_MIN, HUB_TRANSFER_MIN, CROSS_TRANSFER_MIN,
+    METRO_TRANSFER_MIN, THRU_TRANSFER_MIN,
+  };
 
 })();
