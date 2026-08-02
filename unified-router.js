@@ -228,11 +228,11 @@
    *   2. Fewest transfers
    *   3. Latest departure time
    *
-   * Dominance pruning: rimuove un journey solo se esiste già
-   * nell'output un journey che arriva PRIMA (non uguale) con meno
-   * o ugual numero di cambi. Questo assicura che il diretto (08:48)
-   * non venga mai scavalcato dal con-cambio (09:01) anche quando
-   * quest'ultimo viene generato prima nell'array.
+   * Dominance pruning: journey B è dominato da A se:
+   *   - A arriva PRIMA (strettamente) con cambi <= B, OPPURE
+   *   - A arriva ALLA STESSA ORA con cambi strettamente < B
+   * Questo assicura che a parità di arrivo sopravviva solo il percorso
+   * con meno cambi, senza mai auto-potare journey identici.
    * ================================================================ */
   function _dedup(journeys) {
     // Step 1: dedup per chiave robusta
@@ -254,22 +254,18 @@
     });
 
     // Step 3: dominance pruning
-    // Un journey B è dominato da A se:
-    //   arrivalTime(B) > arrivalTime(A)  [strettamente maggiore]
-    //   AND transfers(B) >= transfers(A)
-    // NON si pruna mai un journey con arrivo uguale ma più cambi
-    // (verrebbe tolto dal sort+slice, non qui).
-    // Questo evita il caso in cui il 2-leg (09:01, 1 cambio) elimini
-    // il diretto (08:48, 0 cambi) perché "stesso bucket".
+    // B è dominato da A se:
+    //   arrK < arrJ  AND  trK <= trJ   (A arriva prima con <= cambi)
+    //   OR
+    //   arrK === arrJ  AND  trK < trJ  (stessa ora ma A ha meno cambi)
     const kept = [];
     for (const j of deduped) {
-      const arrJ  = _hmToSec(j.arrivalTime);
-      const trJ   = j.transfers ?? 0;
-      // dominated se esiste già in kept un journey con arrivo MINORE e cambi <= trJ
+      const arrJ = _hmToSec(j.arrivalTime);
+      const trJ  = j.transfers ?? 0;
       const dominated = kept.some(k => {
         const arrK = _hmToSec(k.arrivalTime);
         const trK  = k.transfers ?? 0;
-        return arrK < arrJ && trK <= trJ;
+        return (arrK < arrJ && trK <= trJ) || (arrK === arrJ && trK < trJ);
       });
       if (!dominated) kept.push(j);
     }
