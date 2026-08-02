@@ -85,6 +85,14 @@
      CK29 ↔ SK17  (Punomowen)
      CK30 ↔ SK16  (Kayahori Bunki)
 
+       // Kawasabu Line (KS)
+  KS01: ['KW12'],
+  KS02: ['E02', 'KW11'],
+  KS11: ['CK27', 'SK19'],
+  KS17: [],          // M1?? — da confermare
+  KS18: ['KD20', 'RY02'],  // + M1?? — da confermare
+  KS28: ['AX09'],
+  
    SK_SERVICES / KW_SERVICES:
      Sottoservizi per la generazione degli orari sintetici nel router.
 
@@ -181,6 +189,13 @@ const SUBURBAN_INTERCHANGE = {
   CK28: ['SK18'],
   CK29: ['SK17'],
   CK30: ['SK16'],
+  // Kawasabu Line (KS)
+  KS01: ['KW12'],
+  KS02: ['E02', 'KW11'],
+  KS11: ['CK27', 'SK19'],
+  KS17: [],          // M1?? — da confermare
+  KS18: ['KD20', 'RY02'],  // + M1?? — da confermare
+  KS28: ['AX09'],
 };
 
 const SUBURBAN_LINES = {
@@ -363,18 +378,60 @@ const SUBURBAN_LINES = {
     ],
   },
 
+   /* ────────────────────────────────────────────────
+     KS — Kawasabu Line · 嘉夬苫線
+     28 stazioni · 47.08 km
+     Capolinea: KS01 Niji-Kawayatsu ↔ KS28 Sabullan
+     Interscambi principali:
+       KS01 ↔ KW12 (Neyabakuri)
+       KS02 ↔ E02, KW11 (Kawayatsu)
+       KS11 ↔ CK27, SK19 (Shakihori)
+       KS17 ↔ M1?? (Pakkishoi — da confermare)
+       KS18 ↔ KD20, RY02 (Asaji Torimoshi)
+       KS28 ↔ AX09 (Sabullan)
+  ──────────────────────────────────────────────── */
   KS: {
     id: 'KS',
     name: 'Kawasabu Line',
-    nameJa: '--線',
+    nameJa: '嘉夬苫線',
     color: '#339966',
     circular: false,
     headwayPeak: 5,
     headwayOffPeak: 10,
-    totalKm: 47.10,
-    stations: [],
+    totalKm: 47.08,
+    stations: [
+      { code: 'KS01', name: 'Niji-Kawayatsu',       kanji: '西嘉夬苫',     km:  0.00 },
+      { code: 'KS02', name: 'Kawayatsu',             kanji: '嘉夬苫',       km:  1.81 },
+      { code: 'KS03', name: 'Noketama',              kanji: '坂谷',         km:  3.94 },
+      { code: 'KS04', name: 'Kutana',                kanji: '久多那',       km:  4.87 },
+      { code: 'KS05', name: 'Soyotsu',               kanji: '—',            km:  6.96 },
+      { code: 'KS06', name: 'Takepiro',              kanji: '館敷',         km:  8.36 },
+      { code: 'KS07', name: 'Urabato',               kanji: '鵜石',         km: 10.13 },
+      { code: 'KS08', name: 'Shiki-Shakihori',       kanji: '北石登',       km: 14.54 },
+      { code: 'KS09', name: 'Surikato',              kanji: '須里日',       km: 16.41 },
+      { code: 'KS10', name: 'Bibawara',              kanji: '—',            km: 17.38 },
+      { code: 'KS11', name: 'Shakihori',             kanji: '石登',         km: 19.26 },
+      { code: 'KS12', name: 'Inamori',               kanji: '遖竹',         km: 20.30 },
+      { code: 'KS13', name: 'Gohamuki Kuuraki-mun',  kanji: '塩椋九雨粟門', km: 21.38 },
+      { code: 'KS14', name: 'Uriwako',               kanji: '—',            km: 22.43 },
+      { code: 'KS15', name: 'Jurimotoya',            kanji: '—',            km: 23.46 },
+      { code: 'KS16', name: 'Migawarae',             kanji: '—',            km: 24.72 },
+      { code: 'KS17', name: 'Pakkishoi',             kanji: '—',            km: 26.90 },
+      { code: 'KS18', name: 'Asaji Torimoshi',       kanji: '安佐寺狛篠',   km: 28.18 },
+      { code: 'KS19', name: 'Nari-Aisendawa',        kanji: '—',            km: 29.82 },
+      { code: 'KS20', name: 'Yushinaware',           kanji: '—',            km: 31.47 },
+      { code: 'KS21', name: 'Oitsura',               kanji: '粕鵲',         km: 33.56 },
+      { code: 'KS22', name: 'Kaidaru',               kanji: '艏開',         km: 35.72 },
+      { code: 'KS23', name: 'Taimasaki',             kanji: '太馬羽',       km: 39.47 },
+      { code: 'KS24', name: 'Nari-Kworente',         kanji: '—',            km: 40.81 },
+      { code: 'KS25', name: 'Ekahemi',               kanji: '月姜',         km: 41.87 },
+      { code: 'KS26', name: 'Shiki-Sabullan',        kanji: '北ટરૃેધ્ધપ્', km: 43.29 },
+      { code: 'KS27', name: 'Kamuragi',              kanji: '—',            km: 44.92 },
+      { code: 'KS28', name: 'Sabullan',              kanji: 'ટરૃેધ્ધપ્',   km: 47.08 },
+    ],
   },
 
+   
   /* ────────────────────────────────────────────────
      KW — Kwōkei Line · 荒京線
      33 stazioni · 84.35 km
