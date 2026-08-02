@@ -2,7 +2,7 @@
    UNIFIED-ROUTER.JS — Izaland Cross-Network Journey Planner
    ================================================================
    Aggrega IZXRouter, LERouter, SuburbanRouter e MetroRouter in
-   un'unica interfaccia di ricerca. Gestisce i trasferimenti
+   un’unica interfaccia di ricerca. Gestisce i trasferimenti
    cross-network tra IZX, LE (Lake Eira), Suburban e Metro.
 
    Networks registrabili:
@@ -223,9 +223,24 @@
   }
 
   /* ================================================================
-   * DEDUP + SORT
+   * DEDUP + PARETO FILTER
+   *
+   * Pareto dominance for a trip planner (3 objectives):
+   *   Journey K dominates Journey J iff ALL of:
+   *     arrK  <= arrJ   (arrives no later)
+   *     depK  >= depJ   (departs no earlier — leaves more time at origin)
+   *     trK   <= trJ    (no more transfers)
+   *   with at least one strict inequality.
+   *
+   * This correctly removes e.g. a with-change journey that departs at
+   * 08:00 and arrives at 08:35 when a direct train departs at 08:10
+   * and arrives at 08:26: the direct is strictly better on all axes.
+   *
+   * Output is sorted by arrivalTime ASC, then transfers ASC, then
+   * departureTime DESC (latest departure = least waiting at origin).
    * ================================================================ */
   function _dedup(journeys) {
+    // 1. Remove exact duplicates
     const seen = new Set();
     const deduped = journeys.filter(j => {
       const key = _journeyKey(j);
@@ -234,23 +249,38 @@
       return true;
     });
 
+    // 2. Sort: earliest arrival first; fewest transfers; latest departure (least wait)
     deduped.sort((a, b) => {
-      const da = _hmToSec(a.arrivalTime), db = _hmToSec(b.arrivalTime);
+      const da = _hmToSec(a.arrivalTime),   db = _hmToSec(b.arrivalTime);
       if (da !== db) return da - db;
-      const ta = a.transfers ?? 0, tb = b.transfers ?? 0;
+      const ta = a.transfers ?? 0,          tb = b.transfers ?? 0;
       if (ta !== tb) return ta - tb;
       return _hmToSec(b.departureTime) - _hmToSec(a.departureTime);
     });
 
+    // 3. Pareto filter: keep J only if no already-kept K dominates it.
+    //    K dominates J iff: arrK <= arrJ AND depK >= depJ AND trK <= trJ
+    //    with at least one strict inequality.
     const kept = [];
     for (const j of deduped) {
       const arrJ = _hmToSec(j.arrivalTime);
+      const depJ = _hmToSec(j.departureTime);
       const trJ  = j.transfers ?? 0;
+
       const dominated = kept.some(k => {
         const arrK = _hmToSec(k.arrivalTime);
+        const depK = _hmToSec(k.departureTime);
         const trK  = k.transfers ?? 0;
-        return (arrK < arrJ && trK <= trJ) || (arrK === arrJ && trK < trJ);
+
+        const arrLeq = arrK <= arrJ;   // K arrives no later
+        const depGeq = depK >= depJ;   // K departs no earlier
+        const trLeq  = trK  <= trJ;    // K has no more transfers
+
+        // All three must hold, plus at least one strict
+        if (!(arrLeq && depGeq && trLeq)) return false;
+        return (arrK < arrJ) || (depK > depJ) || (trK < trJ);
       });
+
       if (!dominated) kept.push(j);
     }
     return kept;
