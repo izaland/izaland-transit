@@ -155,7 +155,8 @@ const SUBURBAN_INTERCHANGE = {
   KW00: ['M801'],
   KW02: ['IR'],
   KW03: [],
-  KW10: ['E02', 'KY02'],
+  KW10: ['E02', 'KY02', { code: 'KS02', transferMin: 2 }],
+  KW11: [{ code: 'KS01', transferMin: 2 }, { code: 'KS02', transferMin: 2 }],
   KW16: ['CS02'],
   KW17: ['CS01'],
   KW25: [],
@@ -190,8 +191,8 @@ const SUBURBAN_INTERCHANGE = {
   CK29: ['SK17'],
   CK30: ['SK16'],
   // Kawasabu Line (KS)
-  KS01: ['KW12'],
-  KS02: ['E02', 'KW11'],
+  KS01: [{ code: 'KW12', transferMin: 2 }, { code: 'KW11', transferMin: 2 }],
+  KS02: ['E02', 'KW11', { code: 'KW10', transferMin: 2 }],
   KS11: ['CK27', 'SK19'],
   KS17: [],          // M1?? — da confermare
   KS18: ['KD20', 'RY02'],  // + M1?? — da confermare
