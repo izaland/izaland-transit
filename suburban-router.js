@@ -2,6 +2,7 @@
    SUBURBAN-ROUTER.JS — Izarail Suburban Journey Planner
    Dipende da: suburban-data.js (SUBURBAN_LINES, SUBURBAN_INTERCHANGE,
                                   SK_SERVICES, KW_SERVICES, TS_SERVICES)
+                ks-data.js       (KS_SERVICES)
 
    API pubblica (stesso contratto di IZXRouter):
      SuburbanRouter.search(from, to, depTime, opts) → Journey[]
@@ -31,11 +32,11 @@
      Questo permette di modellare la progressione urbano→extraurbano
      della Kwōkei Line senza toccare le altre linee.
 
-   Sottoservizi SK / KW / TS:
-     Le linee SK, KW e TS usano rispettivamente SK_SERVICES,
-     KW_SERVICES e TS_SERVICES invece del singolo headway di linea.
-     _svcTrips() gestisce tutti e tre; per linee prive di *_SERVICES
-     si usa _syntheticTrips().
+   Sottoservizi SK / KW / TS / KS:
+     Le linee SK, KW, TS e KS usano rispettivamente SK_SERVICES,
+     KW_SERVICES, TS_SERVICES e KS_SERVICES invece del singolo headway
+     di linea. _svcTrips() gestisce tutti e quattro; per linee prive
+     di *_SERVICES si usa _syntheticTrips().
 
      FIX: _svcTrips() restituisce array di {sec, svcId, stops} invece
      di semplici numeri. _buildLeg() usa svcId/stops per filtrare
@@ -116,6 +117,11 @@
      perché il `return _syntheticTrips(...)` fallback lo precedeva.
      Fix: i branch SK, KW e TS vengono tutti valutati prima del return
      del fallback. Stesso fix applicato a _getExpressTrips() per TS.
+
+   FIX 10 (KS_SERVICES):
+     Aggiunto branch KS in _getTrips() e _getExpressTrips() per
+     supportare i servizi KS1 (Local), KS2 (Semi-Rapid) e KS3 (Rapid)
+     definiti in ks-data.js. La logica è identica ai branch SK/KW/TS.
 
    Tempi di trasferimento:
      TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban (stazione normale)
@@ -373,7 +379,7 @@ const SuburbanRouter = (() => {
 
   /* ----------------------------------------------------------------
    * _svcTrips(services, line, iFrom, iTo, depSec)
-   * Genera partenze usando un array *_SERVICES (SK, KW o TS).
+   * Genera partenze usando un array *_SERVICES (SK, KW, TS o KS).
    * Se iTo === null salta il controllo sulla destinazione (usato da
    * _getExpressTrips per la fase 1b).
    * ---------------------------------------------------------------- */
@@ -456,6 +462,7 @@ const SuburbanRouter = (() => {
    * FIX 9: i branch SK, KW e TS vengono tutti valutati PRIMA del
    * return del fallback sintetico. In precedenza il branch TS era
    * posizionato dopo il return e risultava irraggiungibile (dead code).
+   * FIX 10: aggiunto branch KS.
    * ---------------------------------------------------------------- */
   function _getTrips(line, iFrom, iTo, depSec) {
     if (line.id === 'SK' && typeof SK_SERVICES !== 'undefined')
@@ -464,16 +471,19 @@ const SuburbanRouter = (() => {
       return _svcTrips(KW_SERVICES, line, iFrom, iTo, depSec);
     if (line.id === 'TS' && typeof TS_SERVICES !== 'undefined')
       return _svcTrips(TS_SERVICES, line, iFrom, iTo, depSec);
+    if (line.id === 'KS' && typeof KS_SERVICES !== 'undefined')
+      return _svcTrips(KS_SERVICES, line, iFrom, iTo, depSec);
     return _syntheticTrips(line, iFrom, depSec);
   }
 
   /* ----------------------------------------------------------------
-   * _getExpressTrips(line, iFrom, depSec)                  FIX 7+9
+   * _getExpressTrips(line, iFrom, depSec)                  FIX 7+9+10
    * Restituisce tutti i trip EXPRESS (stops[] non vuoto) che partono
    * da iFrom, senza vincolo sulla destinazione.
    * Usato da _buildIntraLineTransfers per trovare Rapid/CR che
    * servono iFrom indipendentemente dalla destinazione finale.
    * FIX 9: aggiunto branch TS (era assente).
+   * FIX 10: aggiunto branch KS.
    * ---------------------------------------------------------------- */
   function _getExpressTrips(line, iFrom, depSec) {
     let raw = [];
@@ -483,6 +493,8 @@ const SuburbanRouter = (() => {
       raw = _svcTrips(KW_SERVICES, line, iFrom, null, depSec);
     else if (line.id === 'TS' && typeof TS_SERVICES !== 'undefined')
       raw = _svcTrips(TS_SERVICES, line, iFrom, null, depSec);
+    else if (line.id === 'KS' && typeof KS_SERVICES !== 'undefined')
+      raw = _svcTrips(KS_SERVICES, line, iFrom, null, depSec);
     // Per linee sintetiche non ci sono express distinti: restituisce []
     return raw.filter(t => t.stops && t.stops.length > 0);
   }
@@ -871,39 +883,32 @@ const SuburbanRouter = (() => {
 
     /* ---- 4. Percorsi Suburbano → Suburbano (cross-line) ---- */
     if (!directOnly) {
-      const subMap = _getSuburbanPartnerMap();
-      for (const line1 of Object.values(SUBURBAN_LINES)) {
-        if (!line1.stations.length) continue;
-        if (lineAllowed && !lineAllowed.has(line1.id)) continue;
-        const iF = _idx(line1, resolvedFrom);
+      const subPartnerMap = _getSuburbanPartnerMap();
+      for (const line of Object.values(SUBURBAN_LINES)) {
+        if (!line.stations.length) continue;
+        if (lineAllowed && !lineAllowed.has(line.id)) continue;
+        const iF = _idx(line, resolvedFrom);
         if (iF === -1) continue;
-
-        for (const subNode of line1.stations) {
-          const partners = subMap[subNode.code];
-          if (!partners?.length) continue;
-          const iMid = _idx(line1, subNode.code);
+        for (const subNode of line.stations) {
+          const partners = subPartnerMap[subNode.code];
+          if (!partners || !partners.length) continue;
+          const iMid = _idx(line, subNode.code);
           if (iMid === -1 || iMid === iF) continue;
-
-          const leg1 = _buildLeg(line1, iF, iMid, depSec);
+          const leg1 = _buildLeg(line, iF, iMid, depSec);
           if (!leg1) continue;
-
+          const xferSec = _subTransferSec(subNode.code, partners[0]);
+          const transferReadySec = leg1.alightArrSec + xferSec;
           for (const partnerCode of partners) {
-            // Usa transferMin per-nodo se definito, altrimenti TRANSFER_SEC
-            const xferSec = _subTransferSec(subNode.code, partnerCode);
-            const transferReadySec = leg1.alightArrSec + xferSec;
-
             for (const line2 of Object.values(SUBURBAN_LINES)) {
+              if (line2.id === line.id) continue;
               if (!line2.stations.length) continue;
-              if (line2.id === line1.id) continue;
-              if (lineAllowed && !lineAllowed.has(line2.id)) continue;
               const iMid2 = _idx(line2, partnerCode);
-              const iT    = _idx(line2, resolvedTo);
-              if (iMid2 === -1 || iT === -1 || iMid2 === iT) continue;
-              const leg2 = _buildLeg(line2, iMid2, iT, transferReadySec);
+              const iT2   = _idx(line2, resolvedTo);
+              if (iMid2 === -1 || iT2 === -1 || iMid2 === iT2) continue;
+              const leg2 = _buildLeg(line2, iMid2, iT2, transferReadySec);
               if (!leg2) continue;
               const waitSec = leg2.boardDepSec - leg1.alightArrSec;
-              const totalKm = (leg1.km != null && leg2.km != null)
-                ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
+              const totalKm = (leg1.km != null && leg2.km != null) ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
               journeys.push({
                 legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
                 totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
@@ -916,53 +921,74 @@ const SuburbanRouter = (() => {
       }
     }
 
-    /* ---- deduplicazione e ordinamento ---- */
+    /* ---- Deduplica e sort ---- */
     const seen = new Set();
     const unique = journeys.filter(j => {
-      const key = j.legs.map(l => `${l.lineId}:${l.svcId}:${l.boardDep}:${l.alightArr}`).join('|');
-      if (seen.has(key)) return false;
-      seen.add(key); return true;
+      const k = `${j.departureTime}|${j.arrivalTime}|${j.legs.map(l => l.svcId).join('+')}|${j.transfers}`;
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
     });
-    unique.sort((a, b) => {
-      const da = _hmToSec(a.arrivalTime), db = _hmToSec(b.arrivalTime);
-      if (da !== db) return da - db;
-      return a.transfers - b.transfers;
-    });
-    return unique.slice(0, maxResults);
+
+    return unique
+      .sort((a, b) => {
+        const da = _hmToSec(a.departureTime), db = _hmToSec(b.departureTime);
+        if (da !== db) return da - db;
+        return a.totalMinutes - b.totalMinutes;
+      })
+      .slice(0, maxResults);
   }
 
-  /* ================================================================
-   * stationName / allStations / lineColor
-   * ================================================================ */
+  /* ----------------------------------------------------------------
+   * stationName(code)
+   * ---------------------------------------------------------------- */
   function stationName(code) {
-    const resolved = _resolveCode(code);
     for (const line of Object.values(SUBURBAN_LINES)) {
-      const st = line.stations.find(s => s.code === resolved);
+      const st = line.stations.find(s => s.code === code);
       if (st) return st.name;
     }
     return code;
   }
 
+  /* ----------------------------------------------------------------
+   * allStations()
+   * ---------------------------------------------------------------- */
   function allStations() {
-    const seen = new Set(), out = [];
+    const seen = new Set();
+    const out  = [];
     for (const line of Object.values(SUBURBAN_LINES)) {
       for (const st of line.stations) {
-        if (seen.has(st.code)) continue;
-        seen.add(st.code);
-        out.push({ ...st, lineId: line.id });
+        if (!seen.has(st.code)) {
+          seen.add(st.code);
+          out.push({ code: st.code, name: st.name, kanji: st.kanji ?? '' });
+        }
       }
     }
     return out;
   }
 
-  function lineColor(lineId) {
-    return SUBURBAN_LINES[lineId]?.color ?? '#888';
+  /* ----------------------------------------------------------------
+   * buildLeg(lineId, svcId, from, to, depSec)
+   * Usato da UnifiedRouter per costruire leg suburbani dall'esterno.
+   * ---------------------------------------------------------------- */
+  function buildLeg(lineId, svcId, from, to, depSec) {
+    const line = SUBURBAN_LINES[lineId];
+    if (!line) return null;
+    const iFrom = _idx(line, from);
+    const iTo   = _idx(line, to);
+    if (iFrom === -1 || iTo === -1 || iFrom === iTo) return null;
+    const trips = _getTrips(line, iFrom, iTo, depSec)
+      .filter(t => !svcId || t.svcId === svcId);
+    if (!trips.length) return null;
+    return _buildLeg(line, iFrom, iTo, depSec, trips[0]);
   }
 
   return {
-    search, stationName, allStations, lineColor,
-    TRANSFER_MIN, HUB_TRANSFER_MIN, CROSS_TRANSFER_MIN,
-    METRO_TRANSFER_MIN, THRU_TRANSFER_MIN,
+    search,
+    stationName,
+    allStations,
+    buildLeg,
+    TRANSFER_MIN,
   };
 
 })();
