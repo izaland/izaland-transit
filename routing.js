@@ -18,6 +18,16 @@
      - Percorso diretto (stesso servizio, stessa linea)
      - Percorso con un cambio (transfer in una stazione di interscambio)
    Tempo di interscambio: TRANSFER_MIN (default 5 minuti).
+
+   FIX (SHORT_WORKING + nextTrip):
+     nextTrip ora usa trip.terminus (esposto da tt-engine FIX) per
+     distinguere tre casi quando alightCode è assente da trip.stops:
+       a) terminus prima di alightCode nella sequenza → skip silenzioso
+          (comportamento corretto: il treno termina prima)
+       b) terminus dopo/uguale ad alightCode ma stop mancante →
+          console.warn (anomalia dati) + skip
+       c) terminus non disponibile (dato vecchio) → skip silenzioso
+          come prima
 ================================================================ */
 
 const IZXRouter = (() => {
@@ -141,6 +151,29 @@ const IZXRouter = (() => {
     return (st && st.km != null) ? st.km : null;
   }
 
+  /* ----------------------------------------------------------------
+   * _terminusPrecedesAlight(trip, lineId, alightCode)
+   * Restituisce true se il terminus del trip si trova PRIMA di
+   * alightCode nella sequenza SVC.stops della linea (direzione SB)
+   * oppure DOPO in direzione NB — cioè se il treno termina prima
+   * di raggiungere alightCode.
+   * Usato da nextTrip per distinguere "treno corto" (skip silenzioso)
+   * da "anomalia dati" (console.warn).
+   * ---------------------------------------------------------------- */
+  function _terminusPrecedesAlight(trip, lineId, alightCode) {
+    const line = IZX_LINES[lineId];
+    if (!line || !trip.terminus) return null; // sconosciuto
+    const svc = line.SVC[trip.svcId];
+    if (!svc) return null;
+    const seq = trip.direction === 'NB'
+      ? [...svc.stops].reverse()
+      : svc.stops;
+    const iTerm   = seq.indexOf(trip.terminus);
+    const iAlight = seq.indexOf(alightCode);
+    if (iTerm === -1 || iAlight === -1) return null;
+    return iTerm < iAlight; // terminus viene prima di alightCode nella direzione di marcia
+  }
+
   function nextTrip(lineId, svcId, boardCode, minDepSec, alightCode) {
     const { hmToSec, secToHM } = TTEngine;
     const fromHM = secToHM(minDepSec);
@@ -156,7 +189,23 @@ const IZXRouter = (() => {
         services:  [svcId],
       });
       for (const trip of trips) {
-        if (alightCode && !trip.stops[alightCode]) continue;
+        if (alightCode && !trip.stops[alightCode]) {
+          // FIX: alightCode assente — capire se è un treno corto o un'anomalia dati
+          const precedes = _terminusPrecedesAlight(trip, lineId, alightCode);
+          if (precedes === true) {
+            // Treno corto: termina prima di alightCode — skip silenzioso (corretto)
+            continue;
+          } else if (precedes === false) {
+            // Anomalia dati: terminus è oltre alightCode ma la fermata manca
+            console.warn(
+              `[IZXRouter] Trip ${trip._uid}: terminus ${trip.terminus} is beyond` +
+              ` alightCode ${alightCode} but stop is missing from trip.stops.` +
+              ` Possible data error in TT/${svcId}.`
+            );
+          }
+          // In entrambi i casi non possiamo usare questo trip
+          continue;
+        }
         const boardStop  = trip.stops[boardCode];
         const alightStop = alightCode ? trip.stops[alightCode] : null;
         if (!boardStop) continue;
