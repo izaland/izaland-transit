@@ -1,10 +1,10 @@
 /* ================================================================
    UNIFIED-ROUTER.JS — Izaland Cross-Network Journey Planner
    ================================================================
-   Aggrega IZXRouter, SuburbanRouter e MetroRouter in un'unica
-   interfaccia di ricerca. Gestisce i trasferimenti cross-network
-   tra IZX, Suburban e Metro.
-   ================================================================ */
+   Aggrega IZXRouter, LERouter, SuburbanRouter e MetroRouter in
+   un'unica interfaccia di ricerca. Gestisce i trasferimenti
+   cross-network tra IZX, LE (Lake Eira), Suburban e Metro.
+================================================================ */
 
 (function (root, factory) {
   if (typeof module !== 'undefined' && module.exports) module.exports = factory();
@@ -12,16 +12,10 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  /* ================================================================
-   * CONSTANTS
-   * ================================================================ */
   const MAX_JOURNEYS       = 5;
   const CROSS_TRANSFER_MIN = 10;
   const CROSS_TRANSFER_SEC = CROSS_TRANSFER_MIN * 60;
 
-  /* ================================================================
-   * NETWORK REGISTRY
-   * ================================================================ */
   const _routers = {};
 
   function registerRouter(networkId, routerObj) {
@@ -32,9 +26,6 @@
     return _routers[networkId ? networkId.toUpperCase() : ''] || null;
   }
 
-  /* ================================================================
-   * INTERCHANGE INDEX
-   * ================================================================ */
   const _ixIndex = {};
 
   function _add(codeA, codeB, transferMin) {
@@ -58,9 +49,6 @@
     });
   }
 
-  /* ================================================================
-   * PARTNER LOOKUP
-   * ================================================================ */
   function _partnersOf(code) {
     const raw = _ixIndex[code] || [];
     const out = [];
@@ -83,9 +71,6 @@
     return out.filter(e => { if (seen.has(e.code)) return false; seen.add(e.code); return true; });
   }
 
-  /* ================================================================
-   * TIME UTILITIES
-   * ================================================================ */
   function _hmToSec(hm) {
     if (!hm) return 0;
     const [h, m] = hm.split(':').map(Number);
@@ -98,9 +83,6 @@
     return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
   }
 
-  /* ================================================================
-   * JOURNEY BUILDERS
-   * ================================================================ */
   function _buildJourney2(j1, j2, midCode, walkMin) {
     const totalKm = (j1.totalKm != null && j2.totalKm != null)
       ? j1.totalKm + j2.totalKm : null;
@@ -152,9 +134,6 @@
     };
   }
 
-  /* ================================================================
-   * SAFE SEARCH WRAPPER
-   * ================================================================ */
   function _safeSearch(router, networkId, from, to, depTime, opts) {
     try {
       if (from === to) return [];
@@ -167,18 +146,12 @@
     }
   }
 
-  /* ================================================================
-   * NETWORK FILTER
-   * ================================================================ */
   function _networkFilter(opts) {
     const raw = opts.networks;
     if (!raw) return null;
     return new Set(Array.isArray(raw) ? raw.map(s => s.toUpperCase()) : [raw.toUpperCase()]);
   }
 
-  /* ================================================================
-   * STATION NODE RESOLUTION
-   * ================================================================ */
   function _resolveNodes(code, netFilter) {
     const out = [];
     for (const [id, r] of Object.entries(_routers)) {
@@ -194,13 +167,7 @@
     return out;
   }
 
-  /* ================================================================
-   * JOURNEY KEY
-   * Fingerprint stabile e robusto, non dipende da campi opzionali.
-   * Usa depTime+arrTime+transfers+from+to come fallback sicuro.
-   * ================================================================ */
   function _journeyKey(j) {
-    // Chiave primaria: struttura dei leg
     const legKey = j.legs.map(l => [
       l.lineId  || l.line  || '',
       l.svcId   || l.serviceId || l.tripId || '',
@@ -210,9 +177,6 @@
       l.alightArr || l.arrivalTime   || '',
     ].join(':')).join('|');
 
-    // Se i leg sono tutti vuoti (campi mancanti), usa il fingerprint
-    // depTime+arrTime+transfers come fallback per evitare che tutto
-    // collassi sulla stessa chiave ''
     const blank = legKey.replace(/[:|]/g, '').trim() === '';
     if (blank) {
       return `${j.departureTime}~${j.arrivalTime}~${j.transfers ?? 0}~${j.totalMinutes ?? 0}`;
@@ -220,22 +184,7 @@
     return legKey;
   }
 
-  /* ================================================================
-   * DEDUP + SORT
-   *
-   * Ordering:
-   *   1. Earliest arrival time
-   *   2. Fewest transfers
-   *   3. Latest departure time
-   *
-   * Dominance pruning: journey B è dominato da A se:
-   *   - A arriva PRIMA (strettamente) con cambi <= B, OPPURE
-   *   - A arriva ALLA STESSA ORA con cambi strettamente < B
-   * Questo assicura che a parità di arrivo sopravviva solo il percorso
-   * con meno cambi, senza mai auto-potare journey identici.
-   * ================================================================ */
   function _dedup(journeys) {
-    // Step 1: dedup per chiave robusta
     const seen = new Set();
     const deduped = journeys.filter(j => {
       const key = _journeyKey(j);
@@ -244,37 +193,38 @@
       return true;
     });
 
-    // Step 2: sort — arrivo prima, poi meno cambi, poi partenza più tarda
     deduped.sort((a, b) => {
-      const da = _hmToSec(a.arrivalTime), db = _hmToSec(b.arrivalTime);
+      const da = _hmToSec(a.arrivalTime),   db = _hmToSec(b.arrivalTime);
       if (da !== db) return da - db;
-      const ta = a.transfers ?? 0, tb = b.transfers ?? 0;
+      const ta = a.transfers ?? 0,          tb = b.transfers ?? 0;
       if (ta !== tb) return ta - tb;
       return _hmToSec(b.departureTime) - _hmToSec(a.departureTime);
     });
 
-    // Step 3: dominance pruning
-    // B è dominato da A se:
-    //   arrK < arrJ  AND  trK <= trJ   (A arriva prima con <= cambi)
-    //   OR
-    //   arrK === arrJ  AND  trK < trJ  (stessa ora ma A ha meno cambi)
     const kept = [];
     for (const j of deduped) {
       const arrJ = _hmToSec(j.arrivalTime);
+      const depJ = _hmToSec(j.departureTime);
       const trJ  = j.transfers ?? 0;
+
       const dominated = kept.some(k => {
         const arrK = _hmToSec(k.arrivalTime);
+        const depK = _hmToSec(k.departureTime);
         const trK  = k.transfers ?? 0;
-        return (arrK < arrJ && trK <= trJ) || (arrK === arrJ && trK < trJ);
+
+        const arrLeq = arrK <= arrJ;
+        const depGeq = depK >= depJ;
+        const trLeq  = trK  <= trJ;
+
+        if (!(arrLeq && depGeq && trLeq)) return false;
+        return (arrK < arrJ) || (depK > depJ) || (trK < trJ);
       });
+
       if (!dominated) kept.push(j);
     }
     return kept;
   }
 
-  /* ================================================================
-   * search(from, to, depTime, opts)
-   * ================================================================ */
   function search(from, to, depTime, opts = {}) {
     const maxResults = opts.maxResults ?? MAX_JOURNEYS;
     const directOnly = !!opts.directOnly;
@@ -424,9 +374,6 @@
     return _dedup(journeys).slice(0, maxResults);
   }
 
-  /* ================================================================
-   * PUBLIC API
-   * ================================================================ */
   return {
     registerRouter,
     buildInterchangeIndex,
