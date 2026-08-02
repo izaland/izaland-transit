@@ -148,7 +148,7 @@ const M5_INTERCHANGE = {
     // ↔ SB?? e M17?? da confermare
   ],
   M505: [
-    { code: 'M11-10', network: 'metro', transferMin: 3,
+    { code: 'M1112', network: 'metro', transferMin: 3,
       note: 'Metro Line 11 — Kirifunu Kukubān' },
   ],
   M506: [
@@ -162,12 +162,12 @@ const M5_INTERCHANGE = {
       note: 'Metro Line 7 — Riihisano' },
   ],
   M510: [
-    { code: 'M15-18', network: 'metro', transferMin: 3,
+    { code: 'M1518', network: 'metro', transferMin: 3,
       note: 'Metro Line 15 — Eonogi Kōwen' },
   ],
   M511: [
     { code: 'HO13', network: 'ho',    transferMin: 3,
-      note: 'Honanshū Line — Kadokamahiwa' },
+      note: 'Hoze-Oyehatton Line — Kadokamahiwa' },
   ],
   M513: [
     // ↔ M17?? e M7?? da confermare
@@ -175,6 +175,8 @@ const M5_INTERCHANGE = {
   M514: [
     { code: 'KD39', network: 'suburban', transferMin: 3,
       note: 'Kidai Line — Jisahara, stesso nome' },
+    { code: 'M1120', network: 'suburban', transferMin: 3,
+      note: 'Metro Line 11 — Jisahara, stesso nome' },
   ],
 };
 
