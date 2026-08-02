@@ -20,49 +20,18 @@ const TTEngine = (() => {
     return peakWindows.some(w => sec >= hmToSec(w.start) && sec < hmToSec(w.end));
   }
 
-  /* ----------------------------------------------------------------
-   * trainNumber(lineId, svcId, direction, tripIndex)
-   *
-   * Calcola il numero di corsa secondo lo schema TRAIN_NUM_CONFIG:
-   *
-   *   numero = lineDigit × 10000
-   *          + svcBase × 100
-   *          + seq
-   *
-   * dove seq è un contatore progressivo per direzione:
-   *   SB (Outbound) → numeri PARI  (seq = tripIndex × 2 + 2)
-   *   NB (Inbound)  → numeri DISPARI (seq = tripIndex × 2 + 1)
-   *
-   * Il numero è sempre a 5 cifre, zero-padded.
-   * Esempio: KE-A-SB terzo treno → 1×10000 + 0×100 + 6 = 10006
-   *          RY-I-NB primo treno → 2×10000 + 30×100 + 1 = 23001
-   * ---------------------------------------------------------------- */
   function trainNumber(lineId, svcId, direction, tripIndex) {
     const cfg = typeof TRAIN_NUM_CONFIG !== "undefined" ? TRAIN_NUM_CONFIG : null;
     if (!cfg || !cfg[lineId]) return null;
     const { lineDigit, svcBase } = cfg[lineId];
     const base = svcBase[svcId] ?? 0;
     const seq  = direction === "NB"
-      ? tripIndex * 2 + 1   // dispari → inbound
-      : tripIndex * 2 + 2;  // pari    → outbound
+      ? tripIndex * 2 + 1
+      : tripIndex * 2 + 2;
     const num = lineDigit * 10000 + base * 100 + seq;
     return String(num).padStart(5, "0");
   }
 
-  /**
-   * Restituisce true se la fermata è attiva per questo trip.
-   *
-   * Regole supportate:
-   *   "peak"     — solo nelle ore di punta
-   *   "alternate"— in alternanza (ogni 2 corse), con phase opzionale
-   *   "always"   — sempre attiva (usato per terminali fissi)
-   *   "direct"   — attiva sui treni diretti (routeType !== "punohai")
-   *   "punohai"  — attiva solo sui treni via Punohai (routeType === "punohai")
-   *
-   * I treni Daidōn alternano percorso diretto e via Punohai:
-   *   tripIndex pari  → diretto  (DI13 transito, DI131 saltata)
-   *   tripIndex dispari → punohai (DI131 fermata, DI13 saltata/transitata)
-   */
   function stopIsActive(code, conditionalStops, tripIndex, peakNow, routeType) {
     if (!conditionalStops?.[code]) return true;
     const rule = conditionalStops[code].rule;
@@ -74,17 +43,11 @@ const TTEngine = (() => {
     return true;
   }
 
-  /**
-   * Dwell in secondi per una fermata.
-   * DI13 Sasshi è un transito: il treno non si ferma (0 s dwell).
-   * Tutte le altre fermate: 60 s.
-   */
   const TRANSIT_STATIONS = new Set(["DI13"]);
   function dwellSec(code) {
     return TRANSIT_STATIONS.has(code) ? 0 : 60;
   }
 
-  /* ---- genera tutte le corse di un servizio in una direzione ---- */
   function generateTripsForService(lineId, svcId, dir, fromSec, toSec) {
     const line   = IZX_LINES[lineId];
     const svc    = line.SVC[svcId];
@@ -93,7 +56,6 @@ const TTEngine = (() => {
     const peaks  = line.PEAK;
     const offset = (line.OFFSETS?.[svcId] ?? 0) * 60;
 
-    // fermate in ordine canonico per la direzione
     const stopsRaw = svc.stops.filter(s => tt[s] !== undefined);
     const stops    = dir === "NB" ? [...stopsRaw].reverse() : stopsRaw;
 
@@ -101,14 +63,11 @@ const TTEngine = (() => {
 
     const totalDuration = tt[stopsRaw[stopsRaw.length - 1]];
 
-    // In SB il terminus viene scelto con TERMINUS_SPLIT (round-robin sui pesi).
-    // In NB il treno torna verso l'origine SB, quindi il terminus è sempre
-    // la prima stazione del percorso SB (stopsRaw[0]).
     const splits = dir === "SB" ? (line.TERMINUS_SPLIT?.[svcId] ?? null) : null;
     const nbTerminus = dir === "NB" ? stopsRaw[0] : null;
 
     const SERVICE_START = hmToSec("06:00");
-    const SERVICE_END   = hmToSec("24:30"); // ultimo treno parte entro 24:30 (manutenzione notturna)
+    const SERVICE_END   = hmToSec("24:30");
 
     const trips = [];
     let   cursor = SERVICE_START + offset;
@@ -117,12 +76,8 @@ const TTEngine = (() => {
       const tripIndex = trips.length;
       const peakNow   = isPeak(cursor, peaks);
       const freq_ph   = peakNow ? freq.peak : freq.offpeak;
-      // freq_ph può essere 0.5 (ogni 2 ore) → interval = 7200 s
       const interval  = Math.round(3600 / freq_ph);
 
-      // Determina il tipo di percorso per i treni Daidōn
-      // I treni di indice pari sono "diretti", dispari sono "punohai"
-      // (valido per servizi I, IS, IL che usano le regole direct/punohai)
       const hasPunohaiRule = Object.values(svc.conditionalStops || {}).some(
         r => r.rule === "punohai" || r.rule === "direct"
       );
@@ -130,9 +85,6 @@ const TTEngine = (() => {
         ? (tripIndex % 2 === 0 ? "direct" : "punohai")
         : null;
 
-      // Scegli terminus:
-      //   NB → sempre stopsRaw[0] (origine del percorso SB = Sainðaul)
-      //   SB → round-robin su TERMINUS_SPLIT (o ultima fermata se non definito)
       let terminus = stops[stops.length - 1];
       if (nbTerminus) {
         terminus = nbTerminus;
@@ -146,12 +98,6 @@ const TTEngine = (() => {
         }
       }
 
-      // ---- SHORT WORKING: sovrascrive terminus per corse notturne ----
-      // Legge SHORT_WORKING dalla definizione della linea in izx-data.js.
-      // Ogni regola: { svcId, dir ("SB"|"NB"|"BOTH"), cutoff ("HH:MM"), terminus }
-      // La prima regola che soddisfa tutte le condizioni vince.
-      // Il terminus ridotto deve esistere nel TT del servizio, altrimenti
-      // la regola viene ignorata silenziosamente.
       const swRules = line.SHORT_WORKING ?? [];
       for (const sw of swRules) {
         const dirMatch = sw.dir === "BOTH" || sw.dir === dir;
@@ -162,22 +108,14 @@ const TTEngine = (() => {
           break;
         }
       }
-      // ---- fine SHORT WORKING ----
 
-      // Per i treni via Punohai il TT usa DI131 + DI14 (via Punohai);
-      // il timing di DI14 via Punohai = DI131 + 1286 s (calcolato qui
-      // se non esplicitamente presente nel TT).
-      // Il TT base (I/IS/IL) contiene DI14 come valore diretto; per la
-      // variante Punohai costruiamo il timing DI14 dinamicamente.
       function getOffset(stCode) {
         if (routeType === "punohai" && stCode === "DI14" && tt["DI131"] !== undefined) {
-          // DI14 via Punohai = DI131 + 1286 s
           return tt["DI131"] + 1286;
         }
         return tt[stCode];
       }
 
-      // costruisci le fermate del trip
       const tripStops = {};
       const conditionalStops = svc.conditionalStops || null;
 
@@ -197,12 +135,11 @@ const TTEngine = (() => {
         tripStops[st] = {
           arr:     secToHM(arrSec < cursor ? depSec : arrSec),
           dep:     secToHM(depSec),
-          transit: dwell === 0,   // true per le stazioni di transito (DI13)
+          transit: dwell === 0,
         };
         if (st === terminus) break;
       }
 
-      // filtra: includi solo se il trip ferma nel range richiesto
       const depTimes = Object.values(tripStops).map(t => hmToSec(t.dep));
       if (depTimes.length > 0) {
         const minDep = Math.min(...depTimes);
@@ -219,7 +156,7 @@ const TTEngine = (() => {
             direction:   dir,
             origin:      stops[0],
             terminus,
-            routeType,   // "direct" | "punohai" | null
+            routeType,
             trainNumber: trainNumber(lineId, svcId, dir, tripIndex),
             stops:       tripStops,
           });
@@ -232,7 +169,6 @@ const TTEngine = (() => {
     return trips;
   }
 
-  /* ---- raggruppa coppie dichiarate con svc.pair (es. K+J) ---- */
   function groupPairs(trips) {
     const out  = [];
     const used = new Set();
@@ -273,40 +209,6 @@ const TTEngine = (() => {
     return out;
   }
 
-  /* ---- API pubblica ---- */
-
-  /**
-   * TTEngine.query(opts) → Trip[]
-   *
-   * opts:
-   *   lines      {string|string[]}  "KE" | "RY" | ["KE","RY"] | "ALL"
-   *   station    {string}           codice fermata (es. "K08", "DI3", "DI131")
-   *   direction  {string}           "SB" | "NB" | "" (entrambe)
-   *   fromTime   {string}           "HH:MM"
-   *   toTime     {string}           "HH:MM"  (default "23:30")
-   *   services   {string[]}         filtro servizi opzionale (es. ["I","IS","IL"])
-   *
-   * Ogni Trip include il campo `trainNumber` (stringa a 5 cifre, es. "10006").
-   * Schema:
-   *   [lineDigit 1c][svcBase 2c][seq 2c]
-   *   SB → seq pari (2,4,6,…) · NB → seq dispari (1,3,5,…)
-   *
-   * Nota sui servizi Daidōn (I / IS / IL):
-   *   Ogni Trip include il campo `routeType`:
-   *     "direct"  → percorso diretto (DI13 transito, DI131 saltata)
-   *     "punohai" → percorso via Punohai (DI131 fermata, DI13 saltata)
-   *   Le fermate di transito hanno il flag `transit: true` nell'oggetto fermata.
-   *
-   * SHORT_WORKING:
-   *   Alcune corse notturne terminano a un capolinea ridotto definito in
-   *   line.SHORT_WORKING. Il campo `terminus` del Trip riflette già la
-   *   stazione ridotta; nessun campo aggiuntivo è necessario lato UI.
-   *
-   * Orario di servizio:
-   *   Prima corsa: 06:00 (+ offset per linea)
-   *   Ultima partenza dal capolinea: max 24:30
-   *   La rete è chiusa dalle 24:30 per la manutenzione notturna.
-   */
   function query(opts = {}) {
     const {
       lines     = "ALL",
@@ -342,9 +244,6 @@ const TTEngine = (() => {
         for (const dir of dirs) {
           const trips = generateTripsForService(lineId, svcId, dir, fromSec, toSec);
 
-          // filtra per stazione se richiesta
-          // DI131 Punohai: inclusa anche nei trip punohai anche se non
-          // appare nei svc.stops canonici (viene aggiunta dinamicamente)
           const filtered = station
             ? trips.filter(t => t.stops[station] !== undefined)
             : trips;
@@ -354,7 +253,6 @@ const TTEngine = (() => {
       }
     }
 
-    // ordina per orario di partenza alla stazione cercata (o prima fermata)
     results.sort((a, b) => {
       const getKey = t => station && t.stops[station]
         ? hmToSec(t.stops[station].dep)
@@ -365,10 +263,6 @@ const TTEngine = (() => {
     return groupPairs(results);
   }
 
-  /**
-   * TTEngine.allStations() → [{lineId, code, name, kanji, branch}]
-   * Utile per popolare il dropdown unificato.
-   */
   function allStations() {
     const seen = new Set();
     const out  = [];
