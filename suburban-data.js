@@ -49,7 +49,8 @@
      KW00 (Kishagoi-Exhibitown) ↔ M801
      KW02 (Shiki-Kiranne) ↔ IR
      KW03 (Ottanjoe) ↔ M03?? (da confermare)
-     KW10 (Kawayatsu) ↔ E02, KY02
+     KW10 (Kawayatsu) ↔ E02, KY02, KS02, TS07  [cluster KAWAYATSU]
+     KW11 (Niji-Kawayatsu) ↔ KS01, TS06         [cluster NIJI-KAWAYATSU]
      KW16 (Otsumi-Ibarosu) ↔ CS02
      KW17 (Ibarosu) ↔ CS01
      KW25 (Kotamari) ↔ IB?? (da confermare)
@@ -57,7 +58,8 @@
      KW32 (Yamakoga) ↔ CS?? (da confermare)
 
      TS interchanges (Tandan-Senpyan Line):
-     TS07 ↔ KW10, E02  (Kawayatsu — thru KW)
+     TS06 ↔ KW11, KS01  (Niji-Kawayatsu — cluster NIJI-KAWAYATSU)
+     TS07 ↔ KW10, KS02, E02  (Kawayatsu — cluster KAWAYATSU)
      TS12 ↔ LL02, SK25  (Binno)
      TS13 ↔ LL01, SK26, M814, K01, R01, E01, AX06  (Sainðaul Central)
      TS14 ↔ SK33, M417, M203  (Shimamera)
@@ -85,14 +87,24 @@
      CK29 ↔ SK17  (Punomowen)
      CK30 ↔ SK16  (Kayahori Bunki)
 
-       // Kawasabu Line (KS)
-  KS01: ['KW12'],
-  KS02: ['E02', 'KW11'],
-  KS11: ['CK27', 'SK19'],
-  KS17: [],          // M1?? — da confermare
-  KS18: ['KD20', 'RY02'],  // + M1?? — da confermare
-  KS28: ['AX09'],
-  
+     Kawasabu Line (KS):
+     KS01 ↔ KW12 (Neyabakuri), KW11, TS06  [cluster NIJI-KAWAYATSU]
+     KS02 ↔ E02, KW10, TS07                [cluster KAWAYATSU]
+     KS11 ↔ CK27, SK19  (Shakihori)
+     KS17 ↔ M1?? — da confermare
+     KS18 ↔ KD20, RY02
+
+   NOTA ANTI-CICLO — cluster Kawayatsu (FIX 12):
+     I sei nodi KW10/KW11/KS01/KS02/TS06/TS07 formano due piazzali adiacenti.
+     Regola: nessun nodo di NIJI-KAWAYATSU (KW11/KS01/TS06) punta direttamente
+     a nodi di KAWAYATSU (KW10/KS02/TS07) come partner di interscambio cross-linea,
+     e viceversa — tranne KW10↔KW11 che sono adiacenti sulla stessa linea KW
+     e vengono già collegati dal grafo lineare interno.
+     Questo impedisce il ciclo spurio:
+       KW→KW10→KW11→(xfer)KS01→KS02→KS03→...→Taimasaki
+     che duplicava il path canonico:
+       KW→KW10→(xfer)KS02→KS03→...→Taimasaki
+
    SK_SERVICES / KW_SERVICES:
      Sottoservizi per la generazione degli orari sintetici nel router.
 
@@ -114,6 +126,12 @@
      via TS13) invece di TS19 (quella corretta, vicina a Shutazai),
      generando percorsi 3-leg spuri AX+A+TS invece del diretto TS.
      Fix: TS10 → 'Eigandan Senpyan (Semukudai)'; TS11 → 'Rismyonjen (Eigandan)'.
+
+   FIX 12 (cluster Kawayatsu — ciclo spurio KW→KS via Niji-Kawayatsu):
+     Aggiunta TS06/TS07 come entry mancanti nel SUBURBAN_INTERCHANGE.
+     Rimosso KW11 da KS02.partners e KS02 da KS01.partners per spezzare
+     il ciclo: ogni sotto-cluster (Kawayatsu / Niji-Kawayatsu) è autonomo,
+     il collegamento tra i due avviene solo tramite il grafo lineare KW/KS/TS.
 
    Nota km Loop Line:
      Distanze progressive reali da rilievo cartografico.
@@ -155,15 +173,22 @@ const SUBURBAN_INTERCHANGE = {
   KW00: ['M801'],
   KW02: ['IR'],
   KW03: [],
-  KW10: ['E02', 'KY02', { code: 'KS02', transferMin: 2 }],
-  KW11: [{ code: 'KS01', transferMin: 2 }],
+  // ── Cluster KAWAYATSU: KW10 | KS02 | TS07 ──────────────────────────────
+  // NON includere partner del cluster NIJI-KAWAYATSU (KW11/KS01/TS06) qui:
+  // il collegamento tra i due piazzali avviene tramite il grafo lineare KW/KS/TS.
+  KW10: ['E02', 'KY02', { code: 'KS02', transferMin: 2 }, { code: 'TS07', transferMin: 2 }],
+  // ── Cluster NIJI-KAWAYATSU: KW11 | KS01 | TS06 ─────────────────────────
+  KW11: [{ code: 'KS01', transferMin: 2 }, { code: 'TS06', transferMin: 2 }],
   KW16: ['CS02'],
   KW17: ['CS01'],
   KW25: [],
   KW29: ['MS01', 'IN03'],
   KW32: [],
   // Tandan-Senpyan Line (TS)
-  TS07: ['KW10', 'E02'],
+  // ── Cluster NIJI-KAWAYATSU: TS06 | KW11 | KS01 ──────────────────────────
+  TS06: [{ code: 'KW11', transferMin: 2 }, { code: 'KS01', transferMin: 2 }],
+  // ── Cluster KAWAYATSU: TS07 | KW10 | KS02 ───────────────────────────────
+  TS07: ['E02', { code: 'KW10', transferMin: 2 }, { code: 'KS02', transferMin: 2 }],
   TS12: ['LL02', 'SK25'],
   TS13: ['LL01', 'SK26', 'M814', 'K01', 'R01', 'E01', 'AX06'],
   TS14: ['SK33', 'M417', 'M203'],
@@ -191,8 +216,13 @@ const SUBURBAN_INTERCHANGE = {
   CK29: ['SK17'],
   CK30: ['SK16'],
   // Kawasabu Line (KS)
-  KS01: [{ code: 'KW12', transferMin: 2 }],
-  KS02: ['E02', 'KW11', { code: 'KW10', transferMin: 2 }],
+  // ── Cluster NIJI-KAWAYATSU: KS01 | KW11 | TS06 ──────────────────────────
+  // NON includere KS02 tra i partner: KS01 e KS02 sono adiacenti sulla linea KS
+  // e il collegamento avviene tramite il grafo lineare, non via interchange.
+  KS01: [{ code: 'KW12', transferMin: 2 }, { code: 'KW11', transferMin: 2 }, { code: 'TS06', transferMin: 2 }],
+  // ── Cluster KAWAYATSU: KS02 | KW10 | TS07 ───────────────────────────────
+  // Rimosso KW11: spezza il ciclo KW10→KW11→KS01→KS02→KS03 (FIX 12)
+  KS02: ['E02', { code: 'KW10', transferMin: 2 }, { code: 'TS07', transferMin: 2 }],
   KS11: ['CK27', 'SK19'],
   KS17: [],          // M1?? — da confermare
   KS18: ['KD20', 'RY02'],  // + M1?? — da confermare
@@ -384,8 +414,8 @@ const SUBURBAN_LINES = {
      28 stazioni · 47.08 km
      Capolinea: KS01 Niji-Kawayatsu ↔ KS28 Sabullan
      Interscambi principali:
-       KS01 ↔ KW12 (Neyabakuri)
-       KS02 ↔ E02, KW11 (Kawayatsu)
+       KS01 ↔ KW12 (Neyabakuri), KW11, TS06  [cluster NIJI-KAWAYATSU]
+       KS02 ↔ E02, KW10, TS07                [cluster KAWAYATSU]
        KS11 ↔ CK27, SK19 (Shakihori)
        KS17 ↔ M1?? (Pakkishoi — da confermare)
        KS18 ↔ KD20, RY02 (Asaji Torimoshi)
