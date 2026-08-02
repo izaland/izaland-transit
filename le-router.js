@@ -68,20 +68,18 @@
 
   /* ── nextTrip via TTEngine ─────────────────────────────────────── */
   function _nextTrip(lineId, svcId, boardCode, alightCode, fromSec) {
-    const toSec = fromSec + DEFAULT_WINDOW_MIN * 60;
+    const toSec  = fromSec + DEFAULT_WINDOW_MIN * 60;
     const fromHM = secToHM(fromSec);
     const toHM   = secToHM(toSec);
 
-    const trips = TTEngine.query({
+    const tripsSB = TTEngine.query({
       lines:     lineId,
       station:   boardCode,
-      direction: 'SB',       // direzione canonica outbound
+      direction: 'SB',
       fromTime:  fromHM,
       toTime:    toHM,
       services:  [svcId],
     });
-
-    // Prova anche NB
     const tripsNB = TTEngine.query({
       lines:     lineId,
       station:   boardCode,
@@ -91,18 +89,24 @@
       services:  [svcId],
     });
 
-    const allTrips = [...trips, ...tripsNB];
+    let best = null;
 
-    for (const trip of allTrips) {
+    for (const trip of [...tripsSB, ...tripsNB]) {
       if (!trip.stops[alightCode]) continue;
       const boardStop  = trip.stops[boardCode];
       const alightStop = trip.stops[alightCode];
-      const boardSec   = hmToSec(boardStop.dep ?? boardStop.arr);
-      const alightSec  = hmToSec(alightStop.arr ?? alightStop.dep);
+      if (!boardStop || !alightStop) continue;
+      const boardSec  = hmToSec(boardStop.dep  ?? boardStop.arr);
+      const alightSec = hmToSec(alightStop.arr ?? alightStop.dep);
+      /* Deve partire non prima di fromSec e arrivare dopo la partenza */
+      if (boardSec < fromSec)  continue;
       if (alightSec <= boardSec) continue;
-      return { trip, boardStop, alightStop, boardSec, alightSec };
+      if (!best || boardSec < best.boardSec) {
+        best = { trip, boardStop, alightStop, boardSec, alightSec };
+      }
     }
-    return null;
+
+    return best;
   }
 
   /* ── buildLeg ──────────────────────────────────────────────────── */
@@ -115,12 +119,10 @@
     const svc  = line.SVC[svcId];
     const totalSec = alightSec - boardSec;
 
-    // Calcolo km tramite TT offset
+    // Calcolo km tramite offset TT e km reali in ST
     const tt = line.TT[svcId];
     let km = null;
     if (tt && tt[from] != null && tt[to] != null) {
-      // Stima distanza proporzionale agli offset TT
-      // (approssimazione; le linee LE hanno km reali in ST)
       const stFrom = line.ST[from];
       const stTo   = line.ST[to];
       if (stFrom && stTo && stFrom.km != null && stTo.km != null) {
