@@ -1,9 +1,17 @@
 /* ================================================================
    UNIFIED-ROUTER.JS — Izaland Cross-Network Journey Planner
    ================================================================
-   Aggrega IZXRouter, SuburbanRouter e MetroRouter in un'unica
-   interfaccia di ricerca. Gestisce i trasferimenti cross-network
-   tra IZX, Suburban e Metro.
+   Aggrega IZXRouter, LERouter, SuburbanRouter e MetroRouter in
+   un'unica interfaccia di ricerca. Gestisce i trasferimenti
+   cross-network tra IZX, LE (Lake Eira), Suburban e Metro.
+
+   Networks registrabili:
+     "IZX"  — IZX high-speed + Airport Express (AX) + Commuter (SN, EI)
+     "LE"   — Lake Eira Regional (le-router.js / le-data.js)
+     "SUB"  — Suburban / Izarail conventional (suburban-router.js)
+     "MTR"  — Metro (metro-router.js)
+
+   Interscambi cross-network definiti tramite buildInterchangeIndex().
    ================================================================ */
 
 (function (root, factory) {
@@ -196,11 +204,8 @@
 
   /* ================================================================
    * JOURNEY KEY
-   * Fingerprint stabile e robusto, non dipende da campi opzionali.
-   * Usa depTime+arrTime+transfers+from+to come fallback sicuro.
    * ================================================================ */
   function _journeyKey(j) {
-    // Chiave primaria: struttura dei leg
     const legKey = j.legs.map(l => [
       l.lineId  || l.line  || '',
       l.svcId   || l.serviceId || l.tripId || '',
@@ -210,9 +215,6 @@
       l.alightArr || l.arrivalTime   || '',
     ].join(':')).join('|');
 
-    // Se i leg sono tutti vuoti (campi mancanti), usa il fingerprint
-    // depTime+arrTime+transfers come fallback per evitare che tutto
-    // collassi sulla stessa chiave ''
     const blank = legKey.replace(/[:|]/g, '').trim() === '';
     if (blank) {
       return `${j.departureTime}~${j.arrivalTime}~${j.transfers ?? 0}~${j.totalMinutes ?? 0}`;
@@ -222,20 +224,8 @@
 
   /* ================================================================
    * DEDUP + SORT
-   *
-   * Ordering:
-   *   1. Earliest arrival time
-   *   2. Fewest transfers
-   *   3. Latest departure time
-   *
-   * Dominance pruning: journey B è dominato da A se:
-   *   - A arriva PRIMA (strettamente) con cambi <= B, OPPURE
-   *   - A arriva ALLA STESSA ORA con cambi strettamente < B
-   * Questo assicura che a parità di arrivo sopravviva solo il percorso
-   * con meno cambi, senza mai auto-potare journey identici.
    * ================================================================ */
   function _dedup(journeys) {
-    // Step 1: dedup per chiave robusta
     const seen = new Set();
     const deduped = journeys.filter(j => {
       const key = _journeyKey(j);
@@ -244,7 +234,6 @@
       return true;
     });
 
-    // Step 2: sort — arrivo prima, poi meno cambi, poi partenza più tarda
     deduped.sort((a, b) => {
       const da = _hmToSec(a.arrivalTime), db = _hmToSec(b.arrivalTime);
       if (da !== db) return da - db;
@@ -253,11 +242,6 @@
       return _hmToSec(b.departureTime) - _hmToSec(a.departureTime);
     });
 
-    // Step 3: dominance pruning
-    // B è dominato da A se:
-    //   arrK < arrJ  AND  trK <= trJ   (A arriva prima con <= cambi)
-    //   OR
-    //   arrK === arrJ  AND  trK < trJ  (stessa ora ma A ha meno cambi)
     const kept = [];
     for (const j of deduped) {
       const arrJ = _hmToSec(j.arrivalTime);
