@@ -211,7 +211,19 @@ const M4_INTERCHANGE = {
       note: 'Kidai Line — Kasakuri, uscita est' },
     { code: 'K02',  network: 'izx',      transferMin: 10,
       note: 'IZX Keishin — Niji-Sainðaul, walkable uscita nord' },
+       ],
+  M421: [
+    { code: 'SK36', network: 'suburban', transferMin: 4
+      note: 'Seishaku Line  — interscambio underground - elevated' },
   ],
+  M424: [
+    { code: 'M1110', network: 'metro', transferMin: 1
+      note: 'M11 Ipporai - Owonideki  — interscambio facile' },
+],
+  M425: [
+    { code: 'TS18', network: 'suburban', transferMin: 5
+      note: 'Tandan Senpyan Line  — interscambio underground - elevated' },
+],
 };
 
 if (typeof module !== 'undefined') {
