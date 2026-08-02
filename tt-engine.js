@@ -2,6 +2,14 @@
    TT-ENGINE — Motore universale orari IZX
    Dipende da: izx-data.js (IZX_LINES, TRAIN_NUM_CONFIG)
    API pubblica: TTEngine.query(opts) → Array<Trip>
+
+   FIX (SHORT_WORKING terminus visibility):
+     generateTripsForService ora espone `terminus` sull'oggetto trip.
+     routing.js/nextTrip usa questo campo per distinguere tra:
+       a) treno che termina prima di alightCode → skip silenzioso (corretto)
+       b) fermata mancante benché il terminus sia oltre → anomalia dati
+     In questo modo AX03→AX06 durante la finestra short-working non
+     produce un risultato sbagliato né un errore silenzioso opaco.
 ================================================================ */
 
 const TTEngine = (() => {
@@ -155,7 +163,8 @@ const TTEngine = (() => {
             cls:         svc.cls,
             direction:   dir,
             origin:      stops[0],
-            terminus,
+            terminus,           // ← FIX: esposto per permettere a nextTrip di
+                                //   distinguere "treno corto" da "dato mancante"
             routeType,
             trainNumber: trainNumber(lineId, svcId, dir, tripIndex),
             stops:       tripStops,
