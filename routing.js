@@ -278,6 +278,65 @@ const IZXRouter = (() => {
   }
 
   /* ----------------------------------------------------------------
+   * _paretoDedup(journeys)
+   *
+   * Pareto dominance a 3 assi per trip planner:
+   *   K domina J  ⟺  arr(K) ≤ arr(J)  AND  dep(K) ≥ dep(J)  AND  tr(K) ≤ tr(J)
+   *                   con almeno una disuguaglianza stretta.
+   *
+   * Esempio: diretta dep 08:10 arr 08:26 (tr=0) domina
+   *          con-cambio dep 08:00 arr 08:35 (tr=1):
+   *            arrK=08:26 ≤ arrJ=08:35 ✓
+   *            depK=08:10 ≥ depJ=08:00 ✓
+   *            trK=0      ≤ trJ=1      ✓  → dominata → scartata.
+   *
+   * Il sort pre-Pareto (arrival ASC) garantisce che l'insieme "kept"
+   * venga costruito dal miglior arrivo verso il peggiore, così
+   * la dominanza viene rilevata correttamente.
+   * ---------------------------------------------------------------- */
+  function _paretoDedup(journeys) {
+    const { hmToSec } = TTEngine;
+
+    /* 1. Rimuovi duplicati esatti */
+    const seen   = new Set();
+    const unique = journeys.filter(j => {
+      const key = j.legs.map(l =>
+        `${l.lineId}:${l.svcId}:${l.boardDep}:${l.alightArr}`
+      ).join("|");
+      if (seen.has(key)) return false;
+      seen.add(key); return true;
+    });
+
+    /* 2. Sort: arrival ASC → transfers ASC → departure DESC */
+    unique.sort((a, b) => {
+      const da = hmToSec(a.arrivalTime),   db = hmToSec(b.arrivalTime);
+      if (da !== db) return da - db;
+      const ta = a.transfers ?? 0,         tb = b.transfers ?? 0;
+      if (ta !== tb) return ta - tb;
+      return hmToSec(b.departureTime) - hmToSec(a.departureTime);
+    });
+
+    /* 3. Pareto filter */
+    const kept = [];
+    for (const j of unique) {
+      const arrJ = hmToSec(j.arrivalTime);
+      const depJ = hmToSec(j.departureTime);
+      const trJ  = j.transfers ?? 0;
+
+      const dominated = kept.some(k => {
+        const arrK = hmToSec(k.arrivalTime);
+        const depK = hmToSec(k.departureTime);
+        const trK  = k.transfers ?? 0;
+        if (!(arrK <= arrJ && depK >= depJ && trK <= trJ)) return false;
+        return (arrK < arrJ) || (depK > depJ) || (trK < trJ);
+      });
+
+      if (!dominated) kept.push(j);
+    }
+    return kept;
+  }
+
+  /* ----------------------------------------------------------------
    * search(from, to, depTime, opts)
    *
    * opts.directOnly {boolean} — se true salta la fase dei cambi
@@ -365,19 +424,7 @@ const IZXRouter = (() => {
       }
     }
 
-    /* ---- deduplicazione e ordinamento ---- */
-    const seen = new Set();
-    const unique = journeys.filter(j => {
-      const key = j.legs.map(l => `${l.lineId}:${l.svcId}:${l.boardDep}:${l.alightArr}`).join("|");
-      if (seen.has(key)) return false;
-      seen.add(key); return true;
-    });
-    unique.sort((a, b) => {
-      const da = hmToSec(a.arrivalTime), db = hmToSec(b.arrivalTime);
-      if (da !== db) return da - db;
-      return a.transfers - b.transfers;
-    });
-    return unique.slice(0, maxResults);
+    return _paretoDedup(journeys).slice(0, maxResults);
   }
 
   /* ----------------------------------------------------------------
