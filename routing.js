@@ -18,49 +18,24 @@
      - Percorso diretto (stesso servizio, stessa linea)
      - Percorso con un cambio (transfer in una stazione di interscambio)
    Tempo di interscambio: TRANSFER_MIN (default 5 minuti).
-
-   Interscambio LL01 ↔ K01/R01/E01/AX06:
-     buildLeg() è esposto nell'API pubblica così che SuburbanRouter
-     possa costruire il leg IZX nel percorso con cambio.
-
-   Opzioni di ricerca (opts):
-     maxResults  {number}   — max journey da restituire (default 5)
-     lines       {string}   — filtra per lineId ('KE','RY','EI','SN','AX')
-                              se omesso o 'ALL' considera tutte le linee
-     directOnly  {boolean}  — se true, restituisce solo percorsi senza cambi
-
-   Nota sui servizi SN:
-     G_rapid e G_local sono varianti dello stesso servizio logico G;
-     il router le tratta come servizi distinti ma il display può
-     unificarle (campo leg.svcLogical = "G" per entrambe).
 ================================================================ */
 
 const IZXRouter = (() => {
 
-  /* ---- costanti ---- */
   const TRANSFER_MIN   = 5;
   const TRANSFER_SEC   = TRANSFER_MIN * 60;
   const MAX_JOURNEYS   = 5;
   const SEARCH_WINDOW  = 3 * 3600;
 
-  /* Servizi AX che vengono unificati nel badge "AX" */
   const AX_SVC_VARIANTS = new Set(['EST', 'BAJ', 'SAK']);
 
-  /* ----------------------------------------------------------------
-   * _lineFilter(opts)
-   * Restituisce un Set di lineId ammessi, o null se è tutto aperto.
-   * ---------------------------------------------------------------- */
   function _lineFilter(opts) {
     const raw = opts.lines;
     if (!raw || raw === 'ALL') return null;
-    /* Accetta sia stringa singola ('KE') sia array (['KE','RY']) */
     const list = Array.isArray(raw) ? raw : [raw];
     return new Set(list);
   }
 
-  /* ----------------------------------------------------------------
-   * interchangeNodes()
-   * ---------------------------------------------------------------- */
   function interchangeNodes() {
     const nodes = new Set();
     for (const line of Object.values(IZX_LINES)) {
@@ -91,9 +66,6 @@ const IZXRouter = (() => {
     return nodes;
   }
 
-  /* ----------------------------------------------------------------
-   * buildPartnerMap()
-   * ---------------------------------------------------------------- */
   function buildPartnerMap() {
     const map = {};
     function add(a, b) {
@@ -105,8 +77,6 @@ const IZXRouter = (() => {
     for (const line of Object.values(IZX_LINES)) {
       if (!line.INTERCHANGE) continue;
       for (const [a, b] of Object.entries(line.INTERCHANGE)) add(a, b);
-      /* INTERCHANGE_EXTRA: stazioni con più di un partner IZX
-         es. AX06 ↔ K01, R01, E01  (Sainðaul Central) */
       if (line.INTERCHANGE_EXTRA) {
         for (const [a, partners] of Object.entries(line.INTERCHANGE_EXTRA)) {
           for (const b of partners) add(a, b);
@@ -134,9 +104,6 @@ const IZXRouter = (() => {
     return result;
   }
 
-  /* ----------------------------------------------------------------
-   * stationName(code)
-   * ---------------------------------------------------------------- */
   function stationName(code) {
     for (const line of Object.values(IZX_LINES)) {
       if (line.ST[code]) return line.ST[code].n;
@@ -144,11 +111,6 @@ const IZXRouter = (() => {
     return code;
   }
 
-  /* ----------------------------------------------------------------
-   * allStations()
-   * Restituisce tutte le stazioni IZX come array { code, name, kanji }
-   * senza duplicati (una stazione può comparire su più linee).
-   * ---------------------------------------------------------------- */
   function allStations() {
     const seen = new Set();
     const out  = [];
@@ -164,10 +126,6 @@ const IZXRouter = (() => {
     return out;
   }
 
-  /* ----------------------------------------------------------------
-   * allLines()
-   * Restituisce tutte le linee IZX come array { id, name, color }
-   * ---------------------------------------------------------------- */
   function allLines() {
     return Object.entries(IZX_LINES).map(([id, line]) => ({
       id,
@@ -176,9 +134,6 @@ const IZXRouter = (() => {
     }));
   }
 
-  /* ----------------------------------------------------------------
-   * stationKm(lineId, code)
-   * ---------------------------------------------------------------- */
   function stationKm(lineId, code) {
     const line = IZX_LINES[lineId];
     if (!line) return null;
@@ -186,9 +141,6 @@ const IZXRouter = (() => {
     return (st && st.km != null) ? st.km : null;
   }
 
-  /* ----------------------------------------------------------------
-   * nextTrip(lineId, svcId, boardCode, minDepSec, alightCode)
-   * ---------------------------------------------------------------- */
   function nextTrip(lineId, svcId, boardCode, minDepSec, alightCode) {
     const { hmToSec, secToHM } = TTEngine;
     const fromHM = secToHM(minDepSec);
@@ -221,15 +173,10 @@ const IZXRouter = (() => {
     return best;
   }
 
-  /* ----------------------------------------------------------------
-   * buildLeg(lineId, svcId, boardCode, alightCode, minDepSec)
-   * Esposto nell'API pubblica per uso da SuburbanRouter (cross-network).
-   * ---------------------------------------------------------------- */
   function buildLeg(lineId, svcId, boardCode, alightCode, minDepSec) {
     const found = nextTrip(lineId, svcId, boardCode, minDepSec, alightCode);
     if (!found) return null;
     const { trip, boardStop, alightStop, boardSec, alightSec } = found;
-    /* Servizi AX (EST/BAJ/SAK) vengono normalizzati a 'AX' per il display */
     const svcLogical = AX_SVC_VARIANTS.has(svcId)
       ? 'AX'
       : svcId.replace(/_rapid$|_local$/, "");
@@ -277,11 +224,45 @@ const IZXRouter = (() => {
     };
   }
 
-  /* ----------------------------------------------------------------
-   * search(from, to, depTime, opts)
-   *
-   * opts.directOnly {boolean} — se true salta la fase dei cambi
-   * ---------------------------------------------------------------- */
+  function _paretoDedup(journeys) {
+    const { hmToSec } = TTEngine;
+
+    const seen   = new Set();
+    const unique = journeys.filter(j => {
+      const key = j.legs.map(l =>
+        `${l.lineId}:${l.svcId}:${l.boardDep}:${l.alightArr}`
+      ).join("|");
+      if (seen.has(key)) return false;
+      seen.add(key); return true;
+    });
+
+    unique.sort((a, b) => {
+      const da = hmToSec(a.arrivalTime),   db = hmToSec(b.arrivalTime);
+      if (da !== db) return da - db;
+      const ta = a.transfers ?? 0,         tb = b.transfers ?? 0;
+      if (ta !== tb) return ta - tb;
+      return hmToSec(b.departureTime) - hmToSec(a.departureTime);
+    });
+
+    const kept = [];
+    for (const j of unique) {
+      const arrJ = hmToSec(j.arrivalTime);
+      const depJ = hmToSec(j.departureTime);
+      const trJ  = j.transfers ?? 0;
+
+      const dominated = kept.some(k => {
+        const arrK = hmToSec(k.arrivalTime);
+        const depK = hmToSec(k.departureTime);
+        const trK  = k.transfers ?? 0;
+        if (!(arrK <= arrJ && depK >= depJ && trK <= trJ)) return false;
+        return (arrK < arrJ) || (depK > depJ) || (trK < trJ);
+      });
+
+      if (!dominated) kept.push(j);
+    }
+    return kept;
+  }
+
   function search(from, to, depTime, opts = {}) {
     const { hmToSec } = TTEngine;
     const maxResults  = opts.maxResults ?? MAX_JOURNEYS;
@@ -289,9 +270,8 @@ const IZXRouter = (() => {
     const depSec      = hmToSec(depTime);
     const partnerMap  = buildPartnerMap();
     const journeys    = [];
-    const lineAllowed = _lineFilter(opts); /* null = tutte */
+    const lineAllowed = _lineFilter(opts);
 
-    /* ---- 1. Percorsi DIRETTI ---- */
     for (const [lineId, line] of Object.entries(IZX_LINES)) {
       if (lineAllowed && !lineAllowed.has(lineId)) continue;
       const hasFrom = line.ST[from] !== undefined;
@@ -313,7 +293,6 @@ const IZXRouter = (() => {
       }
     }
 
-    /* ---- 2. Percorsi con UN CAMBIO (saltati se directOnly) ---- */
     if (!directOnly) {
       const reachableInterchanges = new Set();
       for (const [lineId, line] of Object.entries(IZX_LINES)) {
@@ -365,24 +344,9 @@ const IZXRouter = (() => {
       }
     }
 
-    /* ---- deduplicazione e ordinamento ---- */
-    const seen = new Set();
-    const unique = journeys.filter(j => {
-      const key = j.legs.map(l => `${l.lineId}:${l.svcId}:${l.boardDep}:${l.alightArr}`).join("|");
-      if (seen.has(key)) return false;
-      seen.add(key); return true;
-    });
-    unique.sort((a, b) => {
-      const da = hmToSec(a.arrivalTime), db = hmToSec(b.arrivalTime);
-      if (da !== db) return da - db;
-      return a.transfers - b.transfers;
-    });
-    return unique.slice(0, maxResults);
+    return _paretoDedup(journeys).slice(0, maxResults);
   }
 
-  /* ----------------------------------------------------------------
-   * formatJourney(journey)
-   * ---------------------------------------------------------------- */
   function formatJourney(j) {
     const lines = [];
     lines.push(
@@ -407,10 +371,9 @@ const IZXRouter = (() => {
     return lines.join("\n");
   }
 
-  /* ---- API pubblica ---- */
   return {
     search,
-    buildLeg,          // esposto per SuburbanRouter cross-network
+    buildLeg,
     interchangeNodes,
     buildPartnerMap,
     stationName,
