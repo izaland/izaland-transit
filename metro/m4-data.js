@@ -213,15 +213,15 @@ const M4_INTERCHANGE = {
       note: 'IZX Keishin — Niji-Sainðaul, walkable uscita nord' },
        ],
   M421: [
-    { code: 'SK36', network: 'suburban', transferMin: 4
+    { code: 'SK36', network: 'suburban', transferMin: 4,
       note: 'Seishaku Line  — interscambio underground - elevated' },
   ],
   M424: [
-    { code: 'M1110', network: 'metro', transferMin: 1
+    { code: 'M1110', network: 'metro', transferMin: 1,
       note: 'M11 Ipporai - Owonideki  — interscambio facile' },
 ],
   M425: [
-    { code: 'TS18', network: 'suburban', transferMin: 5
+    { code: 'TS18', network: 'suburban', transferMin: 5,
       note: 'Tandan Senpyan Line  — interscambio underground - elevated' },
 ],
 };
