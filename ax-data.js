@@ -18,17 +18,17 @@
 const AX_ST = {
   /* Tratta comune */
   AX00: {n:"Asunahama Airport Terminal 4", k:"",                              b:"common", km:0},
-  AX01: {n:"Asunahama Airport",            k:"\u4f5c\u5b89\u6d5c\u56fd\u969b\u7a7a\u6e2f", b:"common", km:3.094},
-  AX02: {n:"Rink\u016bn City",             k:"\u0aa6\u0abe\u0aaa\u0acd\u200c\u0aa1\u0ac7\u0a83\u0aaa\u0acd \u0a9f\u0abe\u0aa0\u0abe", b:"common", km:8.203},
-  AX03: {n:"Riimibaiken",                  k:"\ud841\udf4f\u535e",             b:"common", km:13.493},
+  AX01: {n:"Asunahama Airport",            k:"作安浜国際空港", b:"common", km:3.094},
+  AX02: {n:"Rinkūn City",             k:"દાપ્‌ડેઃપ્ ટાઠા", b:"common", km:8.203},
+  AX03: {n:"Riimibaiken",                  k:"𠝏卞",             b:"common", km:13.493},
 
   /* Ramo Est: Riimibaiken → Sabullan */
-  AX04: {n:"Kasakuri",                     k:"\u9bdb\u5dfb",                  b:"est",    km:26.493},
-  AX05: {n:"Shimamera",                    k:"\u6e20\u702c\u7530",            b:"est",    km:31.643},
-  AX07: {n:"Herubori",                     k:"\u674f\u767b",                  b:"est",    km:38.403},
-  AX06: {n:"Sain\u00f0aul Central",        k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e", b:"est",   km:41.793},
-  AX08: {n:"Osenude",                      k:"\u9632\u6589",                  b:"est",    km:51.653},
-  AX09: {n:"Sabullan",                     k:"\u0a9f\u0ab0\u0ac3\u0ac7\u0aa7\u0acd\u0aa7\u0aaa\u0acd", b:"est", km:59.553},
+  AX04: {n:"Kasakuri",                     k:"鯛巻",                  b:"est",    km:26.493},
+  AX05: {n:"Shimamera",                    k:"渠瀬田",            b:"est",    km:31.643},
+  AX07: {n:"Herubori",                     k:"杏登",                  b:"est",    km:38.403},
+  AX06: {n:"Sainðaul Central",        k:"作安崎中央", b:"est",   km:41.793},
+  AX08: {n:"Osenude",                      k:"防斉",                  b:"est",    km:51.653},
+  AX09: {n:"Sabullan",                     k:"ટરૃેધ્ધપ્", b:"est", km:59.553},
 
   /* Ramo Bajikoe: Riimibaiken → Onnojaris
      Distanze reali da AX03 (km 13.493):
@@ -37,17 +37,17 @@ const AX_ST = {
        AX21→AX22  32.650 km  → 62.753 km
        AX22→AX23  25.210 km  → 87.963 km
   */
-  AX20: {n:"Eigandan Senpyan",             k:"\u6c38\u73b5\u6bb5\u8239\u99e2", b:"baj",   km:23.803},
-  AX21: {n:"Showanul",                     k:"\u66f8\u74e6\u5d0e",            b:"baj",   km:30.103},
-  AX22: {n:"Sasatotsu",                    k:"\u4f50\u3005\u6a4b",            b:"baj",   km:62.753},
+  AX20: {n:"Eigandan Senpyan",             k:"永玵段船駢", b:"baj",   km:23.803},
+  AX21: {n:"Showanul",                     k:"書瓦崎",            b:"baj",   km:30.103},
+  AX22: {n:"Sasatotsu",                    k:"佐々橋",            b:"baj",   km:62.753},
   AX23: {n:"Onnojaris",                    k:"",                              b:"baj",   km:87.963},
 
   /* Ramo Sakamuso: Showanul → Illashiya */
-  AX30: {n:"Shin-Erigowa",                 k:"\u65b0\u7e70\u7dca",            b:"sak",   km:119.37},
-  AX31: {n:"Sejisebu",                     k:"\u4e95\u7d42",                  b:"sak",   km:126.41},
-  AX32: {n:"Yutsukabul",                   k:"\u67da\u9db4\u6b66\u5d0e",      b:"sak",   km:139.41},
-  AX33: {n:"Akkosoi",                      k:"\u7a2e\u7db1",                  b:"sak",   km:160.67},
-  AX34: {n:"Illashiya",                    k:"\u72d0\u68f2",                  b:"sak",   km:162.17},
+  AX30: {n:"Shin-Erigowa",                 k:"新繰緊",            b:"sak",   km:119.37},
+  AX31: {n:"Sejisebu",                     k:"井終",                  b:"sak",   km:126.41},
+  AX32: {n:"Yutsukabul",                   k:"柚鶴武崎",      b:"sak",   km:139.41},
+  AX33: {n:"Akkosoi",                      k:"種綱",                  b:"sak",   km:160.67},
+  AX34: {n:"Illashiya",                    k:"狐棲",                  b:"sak",   km:162.17},
 };
 
 /* ----------------------------------------------------------------
@@ -65,7 +65,7 @@ const AX_CANONICAL_ORDER = {
   SAK: ["AX21","AX30","AX31","AX32","AX33","AX34"],
 };
 
-/* Array flat deduplicato: usato da TTEngine e IZXRouter che si
+/* Array flat deduplicato: usato da TTEngine e LERouter che si
    aspettano line.CANONICAL come array iterabile. */
 const AX_CANONICAL_FLAT = [
   ...new Set([
@@ -177,8 +177,8 @@ const AX_LINES = {
     color:        "#CC99FF",
     textColor:    "#1a0033",
     inboundDir:   "NB",
-    inboundLabel:  "\u2191 Inbound \u2014 Asunahama Airport",
-    outboundLabel: "\u2193 Outbound",
+    inboundLabel:  "↑ Inbound — Asunahama Airport",
+    outboundLabel: "↓ Outbound",
     ST:        AX_ST,
     CANONICAL: AX_CANONICAL_FLAT,
     SVC:       AX_SVC,
@@ -221,7 +221,7 @@ const AX_LINES = {
     },
     OFFSETS: {EST:0, BAJ:7, SAK:12},
     SHORT_WORKING: [],
-    /* ── TARIFF ────────────────────────────────────────────────── */
+    /* ── TARIFF ─────────────────────────────────────────────────────────────── */
     tariff: {
       operator:   "IZX",
       zone:       "airport",
@@ -234,8 +234,15 @@ const AX_LINES = {
 };
 
 /* ----------------------------------------------------------------
-   Integra AX in IZX_LINES così che TTEngine e IZXRouter
-   possano vedere le stazioni Airport Express.
-   (izx-data.js è caricato prima di ax-data.js)
+   Integra AX in LE_LINES così che LERouter possa vedere le stazioni
+   Airport Express. AX appartiene alla rete LE (tokkyū tier), NON
+   a IZX_LINES.
+
+   Ordine di caricamento script richiesto:
+     1. izx-data.js   — definisce IZX_LINES
+     2. le-data.js    — definisce LE_LINES (registro vuoto)
+     3. ax-data.js    — popola LE_LINES con AX
+     4. le-router.js  — LERouter legge LE_LINES
+     5. unified-router.js + registrazione router
 ---------------------------------------------------------------- */
-Object.assign(IZX_LINES, AX_LINES);
+Object.assign(LE_LINES, AX_LINES);
