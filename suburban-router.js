@@ -123,6 +123,13 @@
      supportare i servizi KS1 (Local), KS2 (Semi-Rapid) e KS3 (Rapid)
      definiti in ks-data.js. La logica è identica ai branch SK/KW/TS.
 
+   FIX 11 (fase 1 — _buildLegsAllSvcs):
+     La fase 1 (percorsi diretti) usava il vecchio loop su _getTrips
+     che produceva un solo journey per orario, senza distinguere i
+     svcId. Sostituito con _buildLegsAllSvcs() così W1 (Local),
+     W3 (Rapid) e W4 (Commuter Rapid) appaiono come journey separati
+     anche nella fase diretta (non solo nella 1b intra-line).
+
    Tempi di trasferimento:
      TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban (stazione normale)
      HUB_TRANSFER_MIN        8 min  — interscambio suburban ↔ suburban (grande nodo)
@@ -697,10 +704,10 @@ const SuburbanRouter = (() => {
       const iF = _idx(line, resolvedFrom);
       const iT = _idx(line, resolvedTo);
       if (iF === -1 || iT === -1 || iF === iT) continue;
-      const trips = _getTrips(line, iF, iT, depSec);
-      for (const trip of trips) {
-        const leg = _buildLeg(line, iF, iT, depSec, trip);
-        if (!leg) continue;
+
+      // FIX 11: _buildLegsAllSvcs produce un journey per ogni svcId
+      // (W1 Local, W3 Rapid, W4 Commuter Rapid) invece di uno solo.
+      for (const leg of _buildLegsAllSvcs(line, iF, iT, depSec)) {
         journeys.push({
           legs: [leg], departureTime: leg.boardDep, arrivalTime: leg.alightArr,
           totalMinutes: Math.round((leg.alightArrSec - leg.boardDepSec) / 60),
@@ -886,109 +893,3 @@ const SuburbanRouter = (() => {
       const subPartnerMap = _getSuburbanPartnerMap();
       for (const line of Object.values(SUBURBAN_LINES)) {
         if (!line.stations.length) continue;
-        if (lineAllowed && !lineAllowed.has(line.id)) continue;
-        const iF = _idx(line, resolvedFrom);
-        if (iF === -1) continue;
-        for (const subNode of line.stations) {
-          const partners = subPartnerMap[subNode.code];
-          if (!partners || !partners.length) continue;
-          const iMid = _idx(line, subNode.code);
-          if (iMid === -1 || iMid === iF) continue;
-          const leg1 = _buildLeg(line, iF, iMid, depSec);
-          if (!leg1) continue;
-          const xferSec = _subTransferSec(subNode.code, partners[0]);
-          const transferReadySec = leg1.alightArrSec + xferSec;
-          for (const partnerCode of partners) {
-            for (const line2 of Object.values(SUBURBAN_LINES)) {
-              if (line2.id === line.id) continue;
-              if (!line2.stations.length) continue;
-              const iMid2 = _idx(line2, partnerCode);
-              const iT2   = _idx(line2, resolvedTo);
-              if (iMid2 === -1 || iT2 === -1 || iMid2 === iT2) continue;
-              const leg2 = _buildLeg(line2, iMid2, iT2, transferReadySec);
-              if (!leg2) continue;
-              const waitSec = leg2.boardDepSec - leg1.alightArrSec;
-              const totalKm = (leg1.km != null && leg2.km != null) ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
-              journeys.push({
-                legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
-                totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
-                totalKm, transfers: 1, transferNodes: [subNode.code],
-                transferWaitMin: Math.round(waitSec / 60),
-              });
-            }
-          }
-        }
-      }
-    }
-
-    /* ---- Deduplica e sort ---- */
-    const seen = new Set();
-    const unique = journeys.filter(j => {
-      const k = `${j.departureTime}|${j.arrivalTime}|${j.legs.map(l => l.svcId).join('+')}|${j.transfers}`;
-      if (seen.has(k)) return false;
-      seen.add(k);
-      return true;
-    });
-
-    return unique
-      .sort((a, b) => {
-        const da = _hmToSec(a.departureTime), db = _hmToSec(b.departureTime);
-        if (da !== db) return da - db;
-        return a.totalMinutes - b.totalMinutes;
-      })
-      .slice(0, maxResults);
-  }
-
-  /* ----------------------------------------------------------------
-   * stationName(code)
-   * ---------------------------------------------------------------- */
-  function stationName(code) {
-    for (const line of Object.values(SUBURBAN_LINES)) {
-      const st = line.stations.find(s => s.code === code);
-      if (st) return st.name;
-    }
-    return code;
-  }
-
-  /* ----------------------------------------------------------------
-   * allStations()
-   * ---------------------------------------------------------------- */
-  function allStations() {
-    const seen = new Set();
-    const out  = [];
-    for (const line of Object.values(SUBURBAN_LINES)) {
-      for (const st of line.stations) {
-        if (!seen.has(st.code)) {
-          seen.add(st.code);
-          out.push({ code: st.code, name: st.name, kanji: st.kanji ?? '' });
-        }
-      }
-    }
-    return out;
-  }
-
-  /* ----------------------------------------------------------------
-   * buildLeg(lineId, svcId, from, to, depSec)
-   * Usato da UnifiedRouter per costruire leg suburbani dall'esterno.
-   * ---------------------------------------------------------------- */
-  function buildLeg(lineId, svcId, from, to, depSec) {
-    const line = SUBURBAN_LINES[lineId];
-    if (!line) return null;
-    const iFrom = _idx(line, from);
-    const iTo   = _idx(line, to);
-    if (iFrom === -1 || iTo === -1 || iFrom === iTo) return null;
-    const trips = _getTrips(line, iFrom, iTo, depSec)
-      .filter(t => !svcId || t.svcId === svcId);
-    if (!trips.length) return null;
-    return _buildLeg(line, iFrom, iTo, depSec, trips[0]);
-  }
-
-  return {
-    search,
-    stationName,
-    allStations,
-    buildLeg,
-    TRANSFER_MIN,
-  };
-
-})();
