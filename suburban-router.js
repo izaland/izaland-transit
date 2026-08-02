@@ -672,6 +672,84 @@ const SuburbanRouter = (() => {
     return results;
   }
 
+     /* ----------------------------------------------------------------
+   * _buildLocalToExpressTransfers(line, iFrom, iTo, depSec)   FIX 11
+   * Fase 1c: Local→Rapid intra-linea.
+   * Caso 2: partenza da stazione Local-only, arrivo a fermata Rapid.
+   * Si prende il Local fino alla prima fermata Rapid nel percorso,
+   * poi si sale sul Rapid fino a iTo.
+   * ---------------------------------------------------------------- */
+  function _buildLocalToExpressTransfers(line, iFrom, iTo, depSec) {
+    const goingFwd = iFrom < iTo;
+    const lo = Math.min(iFrom, iTo);
+    const hi = Math.max(iFrom, iTo);
+    const fromCode = line.stations[iFrom].code;
+    const toCode   = line.stations[iTo].code;
+
+    // Recupera tutti i trip express disponibili verso iTo
+    // (skipDestCheck=null non va bene qui — usiamo _getExpressTrips
+    //  e poi filtriamo per toCode)
+    const expressTrips = _getExpressTrips(line, iTo, depSec)
+      .filter(t => t.stops.includes(toCode));
+
+    // Raccoglie i svcId express distinti che fermano a iTo
+    const expressSvcIds = [...new Set(expressTrips.map(t => t.svcId))];
+    if (!expressSvcIds.length) return [];
+
+    // iFrom deve essere Local-only: se un express ferma a iFrom
+    // il caso 1 lo gestisce già → saltiamo
+    const anyExpressServesFrom = expressTrips.some(t => t.stops.includes(fromCode));
+    if (anyExpressServesFrom) return [];
+
+    const results = [];
+
+    for (const svcId of expressSvcIds) {
+      // Fermate dell'express nel range [lo+1, hi-1] escluse iFrom e iTo
+      const svcStops = expressTrips.find(t => t.svcId === svcId)?.stops ?? [];
+      const candidates = line.stations
+        .slice(lo + 1, hi)
+        .filter(st => svcStops.includes(st.code));
+
+      if (!candidates.length) continue;
+
+      // In NB si tenta prima la fermata più vicina a iFrom
+      if (!goingFwd) candidates.reverse();
+
+      for (const xferSt of candidates) {
+        const iXfer = line.stations.indexOf(xferSt);
+
+        // Leg 1: Local da iFrom a iXfer
+        const localTrips = _getTrips(line, iFrom, iXfer, depSec)
+          .filter(t => t.stops.length === 0 || t.stops.includes(xferSt.code));
+        if (!localTrips.length) continue;
+        const leg1 = _buildLeg(line, iFrom, iXfer, depSec, localTrips[0]);
+        if (!leg1) continue;
+
+        // Leg 2: Rapid da iXfer a iTo
+        const transferReadySec = leg1.alightArrSec + INTRA_TRANSFER_SEC;
+        const rapidTrips = _getTrips(line, iXfer, iTo, transferReadySec)
+          .filter(t => t.svcId === svcId && t.stops.includes(toCode));
+        if (!rapidTrips.length) continue;
+        const leg2 = _buildLeg(line, iXfer, iTo, transferReadySec, rapidTrips[0]);
+        if (!leg2) continue;
+
+        const waitSec = leg2.boardDepSec - leg1.alightArrSec;
+        results.push({
+          legs: [leg1, leg2],
+          departureTime:   leg1.boardDep,
+          arrivalTime:     leg2.alightArr,
+          totalMinutes:    Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+          totalKm:         leg1.km + leg2.km,
+          transfers:       1,
+          transferNodes:   [xferSt.code],
+          transferWalkMin: 0,
+          transferWaitMin: Math.round(waitSec / 60),
+        });
+      }
+    }
+    return results;
+  }
+
   function _lineFilter(opts) {
     const raw = opts.lines;
     if (!raw || raw === 'ALL') return null;
@@ -717,6 +795,18 @@ const SuburbanRouter = (() => {
       const iT = _idx(line, resolvedTo);
       if (iF === -1 || iT === -1 || iF === iT) continue;
       for (const j of _buildIntraLineTransfers(line, iF, iT, depSec)) {
+        journeys.push(j);
+      }
+    }
+
+         /* ---- 1c. Intra-line Local→Rapid (FIX 11) ---- */
+    for (const line of Object.values(SUBURBAN_LINES)) {
+      if (!line.stations.length) continue;
+      if (lineAllowed && !lineAllowed.has(line.id)) continue;
+      const iF = _idx(line, resolvedFrom);
+      const iT = _idx(line, resolvedTo);
+      if (iF === -1 || iT === -1 || iF === iT) continue;
+      for (const j of _buildLocalToExpressTransfers(line, iF, iT, depSec)) {
         journeys.push(j);
       }
     }
@@ -881,7 +971,7 @@ const SuburbanRouter = (() => {
       }
     }
 
-    /* ---- 4. Percorsi Suburbano → Suburbano (cross-line) ---- */
+        /* ---- 4. Percorsi Suburbano → Suburbano (cross-line) ---- */
     if (!directOnly) {
       const subPartnerMap = _getSuburbanPartnerMap();
       for (const line of Object.values(SUBURBAN_LINES)) {
@@ -894,27 +984,36 @@ const SuburbanRouter = (() => {
           if (!partners || !partners.length) continue;
           const iMid = _idx(line, subNode.code);
           if (iMid === -1 || iMid === iF) continue;
-          const leg1 = _buildLeg(line, iF, iMid, depSec);
-          if (!leg1) continue;
-          const xferSec = _subTransferSec(subNode.code, partners[0]);
-          const transferReadySec = leg1.alightArrSec + xferSec;
-          for (const partnerCode of partners) {
-            for (const line2 of Object.values(SUBURBAN_LINES)) {
-              if (line2.id === line.id) continue;
-              if (!line2.stations.length) continue;
-              const iMid2 = _idx(line2, partnerCode);
-              const iT2   = _idx(line2, resolvedTo);
-              if (iMid2 === -1 || iT2 === -1 || iMid2 === iT2) continue;
-              const leg2 = _buildLeg(line2, iMid2, iT2, transferReadySec);
-              if (!leg2) continue;
-              const waitSec = leg2.boardDepSec - leg1.alightArrSec;
-              const totalKm = (leg1.km != null && leg2.km != null) ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
-              journeys.push({
-                legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
-                totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
-                totalKm, transfers: 1, transferNodes: [subNode.code],
-                transferWaitMin: Math.round(waitSec / 60),
-              });
+
+          // Leg1: tutti i servizi (Local + Rapid) da iF a iMid
+          const legs1 = _buildLegsAllSvcs(line, iF, iMid, depSec);
+          if (!legs1.length) continue;
+
+          for (const leg1 of legs1) {
+            const xferSec = _subTransferSec(subNode.code, partners[0]);
+            const transferReadySec = leg1.alightArrSec + xferSec;
+
+            for (const partnerCode of partners) {
+              for (const line2 of Object.values(SUBURBAN_LINES)) {
+                if (line2.id === line.id) continue;
+                if (!line2.stations.length) continue;
+                const iMid2 = _idx(line2, partnerCode);
+                const iT2   = _idx(line2, resolvedTo);
+                if (iMid2 === -1 || iT2 === -1 || iMid2 === iT2) continue;
+
+                // Leg2: tutti i servizi (Local + Rapid) da iMid2 a iT2
+                for (const leg2 of _buildLegsAllSvcs(line2, iMid2, iT2, transferReadySec)) {
+                  const waitSec = leg2.boardDepSec - leg1.alightArrSec;
+                  const totalKm = (leg1.km != null && leg2.km != null)
+                    ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
+                  journeys.push({
+                    legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
+                    totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+                    totalKm, transfers: 1, transferNodes: [subNode.code],
+                    transferWaitMin: Math.round(waitSec / 60),
+                  });
+                }
+              }
             }
           }
         }
