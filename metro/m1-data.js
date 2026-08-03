@@ -1,8 +1,8 @@
 /* ================================================================
    M1-DATA.JS — Metro Line 1 · [Line name TBD]
    ================================================================
-   35 stazioni · 47.47 km (provvisorio — spaziatura uniforme)
-   Distanza media per intervallo: 47.47 / 34 ≈ 1.396 km
+   35 stazioni · 46.6 km
+   Distanze progressive reali da M110 (Alkuitsa) a M144 (Enikezya Forum).
 
    Ordine canonico geografico: M110 (Alkuitsa, ovest) → M144 (Enikezya Forum, est)
 
@@ -17,50 +17,45 @@
      M119 Kushidaru Amiya  — M406 (Line 4)
      M115 Nimunoðai        — M808 (Line 8)
      M113 Takkurahama      — SK32
-
-   Nota km:
-     Progressive da M110 (km 0.0) a M144 (km 47.47).
-     Spaziatura uniforme provvisoria ≈ 1.396 km; aggiornare con
-     distanze reali appena disponibili.
 ================================================================ */
 'use strict';
 
 const M1_ST = {
-  M110: { n: 'Alkuitsa',               k: '潮屺',           km:  0.000 },
-  M111: { n: 'Shimamera',              k: '渠瀬田',          km:  1.396 },
-  M112: { n: 'Ripeigu',                k: '李平具',          km:  2.793 },
-  M113: { n: 'Takkurahama',            k: '琢玖羅島',        km:  4.189 },
-  M114: { n: 'Horahama',               k: '稲島',            km:  5.585 },
-  M115: { n: 'Nimunoðai',              k: '秩済',            km:  6.982 },
-  M116: { n: 'Okoromachi',             k: '',                km:  8.378 },
-  M117: { n: 'Sainðaul Central',       k: '作安崎中央',      km:  9.774 },
-  M118: { n: 'Masuda Agarai',          k: '馬砅任尭',        km: 11.171 },
-  M119: { n: 'Kushidaru Amiya',        k: '柚艏',            km: 12.567 },
-  M120: { n: 'Tsumiji',                k: '都巳治',          km: 13.963 },
-  M121: { n: 'Upajiya',                k: '袁棲',            km: 15.360 },
-  M122: { n: 'Tensari Omuhate',        k: '典河〇蔦',        km: 16.756 },
-  M123: { n: 'Tamanoke-Tsunui',        k: '谷坂淡枡',        km: 18.152 },
-  M124: { n: 'Oebatsun Resort',        k: '',                km: 19.549 },
-  M125: { n: 'Nandamoigon Sumatai',    k: '凬浪社',          km: 20.945 },
-  M126: { n: 'Otsunuke 2sa',           k: '',                km: 22.341 },
-  M127: { n: 'Shin-Pakkishoi',         k: '',                km: 23.738 },
-  M128: { n: 'Asaji Torimoshi',        k: '安佐寺狛篠',      km: 25.134 },
-  M129: { n: 'Minotase Kōwen',         k: '蓑村公園',        km: 26.530 },
-  M130: { n: 'Hintomaui',              k: '価園斐',          km: 27.927 },
-  M131: { n: 'Furukobe',               k: '福絽杷',          km: 29.323 },
-  M132: { n: 'Otsumi-Furukobe',        k: '南福絽杷',        km: 30.719 },
-  M133: { n: 'Watarui Azenami',        k: '芳聖刈咲',        km: 32.116 },
-  M134: { n: 'Watarui',                k: '芳聖',            km: 33.512 },
-  M135: { n: 'Shin-Watarui',           k: '新芳聖',          km: 34.908 },
-  M136: { n: 'Shinojawi',              k: '櫂枳',            km: 36.305 },
-  M137: { n: 'Tomori Dantsi',          k: '土母里團地',      km: 37.701 },
-  M138: { n: 'Takawidama',             k: '浚位谷',          km: 39.097 },
-  M139: { n: 'Enikezya Sports Park',   k: '盛狩運動公園',    km: 40.494 },
-  M140: { n: 'Jiroidan',               k: '治蕾丹',          km: 41.890 },
-  M141: { n: 'Akashima Seisan',        k: '蛞渠精参',        km: 43.286 },
-  M142: { n: 'Enikezya',               k: '盛狩',            km: 44.683 },
-  M143: { n: 'Shin-Enikezya',          k: '新盛狩',          km: 46.079 },
-  M144: { n: 'Enikezya Forum',         k: '盛狩ળ૾દપ્',      km: 47.470 },
+  M110: { n: 'Alkuitsa',               k: '潮屺',           km:  0.00 },
+  M111: { n: 'Shimamera',              k: '渠瀬田',          km:  1.26 },
+  M112: { n: 'Ripeigu',                k: '李平具',          km:  1.91 },
+  M113: { n: 'Takkurahama',            k: '琢玖羅島',        km:  2.70 },
+  M114: { n: 'Horahama',               k: '稲島',            km:  3.60 },
+  M115: { n: 'Nimunoðai',              k: '秩済',            km:  4.75 },
+  M116: { n: 'Okoromachi',             k: '',                km:  5.65 },
+  M117: { n: 'Sainðaul Central',       k: '作安崎中央',      km:  6.86 },
+  M118: { n: 'Masuda Agarai',          k: '馬砅任尭',        km:  8.19 },
+  M119: { n: 'Kushidaru Amiya',        k: '柚艏',            km:  9.98 },
+  M120: { n: 'Tsumiji',                k: '都巳治',          km: 11.20 },
+  M121: { n: 'Upajiya',                k: '袁棲',            km: 12.39 },
+  M122: { n: 'Tensari Omuhate',        k: '典河〇蔦',        km: 13.73 },
+  M123: { n: 'Tamanoke-Tsunui',        k: '谷坂淡枡',        km: 14.95 },
+  M124: { n: 'Oebatsun Resort',        k: '',                km: 16.71 },
+  M125: { n: 'Nandamoigon Sumatai',    k: '凬浪社',          km: 18.80 },
+  M126: { n: 'Otsunuke 2sa',           k: '',                km: 19.81 },
+  M127: { n: 'Shin-Pakkishoi',         k: '',                km: 21.78 },
+  M128: { n: 'Asaji Torimoshi',        k: '安佐寺狛篠',      km: 23.02 },
+  M129: { n: 'Minotase Kōwen',         k: '蓑村公園',        km: 24.04 },
+  M130: { n: 'Hintomaui',              k: '価園斐',          km: 24.87 },
+  M131: { n: 'Furukobe',               k: '福絽杷',          km: 26.24 },
+  M132: { n: 'Otsumi-Furukobe',        k: '南福絽杷',        km: 27.40 },
+  M133: { n: 'Watarui Azenami',        k: '芳聖刈咲',        km: 29.01 },
+  M134: { n: 'Watarui',                k: '芳聖',            km: 32.22 },
+  M135: { n: 'Shin-Watarui',           k: '新芳聖',          km: 33.72 },
+  M136: { n: 'Shinojawi',              k: '櫂枳',            km: 36.01 },
+  M137: { n: 'Tomori Dantsi',          k: '土母里團地',      km: 37.40 },
+  M138: { n: 'Takawidama',             k: '浚位谷',          km: 39.49 },
+  M139: { n: 'Enikezya Sports Park',   k: '盛狩運動公園',    km: 40.77 },
+  M140: { n: 'Jiroidan',               k: '治蕾丹',          km: 42.06 },
+  M141: { n: 'Akashima Seisan',        k: '蛞渠精参',        km: 42.98 },
+  M142: { n: 'Enikezya',               k: '盛狩',            km: 43.74 },
+  M143: { n: 'Shin-Enikezya',          k: '新盛狩',          km: 45.29 },
+  M144: { n: 'Enikezya Forum',         k: '盛狩ળ૾દપ્',      km: 46.60 },
 };
 
 /* Ordine canonico geografico: ovest (Alkuitsa) → est (Enikezya Forum) */
@@ -81,7 +76,7 @@ const M1_META = {
   name:        'Line 1',       // nome completo da definire
   nameJa:      '',             // da definire
   color:       '#F77F00',      // arancione
-  totalKm:     47.470,
+  totalKm:     46.60,
   stations:    35,
   avgSpeedKmh: 42,
   dwellSec:    20,
