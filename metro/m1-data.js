@@ -80,7 +80,7 @@ const M1_META = {
   code:        'M1',
   name:        'Line 1',       // nome completo da definire
   nameJa:      '',             // da definire
-  color:       '#E60026',      // rosso (placeholder — da confermare)
+  color:       '#F77F00',      // arancione
   totalKm:     47.470,
   stations:    35,
   avgSpeedKmh: 32,
@@ -119,7 +119,7 @@ const M1_SVC = {
   A: {
     name:   'All-stop',
     nameJa: '各駅停車',
-    color:  '#E60026',
+    color:  '#F77F00',
     cls:    'svc-A',
     stops:  M1_CANONICAL_ORDER,
   },

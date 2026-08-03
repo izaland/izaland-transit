@@ -16,7 +16,6 @@
 
 /* ----------------------------------------------------------------
    Profilo frequenze M1: 6 tph = headway 10 min costante
-   (override del M1_HEADWAY di m1-data.js, più semplice)
 ---------------------------------------------------------------- */
 const M1_HEADWAY_10 = [
   { from: '05:00', to: '24:30', headwayMin: 10 },
@@ -30,21 +29,21 @@ const M1_SERVICES_NORM = [
     id:         'M1',
     svcLogical: 'A_W',
     name:       'All-stop (westbound)',
-    color:      '#E60026',
+    color:      '#F77F00',
     cls:        'metro',
     rapid:      false,
     headway:    M1_HEADWAY_10,
-    stops:      M1_CANONICAL_ORDER,          // M110 → M144
+    stops:      M1_CANONICAL_ORDER,
   },
   {
     id:         'M1',
     svcLogical: 'A_E',
     name:       'All-stop (eastbound)',
-    color:      '#E60026',
+    color:      '#F77F00',
     cls:        'metro',
     rapid:      false,
     headway:    M1_HEADWAY_10,
-    stops:      [...M1_CANONICAL_ORDER].reverse(),  // M144 → M110
+    stops:      [...M1_CANONICAL_ORDER].reverse(),
   },
 ];
 
