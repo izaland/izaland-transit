@@ -133,6 +133,15 @@
      Fix: il blocco fase 1c è ora correttamente posizionato dentro
      search(), dopo la fase 1b.
 
+   FIX 12 (deduplica per svcLogical):
+     La chiave di deduplica usava l.svcId (es. 'SK1', 'SK2', 'SK3'),
+     producendo N copie identiche del medesimo viaggio — una per ogni
+     sottoservizio con lo stesso orario. Fix: la chiave usa ora
+     `l.svcLogical ?? l.svcId` (es. 'SK') così i sottoservizi con
+     stesso orario e stessa linea logica vengono deduplicati.
+     Servizi con orari diversi (Local vs Rapid) rimangono distinti
+     perché la chiave include anche departureTime|arrivalTime.
+
    Tempi di trasferimento:
      TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban (stazione normale)
      HUB_TRANSFER_MIN        8 min  — interscambio suburban ↔ suburban (grande nodo)
@@ -1033,10 +1042,10 @@ if (!directOnly) {
     }
   }
 }
-    /* ---- Deduplica e sort ---- */
+    /* ---- Deduplica e sort (FIX 12) ---- */
     const seen = new Set();
     const unique = journeys.filter(j => {
-      const k = `${j.departureTime}|${j.arrivalTime}|${j.legs.map(l => l.svcId).join('+')}|${j.transfers}`;
+      const k = `${j.departureTime}|${j.arrivalTime}|${j.legs.map(l => l.svcLogical ?? l.svcId).join('+')}|${j.transfers}`;
       if (seen.has(k)) return false;
       seen.add(k);
       return true;
