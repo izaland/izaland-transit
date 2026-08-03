@@ -320,6 +320,7 @@
 }
 .kw-svc-pill.rapid          { color: #e07b00; border-color: #e07b00; }
 .kw-svc-pill.commuter-rapid { color: #c0392b; border-color: #c0392b; }
+.kw-svc-pill.semi-rapid { color: #b45309; border-color: #b45309; }
 
     /* ── DIRECT-ONLY TOGGLE ── */
 .toggle-track{
@@ -1188,9 +1189,10 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
     return '<span class="kw-svc-pill commuter-rapid">Commuter Rapid</span>';
   if (d.includes('rapid'))
     return '<span class="kw-svc-pill rapid">Rapid</span>';
+  if (d.includes('semi-rapid') || d.includes('semi rapid'))
+    return '<span class="kw-svc-pill semi-rapid">Semi-Rapid</span>';
   return '';
 }
-
   function svcBadgeHTML(lineId, svcLogical, color, network) {
   const isMetro = network === 'metro';
   if (isMetro) {
@@ -1275,7 +1277,7 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
       let legsHTML = '<div class="journey-legs">';
       j.legs.forEach((leg, li) => {
         const badge = svcBadgeHTML(leg.lineId, leg.svcLogical, leg.color, leg.network);
-        const kwPill = leg.lineId === 'KW' ? kwSvcPillHTML(leg.svcDesc) : '';
+        const kwPill = /^(KW|KS|SK|TS)$/.test(leg.lineId) ? kwSvcPillHTML(leg.svcDesc) : '';
         const intStops = leg.intermediateStops ?? [];
         const intId = `int-${idx}-${li}`;
         const expandBtn = intStops.length
