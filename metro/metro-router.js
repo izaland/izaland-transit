@@ -12,13 +12,17 @@
      MetroRouter.networkOf(code)                 → string  ('M2'|'M4'|…)
      MetroRouter.allInterchanges()               → { codeA, codeB, transferMin }[]
 
-   Tempi di trasferimento di default (usati se transferMin non è specificato
-   nell'interchange del data file):
+   Campo opzionale nei service objects:
+     svc.offsetMin  — sfasa le partenze di N minuti rispetto al multiplo
+                       del headway. Es. offsetMin:3 con headway 15 min →
+                       treni alle :03 :18 :33 :48 invece di :00 :15 :30 :45.
+
+   Tempi di trasferimento di default:
      METRO_TRANSFER_MIN  4 min  — metro ↔ metro
 
    Per aggiungere una nuova linea metro (es. M3):
-     1. Creare metro/m3-data.js  (chiama MetroRouter.register alla fine)
-     2. Creare metro/m3-tt.js    (opzionale, chiamata register può stare in m3-data.js)
+     1. Creare metro/m3-data.js
+     2. Creare metro/m3-tt.js
      3. Aggiungere <script> in HTML — nessuna modifica qui.
 ================================================================ */
 'use strict';
@@ -28,32 +32,15 @@ const MetroRouter = (() => {
   const MAX_JOURNEYS        = 5;
   const SEARCH_WINDOW       = 3 * 3600;
   const DWELL_SEC           = 30;
-  const METRO_TRANSFER_MIN  = 4;   // default metro ↔ metro se non specificato nel data file
+  const METRO_TRANSFER_MIN  = 4;
 
-  /* ----------------------------------------------------------------
-   * Registro interno delle linee.
-   * Ogni linea viene aggiunta via MetroRouter.register(config).
-   * ---------------------------------------------------------------- */
   const _registry = [];
 
-  /**
-   * register(config)
-   * Chiamato dai file m*-data.js / m*-tt.js per registrare una linea.
-   *
-   * config: {
-   *   lineId,          // es. 'M2'
-   *   meta,            // M2_META
-   *   st,              // M2_ST
-   *   services,        // array di service objects (formato normalizzato)
-   *   interchange,     // M2_INTERCHANGE
-   * }
-   */
   function register(config) {
     if (!config || !config.lineId || !config.st || !config.meta) {
       console.warn('MetroRouter.register: config invalida', config);
       return;
     }
-    /* Evita duplicati se lo script viene caricato due volte */
     if (_registry.find(l => l.lineId === config.lineId)) return;
     _registry.push({
       lineId:      config.lineId,
@@ -96,6 +83,22 @@ const MetroRouter = (() => {
   }
 
   /* ----------------------------------------------------------------
+   * _nextDeparture(depSec, hwSec, offsetSec)
+   *
+   * Restituisce il primo istante >= depSec in cui parte un treno,
+   * dato un headway hwSec e uno sfasamento offsetSec dal multiplo.
+   *
+   * Esempio: hwSec=900 (15 min), offsetSec=180 (3 min)
+   *   partenze: 180, 1080, 1980, …  (:03, :18, :33, :48)
+   * ---------------------------------------------------------------- */
+  function _nextDeparture(depSec, hwSec, offsetSec) {
+    // Normalizza depSec nel ciclo del headway rispetto all'offset
+    const phase = ((depSec - offsetSec) % hwSec + hwSec) % hwSec;
+    const wait  = phase === 0 ? 0 : hwSec - phase;
+    return depSec + wait;
+  }
+
+  /* ----------------------------------------------------------------
    * _buildLegForService(line, svc, boardCode, alightCode, depSec)
    * ---------------------------------------------------------------- */
   function _buildLegForService(line, svc, boardCode, alightCode, depSec) {
@@ -104,11 +107,13 @@ const MetroRouter = (() => {
     const iT = stops.indexOf(alightCode);
     if (iF === -1 || iT === -1 || iF === iT) return null;
 
-    const direction = iF < iT ? 'outbound' : 'inbound';
-    const hwSec = _headwaySecAt(svc, depSec, direction);
+    const direction  = iF < iT ? 'outbound' : 'inbound';
+    const hwSec      = _headwaySecAt(svc, depSec, direction);
     if (hwSec === null) return null;
 
-    const alignSec = Math.ceil(depSec / hwSec) * hwSec;
+    const offsetSec  = (svc.offsetMin ?? 0) * 60;
+    const alignSec   = _nextDeparture(depSec, hwSec, offsetSec);
+
     const kmF = line.st[boardCode]?.km ?? null;
     const kmT = line.st[alightCode]?.km ?? null;
     if (kmF === null || kmT === null) return null;
@@ -197,9 +202,10 @@ const MetroRouter = (() => {
         const hwSec = _headwaySecAt(svc, depSec, direction);
         if (hwSec === null) continue;
 
-        let t        = Math.ceil(depSec / hwSec) * hwSec;
-        const endSec = depSec + SEARCH_WINDOW;
-        let count    = 0;
+        const offsetSec = (svc.offsetMin ?? 0) * 60;
+        let t           = _nextDeparture(depSec, hwSec, offsetSec);
+        const endSec    = depSec + SEARCH_WINDOW;
+        let count       = 0;
 
         while (t <= endSec && count < 2) {
           const leg = _buildLegForService(line, svc, from, to, t);
@@ -215,20 +221,17 @@ const MetroRouter = (() => {
             });
             count++;
           }
-          const nextHw = _headwaySecAt(svc, t, direction);
-          if (nextHw === null) break;
-          t += nextHw;
+          t += hwSec;
         }
       }
     }
 
     /* ----------------------------------------------------------------
-     * Deduplicazione: chiave = lineId + svcLogical + boardCode + boardDep + alightCode.
-     *
-     * NOTA: include svcLogical per evitare che servizi diversi (es. All-stop
-     * ed Express) vengano collassati quando per coincidenza partono alla
-     * stessa ora. Servizi con lo stesso svcLogical sullo stesso tratto fisico
-     * (es. _S e _N) producono comunque la stessa chiave e vengono deduplicati.
+     * Deduplicazione: chiave = lineId + svcLogical + boardCode + boardDep
+     *   + alightCode. Include svcLogical per evitare che servizi diversi
+     *   (es. All-stop ed Express) vengano collassati se per coincidenza
+     *   partono alla stessa ora. Servizi con lo stesso svcLogical sullo
+     *   stesso tratto fisico vengono comunque deduplicati correttamente.
      * ---------------------------------------------------------------- */
     const seen   = new Set();
     const unique = journeys.filter(j => {
@@ -306,9 +309,6 @@ const MetroRouter = (() => {
 
   /* ----------------------------------------------------------------
    * buildMultiLeg(boardCode, alightCode, depSec)
-   * Come buildLeg, ma supporta cambi interni metro↔metro tramite BFS
-   * sugli interchange registrati. Restituisce { legs, totalMin } | null.
-   * Usato da SuburbanRouter per tratti metro a più linee (es. M405→M801).
    * ---------------------------------------------------------------- */
   function buildMultiLeg(boardCode, alightCode, depSec) {
     const direct = buildLeg(boardCode, alightCode, depSec);
