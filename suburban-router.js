@@ -142,6 +142,14 @@
      Servizi con orari diversi (Local vs Rapid) rimangono distinti
      perché la chiave include anche departureTime|arrivalTime.
 
+   FIX 13 (_hasLoop — guard anti-loop):
+     Aggiunta funzione _hasLoop(legs) che restituisce true se un
+     qualsiasi boardCode o alightCode compare più di una volta
+     nell'insieme dei codici dei leg. Applicata come guard prima
+     di ogni journeys.push() nelle fasi 2, 2b, 3, 3b e 4.
+     Elimina journey fantasma come LO→Binno→LO→M1 dove un leg
+     ritorna alla stazione di partenza del journey.
+
    Tempi di trasferimento:
      TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban (stazione normale)
      HUB_TRANSFER_MIN        8 min  — interscambio suburban ↔ suburban (grande nodo)
@@ -746,6 +754,22 @@ function _getEquivalentCodes(code) {
     return results;
   }
 
+  /* ----------------------------------------------------------------
+   * _hasLoop(legs)   FIX 13
+   * Restituisce true se un qualsiasi boardCode o alightCode compare
+   * più di una volta nell'insieme dei codici del journey.
+   * Usato come guard prima di journeys.push() nelle fasi 2–4.
+   * ---------------------------------------------------------------- */
+  function _hasLoop(legs) {
+    const seen = new Set();
+    for (const leg of legs) {
+      if (seen.has(leg.boardCode) || seen.has(leg.alightCode)) return true;
+      seen.add(leg.boardCode);
+      seen.add(leg.alightCode);
+    }
+    return false;
+  }
+
   /* ================================================================
    * search(from, to, depTime, opts)
    * ================================================================ */
@@ -848,6 +872,7 @@ for (const line of Object.values(SUBURBAN_LINES)) {
                 if (!line2.TT[svcId2]) continue;
                 const leg2 = IZXRouter.buildLeg?.(lineId2, svcId2, izxNode, to, transferReadySec);
                 if (!leg2) continue;
+                if (_hasLoop([leg1, leg2])) continue;
                 const waitSec = leg2.boardDepSec - leg1.alightArrSec;
                 const totalKm = (leg1.km != null && leg2.km != null) ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
                 journeys.push({
@@ -889,6 +914,7 @@ for (const line of Object.values(SUBURBAN_LINES)) {
             if (!_mResult2) continue;
             const leg2 = _mResult2.legs.at(-1);
             if (!leg2) continue;
+            if (_hasLoop([leg1, leg2])) continue;
             const waitSec = leg2.boardDepSec - leg1.alightArrSec;
             const totalKm = (leg1.km != null && leg2.km != null) ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
             journeys.push({
@@ -928,6 +954,7 @@ for (const line of Object.values(SUBURBAN_LINES)) {
                 const transferReadySec = leg1.alightArrSec + CROSS_TRANSFER_SEC;
                 const leg2 = _buildLeg(line, iMid, iT, transferReadySec);
                 if (!leg2) continue;
+                if (_hasLoop([leg1, leg2])) continue;
                 const waitSec = leg2.boardDepSec - leg1.alightArrSec;
                 const totalKm = (leg1.km != null && leg2.km != null) ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
                 journeys.push({
@@ -969,6 +996,7 @@ for (const line of Object.values(SUBURBAN_LINES)) {
             const transferReadySec = leg1.alightArrSec + xferSec;
             const leg2 = _buildLeg(line, iMid, iT, transferReadySec);
             if (!leg2) continue;
+            if (_hasLoop([leg1, leg2])) continue;
             const waitSec = leg2.boardDepSec - leg1.alightArrSec;
             const totalKm = (leg1.km != null && leg2.km != null) ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
             journeys.push({
@@ -1026,6 +1054,7 @@ if (!directOnly) {
             const iT2 = iT2_candidates[0];
 
             for (const leg2 of _buildLegsAllSvcs(line2, iMid2, iT2, transferReadySec)) {
+              if (_hasLoop([leg1, leg2])) continue;
               const waitSec = leg2.boardDepSec - leg1.alightArrSec;
               const totalKm = (leg1.km != null && leg2.km != null)
                 ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
