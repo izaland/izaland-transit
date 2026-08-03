@@ -223,15 +223,17 @@ const MetroRouter = (() => {
     }
 
     /* ----------------------------------------------------------------
-     * Deduplicazione: chiave = lineId + boardCode + boardDep + alightCode.
-     * NON include svcLogical: servizi _S e _N sullo stesso tratto fisico
-     * producono lo stesso viaggio (stesso orario, stessa origine/dest.)
-     * e vanno collassati in un unico risultato.
+     * Deduplicazione: chiave = lineId + svcLogical + boardCode + boardDep + alightCode.
+     *
+     * NOTA: include svcLogical per evitare che servizi diversi (es. All-stop
+     * ed Express) vengano collassati quando per coincidenza partono alla
+     * stessa ora. Servizi con lo stesso svcLogical sullo stesso tratto fisico
+     * (es. _S e _N) producono comunque la stessa chiave e vengono deduplicati.
      * ---------------------------------------------------------------- */
     const seen   = new Set();
     const unique = journeys.filter(j => {
       const key = j.legs.map(l =>
-        `${l.lineId}:${l.boardCode}:${l.boardDep}:${l.alightCode}`
+        `${l.lineId}:${l.svcLogical}:${l.boardCode}:${l.boardDep}:${l.alightCode}`
       ).join('|');
       if (seen.has(key)) return false;
       seen.add(key); return true;
@@ -302,71 +304,65 @@ const MetroRouter = (() => {
     return line?.meta.color ?? '#888';
   }
 
-  if (typeof module !== 'undefined') {
-    module.exports = {
-      register, search, buildLeg, stationName, allStations,
-      allLines, lineColor, networkOf, allInterchanges,
-    };
-  }
+  /* ----------------------------------------------------------------
+   * buildMultiLeg(boardCode, alightCode, depSec)
+   * Come buildLeg, ma supporta cambi interni metro↔metro tramite BFS
+   * sugli interchange registrati. Restituisce { legs, totalMin } | null.
+   * Usato da SuburbanRouter per tratti metro a più linee (es. M405→M801).
+   * ---------------------------------------------------------------- */
+  function buildMultiLeg(boardCode, alightCode, depSec) {
+    const direct = buildLeg(boardCode, alightCode, depSec);
+    if (direct) return { legs: [direct], totalMin: Math.round((direct.alightArrSec - direct.boardDepSec) / 60) };
 
-   /* ----------------------------------------------------------------
- * buildMultiLeg(boardCode, alightCode, depSec)
- * Come buildLeg, ma supporta cambi interni metro↔metro tramite BFS
- * sugli interchange registrati. Restituisce { legs, totalMin } | null.
- * Usato da SuburbanRouter per tratti metro a più linee (es. M405→M801).
- * ---------------------------------------------------------------- */
-function buildMultiLeg(boardCode, alightCode, depSec) {
-  // Tenta prima un leg diretto
-  const direct = buildLeg(boardCode, alightCode, depSec);
-  if (direct) return { legs: [direct], totalMin: Math.round((direct.alightArrSec - direct.boardDepSec) / 60) };
+    const METRO_XFER_MIN = 4;
+    const visited = new Set([boardCode]);
+    const queue = [{ code: boardCode, depSec, legsAccum: [] }];
 
-  // BFS sugli interchange metro↔metro
-  const METRO_XFER_MIN = 4;
-  const visited = new Set([boardCode]);
-  // coda: { code, depSec, legsAccum }
-  const queue = [{ code: boardCode, depSec, legsAccum: [] }];
+    while (queue.length) {
+      const { code: curCode, depSec: curDep, legsAccum } = queue.shift();
+      if (legsAccum.length >= 3) continue;
 
-  while (queue.length) {
-    const { code: curCode, depSec: curDep, legsAccum } = queue.shift();
-    if (legsAccum.length >= 3) continue; // max 3 leg = 2 cambi metro
-
-    // Trova tutti i nodi metro raggiungibili da curCode
-    for (const line of _LINES()) {
-      for (const svc of line.services) {
-        if (!svc.stops.includes(curCode)) continue;
-        // Stazione di destinazione finale
-        if (svc.stops.includes(alightCode)) {
-          const legFinal = _buildLegForService(line, svc, curCode, alightCode, curDep);
-          if (legFinal) {
-            const allLegs = [...legsAccum, legFinal];
-            const totalMin = Math.round((legFinal.alightArrSec - allLegs[0].boardDepSec) / 60);
-            return { legs: allLegs, totalMin };
+      for (const line of _LINES()) {
+        for (const svc of line.services) {
+          if (!svc.stops.includes(curCode)) continue;
+          if (svc.stops.includes(alightCode)) {
+            const legFinal = _buildLegForService(line, svc, curCode, alightCode, curDep);
+            if (legFinal) {
+              const allLegs = [...legsAccum, legFinal];
+              const totalMin = Math.round((legFinal.alightArrSec - allLegs[0].boardDepSec) / 60);
+              return { legs: allLegs, totalMin };
+            }
           }
-        }
-        // Prova ogni nodo di cambio metro raggiungibile
-        for (const [xferCode, partners] of Object.entries(line.interchange)) {
-          if (!svc.stops.includes(xferCode)) continue;
-          if (visited.has(xferCode)) continue;
-          for (const p of (partners || [])) {
-            if (p.network !== 'metro') continue;
-            if (visited.has(p.code)) continue;
-            const legToXfer = _buildLegForService(line, svc, curCode, xferCode, curDep);
-            if (!legToXfer) continue;
-            visited.add(xferCode);
-            visited.add(p.code);
-            const nextDep = legToXfer.alightArrSec + (p.transferMin ?? METRO_XFER_MIN) * 60;
-            queue.push({ code: p.code, depSec: nextDep, legsAccum: [...legsAccum, legToXfer] });
+          for (const [xferCode, partners] of Object.entries(line.interchange)) {
+            if (!svc.stops.includes(xferCode)) continue;
+            if (visited.has(xferCode)) continue;
+            for (const p of (partners || [])) {
+              if (p.network !== 'metro') continue;
+              if (visited.has(p.code)) continue;
+              const legToXfer = _buildLegForService(line, svc, curCode, xferCode, curDep);
+              if (!legToXfer) continue;
+              visited.add(xferCode);
+              visited.add(p.code);
+              const nextDep = legToXfer.alightArrSec + (p.transferMin ?? METRO_XFER_MIN) * 60;
+              queue.push({ code: p.code, depSec: nextDep, legsAccum: [...legsAccum, legToXfer] });
+            }
           }
         }
       }
     }
+    return null;
   }
-  return null; // nessun percorso trovato
-}
+
+  if (typeof module !== 'undefined') {
+    module.exports = {
+      register, search, buildLeg, buildMultiLeg,
+      stationName, allStations, allLines, lineColor, networkOf, allInterchanges,
+    };
+  }
 
   return {
-  register, search, buildLeg, buildMultiLeg,   // ← aggiungi buildMultiLeg
-  stationName, allStations, allLines, lineColor, networkOf, allInterchanges,
-};
+    register, search, buildLeg, buildMultiLeg,
+    stationName, allStations, allLines, lineColor, networkOf, allInterchanges,
+  };
 
 })();
