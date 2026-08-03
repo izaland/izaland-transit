@@ -12,10 +12,20 @@
      MetroRouter.networkOf(code)                 → string  ('M2'|'M4'|…)
      MetroRouter.allInterchanges()               → { codeA, codeB, transferMin }[]
 
-   Campo opzionale nei service objects:
-     svc.offsetMin  — sfasa le partenze di N minuti rispetto al multiplo
-                       del headway. Es. offsetMin:3 con headway 15 min →
-                       treni alle :03 :18 :33 :48 invece di :00 :15 :30 :45.
+   Campi opzionali nei service objects:
+     svc.offsetMin   — sfasa le partenze di N minuti rispetto al multiplo
+                        del headway. Es. offsetMin:3 con headway 15 min →
+                        treni alle :03 :18 :33 :48 invece di :00 :15 :30 :45.
+     svc.speedKmh    — velocità commerciale del servizio in km/h. Sovrascrive
+                        meta.avgSpeedKmh. Utile per differenziare express (più
+                        veloce) da all-stop (più lento).
+
+   Calcolo tempi di percorrenza:
+     travelSec = (km / speedKmh) * 3600  +  fermate_intermedie * dwellSec
+     Questo produce tempi diversi tra express e locale anche a pari distanza,
+     perché: (1) l’express ha speedKmh più alta (meno acc/frenate),
+             (2) il locale accumula dwell su ogni fermata intermedia.
+     Aggiornare i valori km in *-data.js aggiorna automaticamente tutti i tempi.
 
    Tempi di trasferimento di default:
      METRO_TRANSFER_MIN  4 min  — metro ↔ metro
@@ -84,15 +94,8 @@ const MetroRouter = (() => {
 
   /* ----------------------------------------------------------------
    * _nextDeparture(depSec, hwSec, offsetSec)
-   *
-   * Restituisce il primo istante >= depSec in cui parte un treno,
-   * dato un headway hwSec e uno sfasamento offsetSec dal multiplo.
-   *
-   * Esempio: hwSec=900 (15 min), offsetSec=180 (3 min)
-   *   partenze: 180, 1080, 1980, …  (:03, :18, :33, :48)
    * ---------------------------------------------------------------- */
   function _nextDeparture(depSec, hwSec, offsetSec) {
-    // Normalizza depSec nel ciclo del headway rispetto all'offset
     const phase = ((depSec - offsetSec) % hwSec + hwSec) % hwSec;
     const wait  = phase === 0 ? 0 : hwSec - phase;
     return depSec + wait;
@@ -100,6 +103,13 @@ const MetroRouter = (() => {
 
   /* ----------------------------------------------------------------
    * _buildLegForService(line, svc, boardCode, alightCode, depSec)
+   *
+   * Tempo di percorrenza:
+   *   runSec   = distanza_km / speedKmh * 3600
+   *   dwellSec = fermate_intermedie * line.dwellSec
+   *   total    = runSec + dwellSec
+   *
+   * speedKmh = svc.speedKmh ?? line.avgSpeedKmh
    * ---------------------------------------------------------------- */
   function _buildLegForService(line, svc, boardCode, alightCode, depSec) {
     const stops = svc.stops;
@@ -119,23 +129,28 @@ const MetroRouter = (() => {
     if (kmF === null || kmT === null) return null;
     const km = Math.abs(kmT - kmF);
 
-    const travelSec = Math.round((km / line.avgSpeedKmh) * 3600);
-    const alightSec = alignSec + travelSec;
-
+    // Fermate intermedie (necessarie sia per dwell che per intermediateStops)
     const ordered = iF < iT
       ? stops.slice(iF, iT + 1)
       : stops.slice(iT, iF + 1).reverse();
     const between = ordered.slice(1, -1);
 
+    // Velocità commerciale: svc.speedKmh sovrascrive line.avgSpeedKmh
+    const speedKmh  = svc.speedKmh ?? line.avgSpeedKmh;
+    const runSec    = Math.round((km / speedKmh) * 3600);
+    const travelSec = runSec + between.length * line.dwellSec;
+    const alightSec = alignSec + travelSec;
+
     const intermediateStops = between.map(code => {
-      const st   = line.st[code];
-      const kmEl = Math.abs((st?.km ?? kmF) - kmF);
-      const arrSec = alignSec + Math.round((kmEl / km) * travelSec);
+      const st     = line.st[code];
+      const kmEl   = Math.abs((st?.km ?? kmF) - kmF);
+      const arrSec = alignSec + Math.round((kmEl / km) * runSec)
+                     + between.slice(0, between.indexOf(code)).length * line.dwellSec;
       return {
         code,
-        name:  st?.n ?? code,
-        arr:   _secToHM(arrSec),
-        dep:   _secToHM(arrSec + line.dwellSec),
+        name: st?.n ?? code,
+        arr:  _secToHM(arrSec),
+        dep:  _secToHM(arrSec + line.dwellSec),
       };
     });
 
@@ -226,13 +241,6 @@ const MetroRouter = (() => {
       }
     }
 
-    /* ----------------------------------------------------------------
-     * Deduplicazione: chiave = lineId + svcLogical + boardCode + boardDep
-     *   + alightCode. Include svcLogical per evitare che servizi diversi
-     *   (es. All-stop ed Express) vengano collassati se per coincidenza
-     *   partono alla stessa ora. Servizi con lo stesso svcLogical sullo
-     *   stesso tratto fisico vengono comunque deduplicati correttamente.
-     * ---------------------------------------------------------------- */
     const seen   = new Set();
     const unique = journeys.filter(j => {
       const key = j.legs.map(l =>
