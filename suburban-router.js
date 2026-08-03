@@ -975,53 +975,64 @@ for (const line of Object.values(SUBURBAN_LINES)) {
       }
     }
 
-    /* ---- 4. Percorsi Suburbano → Suburbano (cross-line) ---- */
-    if (!directOnly) {
-      const subPartnerMap = _getSuburbanPartnerMap();
-      for (const line of Object.values(SUBURBAN_LINES)) {
-        if (!line.stations.length) continue;
-        if (lineAllowed && !lineAllowed.has(line.id)) continue;
-        const iF = _idx(line, resolvedFrom);
-        if (iF === -1) continue;
-        for (const subNode of line.stations) {
-          const partners = subPartnerMap[subNode.code];
-          if (!partners || !partners.length) continue;
-          const iMid = _idx(line, subNode.code);
-          if (iMid === -1 || iMid === iF) continue;
+   /* ---- 4. Percorsi Suburbano → Suburbano (cross-line) ---- */
+if (!directOnly) {
+  const subPartnerMap = _getSuburbanPartnerMap();
+  for (const line of Object.values(SUBURBAN_LINES)) {
+    if (!line.stations.length) continue;
+    if (lineAllowed && !lineAllowed.has(line.id)) continue;
 
-          const legs1 = _buildLegsAllSvcs(line, iF, iMid, depSec);
-          if (!legs1.length) continue;
+    // Espandi resolvedFrom a tutti i codici equivalenti (come nelle fasi 1a/b/c)
+    const iF_candidates = fromCodes
+      .map(c => _idx(line, c))
+      .filter(i => i !== -1);
+    if (!iF_candidates.length) continue;
+    const iF = iF_candidates[0];
 
-          for (const leg1 of legs1) {
-            const xferSec = _subTransferSec(subNode.code, partners[0]);
-            const transferReadySec = leg1.alightArrSec + xferSec;
+    for (const subNode of line.stations) {
+      const partners = subPartnerMap[subNode.code];
+      if (!partners || !partners.length) continue;
+      const iMid = _idx(line, subNode.code);
+      if (iMid === -1 || iMid === iF) continue;
 
-            for (const partnerCode of partners) {
-              for (const line2 of Object.values(SUBURBAN_LINES)) {
-                if (line2.id === line.id) continue;
-                if (!line2.stations.length) continue;
-                const iMid2 = _idx(line2, partnerCode);
-                const iT2   = _idx(line2, resolvedTo);
-                if (iMid2 === -1 || iT2 === -1 || iMid2 === iT2) continue;
+      const legs1 = _buildLegsAllSvcs(line, iF, iMid, depSec);
+      if (!legs1.length) continue;
 
-                for (const leg2 of _buildLegsAllSvcs(line2, iMid2, iT2, transferReadySec)) {
-                  const waitSec = leg2.boardDepSec - leg1.alightArrSec;
-                  const totalKm = (leg1.km != null && leg2.km != null)
-                    ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
-                  journeys.push({
-                    legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
-                    totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
-                    totalKm, transfers: 1, transferNodes: [subNode.code],
-                    transferWaitMin: Math.round(waitSec / 60),
-                  });
-                }
-              }
+      for (const leg1 of legs1) {
+        const xferSec = _subTransferSec(subNode.code, partners[0]);
+        const transferReadySec = leg1.alightArrSec + xferSec;
+
+        for (const partnerCode of partners) {
+          for (const line2 of Object.values(SUBURBAN_LINES)) {
+            if (line2.id === line.id) continue;
+            if (!line2.stations.length) continue;
+            const iMid2 = _idx(line2, partnerCode);
+            if (iMid2 === -1) continue;
+
+            // Espandi resolvedTo a tutti i codici equivalenti sulla line2
+            const iT2_candidates = toCodes
+              .map(c => _idx(line2, c))
+              .filter(i => i !== -1 && i !== iMid2);
+            if (!iT2_candidates.length) continue;
+            const iT2 = iT2_candidates[0];
+
+            for (const leg2 of _buildLegsAllSvcs(line2, iMid2, iT2, transferReadySec)) {
+              const waitSec = leg2.boardDepSec - leg1.alightArrSec;
+              const totalKm = (leg1.km != null && leg2.km != null)
+                ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
+              journeys.push({
+                legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
+                totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+                totalKm, transfers: 1, transferNodes: [subNode.code],
+                transferWaitMin: Math.round(waitSec / 60),
+              });
             }
           }
         }
       }
     }
-
+  }
+}
     /* ---- Deduplica e sort ---- */
     const seen = new Set();
     const unique = journeys.filter(j => {
