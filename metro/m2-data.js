@@ -169,8 +169,10 @@ const M2_SVC = {
 const M2_INTERCHANGE = {
   /* M203 ↔ Shimamera (nome diverso: Shimamera Shikiniswae ≠ Shimamera) */
   M203: [
-    { code: 'M417', network: 'metro',    transferMin: 5,
+    { code: 'M417', network: 'metro',    transferMin: 9,
       note: 'M4 Shimamera — 300 m corridor' },
+    { code: 'M111', network: 'metro',    transferMin: 7,
+      note: 'M1 Shimamera — 300 m corridor' },
     /* AX Shimamera: aggiungere codice quando disponibile */
   ],
   /* M206 ↔ M401 (Heinomoji — stesso nome, banchine separate) */
@@ -197,10 +199,17 @@ const M2_INTERCHANGE = {
   M210: [
     { code: 'M406', network: 'metro', transferMin: 3,
       note: 'M4 Kushidaru Amiya — stesso nome, banchine separate' },
+    { code: 'M119', network: 'metro', transferMin: 3,
+      note: 'M1 Kushidaru Amiya — stesso nome, banchine separate' },
   ],
   /* M211 ↔ Nagida Kunbai (M18??) — stazione diversa */
   M211: [
     /* Codice M18 Nagida Kunbai da aggiungere quando disponibile */
+  ],
+     /* M226 ↔ M130 (Hintomaui — stesso nome, banchine separate) */
+  M226: [
+    { code: 'M130', network: 'metro', transferMin: 3,
+      note: 'M1 Hintomaui — stesso nome, banchine separate' },
   ],
   /* M230 ↔ M415 (Kawaei — stesso nome, banchine separate) */
   M230: [
