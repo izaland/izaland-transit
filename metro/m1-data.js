@@ -83,8 +83,8 @@ const M1_META = {
   color:       '#F77F00',      // arancione
   totalKm:     47.470,
   stations:    35,
-  avgSpeedKmh: 32,
-  dwellSec:    30,
+  avgSpeedKmh: 42,
+  dwellSec:    20,
 };
 
 /* ----------------------------------------------------------------
@@ -211,7 +211,7 @@ const M1_INTERCHANGE = {
     { code: 'SK26', network: 'suburban', transferMin: 4,
       note: 'Seishaku Line — Sainðaul Central' },
     { code: 'TS13', network: 'suburban', transferMin: 4,
-      note: 'Tandan-Senpyan — Sainðaul Central' },
+      note: 'Tandan-Senpyan — Sainðaul Central TS' },
   ],
   M119: [
     { code: 'M406', network: 'metro',    transferMin: 3,
