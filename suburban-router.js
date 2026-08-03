@@ -301,6 +301,33 @@ const SuburbanRouter = (() => {
     return _getInverseMap()[code] ?? code;
   }
 
+   /* ----------------------------------------------------------------
+ * _getEquivalentCodes(code)
+ * Restituisce tutti i codici suburbani equivalenti a `code`
+ * (incluso code stesso) tramite SUBURBAN_INTERCHANGE.
+ * Usato dalla fase 1 per tentare il percorso diretto anche quando
+ * from/to è espresso con il codice di un'altra linea sullo stesso nodo.
+ * ---------------------------------------------------------------- */
+function _getEquivalentCodes(code) {
+  const result = new Set([code]);
+  // Cerca i partner di code in SUBURBAN_INTERCHANGE
+  const partners = SUBURBAN_INTERCHANGE[code];
+  if (partners) {
+    for (const p of partners) {
+      const c = (typeof p === 'object' && p !== null) ? p.code : p;
+      if (_getSuburbanCodeSet().has(c)) result.add(c);
+    }
+  }
+  // Cerca anche simmetrico: nodi che puntano a code
+  for (const [key, vals] of Object.entries(SUBURBAN_INTERCHANGE)) {
+    for (const p of vals) {
+      const c = (typeof p === 'object' && p !== null) ? p.code : p;
+      if (c === code && _getSuburbanCodeSet().has(key)) result.add(key);
+    }
+  }
+  return [...result];
+}
+
   /* ---- utils tempo ---- */
   function _hmToSec(hm) {
     if (!hm) return 0;
@@ -725,11 +752,19 @@ const SuburbanRouter = (() => {
     const journeys = [];
 
     /* ---- 1a. Percorsi diretti (tutti i servizi) ---- */
-    for (const line of Object.values(SUBURBAN_LINES)) {
-      if (!line.stations.length) continue;
-      if (lineAllowed && !lineAllowed.has(line.id)) continue;
-      const iF = _idx(line, resolvedFrom);
-      const iT = _idx(line, resolvedTo);
+// Espande from/to a tutti i codici suburbani equivalenti (stesso nodo, linea diversa)
+// così KW10 "Kawayatsu" trova anche KS02 "Kawayatsu" come partenza diretta su KS.
+const fromCodes = _getEquivalentCodes(resolvedFrom);
+const toCodes   = _getEquivalentCodes(resolvedTo);
+
+for (const line of Object.values(SUBURBAN_LINES)) {
+  if (!line.stations.length) continue;
+  if (lineAllowed && !lineAllowed.has(line.id)) continue;
+  for (const fCode of fromCodes) {
+    for (const tCode of toCodes) {
+      if (fCode === tCode) continue;
+      const iF = _idx(line, fCode);
+      const iT = _idx(line, tCode);
       if (iF === -1 || iT === -1 || iF === iT) continue;
       for (const leg of _buildLegsAllSvcs(line, iF, iT, depSec)) {
         journeys.push({
@@ -743,30 +778,42 @@ const SuburbanRouter = (() => {
         });
       }
     }
+  }
+}
 
     /* ---- 1b. Rapid→Local intra-linea ---- */
-    for (const line of Object.values(SUBURBAN_LINES)) {
-      if (!line.stations.length) continue;
-      if (lineAllowed && !lineAllowed.has(line.id)) continue;
-      const iF = _idx(line, resolvedFrom);
-      const iT = _idx(line, resolvedTo);
+for (const line of Object.values(SUBURBAN_LINES)) {
+  if (!line.stations.length) continue;
+  if (lineAllowed && !lineAllowed.has(line.id)) continue;
+  for (const fCode of fromCodes) {
+    for (const tCode of toCodes) {
+      if (fCode === tCode) continue;
+      const iF = _idx(line, fCode);
+      const iT = _idx(line, tCode);
       if (iF === -1 || iT === -1 || iF === iT) continue;
       for (const j of _buildIntraLineTransfers(line, iF, iT, depSec)) {
         journeys.push(j);
       }
     }
+  }
+}
 
-    /* ---- 1c. Local→Rapid intra-linea (FIX 11) ---- */
-    for (const line of Object.values(SUBURBAN_LINES)) {
-      if (!line.stations.length) continue;
-      if (lineAllowed && !lineAllowed.has(line.id)) continue;
-      const iF = _idx(line, resolvedFrom);
-      const iT = _idx(line, resolvedTo);
+/* ---- 1c. Local→Rapid intra-linea (FIX 11) ---- */
+for (const line of Object.values(SUBURBAN_LINES)) {
+  if (!line.stations.length) continue;
+  if (lineAllowed && !lineAllowed.has(line.id)) continue;
+  for (const fCode of fromCodes) {
+    for (const tCode of toCodes) {
+      if (fCode === tCode) continue;
+      const iF = _idx(line, fCode);
+      const iT = _idx(line, tCode);
       if (iF === -1 || iT === -1 || iF === iT) continue;
       for (const j of _buildLocalToExpressTransfers(line, iF, iT, depSec)) {
         journeys.push(j);
       }
     }
+  }
+}
 
     /* ---- 2. Percorsi Suburbano → IZX/AX ---- */
     if (!directOnly && typeof IZXRouter !== 'undefined') {
