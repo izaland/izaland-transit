@@ -831,18 +831,57 @@ for (const line of Object.values(SUBURBAN_LINES)) {
   }
 }
 
-/* ---- 1c. Local→Rapid intra-linea (FIX 11) ---- */
-for (const line of Object.values(SUBURBAN_LINES)) {
-  if (!line.stations.length) continue;
-  if (lineAllowed && !lineAllowed.has(line.id)) continue;
-  for (const fCode of fromCodes) {
-    for (const tCode of toCodes) {
-      if (fCode === tCode) continue;
-      const iF = _idx(line, fCode);
-      const iT = _idx(line, tCode);
-      if (iF === -1 || iT === -1 || iF === iT) continue;
-      for (const j of _buildLocalToExpressTransfers(line, iF, iT, depSec)) {
-        journeys.push(j);
+/* ---- 1c. Same-line service upgrade (es. Local → Rapid sulla stessa linea) ---- */
+if (!directOnly) {
+  for (const line of Object.values(SUBURBAN_LINES)) {
+    if (!line.stations.length) continue;
+    if (lineAllowed && !lineAllowed.has(line.id)) continue;
+
+    const iF_candidates = fromCodes.map(c => _idx(line, c)).filter(i => i !== -1);
+    if (!iF_candidates.length) continue;
+    const iF = iF_candidates[0];
+
+    const iT_candidates = toCodes.map(c => _idx(line, c)).filter(i => i !== -1);
+    if (!iT_candidates.length) continue;
+    const iT = iT_candidates[0];
+
+    if (iF === iT) continue;
+    const dir = iT > iF ? 1 : -1;
+
+    // Cerca stazioni intermedie tra iF e iT
+    for (let iMid = iF + dir; iMid !== iT; iMid += dir) {
+      const midStation = line.stations[iMid];
+
+      // Costruisce leg1: qualsiasi servizio da iF a iMid
+      const legs1 = _buildLegsAllSvcs(line, iF, iMid, depSec);
+      if (!legs1.length) continue;
+
+      for (const leg1 of legs1) {
+        // Costruisce leg2: solo servizi più veloci (Rapid/Express) da iMid a iT
+        // che non fermerebbero a iF
+        const upgradeLegs = _buildLegsAllSvcs(line, iMid, iT, leg1.alightArrSec)
+          .filter(leg2 => {
+            // Scarta se il servizio del leg2 fermava già a iF
+            // (sarebbe già stato trovato come diretto nella fase 1a)
+            const svc = _getSvcById(line, leg2.serviceId);
+            return svc && _idx(svc, fromCodes) === -1; // non ferma a iF
+          });
+
+        for (const leg2 of upgradeLegs) {
+          const waitSec = leg2.boardDepSec - leg1.alightArrSec;
+          if (waitSec < 0) continue;
+          const totalKm = (leg1.km != null && leg2.km != null)
+            ? leg1.km + leg2.km : null;
+          journeys.push({
+            legs: [leg1, leg2],
+            departureTime: leg1.boardDep,
+            arrivalTime: leg2.alightArr,
+            totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+            totalKm, transfers: 1,
+            transferNodes: [midStation.code],
+            transferWaitMin: Math.round(waitSec / 60),
+          });
+        }
       }
     }
   }
