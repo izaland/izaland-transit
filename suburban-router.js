@@ -1060,12 +1060,15 @@ if (!directOnly) {
               const waitSec = leg2.boardDepSec - leg1.alightArrSec;
               const totalKm = (leg1.km != null && leg2.km != null)
                 ? leg1.km + leg2.km : (leg1.km ?? leg2.km ?? null);
-              journeys.push({
-                legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
-                totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
-                totalKm, transfers: 1, transferNodes: [subNode.code],
-                transferWaitMin: Math.round(waitSec / 60),
-              });
+             journeys.push({
+  legs: [leg1, leg2],
+  departureTime: leg1.boardDep,
+  arrivalTime:   leg2.alightArr,
+  totalMinutes:  Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+  totalKm, transfers: 1, transferNodes: [subNode.code],
+  transferWalkMin: leg1.lineId === leg2.lineId ? 0 : undefined,
+  transferWaitMin: Math.round(waitSec / 60),
+});
             }
           }
         }
