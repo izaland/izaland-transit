@@ -241,6 +241,77 @@ const MetroRouter = (() => {
       }
     }
 
+     /* ---- Intra-line Local→Express upgrade ---- */
+for (const line of _LINES()) {
+  if (lineAllowed && !lineAllowed.has(line.lineId)) continue;
+
+  // Servizi express che fermano a `to` ma NON a `from`
+  const expressSvcs = line.services.filter(svc =>
+    svc.stops.includes(to) &&
+    !svc.stops.includes(from)
+  );
+  if (!expressSvcs.length) continue;
+
+  // Servizi locali che fermano a `from`
+  const localSvcs = line.services.filter(svc =>
+    svc.stops.includes(from)
+  );
+  if (!localSvcs.length) continue;
+
+  for (const expSvc of expressSvcs) {
+    const iTo = expSvc.stops.indexOf(to);
+
+    // Cerca la prima fermata del Rapid raggiungibile da `from` (nella direzione giusta)
+    for (const localSvc of localSvcs) {
+      const iFromLocal = localSvc.stops.indexOf(from);
+
+      // Candidate: fermate dove local ferma E express ferma, nella direzione giusta
+      const candidates = expSvc.stops.filter(code => {
+        if (code === from || code === to) return false;
+        if (!localSvc.stops.includes(code)) return false;
+        const iInExp   = expSvc.stops.indexOf(code);
+        const iInLocal = localSvc.stops.indexOf(from);
+        // Stesso verso: iInExp deve essere tra from e to
+        return (iTo > expSvc.stops.indexOf(code))
+          ? expSvc.stops.indexOf(code) > (expSvc.stops.indexOf(from) ?? -Infinity)
+          : true;
+      });
+      // Ordina per vicinanza a `from` nella lista local
+      candidates.sort((a, b) => {
+        const ia = localSvc.stops.indexOf(a);
+        const ib = localSvc.stops.indexOf(b);
+        const distA = Math.abs(ia - iFromLocal);
+        const distB = Math.abs(ib - iFromLocal);
+        return distA - distB;
+      });
+
+      for (const xferCode of candidates) {
+        const leg1 = _buildLegForService(line, localSvc, from, xferCode, depSec);
+        if (!leg1) continue;
+
+        const leg2 = _buildLegForService(line, expSvc, xferCode, to, leg1.alightArrSec);
+        if (!leg2) continue;
+
+        const waitSec = leg2.boardDepSec - leg1.alightArrSec;
+        if (waitSec < 0) continue;
+
+        journeys.push({
+          legs:          [leg1, leg2],
+          departureTime: leg1.boardDep,
+          arrivalTime:   leg2.alightArr,
+          totalMinutes:  Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
+          totalKm:       leg1.km + leg2.km,
+          transfers:     1,
+          transferNodes: [xferCode],
+          transferWalkMin: 0,
+          transferWaitMin: Math.round(waitSec / 60),
+        });
+        break; // prima fermata valida trovata, passa al prossimo expSvc
+      }
+    }
+  }
+}
+
     const seen   = new Set();
     const unique = journeys.filter(j => {
       const key = j.legs.map(l =>
