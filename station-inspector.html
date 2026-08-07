@@ -28,7 +28,7 @@
     .section-title { font-size: 0.7rem; color: #666; letter-spacing: 0.1em;
                      text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 6px; }
 
-    /* ─ Badge stile pill (suburban / IZX / AX) ───────────────────── */
+    /* ─ Badge stile pill (suburban / IZX / AX) ──────────────────── */
     .line-chip {
       display: inline-block;
       padding: 4px 10px;
@@ -39,7 +39,7 @@
       font-weight: bold;
     }
 
-    /* ─ Badge stile cerchio (metro) ────────────────────────── */
+    /* ─ Badge stile cerchio (metro) ──────────────────────── */
     .line-chip-metro {
       display: inline-flex;
       align-items: center;
@@ -49,7 +49,7 @@
       border-radius: 50%;
       font-size: 0.75rem;
       margin: 3px;
-      color: #000;
+      color: #fff;
       font-weight: bold;
       flex-shrink: 0;
     }
@@ -85,33 +85,46 @@
   <div id="no-result">No station found.</div>
   <div id="results"></div>
 
-  <!-- ═══ DATA FILES ════════════════════════════════════════════════════════════ -->
+  <!-- ═══ DATA FILES ══════════════════════════════════════════════════ -->
+  <script src="metro/m1-data.js"></script>
+  <script src="metro/m2-data.js"></script>
+  <script src="metro/m3-data.js"></script>
   <script src="metro/m4-data.js"></script>
+  <script src="metro/m5-data.js"></script>
   <script src="metro/m8-data.js"></script>
   <script src="metro/m8-tt.js"></script>
+  <script src="metro/m11-data.js"></script>
   <script src="suburban-data.js"></script>
   <script src="izx-data.js"></script>
   <script src="ax-data.js"></script>
 
   <script>
-  /* ── Build unified station index ──────────────────────────────────── */
+  /* ── Build unified station index ────────────────────────────────────── */
   const ALL_STATIONS = [];   // { code, name, network, lineId, lineColor, lineName }
 
-  /* M4 */
-  if (typeof M4_ST !== 'undefined') {
-    for (const [code, st] of Object.entries(M4_ST)) {
+  /* Helper per aggiungere stazioni da un *_ST map + *_META */
+  function addMetroLine(ST, META) {
+    if (typeof ST === 'undefined' || typeof META === 'undefined') return;
+    for (const [code, st] of Object.entries(ST)) {
       ALL_STATIONS.push({ code, name: st.n, network: 'metro',
-        lineId: 'M4', lineColor: M4_META.color, lineName: M4_META.name });
+        lineId: META.id || META.code, lineColor: META.color, lineName: META.name });
     }
   }
 
-  /* M8 */
-  if (typeof M8_ST !== 'undefined') {
-    for (const [code, st] of Object.entries(M8_ST)) {
-      ALL_STATIONS.push({ code, name: st.n, network: 'metro',
-        lineId: 'M8', lineColor: M8_META.color, lineName: M8_META.name });
-    }
-  }
+  addMetroLine(typeof M1_ST !== 'undefined'  ? M1_ST  : undefined,
+               typeof M1_META !== 'undefined' ? M1_META : undefined);
+  addMetroLine(typeof M2_ST !== 'undefined'  ? M2_ST  : undefined,
+               typeof M2_META !== 'undefined' ? M2_META : undefined);
+  addMetroLine(typeof M3_ST !== 'undefined'  ? M3_ST  : undefined,
+               typeof M3_META !== 'undefined' ? M3_META : undefined);
+  addMetroLine(typeof M4_ST !== 'undefined'  ? M4_ST  : undefined,
+               typeof M4_META !== 'undefined' ? M4_META : undefined);
+  addMetroLine(typeof M5_ST !== 'undefined'  ? M5_ST  : undefined,
+               typeof M5_META !== 'undefined' ? M5_META : undefined);
+  addMetroLine(typeof M8_ST !== 'undefined'  ? M8_ST  : undefined,
+               typeof M8_META !== 'undefined' ? M8_META : undefined);
+  addMetroLine(typeof M11_ST !== 'undefined' ? M11_ST : undefined,
+               typeof M11_META !== 'undefined'? M11_META: undefined);
 
   /* Suburban */
   if (typeof SUBURBAN_LINES !== 'undefined') {
@@ -146,7 +159,7 @@
     }
   }
 
-  /* ── Helper: render badge con forma giusta per network ───────────────── */
+  /* ── Helper: render badge con forma giusta per network ───────────── */
   function lineBadge(lineId, lineColor, lineName, network) {
     if (network === 'metro') {
       return `<span class="line-chip-metro" style="background:${lineColor}">${lineId}</span>`
@@ -187,7 +200,6 @@
       div.className = 'sug-item';
       const codeList = g.codes.map(s => `${s.code} · ${s.lineId}`).join('  ');
       div.innerHTML = `${g.name} <span class="sug-code">${codeList}</span>`;
-      /* Al click usa il primo codice come anchor per inspect() */
       div.onclick = () => { qEl.value = g.codes[0].code; sugEl.style.display = 'none'; inspect(); };
       sugEl.appendChild(div);
     });
@@ -199,6 +211,18 @@
   });
 
   qEl.addEventListener('keydown', e => { if (e.key === 'Enter') inspect(); });
+
+  /* ── Raccoglie tutti gli interscambi metro definiti ────────────── */
+  const METRO_INTERCHANGE_MAP = {}; // lineId -> INTERCHANGE object
+  [
+    ['M1', typeof M1_INTERCHANGE !== 'undefined' ? M1_INTERCHANGE : null],
+    ['M2', typeof M2_INTERCHANGE !== 'undefined' ? M2_INTERCHANGE : null],
+    ['M3', typeof M3_INTERCHANGE !== 'undefined' ? M3_INTERCHANGE : null],
+    ['M4', typeof M4_INTERCHANGE !== 'undefined' ? M4_INTERCHANGE : null],
+    ['M5', typeof M5_INTERCHANGE !== 'undefined' ? M5_INTERCHANGE : null],
+    ['M8', typeof M8_INTERCHANGE !== 'undefined' ? M8_INTERCHANGE : null],
+    ['M11',typeof M11_INTERCHANGE!== 'undefined' ? M11_INTERCHANGE: null],
+  ].forEach(([id, obj]) => { if (obj) METRO_INTERCHANGE_MAP[id] = obj; });
 
   /* ── Core inspect() ────────────────────────────────────────── */
   function inspect() {
@@ -223,50 +247,8 @@
 
     const memberOf = ALL_STATIONS.filter(s => s.code === station.code);
 
-    /* Interscambi M4 */
-    const m4Interchanges = [];
-    if (typeof M4_INTERCHANGE !== 'undefined') {
-      for (const [m4code, entries] of Object.entries(M4_INTERCHANGE)) {
-        for (const entry of (Array.isArray(entries) ? entries : [entries])) {
-          const pCode = entry.code ?? entry;
-          if (pCode === station.code || m4code === station.code) {
-            m4Interchanges.push({ m4code, partnerCode: pCode,
-              network: entry.network, transferMin: entry.transferMin, note: entry.note });
-          }
-        }
-      }
-    }
-
-    /* Interscambi M8 */
-    const m8Interchanges = [];
-    if (typeof M8_INTERCHANGE !== 'undefined') {
-      for (const [m8code, entries] of Object.entries(M8_INTERCHANGE)) {
-        for (const entry of (Array.isArray(entries) ? entries : [entries])) {
-          const pCode = entry.code ?? entry;
-          if (pCode === station.code || m8code === station.code) {
-            m8Interchanges.push({ m8code, partnerCode: pCode,
-              network: entry.network, transferMin: entry.transferMin, note: entry.note });
-          }
-        }
-      }
-    }
-
-    /* Interscambi Suburban */
-    const subInterchanges = [];
-    if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
-      for (const [key, partners] of Object.entries(SUBURBAN_INTERCHANGE)) {
-        for (const p of partners) {
-          if (key === station.code || p === station.code) {
-            subInterchanges.push({ from: key, to: p });
-          }
-        }
-      }
-    }
-
     /* Status checks */
     function checkMetroReachable(code) {
-      if (typeof M4_ST !== 'undefined' && M4_ST[code]) return 'ok';
-      if (typeof M8_ST !== 'undefined' && M8_ST[code]) return 'ok';
       if (ALL_STATIONS.find(s => s.code === code && s.network === 'metro')) return 'ok';
       return 'missing';
     }
@@ -287,6 +269,32 @@
       for (const line of Object.values(AX_LINES))
         if (line.ST && line.ST[code]) return 'ok';
       return 'missing';
+    }
+
+    /* Interscambi da tutte le linee metro */
+    const metroInterchanges = []; // { lineId, metroCode, partnerCode, network, transferMin, note }
+    for (const [lineId, imap] of Object.entries(METRO_INTERCHANGE_MAP)) {
+      for (const [mcode, entries] of Object.entries(imap)) {
+        for (const entry of (Array.isArray(entries) ? entries : [entries])) {
+          const pCode = entry.code ?? entry;
+          if (pCode === station.code || mcode === station.code) {
+            metroInterchanges.push({ lineId, metroCode: mcode, partnerCode: pCode,
+              network: entry.network, transferMin: entry.transferMin, note: entry.note });
+          }
+        }
+      }
+    }
+
+    /* Interscambi Suburban */
+    const subInterchanges = [];
+    if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
+      for (const [key, partners] of Object.entries(SUBURBAN_INTERCHANGE)) {
+        for (const p of partners) {
+          if (key === station.code || p === station.code) {
+            subInterchanges.push({ from: key, to: p });
+          }
+        }
+      }
     }
 
     /* Helper: render sezione interscambi generica */
@@ -337,17 +345,10 @@
       </div>`;
 
     html += renderInterchangeSection(
-      'M4 Interchanges', m4Interchanges,
-      ix => ix.m4code === station.code ? ix.partnerCode : ix.m4code,
-      ix => ix.m4code === station.code ? ix.network : 'metro',
-      ix => ix.note,
-      ix => ix.transferMin
-    );
-
-    html += renderInterchangeSection(
-      'M8 Interchanges', m8Interchanges,
-      ix => ix.m8code === station.code ? ix.partnerCode : ix.m8code,
-      ix => ix.m8code === station.code ? ix.network : 'metro',
+      'Metro Interchanges',
+      metroInterchanges,
+      ix => ix.metroCode === station.code ? ix.partnerCode : ix.metroCode,
+      ix => ix.metroCode === station.code ? ix.network : 'metro',
       ix => ix.note,
       ix => ix.transferMin
     );
@@ -383,7 +384,7 @@
       html += `</div>`;
     }
 
-    if (!m4Interchanges.length && !m8Interchanges.length && !subInterchanges.length) {
+    if (!metroInterchanges.length && !subInterchanges.length) {
       html += `<div class="section"><div class="section-title">Interchanges</div>
         <span style="color:#555;font-size:0.85rem">No interchange defined for this station.</span></div>`;
     }
