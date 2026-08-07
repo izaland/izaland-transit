@@ -187,13 +187,22 @@ const M2_INTERCHANGE = {
   ],
   /* M208 ↔ Sainðaul Central — 500 m underground corridor */
   M208: [
-    { code: 'K01',  network: 'izx',      transferMin: 8,
+    { code: 'K01',  network: 'izx',      transferMin: 10,
       note: 'IZX Keishin — Sainðaul Central, 500 m underground corridor' },
+    { code: 'M8', network: 'metro', transferMin: 2,
+      note: 'M815 Egunsen Botanical Garden — stesso nome, banchine separate' },
     /* Altri codici Sainðaul Central da aggiungere */
   ],
   /* M209 ↔ Masuda Agarai — 400 m corridor */
   M209: [
-    /* Codice Masuda Agarai da aggiungere quando disponibile */
+    { code: 'M118', network: 'metro', transferMin: 9,
+      note: 'M1 Masuda Agarai — stazione diversa, 400 m transfer' },
+    { code: 'M325', network: 'metro', transferMin: 9,
+      note: 'M3 Masuda Agarai — stazione diversa, 400 m transfer' },
+    { code: 'M1422', network: 'metro', transferMin: 9,
+      note: 'M14 Masuda Agarai — stazione diversa, 400 m transfer' },
+    { code: 'M911', network: 'metro', transferMin: 12,
+      note: 'M9 Masuda Agarai — stazione diversa, 500 m transfer' },
   ],
   /* M210 ↔ M406 (Kushidaru Amiya — stesso nome, banchine separate) */
   M210: [
@@ -206,6 +215,10 @@ const M2_INTERCHANGE = {
   M211: [
     /* Codice M18 Nagida Kunbai da aggiungere quando disponibile */
   ],
+   M214: [
+    { code: 'LL11', network: 'suburban', transferMin: 4,
+      note: 'Loop Line Rakkashoni — stesso nome, banchine separate' },
+    ],
      /* M226 ↔ M130 (Hintomaui — stesso nome, banchine separate) */
   M226: [
     { code: 'M130', network: 'metro', transferMin: 3,
