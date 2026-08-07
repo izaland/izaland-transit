@@ -23,6 +23,8 @@
     #results { display: none; }
     .station-header { margin-bottom: 20px; }
     .station-name { font-size: 1.4rem; color: #fff; }
+    .station-kanji { font-size: 1.1rem; color: #888; margin-top: 2px;
+                     font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; }
     .station-code { font-size: 0.85rem; color: #666; margin-top: 4px; }
     .section { margin-bottom: 20px; }
     .section-title { font-size: 0.7rem; color: #666; letter-spacing: 0.1em;
@@ -59,6 +61,8 @@
     .irow-top { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .irow-code { font-size: 1rem; color: #eee; }
     .irow-name { font-size: 0.85rem; color: #aaa; }
+    .irow-kanji { font-size: 0.8rem; color: #666;
+                  font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; }
     .irow-network { font-size: 0.7rem; color: #666; text-transform: uppercase;
                     background: #222; padding: 2px 6px; border-radius: 2px; }
     .irow-meta { font-size: 0.75rem; color: #555; margin-top: 4px; }
@@ -100,13 +104,12 @@
 
   <script>
   /* ── Build unified station index ────────────────────────────────────── */
-  const ALL_STATIONS = [];   // { code, name, network, lineId, lineColor, lineName }
+  const ALL_STATIONS = [];   // { code, name, kanji, network, lineId, lineColor, lineName }
 
-  /* Helper per aggiungere stazioni da un *_ST map + *_META */
   function addMetroLine(ST, META) {
     if (typeof ST === 'undefined' || typeof META === 'undefined') return;
     for (const [code, st] of Object.entries(ST)) {
-      ALL_STATIONS.push({ code, name: st.n, network: 'metro',
+      ALL_STATIONS.push({ code, name: st.n, kanji: st.k || '', network: 'metro',
         lineId: META.id || META.code, lineColor: META.color, lineName: META.name });
     }
   }
@@ -131,8 +134,8 @@
     for (const line of Object.values(SUBURBAN_LINES)) {
       for (const st of line.stations) {
         if (ALL_STATIONS.find(s => s.code === st.code)) continue;
-        ALL_STATIONS.push({ code: st.code, name: st.name, network: 'suburban',
-          lineId: line.id, lineColor: line.color, lineName: line.name });
+        ALL_STATIONS.push({ code: st.code, name: st.name, kanji: st.k || st.kanji || '',
+          network: 'suburban', lineId: line.id, lineColor: line.color, lineName: line.name });
       }
     }
   }
@@ -142,8 +145,8 @@
     for (const [lineId, line] of Object.entries(IZX_LINES)) {
       for (const [code, st] of Object.entries(line.ST || {})) {
         if (ALL_STATIONS.find(s => s.code === code)) continue;
-        ALL_STATIONS.push({ code, name: st.n || code, network: 'izx',
-          lineId, lineColor: line.META?.color || '#888', lineName: line.META?.name || lineId });
+        ALL_STATIONS.push({ code, name: st.n || code, kanji: st.k || '',
+          network: 'izx', lineId, lineColor: line.META?.color || '#888', lineName: line.META?.name || lineId });
       }
     }
   }
@@ -153,10 +156,15 @@
     for (const [lineId, line] of Object.entries(AX_LINES)) {
       for (const [code, st] of Object.entries(line.ST || {})) {
         if (ALL_STATIONS.find(s => s.code === code)) continue;
-        ALL_STATIONS.push({ code, name: st.n || code, network: 'ax',
-          lineId, lineColor: line.META?.color || '#888', lineName: line.META?.name || lineId });
+        ALL_STATIONS.push({ code, name: st.n || code, kanji: st.k || '',
+          network: 'ax', lineId, lineColor: line.META?.color || '#888', lineName: line.META?.name || lineId });
       }
     }
+  }
+
+  /* ── Helper: kanji inline ────────────────────────────────────── */
+  function kanjiSpan(k, cls = 'irow-kanji') {
+    return k ? ` <span class="${cls}">${k}</span>` : '';
   }
 
   /* ── Helper: render badge con forma giusta per network ───────────── */
@@ -179,10 +187,11 @@
     if (q.length < 2) { sugEl.style.display = 'none'; return; }
 
     const rawHits = ALL_STATIONS.filter(s =>
-      s.code.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)
+      s.code.toLowerCase().includes(q) ||
+      s.name.toLowerCase().includes(q) ||
+      (s.kanji && s.kanji.includes(q))
     );
 
-    /* Raggruppa per nome (case-insensitive): una riga per stazione fisica */
     const grouped = [];
     const seenNames = new Set();
     for (const s of rawHits) {
@@ -190,7 +199,7 @@
       if (seenNames.has(key)) continue;
       seenNames.add(key);
       const peers = rawHits.filter(x => x.name.toLowerCase() === key);
-      grouped.push({ name: s.name, codes: peers });
+      grouped.push({ name: s.name, kanji: s.kanji, codes: peers });
     }
 
     if (!grouped.length) { sugEl.style.display = 'none'; return; }
@@ -199,7 +208,8 @@
       const div = document.createElement('div');
       div.className = 'sug-item';
       const codeList = g.codes.map(s => `${s.code} · ${s.lineId}`).join('  ');
-      div.innerHTML = `${g.name} <span class="sug-code">${codeList}</span>`;
+      const kanjiPart = g.kanji ? ` <span style="color:#666;font-family:sans-serif">${g.kanji}</span>` : '';
+      div.innerHTML = `${g.name}${kanjiPart} <span class="sug-code">${codeList}</span>`;
       div.onclick = () => { qEl.value = g.codes[0].code; sugEl.style.display = 'none'; inspect(); };
       sugEl.appendChild(div);
     });
@@ -213,15 +223,15 @@
   qEl.addEventListener('keydown', e => { if (e.key === 'Enter') inspect(); });
 
   /* ── Raccoglie tutti gli interscambi metro definiti ────────────── */
-  const METRO_INTERCHANGE_MAP = {}; // lineId -> INTERCHANGE object
+  const METRO_INTERCHANGE_MAP = {};
   [
-    ['M1', typeof M1_INTERCHANGE !== 'undefined' ? M1_INTERCHANGE : null],
-    ['M2', typeof M2_INTERCHANGE !== 'undefined' ? M2_INTERCHANGE : null],
-    ['M3', typeof M3_INTERCHANGE !== 'undefined' ? M3_INTERCHANGE : null],
-    ['M4', typeof M4_INTERCHANGE !== 'undefined' ? M4_INTERCHANGE : null],
-    ['M5', typeof M5_INTERCHANGE !== 'undefined' ? M5_INTERCHANGE : null],
-    ['M8', typeof M8_INTERCHANGE !== 'undefined' ? M8_INTERCHANGE : null],
-    ['M11',typeof M11_INTERCHANGE!== 'undefined' ? M11_INTERCHANGE: null],
+    ['M1',  typeof M1_INTERCHANGE  !== 'undefined' ? M1_INTERCHANGE  : null],
+    ['M2',  typeof M2_INTERCHANGE  !== 'undefined' ? M2_INTERCHANGE  : null],
+    ['M3',  typeof M3_INTERCHANGE  !== 'undefined' ? M3_INTERCHANGE  : null],
+    ['M4',  typeof M4_INTERCHANGE  !== 'undefined' ? M4_INTERCHANGE  : null],
+    ['M5',  typeof M5_INTERCHANGE  !== 'undefined' ? M5_INTERCHANGE  : null],
+    ['M8',  typeof M8_INTERCHANGE  !== 'undefined' ? M8_INTERCHANGE  : null],
+    ['M11', typeof M11_INTERCHANGE !== 'undefined' ? M11_INTERCHANGE : null],
   ].forEach(([id, obj]) => { if (obj) METRO_INTERCHANGE_MAP[id] = obj; });
 
   /* ── Core inspect() ────────────────────────────────────────── */
@@ -229,13 +239,15 @@
     sugEl.style.display = 'none';
     const raw = qEl.value.trim();
     const q   = raw.toLowerCase();
-    const resultsEl  = document.getElementById('results');
-    const noResult   = document.getElementById('no-result');
+    const resultsEl = document.getElementById('results');
+    const noResult  = document.getElementById('no-result');
 
     const station = ALL_STATIONS.find(s =>
-      s.code.toLowerCase() === q || s.name.toLowerCase() === q
+      s.code.toLowerCase() === q || s.name.toLowerCase() === q ||
+      (s.kanji && s.kanji === raw)
     ) || ALL_STATIONS.find(s =>
-      s.code.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)
+      s.code.toLowerCase().includes(q) || s.name.toLowerCase().includes(q) ||
+      (s.kanji && s.kanji.includes(q))
     );
 
     if (!station) {
@@ -249,8 +261,7 @@
 
     /* Status checks */
     function checkMetroReachable(code) {
-      if (ALL_STATIONS.find(s => s.code === code && s.network === 'metro')) return 'ok';
-      return 'missing';
+      return ALL_STATIONS.find(s => s.code === code && s.network === 'metro') ? 'ok' : 'missing';
     }
     function checkSubReachable(code) {
       if (typeof SUBURBAN_LINES === 'undefined') return 'no-data';
@@ -272,7 +283,7 @@
     }
 
     /* Interscambi da tutte le linee metro */
-    const metroInterchanges = []; // { lineId, metroCode, partnerCode, network, transferMin, note }
+    const metroInterchanges = [];
     for (const [lineId, imap] of Object.entries(METRO_INTERCHANGE_MAP)) {
       for (const [mcode, entries] of Object.entries(imap)) {
         for (const entry of (Array.isArray(entries) ? entries : [entries])) {
@@ -290,9 +301,8 @@
     if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
       for (const [key, partners] of Object.entries(SUBURBAN_INTERCHANGE)) {
         for (const p of partners) {
-          if (key === station.code || p === station.code) {
+          if (key === station.code || p === station.code)
             subInterchanges.push({ from: key, to: p });
-          }
         }
       }
     }
@@ -319,6 +329,7 @@
               ${st2 ? lineBadge(st2.lineId, st2.lineColor, '', st2.network) : ''}
               <span class="irow-code">${otherCode}</span>
               <span class="irow-name">${st2?.name || '?'}</span>
+              ${st2?.kanji ? kanjiSpan(st2.kanji) : ''}
               <span class="irow-network">${otherNet}</span>
             </div>
             <div class="irow-meta">${getNote(ix) || ''} · ${getTransferMin(ix) ?? '?'} min walk</div>
@@ -331,10 +342,11 @@
       return html + `</div>`;
     }
 
-    /* Render */
+    /* Render header */
     let html = `
       <div class="station-header">
         <div class="station-name">${station.name}</div>
+        ${station.kanji ? `<div class="station-kanji">${station.kanji}</div>` : ''}
         <div class="station-code">${station.code}</div>
       </div>
       <div class="section">
@@ -373,6 +385,7 @@
               ${st2 ? lineBadge(st2.lineId, st2.lineColor, '', st2.network) : ''}
               <span class="irow-code">${otherCode}</span>
               <span class="irow-name">${st2?.name || '?'}</span>
+              ${st2?.kanji ? kanjiSpan(st2.kanji) : ''}
               <span class="irow-network">${net2}</span>
             </div>
             <div class="status-row">
