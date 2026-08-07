@@ -208,6 +208,16 @@ const M1_INTERCHANGE = {
     { code: 'TS13', network: 'suburban', transferMin: 4,
       note: 'Tandan-Senpyan — Sainðaul Central TS' },
   ],
+  M118: [
+    { code: 'M209', network: 'metro',    transferMin: 9,
+      note: 'M2 Masuda Hibaru — corridoio sotterraneo' },
+    { code: 'M325', network: 'metro',    transferMin: 2,
+      note: 'M3 Masuda Agarai — corridoio sotterraneo' },
+    { code: 'M1422', network: 'metro',    transferMin: 2,
+      note: 'M14 Masuda Agarai — corridoio sotterraneo' },
+    { code: 'M911', network: 'metro',    transferMin: 6,
+      note: 'M9 Masuda Agarai — corridoio sotterraneo' },
+  ],
   M119: [
     { code: 'M406', network: 'metro',    transferMin: 3,
       note: 'M4 Kushidaru Amiya — corridoio sotterraneo' },
