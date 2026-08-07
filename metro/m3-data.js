@@ -96,7 +96,7 @@ const M3_META = {
   code:        'M3',
   name:        'Line 3',
   nameJa:      '',
-  color:       '#7B2D8B',
+  color:       '#009E4F',
   totalKm:     43.03,
   stations:    34,
   avgSpeedKmh: 35,
