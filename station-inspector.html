@@ -28,20 +28,20 @@
     .station-code { font-size: 0.85rem; color: #666; margin-top: 4px; }
     .section { margin-bottom: 20px; }
     .section-title { font-size: 0.7rem; color: #666; letter-spacing: 0.1em;
-                     text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 6px; }
+                     text-transform: uppercase; margin-bottom: 10px;
+                     border-bottom: 1px solid #222; padding-bottom: 6px; }
 
-    /* ─ Badge stile pill (suburban / IZX / AX) ──────────────────── */
+    /* ─ Badge pill (suburban / IZX / AX) — colore testo via JS */
     .line-chip {
       display: inline-block;
       padding: 4px 10px;
       border-radius: 4px;
       font-size: 0.8rem;
       margin: 3px;
-      color: #000;
       font-weight: bold;
     }
 
-    /* ─ Badge stile cerchio (metro) ──────────────────────── */
+    /* ─ Badge cerchio (metro) — colore testo via JS */
     .line-chip-metro {
       display: inline-flex;
       align-items: center;
@@ -51,7 +51,6 @@
       border-radius: 50%;
       font-size: 0.75rem;
       margin: 3px;
-      color: #fff;
       font-weight: bold;
       flex-shrink: 0;
     }
@@ -66,15 +65,15 @@
     .irow-network { font-size: 0.7rem; color: #666; text-transform: uppercase;
                     background: #222; padding: 2px 6px; border-radius: 2px; }
     .irow-meta { font-size: 0.75rem; color: #555; margin-top: 4px; }
-    .ok { color: #4caf50; }
+    .ok   { color: #4caf50; }
     .warn { color: #ff9800; }
-    .err { color: #f44336; }
+    .err  { color: #f44336; }
     .status-row { display: flex; align-items: center; gap: 8px; margin-top: 6px;
                   font-size: 0.78rem; }
     .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-    .dot-ok { background: #4caf50; }
+    .dot-ok   { background: #4caf50; }
     .dot-warn { background: #ff9800; }
-    .dot-err { background: #f44336; }
+    .dot-err  { background: #f44336; }
     #no-result { color: #666; font-size: 0.9rem; display: none; }
   </style>
 </head>
@@ -103,8 +102,26 @@
   <script src="ax-data.js"></script>
 
   <script>
+  /* ── WCAG relative luminance → auto contrast (#000 or #fff) ────────── */
+  function hexToLinear(c) {
+    const v = parseInt(c, 16) / 255;
+    return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  }
+  function luminance(hex) {
+    hex = hex.replace(/^#/, '');
+    if (hex.length === 3) hex = hex.split('').map(x => x + x).join('');
+    const r = hexToLinear(hex.slice(0, 2));
+    const g = hexToLinear(hex.slice(2, 4));
+    const b = hexToLinear(hex.slice(4, 6));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+  function contrastColor(hex) {
+    // soglia 0.35: sopra → testo nero, sotto → testo bianco
+    return luminance(hex || '#888') > 0.35 ? '#000' : '#fff';
+  }
+
   /* ── Build unified station index ────────────────────────────────────── */
-  const ALL_STATIONS = [];   // { code, name, kanji, network, lineId, lineColor, lineName }
+  const ALL_STATIONS = [];
 
   function addMetroLine(ST, META) {
     if (typeof ST === 'undefined' || typeof META === 'undefined') return;
@@ -114,20 +131,20 @@
     }
   }
 
-  addMetroLine(typeof M1_ST !== 'undefined'  ? M1_ST  : undefined,
-               typeof M1_META !== 'undefined' ? M1_META : undefined);
-  addMetroLine(typeof M2_ST !== 'undefined'  ? M2_ST  : undefined,
-               typeof M2_META !== 'undefined' ? M2_META : undefined);
-  addMetroLine(typeof M3_ST !== 'undefined'  ? M3_ST  : undefined,
-               typeof M3_META !== 'undefined' ? M3_META : undefined);
-  addMetroLine(typeof M4_ST !== 'undefined'  ? M4_ST  : undefined,
-               typeof M4_META !== 'undefined' ? M4_META : undefined);
-  addMetroLine(typeof M5_ST !== 'undefined'  ? M5_ST  : undefined,
-               typeof M5_META !== 'undefined' ? M5_META : undefined);
-  addMetroLine(typeof M8_ST !== 'undefined'  ? M8_ST  : undefined,
-               typeof M8_META !== 'undefined' ? M8_META : undefined);
+  addMetroLine(typeof M1_ST  !== 'undefined' ? M1_ST  : undefined,
+               typeof M1_META  !== 'undefined' ? M1_META  : undefined);
+  addMetroLine(typeof M2_ST  !== 'undefined' ? M2_ST  : undefined,
+               typeof M2_META  !== 'undefined' ? M2_META  : undefined);
+  addMetroLine(typeof M3_ST  !== 'undefined' ? M3_ST  : undefined,
+               typeof M3_META  !== 'undefined' ? M3_META  : undefined);
+  addMetroLine(typeof M4_ST  !== 'undefined' ? M4_ST  : undefined,
+               typeof M4_META  !== 'undefined' ? M4_META  : undefined);
+  addMetroLine(typeof M5_ST  !== 'undefined' ? M5_ST  : undefined,
+               typeof M5_META  !== 'undefined' ? M5_META  : undefined);
+  addMetroLine(typeof M8_ST  !== 'undefined' ? M8_ST  : undefined,
+               typeof M8_META  !== 'undefined' ? M8_META  : undefined);
   addMetroLine(typeof M11_ST !== 'undefined' ? M11_ST : undefined,
-               typeof M11_META !== 'undefined'? M11_META: undefined);
+               typeof M11_META !== 'undefined' ? M11_META : undefined);
 
   /* Suburban */
   if (typeof SUBURBAN_LINES !== 'undefined') {
@@ -162,18 +179,20 @@
     }
   }
 
-  /* ── Helper: kanji inline ────────────────────────────────────── */
+  /* ── Kanji helper ──────────────────────────────────────────── */
   function kanjiSpan(k, cls = 'irow-kanji') {
     return k ? ` <span class="${cls}">${k}</span>` : '';
   }
 
-  /* ── Helper: render badge con forma giusta per network ───────────── */
+  /* ── Badge con colore testo automatico ────────────────────────── */
   function lineBadge(lineId, lineColor, lineName, network) {
+    const col = lineColor || '#888';
+    const txt = contrastColor(col);
     if (network === 'metro') {
-      return `<span class="line-chip-metro" style="background:${lineColor}">${lineId}</span>`
+      return `<span class="line-chip-metro" style="background:${col};color:${txt}">${lineId}</span>`
            + `<span style="font-size:0.8rem;color:#888;margin-right:12px">${lineName}</span>`;
     }
-    return `<span class="line-chip" style="background:${lineColor}">${lineId}</span>`
+    return `<span class="line-chip" style="background:${col};color:${txt}">${lineId}</span>`
          + `<span style="font-size:0.8rem;color:#888;margin-right:12px">${lineName}</span>`;
   }
 
@@ -208,7 +227,8 @@
       const div = document.createElement('div');
       div.className = 'sug-item';
       const codeList = g.codes.map(s => `${s.code} · ${s.lineId}`).join('  ');
-      const kanjiPart = g.kanji ? ` <span style="color:#666;font-family:sans-serif">${g.kanji}</span>` : '';
+      const kanjiPart = g.kanji
+        ? ` <span style="color:#666;font-family:sans-serif">${g.kanji}</span>` : '';
       div.innerHTML = `${g.name}${kanjiPart} <span class="sug-code">${codeList}</span>`;
       div.onclick = () => { qEl.value = g.codes[0].code; sugEl.style.display = 'none'; inspect(); };
       sugEl.appendChild(div);
@@ -219,10 +239,9 @@
   document.addEventListener('click', e => {
     if (!sugEl.contains(e.target) && e.target !== qEl) sugEl.style.display = 'none';
   });
-
   qEl.addEventListener('keydown', e => { if (e.key === 'Enter') inspect(); });
 
-  /* ── Raccoglie tutti gli interscambi metro definiti ────────────── */
+  /* ── Interchange map ──────────────────────────────────────────── */
   const METRO_INTERCHANGE_MAP = {};
   [
     ['M1',  typeof M1_INTERCHANGE  !== 'undefined' ? M1_INTERCHANGE  : null],
@@ -259,7 +278,6 @@
 
     const memberOf = ALL_STATIONS.filter(s => s.code === station.code);
 
-    /* Status checks */
     function checkMetroReachable(code) {
       return ALL_STATIONS.find(s => s.code === code && s.network === 'metro') ? 'ok' : 'missing';
     }
@@ -282,7 +300,7 @@
       return 'missing';
     }
 
-    /* Interscambi da tutte le linee metro */
+    /* Interscambi metro */
     const metroInterchanges = [];
     for (const [lineId, imap] of Object.entries(METRO_INTERCHANGE_MAP)) {
       for (const [mcode, entries] of Object.entries(imap)) {
@@ -296,7 +314,7 @@
       }
     }
 
-    /* Interscambi Suburban */
+    /* Interscambi suburban */
     const subInterchanges = [];
     if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
       for (const [key, partners] of Object.entries(SUBURBAN_INTERCHANGE)) {
@@ -307,7 +325,6 @@
       }
     }
 
-    /* Helper: render sezione interscambi generica */
     function renderInterchangeSection(title, items, getOtherCode, getNetwork, getNote, getTransferMin) {
       if (!items.length) return '';
       let html = `<div class="section"><div class="section-title">${title}</div>`;
@@ -342,7 +359,6 @@
       return html + `</div>`;
     }
 
-    /* Render header */
     let html = `
       <div class="station-header">
         <div class="station-name">${station.name}</div>
@@ -357,15 +373,12 @@
       </div>`;
 
     html += renderInterchangeSection(
-      'Metro Interchanges',
-      metroInterchanges,
+      'Metro Interchanges', metroInterchanges,
       ix => ix.metroCode === station.code ? ix.partnerCode : ix.metroCode,
-      ix => ix.metroCode === station.code ? ix.network : 'metro',
-      ix => ix.note,
-      ix => ix.transferMin
+      ix => ix.metroCode === station.code ? ix.network     : 'metro',
+      ix => ix.note, ix => ix.transferMin
     );
 
-    /* Suburban interchanges */
     if (subInterchanges.length) {
       html += `<div class="section"><div class="section-title">Suburban Interchanges</div>`;
       subInterchanges.forEach(ix => {
