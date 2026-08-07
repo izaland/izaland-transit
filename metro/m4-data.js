@@ -180,6 +180,10 @@ const M4_INTERCHANGE = {
     { code: 'M207', network: 'metro', transferMin: 3,
       note: 'M2 Ogiwata — stesso nome, banchine separate' },
   ],
+  M403: [
+    { code: 'M323', network: 'metro', transferMin: 3,
+      note: 'M3 Ekinðuka — stesso nome, banchine separate' },
+  ],
   M405: [
     { code: 'KD30', network: 'suburban', transferMin: 5,
       note: 'Kidai Line — Anagusa Mukai, uscita condivisa' },
