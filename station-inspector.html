@@ -94,6 +94,7 @@
   <script src="metro/m3-data.js"></script>
   <script src="metro/m4-data.js"></script>
   <script src="metro/m5-data.js"></script>
+  <script src="metro/m6-data.js"></script>
   <script src="metro/m8-data.js"></script>
   <script src="metro/m8-tt.js"></script>
   <script src="metro/m11-data.js"></script>
@@ -141,6 +142,8 @@
                typeof M4_META  !== 'undefined' ? M4_META  : undefined);
   addMetroLine(typeof M5_ST  !== 'undefined' ? M5_ST  : undefined,
                typeof M5_META  !== 'undefined' ? M5_META  : undefined);
+  addMetroLine(typeof M6_ST  !== 'undefined' ? M6_ST  : undefined,
+               typeof M6_META  !== 'undefined' ? M6_META  : undefined);
   addMetroLine(typeof M8_ST  !== 'undefined' ? M8_ST  : undefined,
                typeof M8_META  !== 'undefined' ? M8_META  : undefined);
   addMetroLine(typeof M11_ST !== 'undefined' ? M11_ST : undefined,
@@ -249,6 +252,7 @@
     ['M3',  typeof M3_INTERCHANGE  !== 'undefined' ? M3_INTERCHANGE  : null],
     ['M4',  typeof M4_INTERCHANGE  !== 'undefined' ? M4_INTERCHANGE  : null],
     ['M5',  typeof M5_INTERCHANGE  !== 'undefined' ? M5_INTERCHANGE  : null],
+    ['M6',  typeof M6_INTERCHANGE  !== 'undefined' ? M6_INTERCHANGE  : null],
     ['M8',  typeof M8_INTERCHANGE  !== 'undefined' ? M8_INTERCHANGE  : null],
     ['M11', typeof M11_INTERCHANGE !== 'undefined' ? M11_INTERCHANGE : null],
   ].forEach(([id, obj]) => { if (obj) METRO_INTERCHANGE_MAP[id] = obj; });
