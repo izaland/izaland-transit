@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Other Rail — Wataiga Monorail &amp; More · Izaland Transit</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-body: 'Satoshi', 'Inter', sans-serif;
+      --font-display: 'Cabinet Grotesk', 'Satoshi', sans-serif;
+      --text-xs:   clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm:   clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg:   clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl:   clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl:  clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+      --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem;
+      --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem; --space-16: 4rem;
+      --radius-sm: 0.375rem; --radius-md: 0.5rem;
+      --radius-lg: 0.75rem; --radius-xl: 1rem;
+      --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    [data-theme="dark"] {
+      --bg: #0f1117; --surface: #161b27; --surface-2: #1c2235;
+      --border: #2a3147; --text: #e2e8f0; --text-muted: #94a3b8; --text-faint: #4a5568;
+      --accent: #3b82f6; --accent-hover: #2563eb; --accent-glow: rgba(59,130,246,0.15);
+      --izx-red: #ef4444; --izx-gold: #f59e0b; --metro-teal: #14b8a6;
+      --wi-color: #838c67; --wi-glow: rgba(131,140,103,0.15);
+    }
+    [data-theme="light"] {
+      --bg: #f8fafc; --surface: #ffffff; --surface-2: #f1f5f9;
+      --border: #e2e8f0; --text: #1e293b; --text-muted: #64748b; --text-faint: #cbd5e1;
+      --accent: #2563eb; --accent-hover: #1d4ed8; --accent-glow: rgba(37,99,235,0.1);
+      --izx-red: #dc2626; --izx-gold: #d97706; --metro-teal: #0d9488;
+      --wi-color: #838c67; --wi-glow: rgba(131,140,103,0.12);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;scroll-padding-top:5rem;}
+    body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--text);background:var(--bg);line-height:1.6;}
+    img,video,canvas{display:block;max-width:100%;height:auto;}
+
+    /* NAV */
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-8);background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
+    .nav-logo{display:flex;align-items:center;gap:var(--space-3);text-decoration:none;color:var(--text);}
+    .nav-logo img{height:40px;width:auto;display:block;}
+    .nav-logo img.logo-dark{display:block;}
+    .nav-logo img.logo-light{display:none;}
+    [data-theme="light"] .nav-logo img.logo-dark{display:none;}
+    [data-theme="light"] .nav-logo img.logo-light{display:block;}
+    .nav-logo-text{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;letter-spacing:-0.02em;}
+    .nav-logo-sub{font-size:var(--text-xs);color:var(--text-muted);}
+    .nav-links{display:flex;gap:var(--space-6);align-items:center;}
+    .nav-links>a{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;font-weight:500;transition:color var(--transition);}
+    .nav-links a:hover{color:var(--text);}
+    .nav-links a.active{color:var(--accent);}
+    .theme-btn{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:var(--radius-md);padding:var(--space-2);cursor:pointer;display:flex;transition:color var(--transition),border-color var(--transition);}
+    .theme-btn:hover{color:var(--text);border-color:var(--text-muted);}
+    .nav-item{position:relative;}
+    .nav-item>button{background:none;border:none;font-size:var(--text-sm);color:var(--text-muted);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0;transition:color var(--transition);}
+    .nav-item>button:hover{color:var(--text);}
+    .nav-item.active>button{color:var(--accent);}
+    .nav-item>button svg{transition:transform var(--transition);}
+    .nav-item.open>button svg{transform:rotate(180deg);}
+    .dropdown{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-4px);min-width:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-2);box-shadow:0 8px 24px oklch(0 0 0 / 0.18);opacity:0;pointer-events:none;transition:opacity var(--transition),transform var(--transition);}
+    .nav-item.open .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+    .dropdown a{display:block;padding:var(--space-2) var(--space-3);font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;border-radius:var(--radius-md);font-weight:500;transition:background var(--transition),color var(--transition);white-space:nowrap;}
+    .dropdown a:hover{background:var(--surface-2);color:var(--text);}
+    .dropdown a.active{color:var(--accent);}
+    .dropdown-label{display:block;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);padding:var(--space-2) var(--space-3) var(--space-1);}
+
+    /* BREADCRUMB */
+    .breadcrumb{max-width:1200px;margin:0 auto;padding:var(--space-4) var(--space-8) 0;display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);color:var(--text-faint);}
+    .breadcrumb a{color:var(--text-muted);text-decoration:none;transition:color var(--transition);}
+    .breadcrumb a:hover{color:var(--accent);}
+    .breadcrumb-sep{opacity:.4;}
+
+    /* PAGE HEADER */
+    .page-header{padding:var(--space-12) var(--space-8) var(--space-8);max-width:1200px;margin:0 auto;}
+    .page-header-label{font-size:var(--text-xs);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:var(--space-3);}
+    .page-header h1{font-family:var(--font-display);font-size:var(--text-2xl);font-weight:800;line-height:1.1;letter-spacing:-0.03em;margin-bottom:var(--space-4);}
+    .page-header-desc{font-size:var(--text-base);color:var(--text-muted);max-width:72ch;line-height:1.7;}
+
+    /* SECTION */
+    section{padding:var(--space-4) var(--space-8) var(--space-12);max-width:1200px;margin:0 auto;}
+    .section-header{margin-bottom:var(--space-6);}
+    .section-label{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:var(--space-2);}
+    .section-title{font-family:var(--font-display);font-size:var(--text-xl);font-weight:800;letter-spacing:-0.02em;}
+    .section-desc{font-size:var(--text-sm);color:var(--text-muted);max-width:72ch;margin-top:var(--space-2);line-height:1.7;}
+
+    /* LINE DETAIL */
+    .line-detail-section{border-top:1px solid var(--border);padding:var(--space-12) var(--space-8);max-width:1200px;margin:0 auto;}
+    .line-detail-inner{border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;}
+
+    /* ACCORDION HEADER */
+    .acc-header{display:flex;align-items:center;gap:var(--space-4);padding:var(--space-6);border-bottom:1px solid var(--border);}
+    .acc-badge{width:3.5rem;height:3.5rem;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:var(--text-base);color:white;flex-shrink:0;}
+    .acc-header h3{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;letter-spacing:-0.02em;}
+    .acc-header p{font-size:var(--text-sm);color:var(--text-muted);margin-top:2px;}
+
+    /* ACC STATS */
+    .acc-stats{display:flex;gap:var(--space-8);padding:var(--space-5) var(--space-6);border-bottom:1px solid var(--border);flex-wrap:wrap;}
+    .acc-stat{display:flex;flex-direction:column;gap:2px;}
+    .acc-stat-val{font-family:var(--font-display);font-size:var(--text-base);font-weight:800;}
+    .acc-stat-lbl{font-size:var(--text-xs);color:var(--text-muted);}
+
+    /* ACC DESC */
+    .acc-desc{padding:var(--space-5) var(--space-6);border-bottom:1px solid var(--border);}
+    .acc-desc p{font-size:var(--text-sm);color:var(--text-muted);line-height:1.75;max-width:80ch;}
+    .acc-desc p+p{margin-top:var(--space-3);}
+
+    /* SERVICE INFO STRIP */
+    .service-strip{display:flex;gap:var(--space-6);flex-wrap:wrap;padding:var(--space-4) var(--space-6);border-bottom:1px solid var(--border);background:var(--surface-2);align-items:center;}
+    .service-item{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);}
+    .service-icon{font-size:1rem;line-height:1;}
+    .service-label{color:var(--text-muted);}
+    .service-val{font-weight:600;color:var(--text);}
+
+    /* STATIONS TABLE */
+    .stn-table-wrap{overflow-x:auto;}
+    .stn-table{width:100%;border-collapse:collapse;font-size:var(--text-xs);}
+    .stn-table thead th{background:var(--surface-2);padding:var(--space-2) var(--space-3);text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);white-space:nowrap;border-bottom:3px solid currentColor;}
+    .stn-table tbody tr{border-bottom:1px solid var(--border);transition:background var(--transition);}
+    .stn-table tbody tr:last-child{border-bottom:none;}
+    .stn-table tbody tr:hover{background:var(--surface-2);}
+    .stn-table td{padding:var(--space-2) var(--space-3);vertical-align:top;}
+    .stn-code{font-family:var(--font-display);font-weight:700;white-space:nowrap;font-size:11px;}
+    .stn-name-en{font-weight:600;color:var(--text);}
+    .stn-name-iz{color:var(--text-muted);font-size:11px;margin-top:1px;}
+    .stn-conn{font-size:10px;color:var(--text-muted);line-height:1.7;}
+    .stn-conn li{margin-left:var(--space-3);}
+    .stn-km{font-family:var(--font-display);font-weight:600;font-size:11px;color:var(--text-muted);white-space:nowrap;}
+    .conn-rail{color:var(--accent);}
+    .conn-metro{color:var(--metro-teal);}
+    .conn-wkb{color:#b8956a;}
+
+    /* MONORAIL INDICATOR */
+    .mono-icon{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:600;padding:2px 6px;border-radius:9999px;background:var(--wi-glow);color:var(--wi-color);border:1px solid var(--wi-color);opacity:.9;white-space:nowrap;}
+
+    /* LINES INDEX TABLE */
+    .lines-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-xl);}
+    .lines-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);}
+    .lines-table thead th{background:var(--surface-2);padding:var(--space-3) var(--space-4);text-align:left;font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);white-space:nowrap;border-bottom:1px solid var(--border);}
+    .lines-table tbody tr{border-bottom:1px solid var(--border);transition:background var(--transition);}
+    .lines-table tbody tr:last-child{border-bottom:none;}
+    .lines-table tbody tr:hover{background:var(--surface);}
+    .lines-table td{padding:var(--space-3) var(--space-4);vertical-align:middle;}
+    .line-badge{display:inline-flex;align-items:center;justify-content:center;min-width:2.4rem;padding:var(--space-1) var(--space-2);border-radius:var(--radius-sm);font-weight:800;font-size:var(--text-xs);letter-spacing:.04em;line-height:1;font-family:var(--font-display);}
+    .jump-btn{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:2px 8px;cursor:pointer;transition:color var(--transition),border-color var(--transition),background var(--transition);white-space:nowrap;margin-top:var(--space-2);text-decoration:none;}
+    .jump-btn:hover{color:var(--wi-color);border-color:var(--wi-color);background:var(--wi-glow);}
+    .back-to-table{display:inline-flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);font-weight:600;color:var(--text-muted);text-decoration:none;margin-bottom:var(--space-6);transition:color var(--transition);}
+    .back-to-table:hover{color:var(--wi-color);}
+    .type-chip{display:inline-block;font-size:10px;font-weight:600;padding:2px 6px;border-radius:9999px;background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border);white-space:nowrap;}
+    .num-cell{font-family:var(--font-display);font-weight:700;font-size:var(--text-sm);color:var(--text);}
+    .freq-cell{font-size:var(--text-xs);color:var(--text-muted);white-space:pre-line;line-height:1.6;}
+    .line-name-sub{font-size:var(--text-xs);color:var(--text-muted);margin-top:2px;}
+    .node-chip{display:inline-block;font-size:9px;font-family:monospace;color:var(--text-faint);background:var(--surface-2);border:1px solid var(--border);border-radius:3px;padding:1px 4px;vertical-align:middle;}
+
+    footer{border-top:1px solid var(--border);padding:var(--space-8);text-align:center;font-size:var(--text-sm);color:var(--text-muted);}
+    footer a{color:var(--accent);text-decoration:none;}
+    footer a:hover{text-decoration:underline;}
+
+    @media(max-width:768px){
+      nav{padding:var(--space-3) var(--space-4);}
+      .nav-links{gap:var(--space-3);}
+      .breadcrumb,.page-header,section,.line-detail-section{padding-left:var(--space-4);padding-right:var(--space-4);}
+      .page-header h1{font-size:var(--text-xl);}
+      .acc-stats{gap:var(--space-4);}
+      .service-strip{gap:var(--space-4);}
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img class="logo-dark"  src="frontend/Izarail Urban Networks dark.svg"   alt="Izarail Urban Networks" height="40" loading="eager">
+      <img class="logo-light" src="frontend/Izarail Urban Networks bright.svg" alt="Izarail Urban Networks" height="40" loading="eager">
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+
+      <div class="nav-item active">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Railways</button>
+        <div class="dropdown">
+          <a href="izarail.html">Izarail</a>
+          <a href="metro.html">Metro</a>
+          <a href="izx.html">IZX</a>
+          <a href="commuter.html">Commuter Rail</a>
+          <a href="other-rail.html" class="active">Other Rail</a>
+          <a href="#map">Map</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Aviation</button>
+        <div class="dropdown">
+          <a href="airports.html">Airports</a>
+          <a href="airlines.html">Airlines</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Other</button>
+        <div class="dropdown">
+          <span class="dropdown-label">Coming soon</span>
+        </div>
+      </div>
+
+      <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>Other Rail</span>
+  </div>
+
+  <div class="page-header">
+    <div class="page-header-label">Izaland · Other Rail Systems</div>
+    <h1>Monorail &amp; Light Rail</h1>
+    <p class="page-header-desc">
+      Specialised rail systems that fall outside the mainline Izarail commuter and IZX networks — including monorails, light rail, and private shuttle lines. These lines serve specific urban corridors, airport links, and suburban areas where conventional rail is impractical.
+    </p>
+  </div>
+
+  <!-- Overview Table -->
+  <section id="lines">
+    <div class="section-header">
+      <div class="section-label">Systems</div>
+      <h2 class="section-title">Line Overview</h2>
+      <p class="section-desc">All monorail and specialised rail lines currently documented.</p>
+    </div>
+
+    <div class="lines-table-wrap">
+      <table class="lines-table" aria-label="Other Rail Lines">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Line</th>
+            <th>Route</th>
+            <th>Type</th>
+            <th>km</th>
+            <th>Stations</th>
+            <th>Frequency</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="row-wi">
+            <td><span class="line-badge" style="background:#838c67;color:white;">WI</span></td>
+            <td>
+              <div style="font-weight:600;color:var(--text);">Wataiga Monorail</div>
+              <div class="line-name-sub">૮ઠ૩ડૃ ઇ૾પ૾દૅઃધ્</div>
+              <a href="#detail-wi" class="jump-btn" aria-label="Jump to Wataiga Monorail details">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                Details ↓
+              </a>
+            </td>
+            <td style="font-size:var(--text-xs);">
+              <div style="font-weight:600;color:var(--text);">Watarui Otsuminiswae ↔ Igattarun Juwon</div>
+              <div style="color:var(--text-muted);margin-top:2px;">WI01 – WI13 · 13 stations</div>
+            </td>
+            <td><span class="type-chip">🚝 Monorail</span></td>
+            <td class="num-cell">14.27</td>
+            <td class="num-cell">13</td>
+            <td class="freq-cell">5 min (peak)
+10 min (off-peak)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       WATAIGA MONORAIL DETAIL
+  ══════════════════════════════════════════ -->
+  <div class="line-detail-section" id="detail-wi">
+
+    <a href="#row-wi" class="back-to-table">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+      Back to line overview
+    </a>
+
+    <div class="line-detail-inner">
+
+      <div class="acc-header">
+        <div class="acc-badge" style="background:#838c67;">WI</div>
+        <div>
+          <h3>Wataiga Monorail — <span style="font-size:0.75em;font-weight:500;color:var(--text-muted);">૮ઠ૩ડૃ ઇ૾પ૾દૅઃધ્</span></h3>
+          <p>Private straddle-beam monorail · Watarui Otsuminiswae → Igattarun Juwon</p>
+        </div>
+      </div>
+
+      <div class="acc-stats">
+        <div class="acc-stat"><div class="acc-stat-val" style="color:#838c67;">14.27 km</div><div class="acc-stat-lbl">Total length</div></div>
+        <div class="acc-stat"><div class="acc-stat-val" style="color:#838c67;">13</div><div class="acc-stat-lbl">Stations</div></div>
+        <div class="acc-stat"><div class="acc-stat-val" style="color:#838c67;">40 km/h</div><div class="acc-stat-lbl">Average speed</div></div>
+        <div class="acc-stat"><div class="acc-stat-val" style="color:#838c67;">5:30</div><div class="acc-stat-lbl">First service</div></div>
+        <div class="acc-stat"><div class="acc-stat-val" style="color:#838c67;">23:30</div><div class="acc-stat-lbl">Last service</div></div>
+        <div class="acc-stat"><div class="acc-stat-val" style="color:#838c67;">6 tph</div><div class="acc-stat-lbl">Min. frequency</div></div>
+        <div class="acc-stat"><div class="acc-stat-val" style="color:#838c67;">12 tph</div><div class="acc-stat-lbl">Peak frequency</div></div>
+      </div>
+
+      <!-- Service info strip -->
+      <div class="service-strip">
+        <div class="service-item">
+          <span class="service-icon">🚝</span>
+          <span class="service-label">Type:</span>
+          <span class="service-val">Straddle-beam monorail</span>
+        </div>
+        <div class="service-item">
+          <span class="service-icon">🧾</span>
+          <span class="service-label">Operator:</span>
+          <span class="service-val">Private</span>
+        </div>
+        <div class="service-item">
+          <span class="service-icon">🕐</span>
+          <span class="service-label">Hours:</span>
+          <span class="service-val">05:30 – 23:30 daily</span>
+        </div>
+        <div class="service-item">
+          <span class="service-icon">🛑</span>
+          <span class="service-label">Stops:</span>
+          <span class="service-val">All stations — every service</span>
+        </div>
+        <div class="service-item">
+          <span class="service-icon">💳</span>
+          <span class="service-label">Card:</span>
+          <span class="service-val">IZWay accepted</span>
+        </div>
+      </div>
+
+      <div class="acc-desc">
+        <p>
+          The <strong style="color:#838c67;">Wataiga Monorail</strong> is a private straddle-beam monorail connecting the Watarui district (southern terminus at Otsuminiswae) with the urban centre of Igattarun, terminating at <strong>Igattarun Juwon</strong>, the city's central station. The line threads through a residential corridor including the Aserimowa housing area, the Bonkado hospital district, and the Wataiga welfare university campus.
+        </p>
+        <p>
+          All 13 stations are served by every train, with a minimum frequency of 6 trains per hour throughout the day and up to 12 trains per hour during peak periods. The line operates from 05:30 to 23:30 seven days a week. The northern terminus (WI01) provides interchange with both the <strong>IZX</strong> (M13) and the <strong>WKB</strong> commuter line, making it an important gateway into the broader Izarail network.
+        </p>
+      </div>
+
+      <!-- Stations Table -->
+      <div class="stn-table-wrap">
+        <table class="stn-table" aria-label="Wataiga Monorail stations">
+          <thead>
+            <tr style="color:#838c67;">
+              <th>Code</th>
+              <th>Station</th>
+              <th>Kanji</th>
+              <th>Connections</th>
+              <th>km</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td class="stn-code" style="color:#838c67;">WI01</td>
+              <td>
+                <div class="stn-name-en">Watarui Otsuminiswae</div>
+              </td>
+              <td class="stn-name-iz">芳聖南口</td>
+              <td class="stn-conn">
+                <ul>
+                  <li class="conn-rail">IZX · M13</li>
+                  <li class="conn-wkb">WKB · WKB01</li>
+                </ul>
+              </td>
+              <td class="stn-km">0.00</td>
+            </tr>
+
+            <tr>
+              <td class="stn-code" style="color:#838c67;">WI02</td>
+              <td><div class="stn-name-en">Tankyānji</div></td>
+              <td class="stn-name-iz">誕響寺</td>
+              <td class="stn-conn">
+                <ul><li class="conn-wkb">WKB · WKB03</li></ul>
+              </td>
+              <td class="stn-km">1.31</td>
+            </tr>
+
+            <tr>
+              <td class="stn-code" style="color:#838c67;">WI03</td>
+              <td><div class="stn-name-en">Aserimowa Jutakugai</div></td>
+              <td class="stn-name-iz">刈箕住宅街</td>
+              <td class="stn-conn">—</td>
+              <td class="stn-km">2.33</td>
+            </tr>
+
+            <tr>
+              <td class="stn-code" style="color:#838c67;">WI04</td>
+              <td><div class="stn-name-en">Bonkado Byōwin</div></td>
+              <td class="stn-name-iz">千日病院</td>
+              <td class="stn-conn">—</td>
+              <td class="stn-km">3.37</td>
+            </tr>
+
+            <tr>
+              <td class="stn-code" style="color:#838c67;">WI05</td>
+              <td><div class="stn-name-en">Watarui Fukushi Daigaku</div></td>
+              <td class="stn-name-iz">芳聖福祉大學</td>
+              <td class="stn-conn">—</td>
+              <td class="stn-km">4.46</td>
+            </tr>
+
+            <tr>
+              <td class="stn-code" style="color:#838c67;">WI06</td>
+              <td><div class="stn-name-en">Sasamo</div></td>
+              <td class="stn-name-iz">佐山</td>
+              <td class="stn-conn">—</td>
+              <td class="stn-km">5.94</td>
+            </tr>
+
+            <tr>
+              <td class="stn-code" style="color:#838c67;">WI07</td>
+              <td><div class="stn-name-en">Tappuni</div></td>
+              <td class="stn-name-iz">狭沢</td>
+              <td class="stn-conn">—</td>
+              <td class="stn-km">7.12</td>
+            </tr>
+
+            <tr>
+              <td class="stn-code" style="color:#838c67;">WI08</td>
+              <td><div class="stn-name-en">Igattarun Korebaiken</div></td>
+              <td class="stn-name-iz"></td>
+              <td class="stn-conn">—</td>
+              <td class="stn-km">8.30</td>
+            </tr>
+
+            <tr>
+              <td class="stn-code" style="color:#838c67;">WI09</td>
+              <td><div class="stn-name-en">Tsuntawari</div></td>
+              <td class="stn-name-iz"></td>
+              <td class="stn-conn">—</td>
+              <td class="stn-km">9.77</td>
+            </tr>
+
+            <tr>
+              <td class="stn-code" style="color:#838c67;">WI10</td>
+              <td><div class="stn-name-en">Yasecharan</div></td>
+              <td class="stn-name-iz"></td>
+              <td class="stn-conn">—</td>
+              <td class="stn-km">10.86</td>
+            </tr>
+
+            <tr>
+              <td class="stn-code" style="color:#838c67;">WI11</td>
+              <td><div class="stn-name-en">Usetamoki</div></td>
+              <td class="stn-name-iz"></td>
+              <td class="stn-conn">—</td>
+              <td class="stn-km">12.01</td>
+            </tr>
+
+            <tr>
+              <td class="stn-code" style="color:#838c67;">WI12</td>
+              <td><div class="stn-name-en">Igattarun Shiyakujo-adae</div></td>
+              <td class="stn-name-iz">蝉陵市役所前</td>
+              <td class="stn-conn">—</td>
+              <td class="stn-km">13.61</td>
+            </tr>
+
+            <tr>
+              <td class="stn-code" style="color:#838c67;">WI13</td>
+              <td><div class="stn-name-en">Igattarun Juwon</div></td>
+              <td class="stn-name-iz">蝉陵中央</td>
+              <td class="stn-conn">
+                <ul>
+                  <li class="conn-rail" style="font-size:10px;font-style:italic;">Seishaku Line (SK)</li>
+                </ul>
+              </td>
+              <td class="stn-km">14.27</td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div><!-- /stn-table-wrap -->
+
+    </div><!-- /line-detail-inner -->
+  </div><!-- /line-detail-section -->
+
+  <footer>
+    <p>Izaland Transit Reference · <a href="index.html">Home</a></p>
+  </footer>
+
+  <script>
+    // Theme toggle
+    (function(){
+      const t = document.querySelector('[data-theme-toggle]');
+      const r = document.documentElement;
+      let d = matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
+      r.setAttribute('data-theme', d);
+      if(t) t.addEventListener('click', () => {
+        d = d === 'dark' ? 'light' : 'dark';
+        r.setAttribute('data-theme', d);
+        t.setAttribute('aria-label', 'Switch to ' + (d === 'dark' ? 'light' : 'dark') + ' mode');
+        t.innerHTML = d === 'dark'
+          ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+          : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+      });
+    })();
+
+    // Nav dropdown toggle
+    document.querySelectorAll('.nav-item > button').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const item = btn.closest('.nav-item');
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+      });
+    });
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('open'));
+    });
+  </script>
+</body>
+</html>
