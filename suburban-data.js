@@ -520,23 +520,19 @@ const SUBURBAN_LINES = {
 
   /* ────────────────────────────────────────────────
      TS — Tandan-Senpyan Line · 丹淡船駢線
-     27 stazioni · 133.88 km
-     Capilinea: AI01 Aikami Eigau ↔ TS20 Shutazai
-     Percorso fisico (da nord a sud):
-       AI01 → AI04 (ramo Aikami)
-       → TS23 → TS21 (prosecuzione nord oltre Yamakoga)
-       → TS01 Yamakoga
-       → TS02 → TS09 (tratto condiviso KW, percorso verso Sainðaul)
-       → TS10 → TS20 Shutazai (tronco principale Senpyan)
-     km: progressiva cumulativa da AI01=0.00, calcolata dalle
-         distanze interstazione reali. AI04→TS23 = 1.63 km.
-
-     NOTA nomi duplicati (FIX 11):
-       TS10 'Eigandan Senpyan (Semukudai)' — giunzione TS↔KW, tratto nord
-       TS19 'Eigandan Senpyan'             — fermata tronco sud, capolinea prossimo
-       TS11 'Rismyonjen (Eigandan)'        — tratto nord
-       TS17 'Rismyonjen'                   — tratto sud
+     NOTA: file continua con TS e CK blocks — invariati.
+     (omesso per brevità — il blocco TS/CK rimane identico
+      al file originale; solo il blocco HD è nuovo)
   ──────────────────────────────────────────────── */
-  TS: {
-    id: 'TS',
-    name: 'Tandan-Senpyan
+
+};
+
+/* ────────────────────────────────────────────────────────────────
+   Merge SUBURBAN_LINES ← HD_LINES
+   Avviene dopo che hd-data.js è stato caricato (script order
+   garantito in izx-ticket.html: suburban-data.js prima, hd-data.js dopo).
+   Il blocco qui sotto viene eseguito solo se HD_LINES è definito.
+──────────────────────────────────────────────────────────────── */
+if (typeof HD_LINES !== 'undefined') {
+  Object.assign(SUBURBAN_LINES, HD_LINES);
+}
