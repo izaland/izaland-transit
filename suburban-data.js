@@ -94,6 +94,9 @@
      KS17 ↔ M1?? — da confermare
      KS18 ↔ KD20, RY02
 
+     HD interchanges (Handai Electric Railway Main Line · 彎大電鐵本線):
+     HD01 (Warohan Daiches) ↔ K17  (IZX Keishin)
+
    NOTA ANTI-CICLO — cluster Kawayatsu (FIX 12):
      I sei nodi KW10/KW11/KS01/KS02/TS06/TS07 formano due piazzali adiacenti.
      Regola: nessun nodo di NIJI-KAWAYATSU (KW11/KS01/TS06) punta direttamente
@@ -227,6 +230,8 @@ const SUBURBAN_INTERCHANGE = {
   KS17: [],          // M1?? — da confermare
   KS18: ['KD20', 'RY02'],  // + M1?? — da confermare
   KS28: ['AX09'],
+  // Handai Electric Railway Main Line (HD)
+  HD01: ['K17'],
 };
 
 const SUBURBAN_LINES = {
@@ -456,9 +461,9 @@ const SUBURBAN_LINES = {
       { code: 'KS23', name: 'Taimasaki',             kanji: '太馬羽',       km: 39.47 },
       { code: 'KS24', name: 'Nari-Kworente',         kanji: '—',            km: 40.81 },
       { code: 'KS25', name: 'Ekahemi',               kanji: '月姜',         km: 41.87 },
-      { code: 'KS26', name: 'Shiki-Sabullan',        kanji: '北ટરૃેધ્ધપ્', km: 43.29 },
+      { code: 'KS26', name: 'Shiki-Sabullan',        kanji: '北ટрૃеধ্ধп্', km: 43.29 },
       { code: 'KS27', name: 'Kamuragi',              kanji: '—',            km: 44.92 },
-      { code: 'KS28', name: 'Sabullan',              kanji: 'ટરૃેધ્ધપ્',   km: 47.08 },
+      { code: 'KS28', name: 'Sabullan',              kanji: 'ટрૃеধ্ধп্',   km: 47.08 },
     ],
   },
 
@@ -534,104 +539,4 @@ const SUBURBAN_LINES = {
   ──────────────────────────────────────────────── */
   TS: {
     id: 'TS',
-    name: 'Tandan-Senpyan Line',
-    nameJa: '丹淡船駢線',
-    color: '#F5EE27',
-    circular: false,
-    headwayPeak: 20,
-    headwayOffPeak: 20,
-    totalKm: 133.88,
-    stations: [
-      // ── Ramo Aikami ──
-      { code: 'AI01', name: 'Aikami Eigau',                    kanji: '—',          km:   0.00 },
-      { code: 'AI02', name: 'Tomahashi',                       kanji: '—',          km:   1.73 },
-      { code: 'AI03', name: 'Kukaðuka',                        kanji: '—',          km:   2.81 },
-      { code: 'AI04', name: 'Moto-Aikami',                     kanji: '—',          km:   4.01 },
-      // ── Prosecuzione nord (giunzione Aikami → Yuriyama → Ikotsuha) ──
-      { code: 'TS23', name: 'Yuriyama',                        kanji: '油里倉',     km:   5.64 },
-      { code: 'TS22', name: 'Sāryarasa',                       kanji: '河霧',       km:   9.36 },
-      { code: 'TS21', name: 'Ikotsuha',                        kanji: '梧戦',       km:  13.47 },
-      // ── Yamakoga e tratto condiviso KW (verso Sainðaul) ──
-      { code: 'TS01', name: 'Yamakoga',                        kanji: '倉湖加',     km:  15.10 },
-      { code: 'TS02', name: 'Abiro',                           kanji: '獏路',       km:  23.30 },
-      { code: 'TS03', name: 'Funoshoni',                       kanji: '—',          km:  54.07 },
-      { code: 'TS04', name: 'Nwatanui',                        kanji: '—',          km:  64.27 },
-      { code: 'TS05', name: 'Ibarosu',                         kanji: '歯舢',       km:  66.09 },
-      { code: 'TS06', name: 'Niji-Kawayatsu',                  kanji: '西嘉夬苫',   km:  78.84 },
-      { code: 'TS07', name: 'Kawayatsu',                       kanji: '嘉夬苫',     km:  80.92 },
-      { code: 'TS08', name: 'Shin-Kawayatsu',                  kanji: '新嘉夬苫',   km:  84.49 },
-      { code: 'TS09', name: 'Semukudai',                       kanji: '世牧臺',     km:  86.06 },
-      // ── Tronco principale Senpyan (verso Shutazai) ──
-      // FIX 11: rinominato da 'Eigandan Senpyan' per disambiguare da TS19
-      { code: 'TS10', name: 'Eigandan Senpyan (Semukudai)',     kanji: '永玵段船駢（世牧臺）', km:  89.08 },
-      // FIX 11: rinominato da 'Rismyonjen' per disambiguare da TS17
-      { code: 'TS11', name: 'Rismyonjen (Eigandan)',           kanji: '—',          km:  94.18 },
-      { code: 'TS12', name: 'Binno',                           kanji: '苠喃',       km:  97.43 },
-      { code: 'TS13', name: 'Sainðaul Central',                kanji: '作安崎中央', km: 100.43 },
-      { code: 'TS14', name: 'Shimamera',                       kanji: '渠瀬田',     km: 103.43 },
-      { code: 'TS15', name: 'Nihkyonta',                       kanji: '濱角',       km: 106.43 },
-      // TS16 Kasakuri: stesso nodo di interscambio di K02 Niji-Sainðaul (IZX Keishin)
-      { code: 'TS16', name: 'Kasakuri',                        kanji: '鯛巻',       km: 109.43 },
-      { code: 'TS17', name: 'Rismyonjen',                      kanji: '—',          km: 113.43 },
-      { code: 'TS18', name: 'Ipporai-Senpyan',                 kanji: '—',          km: 119.43 },
-      { code: 'TS19', name: 'Eigandan Senpyan',                kanji: '永玵段船駢', km: 125.43 },
-      { code: 'TS20', name: 'Shutazai',                        kanji: '守多彩',     km: 133.88 },
-    ],
-  },
-
-  /* ────────────────────────────────────────────────
-     CK — Chukkūn Line · 竹空線
-     33 stazioni · 57.92 km
-     Capolinea: CK01 Asunahama Airport Terminal 4
-              ↔ CK33 Moriyose
-     Passa per: Sainðaul Int'l Airport, Rinkūn City,
-     Riimibaiken, corridoio Seishaku (SK16–SK24)
-     Cinematica: EMU vmax 100 km/h, a=0.9 m/s², dwell 30s
-     Frequenza: 15 min peak · 30 min off-peak
-  ──────────────────────────────────────────────── */
-  CK: {
-    id: 'CK',
-    name: 'Chukkūn Line',
-    nameJa: '竹空線',
-    color: '#6B9E3E',
-    circular: false,
-    headwayPeak: 15,
-    headwayOffPeak: 30,
-    totalKm: 57.92,
-    stations: [
-      { code: 'CK01', name: 'Asunahama Airport Terminal 4',   kanji: '',             km:  0.00 },
-      { code: 'CK02', name: 'Sainðaul International Airport', kanji: '作安崎國際空港', km:  3.11 },
-      { code: 'CK03', name: 'Shinseibijān',                   kanji: '新整備場',      km:  5.56 },
-      { code: 'CK04', name: 'Rinkūn City',                    kanji: 'རིན་ཟེང་པ་ཊཱ',  km:  8.21 },
-      { code: 'CK05', name: 'Ikisawa',                        kanji: '琴空',          km:  9.46 },
-      { code: 'CK06', name: 'Togara',                         kanji: '焦羅',          km: 10.44 },
-      { code: 'CK07', name: 'Toibotsuta',                     kanji: '蚧垣',          km: 12.15 },
-      { code: 'CK08', name: 'Riimibaiken',                    kanji: '𠝏別',          km: 13.64 },
-      { code: 'CK09', name: 'Shin-Tsuruna',                   kanji: '新鳰',          km: 14.85 },
-      { code: 'CK10', name: 'Tsaibako',                       kanji: '済鴒',          km: 15.75 },
-      { code: 'CK11', name: 'Tsurunarikki',                   kanji: '鳰陸起',        km: 16.96 },
-      { code: 'CK12', name: 'Eikunna',                        kanji: '栄勳那',        km: 18.13 },
-      { code: 'CK13', name: 'Rismyonjen',                     kanji: '',             km: 19.90 },
-      { code: 'CK14', name: 'Dodonuka',                       kanji: '登戸降',        km: 22.05 },
-      { code: 'CK15', name: 'Toemonjaru',                     kanji: '',             km: 23.74 },
-      { code: 'CK16', name: 'Kasakuri',                       kanji: '鯛巻',          km: 26.47 },
-      { code: 'CK17', name: 'Nihkyonta',                      kanji: '濱角',          km: 30.28 },
-      { code: 'CK18', name: 'Alkuitsa',                       kanji: '潮尾',          km: 31.88 },
-      { code: 'CK19', name: 'Tajamōri',                       kanji: '宰毛利',        km: 33.87 },
-      { code: 'CK20', name: 'Tobeskauri',                     kanji: '鴨沼',          km: 35.13 },
-      { code: 'CK21', name: 'Makkeriya',                      kanji: '平追',          km: 36.10 },
-      { code: 'CK22', name: 'Shiitehongi',                    kanji: '茛本名',        km: 37.80 },
-      { code: 'CK23', name: 'Kasaraki',                       kanji: '次羽',          km: 39.54 },
-      { code: 'CK24', name: 'Makurigawa',                     kanji: '炭界',          km: 40.55 },
-      { code: 'CK25', name: 'Riyakugo',                       kanji: '追句胡',        km: 41.77 },
-      { code: 'CK26', name: 'Oizato',                         kanji: '粕穫',          km: 42.83 },
-      { code: 'CK27', name: 'Shakihori',                      kanji: '石登',          km: 47.03 },
-      { code: 'CK28', name: 'Awada',                          kanji: '邊太',          km: 48.33 },
-      { code: 'CK29', name: 'Punomowen',                      kanji: '㷀園',          km: 49.24 },
-      { code: 'CK30', name: 'Kayahori Bunki',                 kanji: '香弥登分岐',    km: 50.36 },
-      { code: 'CK31', name: 'Irumanpi',                       kanji: '',             km: 52.80 },
-      { code: 'CK32', name: 'Moriyose Isamata',               kanji: '竹峰安伸',      km: 55.86 },
-      { code: 'CK33', name: 'Moriyose',                       kanji: '竹峰',          km: 57.92 },
-    ],
-  },
-};
+    name: 'Tandan-Senpyan
