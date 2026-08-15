@@ -1,6 +1,6 @@
 /* ================================================================
    WI-DATA.JS — Wataiga Monorail
-   ૮ઠ૩ડૃ ઇ૾પ૾દૅઃધ્ — Monorotaia privata · zona Watarui / Igattarun
+   મઠ઩ડૃ ઇ઴બ઴દવઃધ્ — Monorotaia privata · zona Watarui / Igattarun
 
    Operatore : Wataiga Monorail Co.
    Tipo      : Monorotaia privata (straddle-beam)
@@ -40,7 +40,7 @@ const WI_LINES = {
   WI: {
     id:            'WI',
     name:          'Wataiga Monorail',
-    nameLocal:     '૮ઠ૩ડૃ ઇ૾પ૾દૅઃધ્',
+    nameLocal:     'મઠ઩ડૃ ઇ઴બ઴દવઃધ્',
     color:         '#838c67',
     operator:      'Wataiga Monorail Co.',
     operatorJa:    '',
@@ -57,9 +57,9 @@ const WI_LINES = {
     stations: [
       { code: 'WI01', name: 'Watarui Otsuminiswae',      kanji: '芳聖南口',      km:  0.00 },  /* node 2599106333 */
       { code: 'WI02', name: 'Tankyānji',                 kanji: '誕響寺',        km:  1.31 },  /* node 2599106053 */
-      { code: 'WI03', name: 'Aserimowa Jutakugai',       kanji: '刈箕住宅街',    km:  2.33 },  /* node 2599106043 */
+      { code: 'WI03', name: 'Aserimowa Jutakugai',       kanji: '屈箕住宅街',    km:  2.33 },  /* node 2599106043 */
       { code: 'WI04', name: 'Bonkado Byōwin',            kanji: '千日病院',      km:  3.37 },  /* node 2599106033 */
-      { code: 'WI05', name: 'Watarui Fukushi Daigaku',   kanji: '芳聖福祉大學',  km:  4.46 },  /* node 2599106023 */
+      { code: 'WI05', name: 'Watarui Fukushi Daigaku',   kanji: '芳聖福祝大學',  km:  4.46 },  /* node 2599106023 */
       { code: 'WI06', name: 'Sasamo',                    kanji: '佐山',          km:  5.94 },  /* node 2599106013 */
       { code: 'WI07', name: 'Tappuni',                   kanji: '狭沢',          km:  7.12 },  /* node 2599106003 */
       { code: 'WI08', name: 'Igattarun Korebaiken',      kanji: '',              km:  8.30 },  /* node 2599105993 */
@@ -118,3 +118,25 @@ const WI_SERVICES = [
   },
 
 ];
+
+/* ----------------------------------------------------------------
+   MERGE in SUBURBAN_LINES e SUBURBAN_INTERCHANGE
+   Necessario perché SuburbanRouter itera su SUBURBAN_LINES.
+   Questo blocco viene eseguito dopo che suburban-data.js ha già
+   definito SUBURBAN_LINES e SUBURBAN_INTERCHANGE.
+---------------------------------------------------------------- */
+if (typeof SUBURBAN_LINES !== 'undefined') {
+  Object.assign(SUBURBAN_LINES, WI_LINES);
+}
+if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
+  // WI01 ↔ M13 (IZX) e WKB01 (WKB) — interscambi cross-network
+  // WI02 ↔ WKB03 (WKB)
+  for (const [wiCode, partners] of Object.entries(WI_INTERCHANGE)) {
+    if (!SUBURBAN_INTERCHANGE[wiCode]) SUBURBAN_INTERCHANGE[wiCode] = [];
+    for (const code of partners) {
+      if (!SUBURBAN_INTERCHANGE[wiCode].includes(code)) {
+        SUBURBAN_INTERCHANGE[wiCode].push(code);
+      }
+    }
+  }
+}
