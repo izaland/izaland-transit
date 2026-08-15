@@ -149,3 +149,22 @@ const HD_SERVICES = [
   //   ],
   // },
 ];
+
+/* ----------------------------------------------------------------
+   MERGE in SUBURBAN_LINES e SUBURBAN_INTERCHANGE
+   Necessario perché SuburbanRouter itera su SUBURBAN_LINES.
+   Questo blocco viene eseguito dopo che suburban-data.js ha già
+   definito SUBURBAN_LINES e SUBURBAN_INTERCHANGE.
+---------------------------------------------------------------- */
+if (typeof SUBURBAN_LINES !== 'undefined') {
+  Object.assign(SUBURBAN_LINES, HD_LINES);
+}
+if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
+  // HD01 ↔ K17 (IZX Keishin) — interscambio cross-network
+  if (!SUBURBAN_INTERCHANGE['HD01']) SUBURBAN_INTERCHANGE['HD01'] = [];
+  for (const code of HD_INTERCHANGE['HD01']) {
+    if (!SUBURBAN_INTERCHANGE['HD01'].includes(code)) {
+      SUBURBAN_INTERCHANGE['HD01'].push(code);
+    }
+  }
+}
