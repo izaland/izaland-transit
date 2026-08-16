@@ -35,6 +35,7 @@
      KD54 ↔ K32   (Nagayamatsu)
 
      SK interchanges (Seishaku Line):
+     SK01 ↔ WI13  (Igattarun Juwon)
      SK12 ↔ KD14  (Dankau)
      SK24 ↔ LL03  (Shiitehongi)
      SK25 ↔ LL02  (Binno)
@@ -163,6 +164,7 @@ const SUBURBAN_INTERCHANGE = {
   KD46: ['K31'],
   KD54: ['K32'],
   // Seishaku Line (SK)
+  SK01: ['WI13'],
   SK12: ['KD14'],
   SK24: ['LL03'],
   SK25: ['LL02'],
