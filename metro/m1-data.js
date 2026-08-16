@@ -17,6 +17,7 @@
      M119 Kushidaru Amiya  — M406 (Line 4)
      M115 Nimunoðai        — M808 (Line 8)
      M113 Takkurahama      — SK32
+     M134 Watarui          — WI01 (Warohan–Iniha Line)
 ================================================================ */
 'use strict';
 
@@ -159,6 +160,9 @@ const M1_SVC = {
    M130 Hintomaui
      ↔ M226 (Line 2)           — stesso nome, banchine separate      3 min
 
+   M134 Watarui
+     ↔ WI01 (Warohan–Iniha Line) — Watarui, stazione adiacente      5 min
+
    M142 Enikezya
      ↔ SK07 (Seishaku Line)    — stesso nome, banchine adiacenti    3 min
 
@@ -231,6 +235,10 @@ const M1_INTERCHANGE = {
   M130: [
     { code: 'M226', network: 'metro',    transferMin: 3,
       note: 'M2 Hintomaui — banchine separate' },
+  ],
+  M134: [
+    { code: 'WI01', network: 'suburban', transferMin: 5,
+      note: 'Warohan–Iniha Line — Watarui, stazione adiacente' },
   ],
   M142: [
     { code: 'SK07', network: 'suburban', transferMin: 3,
