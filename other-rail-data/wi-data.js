@@ -1,6 +1,6 @@
 /* ================================================================
    WI-DATA.JS — Wataiga Monorail
-   મઠ઩ડૃ ઇ઴બ઴દવઃધ્ — Monorotaia privata · zona Watarui / Igattarun
+   મઠ઩ડઃ ઇ઴બ઴દવઃધ્ — Monorotaia privata · zona Watarui / Igattarun
 
    Operatore : Wataiga Monorail Co.
    Tipo      : Monorotaia privata (straddle-beam)
@@ -10,9 +10,10 @@
    Vel. media: 40 km/h
 
    Interscambi:
-     WI01 (Watarui Otsuminiswae) ↔ M13   (IZX)
+     WI01 (Watarui Otsuminiswae) ↔ M134  (Metro M1)
      WI01 (Watarui Otsuminiswae) ↔ WKB01 (WKB)
      WI02 (Tankyānji)            ↔ WKB03 (WKB)
+     WI13 (Igattarun Juwon)      ↔ SK01  (Seishaku Line)
 
    Servizi (WI_SERVICES):
      WI1  Local   WI01 ↔ WI13  tutte le fermate (femra)
@@ -26,10 +27,12 @@
 /* ----------------------------------------------------------------
    WI_INTERCHANGE
    Usato da unified-router.js per il cross-network lookup.
+   Nota: M134 sostituisce il precedente codice M13 (vecchio schema).
 ---------------------------------------------------------------- */
 const WI_INTERCHANGE = {
-  WI01: ['M13', 'WKB01'],
+  WI01: ['M134', 'WKB01'],
   WI02: ['WKB03'],
+  WI13: ['SK01'],
 };
 
 /* ----------------------------------------------------------------
@@ -40,7 +43,7 @@ const WI_LINES = {
   WI: {
     id:            'WI',
     name:          'Wataiga Monorail',
-    nameLocal:     'મઠ઩ડૃ ઇ઴બ઴દવઃધ્',
+    nameLocal:     'મઠ઩ડઃ ઇ઴બ઴દવઃધ્',
     color:         '#838c67',
     operator:      'Wataiga Monorail Co.',
     operatorJa:    '',
@@ -129,8 +132,9 @@ if (typeof SUBURBAN_LINES !== 'undefined') {
   Object.assign(SUBURBAN_LINES, WI_LINES);
 }
 if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
-  // WI01 ↔ M13 (IZX) e WKB01 (WKB) — interscambi cross-network
+  // WI01 ↔ M134 (Metro M1) e WKB01 (WKB)
   // WI02 ↔ WKB03 (WKB)
+  // WI13 ↔ SK01 (Seishaku Line) — reciproco da aggiungere in sk-data.js
   for (const [wiCode, partners] of Object.entries(WI_INTERCHANGE)) {
     if (!SUBURBAN_INTERCHANGE[wiCode]) SUBURBAN_INTERCHANGE[wiCode] = [];
     for (const code of partners) {
