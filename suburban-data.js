@@ -98,6 +98,15 @@
      HD interchanges (Handai Electric Railway Main Line · 彎大電鐵本線):
      HD01 (Warohan Daiches) ↔ K17  (IZX Keishin)
 
+     JD interchanges (Juwon-Kodōn Line · 中央湖東線):
+     JD01 (Sainðaul Central) ↔ K01, R01, E01, M117, M814, LL01, KD32, SK26, TS13
+     JD02 (Rosemane) ↔ KD31, M324, M142
+     JD03 (Anagusa Mukai) ↔ KD30, M817, M405
+     JD04 (Tsumiji) ↔ M120, KD29
+     JD05 (Hayatogaru) ↔ LL10, KD26
+     JD06 (Oitsura) ↔ M222, KS21
+     JD10 (Igattarun Juwon) ↔ SK01
+
    NOTA ANTI-CICLO — cluster Kawayatsu (FIX 12):
      I sei nodi KW10/KW11/KS01/KS02/TS06/TS07 formano due piazzali adiacenti.
      Regola: nessun nodo di NIJI-KAWAYATSU (KW11/KS01/TS06) punta direttamente
@@ -234,6 +243,14 @@ const SUBURBAN_INTERCHANGE = {
   KS28: ['AX09'],
   // Handai Electric Railway Main Line (HD)
   HD01: ['K17'],
+  // Juwon-Kodōn Line (JD) · 中央湖東線
+  JD01: ['K01', 'R01', 'E01', 'M117', 'M814', 'LL01', 'KD32', 'SK26', 'TS13'],
+  JD02: ['KD31', 'M324', 'M142'],
+  JD03: ['KD30', 'M817', 'M405'],
+  JD04: ['M120', 'KD29'],
+  JD05: ['LL10', 'KD26'],
+  JD06: ['M222', 'KS21'],
+  JD10: ['SK01'],
 };
 
 const SUBURBAN_LINES = {
@@ -416,7 +433,7 @@ const SUBURBAN_LINES = {
     ],
   },
 
-   /* ────────────────────────────────────────────────
+  /* ────────────────────────────────────────────────
      KS — Kawasabu Line · 嘉夬苫線
      28 stazioni · 47.08 km
      Capolinea: KS01 Niji-Kawayatsu ↔ KS28 Sabullan
@@ -469,7 +486,6 @@ const SUBURBAN_LINES = {
     ],
   },
 
-   
   /* ────────────────────────────────────────────────
      KW — Kwōkei Line · 荒京線
      33 stazioni · 84.35 km
@@ -526,6 +542,58 @@ const SUBURBAN_LINES = {
      (omesso per brevità — il blocco TS/CK rimane identico
       al file originale; solo il blocco HD è nuovo)
   ──────────────────────────────────────────────── */
+
+  /* ────────────────────────────────────────────────
+     JD — Juwon-Kodōn Line · 中央湖東線
+     25 stazioni · 80.44 km
+     Semi-espresso Sainðaul ↔ Ninokawa
+     Interscambi principali:
+       JD01 (Sainðaul Central) ↔ K01, R01, E01, M117, M814,
+                                   LL01, KD32, SK26, TS13
+       JD02 (Rosemane)         ↔ KD31, M324, M142
+       JD03 (Anagusa Mukai)    ↔ KD30, M817, M405
+       JD04 (Tsumiji)          ↔ M120, KD29
+       JD05 (Hayatogaru)       ↔ LL10, KD26
+       JD06 (Oitsura)          ↔ M222, KS21
+       JD10 (Igattarun Juwon)  ↔ SK01
+  ──────────────────────────────────────────────── */
+  JD: {
+    id: 'JD',
+    name: 'Juwon-Kodōn Line',
+    nameJa: '中央湖東線',
+    color: '#FF66CC',
+    circular: false,
+    headwayPeak: 10,
+    headwayOffPeak: 20,
+    totalKm: 80.44,
+    stations: [
+      { code: 'JD01', name: 'Sainðaul Central',      kanji: '作安崎中央', km:  0.00 },
+      { code: 'JD02', name: 'Rosemane',              kanji: '酢丘',       km:  2.22 },
+      { code: 'JD03', name: 'Anagusa Mukai',         kanji: '矢模武凱',   km:  3.44 },
+      { code: 'JD04', name: 'Tsumiji',               kanji: '都巳治',     km:  4.89 },
+      { code: 'JD05', name: 'Hayatogaru',            kanji: '久松',       km:  9.09 },
+      { code: 'JD06', name: 'Oitsura',               kanji: '粕鵲',       km: 16.27 },
+      { code: 'JD07', name: 'Suma Taisha',           kanji: '須万大社',   km: 21.94 },
+      { code: 'JD08', name: 'Tamukaya',              kanji: '軒兜',       km: 25.27 },
+      { code: 'JD09', name: 'Otsumi-Senoira',        kanji: '—',          km: 29.08 },
+      { code: 'JD10', name: 'Igattarun Juwon',       kanji: '蝉陵中央',   km: 35.37 },
+      { code: 'JD11', name: 'Igattarun Daigaku',     kanji: '—',          km: 37.60 },
+      { code: 'JD12', name: 'Yotsekoshi Nyūngu',     kanji: '—',          km: 39.87 },
+      { code: 'JD13', name: 'Shiki-Igattarun',       kanji: '—',          km: 41.97 },
+      { code: 'JD14', name: 'Haritta',               kanji: '楠多',       km: 45.57 },
+      { code: 'JD15', name: 'Saraikala-Motu-1',      kanji: '—',          km: 48.34 },
+      { code: 'JD16', name: 'Tsutaru',               kanji: '—',          km: 50.92 },
+      { code: 'JD17', name: 'Maketaku-Motu',         kanji: '鴋踔基',     km: 54.81 },
+      { code: 'JD18', name: 'Kibenutsi',             kanji: '—',          km: 59.21 },
+      { code: 'JD19', name: 'Kaharu Shindyen',       kanji: '—',          km: 61.70 },
+      { code: 'JD20', name: 'Toboriya',              kanji: '鴨追',       km: 63.99 },
+      { code: 'JD21', name: 'Otsumi-Jakkushonan',    kanji: '南瀬岨男',   km: 65.98 },
+      { code: 'JD22', name: 'Jakkushonan',           kanji: '瀬岨男',     km: 68.94 },
+      { code: 'JD23', name: 'Jakkushonan Seku',      kanji: '瀬岨男世狗', km: 72.98 },
+      { code: 'JD24', name: 'Okitsu',                kanji: '—',          km: 76.05 },
+      { code: 'JD25', name: 'Ninokawa',              kanji: '—',          km: 80.44 },
+    ],
+  },
 
 };
 
