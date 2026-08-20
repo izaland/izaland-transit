@@ -21,7 +21,7 @@
      M321 Tsenduma                           — M17XX (TBD)
      M322 Shiitehongi                        — LL03, SK24, CK22
      M323 Ekinðuka                           — M403
-     M324 Rosemane                           — M1421, KD31
+     M324 Rosemane                           — M1421, KD31, JD02
      M325 Masuda Agarai                      — M118, M1422, M911
      M326 Kansāri                            — M1423, M1017
      M327 Herubori                           — LL17, AX07, SX01, SB04, HC01, M1209
@@ -182,6 +182,8 @@ const M3_INTERCHANGE = {
       note: 'Rosemane — M14 line' },
     { code: 'KD31',  network: 'suburban', transferMin: 4,
       note: 'Rosemane — Kidai Line' },
+    { code: 'JD02',  network: 'suburban', transferMin: 4,
+      note: 'Jōdai Line — Rosemane, stesso nome (node 146642920)' },
   ],
   M325: [
     { code: 'M118',  network: 'metro',    transferMin: 3,

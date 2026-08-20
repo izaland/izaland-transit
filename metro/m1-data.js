@@ -7,10 +7,11 @@
    Ordine canonico geografico: M110 (Alkuitsa, ovest) → M144 (Enikezya Forum, est)
 
    Interscambi principali:
-     M117 Sainðaul Central — R01, E01, K01, AX06, M814, LL01, KD32, SK26, TS13
+     M117 Sainðaul Central — R01, E01, K01, AX06, M814, LL01, KD32, SK26, TS13, JD01
      M111 Shimamera        — AX05, TS14, M417, M4
      M128 Asaji Torimoshi  — R02, KD20
      M110 Alkuitsa         — CK18, M202
+     M120 Tsumiji          — JD04
      M143 Shin-Enikezya    — R03
      M142 Enikezya         — SK07
      M130 Hintomaui        — M226
@@ -149,9 +150,13 @@ const M1_SVC = {
      ↔ KD32 (Kidai Line)       — Sainðaul Central Kidai             4 min
      ↔ SK26 (Seishaku Line)    — Sainðaul Central SK                4 min
      ↔ TS13 (Tandan-Senpyan)   — Sainðaul Central TS                4 min
+     ↔ JD01 (Jōdai Line)       — Sainðaul Central JD                4 min
 
    M119 Kushidaru Amiya
      ↔ M406 (Line 4)           — stesso nome, corridoio sotterraneo  3 min
+
+   M120 Tsumiji
+     ↔ JD04 (Jōdai Line)       — stesso nome, uscita condivisa      3 min
 
    M128 Asaji Torimoshi
      ↔ R02  (IZX Ryānkai)      — Asaji Torimoshi IZX               10 min
@@ -211,6 +216,8 @@ const M1_INTERCHANGE = {
       note: 'Seishaku Line — Sainðaul Central' },
     { code: 'TS13', network: 'suburban', transferMin: 4,
       note: 'Tandan-Senpyan — Sainðaul Central TS' },
+    { code: 'JD01', network: 'suburban', transferMin: 4,
+      note: 'Jōdai Line — Sainðaul Central JD' },
   ],
   M118: [
     { code: 'M209', network: 'metro',    transferMin: 9,
@@ -225,6 +232,10 @@ const M1_INTERCHANGE = {
   M119: [
     { code: 'M406', network: 'metro',    transferMin: 3,
       note: 'M4 Kushidaru Amiya — corridoio sotterraneo' },
+  ],
+  M120: [
+    { code: 'JD04', network: 'suburban', transferMin: 3,
+      note: 'Jōdai Line — Tsumiji, stesso nome, uscita condivisa' },
   ],
   M128: [
     { code: 'R02',  network: 'izx',      transferMin: 10,

@@ -73,18 +73,15 @@ const M4_META = {
   established:  1937,
   thruSince:    1976,
   totalKm:      32.895,
-  avgSpeedKmh:  30,          // usato da MetroRouter per generare TT runtime
-  dwellSec:     30,          // sosta per fermata (secondi)
-  /* Sezione storica */
+  avgSpeedKmh:  30,
+  dwellSec:     30,
   originalSection: { from: 'M401', to: 'M415', stations: 15 },
-  /* Thru-service */
-  thruEast: { operator: 'Shinsabu Oitsura Line', boardingNode: 'M415' }, // futuro
+  thruEast: { operator: 'Shinsabu Oitsura Line', boardingNode: 'M415' },
   thruWest: { sharedWith: 'Line 6', from: 'M425', since: 2013 },
 };
 
 /* ----------------------------------------------------------------
    Profilo frequenze operative (headway in minuti)
-   Valido per entrambe le direzioni su tutta la linea.
 
    Slot        Da      A       Headway
    ─────────── ─────── ─────── ───────
@@ -110,7 +107,6 @@ const M4_HEADWAY = [
    Servizi
    A  Rapid (fermate selezionate) — introdotto 1998
    B  All-stop
-   Timetable reali (M4_TT) da aggiungere in fase successiva.
 ---------------------------------------------------------------- */
 const M4_SVC = {
   A: {
@@ -135,10 +131,6 @@ const M4_SVC = {
 /* ----------------------------------------------------------------
    Interscambi Metro Line 4 ↔ altre reti
 
-   Ogni entry mappa il codice M4 ai nodi partner di altre reti
-   (IZX, AX, Suburban, M2). Il campo transferMin indica il tempo di
-   trasferimento fisico a piedi raccomandato.
-
    M401 Heinomoji
      ↔ M206 (Line 2)          — stesso nome, banchine separate    3 min
      ↔ M806 (Line 8)          — stesso nome, banchine separate    2 min
@@ -149,6 +141,7 @@ const M4_SVC = {
    M405 Anagusa Mukai
      ↔ KD30 (Kidai Line)      — stesso nome, uscita condivisa     3 min
      ↔ M817 (Line 8)          — Anagusa Mukai, banchine separate  3 min
+     ↔ JD03 (Jōdai Line)      — stesso nome, node 176670159       4 min
 
    M406 Kushidaru Amiya
      ↔ M210 (Line 2)          — stesso nome, banchine separate    3 min
@@ -187,8 +180,10 @@ const M4_INTERCHANGE = {
   M405: [
     { code: 'KD30', network: 'suburban', transferMin: 5,
       note: 'Kidai Line — Anagusa Mukai, uscita condivisa' },
-    { code: 'M817', network: 'metro', transferMin: 3,
+    { code: 'M817', network: 'metro',    transferMin: 3,
       note: 'M8 Anagusa Mukai — banchine separate' },
+    { code: 'JD03', network: 'suburban', transferMin: 4,
+      note: 'Jōdai Line — Anagusa Mukai, stesso nome (node 176670159)' },
   ],
   M406: [
     { code: 'M210', network: 'metro', transferMin: 3,
@@ -209,27 +204,7 @@ const M4_INTERCHANGE = {
       note: 'M2 Shimamera Shikiniswae — 300 m corridoio sotterraneo' },
   ],
   M419: [
-    { code: 'AX04', network: 'ax',      transferMin: 5,
+    { code: 'AX04', network: 'ax',       transferMin: 5,
       note: 'Airport Express Ramo Est — Kasakuri, piano -1/0' },
     { code: 'KD35', network: 'suburban', transferMin: 5,
-      note: 'Kidai Line — Kasakuri, uscita est' },
-    { code: 'K02',  network: 'izx',      transferMin: 10,
-      note: 'IZX Keishin — Niji-Sainðaul, walkable uscita nord' },
-       ],
-  M421: [
-    { code: 'SK36', network: 'suburban', transferMin: 4,
-      note: 'Seishaku Line  — interscambio underground - elevated' },
-  ],
-  M424: [
-    { code: 'M1110', network: 'metro', transferMin: 1,
-      note: 'M11 Ipporai - Owonideki  — interscambio facile' },
-],
-  M425: [
-    { code: 'TS18', network: 'suburban', transferMin: 5,
-      note: 'Tandan Senpyan Line  — interscambio underground - elevated' },
-],
-};
-
-if (typeof module !== 'undefined') {
-  module.exports = { M4_META, M4_ST, M4_CANONICAL_ORDER, M4_HEADWAY, M4_SVC, M4_INTERCHANGE };
-}
+      note: 'Kidai Line — Kasakur

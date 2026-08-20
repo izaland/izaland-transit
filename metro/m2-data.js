@@ -157,7 +157,6 @@ const M2_SVC = {
      M202  ↔ M1??            (Alkuitsa — name-match automatico)
      M208  ↔ M8??, M9??     (Egunsen Botanical Garden — name-match)
      M213  ↔ M17??, SX??    (Omenika Jinatsu — name-match)
-     M214  ↔ LL??           (Rakkashoni — name-match)
      M226  ↔ M1??           (Hintomaui — name-match)
 
    Corridoi fisici dichiarati:
@@ -165,6 +164,10 @@ const M2_SVC = {
      M208  ↔ K01  (IZX Keishin):  500 m corridoio sotterraneo
      M209  ↔ Masuda Agarai:       400 m corridoio
      M211  ↔ M18?? Nagida Kunbai (stazione diversa)
+
+   Interscambi Jōdai Line (JD):
+     M214 Rakkashoni ↔ JD05 Hayatogaru — stesso node 124066078, corridoio  5 min
+     M222 Oitsura    ↔ JD06 Oitsura    — stesso nome, stesso node 201351276 3 min
 ---------------------------------------------------------------- */
 const M2_INTERCHANGE = {
   /* M203 ↔ Shimamera (nome diverso: Shimamera Shikiniswae ≠ Shimamera) */
@@ -215,11 +218,19 @@ const M2_INTERCHANGE = {
   M211: [
     /* Codice M18 Nagida Kunbai da aggiungere quando disponibile */
   ],
-   M214: [
+  /* M214 Rakkashoni ↔ JD05 Hayatogaru (node 124066078) + LL11 */
+  M214: [
     { code: 'LL11', network: 'suburban', transferMin: 4,
       note: 'Loop Line Rakkashoni — stesso nome, banchine separate' },
-    ],
-     /* M226 ↔ M130 (Hintomaui — stesso nome, banchine separate) */
+    { code: 'JD05', network: 'suburban', transferMin: 5,
+      note: 'Jōdai Line — Hayatogaru, corridoio sotterraneo (node 124066078)' },
+  ],
+  /* M222 Oitsura ↔ JD06 (stesso nome, node 201351276) */
+  M222: [
+    { code: 'JD06', network: 'suburban', transferMin: 3,
+      note: 'Jōdai Line — Oitsura, stesso nome e node (201351276)' },
+  ],
+  /* M226 ↔ M130 (Hintomaui — stesso nome, banchine separate) */
   M226: [
     { code: 'M130', network: 'metro', transferMin: 3,
       note: 'M1 Hintomaui — stesso nome, banchine separate' },
