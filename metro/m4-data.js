@@ -132,19 +132,23 @@ const M4_SVC = {
    Interscambi Metro Line 4 ↔ altre reti
 
    M401 Heinomoji
-     ↔ M206 (Line 2)          — stesso nome, banchine separate    3 min
+     ↔ M206 (Line 2)          — stesso nome, banchine separate    4 min
      ↔ M806 (Line 8)          — stesso nome, banchine separate    2 min
 
    M402 Ogiwata
      ↔ M207 (Line 2)          — stesso nome, banchine separate    3 min
 
+   M403 Ekinðuka
+     ↔ M323 (Line 3)          — stesso nome, banchine separate    3 min
+
    M405 Anagusa Mukai
-     ↔ KD30 (Kidai Line)      — stesso nome, uscita condivisa     3 min
+     ↔ KD30 (Kidai Line)      — stesso nome, uscita condivisa     5 min
      ↔ M817 (Line 8)          — Anagusa Mukai, banchine separate  3 min
      ↔ JD03 (Jōdai Line)      — stesso nome, node 176670159       4 min
 
    M406 Kushidaru Amiya
      ↔ M210 (Line 2)          — stesso nome, banchine separate    3 min
+     ↔ M119 (Line 1)          — stesso nome, banchine separate    3 min
 
    M409 Sumi-Kokendake
      ↔ LL12 (Loop Line)       — stesso nome, banchine adiacenti   2 min
@@ -188,6 +192,8 @@ const M4_INTERCHANGE = {
   M406: [
     { code: 'M210', network: 'metro', transferMin: 3,
       note: 'M2 Kushidaru Amiya — stesso nome, banchine separate' },
+    { code: 'M119', network: 'metro', transferMin: 3,
+      note: 'M1 Kushidaru Amiya — stesso nome, banchine separate' },
   ],
   M409: [
     { code: 'LL12', network: 'suburban', transferMin: 2,
@@ -204,7 +210,18 @@ const M4_INTERCHANGE = {
       note: 'M2 Shimamera Shikiniswae — 300 m corridoio sotterraneo' },
   ],
   M419: [
-    { code: 'AX04', network: 'ax',       transferMin: 5,
+    { code: 'AX04', network: 'ax',       transferMin:  5,
       note: 'Airport Express Ramo Est — Kasakuri, piano -1/0' },
-    { code: 'KD35', network: 'suburban', transferMin: 5,
-      note: 'Kidai Line — Kasakur
+    { code: 'KD35', network: 'suburban', transferMin:  5,
+      note: 'Kidai Line — Kasakuri, uscita est' },
+    { code: 'K02',  network: 'izx',      transferMin: 10,
+      note: 'IZX Keishin — Kasakuri, walkable 10 min (uscita nord)' },
+  ],
+};
+
+if (typeof module !== 'undefined') {
+  module.exports = {
+    M4_META, M4_ST, M4_CANONICAL_ORDER,
+    M4_HEADWAY, M4_SVC, M4_INTERCHANGE,
+  };
+}
