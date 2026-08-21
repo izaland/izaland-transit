@@ -5,12 +5,23 @@
    Dipende da: suburban-data.js (SUBURBAN_LINES.JD)
 
    Servizi:
-     JD1  JD01 ↔ JD25  tutte le fermate  headway 8 min
-          - da JD01 (Sainðaul Central): 05:42 – 23:42
-          - da JD25 (Ninokawa):         05:42 – 23:42
+     JD1          JD01 ↔ JD25  tutte le fermate  headway 8 min
+                  - da JD01 (Sainðaul Central): 05:42 – 23:42
+                  - da JD25 (Ninokawa):         05:42 – 23:42
+
+     JD1_PEAK_SB  rinforzo mattutino JD25 → JD01 (Ninokawa → Sainðaul)
+                  headway 15 min · 06:35 – 09:35 da JD25
+                  Headway effettivo su JD25→JD01 in fascia peak:
+                    8 min base + 15 min rinforzo → treno ogni ~5 min
+
+     JD1_PEAK_NB  rinforzo serale JD01 → JD25 (Sainðaul → Ninokawa)
+                  headway 15 min · 17:10 – 20:10 da JD01
+                  Headway effettivo su JD01→JD25 in fascia peak:
+                    8 min base + 15 min rinforzo → treno ogni ~5 min
 
    NOTE:
-     — Servizio uniforme tutto il giorno (nessuna fascia peak differenziata).
+     — I servizi JD1_PEAK_* si sovrappongono al base JD1/JD1_NB;
+       il router somma i trip e ne beneficia l’headway effettivo.
      — Servizio Rapid (JD2) previsto in futuro; placeholder commentato.
 ================================================================ */
 'use strict';
@@ -29,6 +40,9 @@ const _JD_JD1_STOPS_NB = [..._JD_JD1_STOPS_SB].reverse();
    JD_TT_SERVICES — formato compatibile con SuburbanRouter _svcTrips()
 ================================================================ */
 const JD_TT_SERVICES = [
+  /* ----------------------------------------------------------------
+     JD1 — Servizio base tutto il giorno
+  ---------------------------------------------------------------- */
   {
     id:       'JD1',
     desc:     'Local — Sainðaul Central → Ninokawa',
@@ -48,6 +62,38 @@ const JD_TT_SERVICES = [
     lastDep:  '23:42',
     headway:  8,
     stops:    _JD_JD1_STOPS_NB,
+  },
+
+  /* ----------------------------------------------------------------
+     JD1_PEAK_SB — Rinforzo mattutino (direzione Sainðaul)
+     Fascia: 06:35 – 09:35 da Ninokawa (JD25)
+     Headway effettivo in fascia peak JD25→JD01: ~5 min
+  ---------------------------------------------------------------- */
+  {
+    id:       'JD1_PEAK_SB',
+    desc:     'Local peak AM — Ninokawa → Sainðaul Central (rinforzo)',
+    fromCode: 'JD25',
+    toCode:   'JD01',
+    firstDep: '06:35',
+    lastDep:  '09:35',
+    headway:  15,
+    stops:    _JD_JD1_STOPS_NB,
+  },
+
+  /* ----------------------------------------------------------------
+     JD1_PEAK_NB — Rinforzo serale (direzione Ninokawa)
+     Fascia: 17:10 – 20:10 da Sainðaul Central (JD01)
+     Headway effettivo in fascia peak JD01→JD25: ~5 min
+  ---------------------------------------------------------------- */
+  {
+    id:       'JD1_PEAK_NB',
+    desc:     'Local peak PM — Sainðaul Central → Ninokawa (rinforzo)',
+    fromCode: 'JD01',
+    toCode:   'JD25',
+    firstDep: '17:10',
+    lastDep:  '20:10',
+    headway:  15,
+    stops:    _JD_JD1_STOPS_SB,
   },
 
   /*
