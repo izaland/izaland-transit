@@ -1466,5 +1466,64 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
 })();
 </script>
 <script src="station-picker.js"></script>
+<script>
+/* ================================================================
+   JOURNEY PLANNER — DATABASE COUNTERS (lines + stations)
+================================================================ */
+(function(){
+  const panel = document.getElementById('tab-planner');
+  if(!panel) return;
+
+  const st = document.createElement('style');
+  st.textContent = `
+    .db-stats{display:flex;gap:var(--space-6);flex-wrap:wrap;margin-bottom:var(--space-6);padding:var(--space-3) var(--space-4);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-lg);}
+    .db-stat{display:flex;align-items:baseline;gap:var(--space-2);}
+    .db-stat-num{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;font-variant-numeric:tabular-nums;color:var(--text);}
+    .db-stat-lbl{font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700;}
+  `;
+  document.head.appendChild(st);
+
+  function safe(fn, fallback){ try { return fn(); } catch(e){ return fallback; } }
+
+  /* ── Stazioni ── */
+  const stationsByCode = new Map();   // codice -> nome
+  const lineIds = new Set();          // relazioni (linee) distinte
+
+  const add = (list, tag) => (list || []).forEach(s => {
+    if(!s || !s.code) return;
+    stationsByCode.set(s.code, (s.name || '').trim());
+    if(s.lineId) lineIds.add(tag + ':' + s.lineId);
+  });
+
+  if(typeof TTEngine !== 'undefined')
+    add(safe(() => TTEngine.allStations(), []), 'IZX');
+
+  if(typeof SuburbanRouter !== 'undefined')
+    add(safe(() => SuburbanRouter.allStations(), []), 'SUB');
+
+  if(typeof MetroRouter !== 'undefined'){
+    add(safe(() => MetroRouter.allStations(), []), 'MET');
+    safe(() => MetroRouter.allLines(), []).forEach(l => lineIds.add('MET:' + l.id));
+  }
+
+  /* Linee suburbane: arrivano da SUBURBAN_LINES (chiavi = id linea) */
+  if(typeof SUBURBAN_LINES !== 'undefined')
+    Object.keys(SUBURBAN_LINES).forEach(k => lineIds.add('SUB:' + k));
+
+  const nLines    = lineIds.size;
+  const nCodes    = stationsByCode.size;
+  const nStations = new Set(Array.from(stationsByCode.values()).map(n => n.toLowerCase())).size;
+
+  const fmt = n => n.toLocaleString('en-US');
+  const box = document.createElement('div');
+  box.className = 'db-stats';
+  box.setAttribute('aria-label', 'Database statistics');
+  box.innerHTML =
+    '<div class="db-stat"><span class="db-stat-num">' + fmt(nLines) + '</span><span class="db-stat-lbl">Lines</span></div>' +
+    '<div class="db-stat"><span class="db-stat-num">' + fmt(nStations) + '</span><span class="db-stat-lbl">Stations</span></div>' +
+    '<div class="db-stat"><span class="db-stat-num">' + fmt(nCodes) + '</span><span class="db-stat-lbl">Station codes</span></div>';
+  panel.insertBefore(box, panel.firstChild);
+})();
+</script>
 </body>
 </html>
