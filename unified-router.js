@@ -4,6 +4,21 @@
    Aggrega IZXRouter, LERouter, SuburbanRouter e MetroRouter in
    un'unica interfaccia di ricerca. Gestisce i trasferimenti
    cross-network tra IZX, LE (Lake Eira), Suburban e Metro.
+
+   FIX 14 (stazioni identiche con codici su reti diverse):
+     Alcune stazioni hanno un codice per ogni rete pur essendo la
+     STESSA stazione (es. Binno = LL02 / SK25 / TS12 / M452;
+     Anagusa Mukai = KD30 / JD03 / M405). Prima la fase 1 (diretto)
+     cercava solo nella rete di from/to, quindi Binno → Anagusa Mukai
+     sulla Metro M4 (M452 → M405) non veniva mai trovato e il cambio
+     veniva trattato come interscambio da 10 min.
+     Ora:
+       - SAME_STATION_GROUPS elenca i codici equivalenti;
+         registerSameStation(codes) permette di aggiungerne altri.
+       - _partnersOf() restituisce transferMin = 0 tra codici dello
+         stesso gruppo appartenenti a reti diverse.
+       - La fase 1 espande from/to agli alias a 0 min e prova il
+         diretto su ogni coppia di codici della stessa rete.
 ================================================================ */
 
 (function (root, factory) {
@@ -18,12 +33,36 @@
 
   const _routers = {};
 
+  /* Gruppi di codici che indicano la stessa stazione fisica su reti diverse. */
+  const SAME_STATION_GROUPS = [
+    ['LL02', 'SK25', 'TS12', 'M452'],   // Binno
+    ['KD30', 'JD03', 'M405'],           // Anagusa Mukai
+  ];
+
+  function registerSameStation(codes) {
+    if (Array.isArray(codes) && codes.length > 1) SAME_STATION_GROUPS.push(codes.slice());
+  }
+
+  function _sameStation(a, b) {
+    return SAME_STATION_GROUPS.some(g => g.includes(a) && g.includes(b));
+  }
+
   function registerRouter(networkId, routerObj) {
     _routers[networkId.toUpperCase()] = routerObj;
   }
 
   function _routerFor(networkId) {
     return _routers[networkId ? networkId.toUpperCase() : ''] || null;
+  }
+
+  function _netOfCode(code) {
+    for (const [id, r] of Object.entries(_routers)) {
+      if (typeof r.hasStation === 'function' && r.hasStation(code)) return id;
+      if (typeof r.allStations === 'function') {
+        if (r.allStations().some(s => s.code === code)) return id;
+      }
+    }
+    return null;
   }
 
   const _ixIndex = {};
@@ -52,17 +91,17 @@
   function _partnersOf(code) {
     const raw = _ixIndex[code] || [];
     const out = [];
+    const ownNet = raw.some(e => _sameStation(code, e.code)) ? _netOfCode(code) : null;
 
     function _push(partnerCode, transferMin) {
-      let net = null;
-      for (const [id, r] of Object.entries(_routers)) {
-        if (typeof r.hasStation === 'function' && r.hasStation(partnerCode)) { net = id; break; }
-        if (typeof r.allStations === 'function') {
-          if (r.allStations().some(s => s.code === partnerCode)) { net = id; break; }
-        }
-      }
+      const net = _netOfCode(partnerCode);
       if (!net) return;
-      out.push({ code: partnerCode, networkId: net, transferMin: transferMin ?? CROSS_TRANSFER_MIN });
+      const zero = ownNet !== null && net !== ownNet && _sameStation(code, partnerCode);
+      out.push({
+        code: partnerCode,
+        networkId: net,
+        transferMin: zero ? 0 : (transferMin ?? CROSS_TRANSFER_MIN),
+      });
     }
 
     raw.forEach(entry => _push(entry.code, entry.transferMin ?? CROSS_TRANSFER_MIN));
@@ -167,6 +206,23 @@
     return out;
   }
 
+  /* Nodi di `code` + alias a 0 min (stessa stazione, altra rete). */
+  function _aliasNodes(code, netFilter) {
+    const out = _resolveNodes(code, netFilter);
+    for (const p of _partnersOf(code)) {
+      if (p.transferMin !== 0) continue;
+      if (netFilter && !netFilter.has(p.networkId)) continue;
+      out.push({ code: p.code, networkId: p.networkId });
+    }
+    const seen = new Set();
+    return out.filter(n => {
+      const k = n.networkId + '|' + n.code;
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }
+
   function _journeyKey(j) {
     const legKey = j.legs.map(l => [
       l.lineId  || l.line  || '',
@@ -236,13 +292,15 @@
 
     const journeys = [];
 
-    /* ---- 1. DIRECT ---- */
-    for (const fNode of fNodes) {
-      for (const tNode of tNodes) {
+    /* ---- 1. DIRECT (con alias stessa-stazione a 0 min) ---- */
+    const fAlias = _aliasNodes(from, netFilter);
+    const tAlias = _aliasNodes(to,   netFilter);
+    for (const fNode of fAlias) {
+      for (const tNode of tAlias) {
         if (fNode.networkId !== tNode.networkId) continue;
         const router = _routerFor(fNode.networkId);
         if (!router) continue;
-        const results = _safeSearch(router, fNode.networkId, from, to, depTime, opts);
+        const results = _safeSearch(router, fNode.networkId, fNode.code, tNode.code, depTime, opts);
         results.forEach(j => {
           journeys.push({
             ...j,
@@ -376,6 +434,7 @@
 
   return {
     registerRouter,
+    registerSameStation,
     buildInterchangeIndex,
     search,
     CROSS_TRANSFER_MIN,
