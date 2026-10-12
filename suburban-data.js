@@ -28,6 +28,7 @@
      KD25 ↔ LL09  (Igashikura/Taishindai)
      KD26 ↔ LL10  (Hayatogaru)
      KD30 ↔ M405  (Anagusa Mukai)
+     KD31 ↔ JD02, M324  (Rosemane — M3; M14 da definire)
      KD35 ↔ AX04, M419  (Kasakuri)
      KD36 ↔ K101  (Sakamuso)
      KD37 ↔ K102, AX21  (Showanul)
@@ -100,7 +101,7 @@
 
      JD interchanges (Juwon-Kodōn Line · 中央湖東線):
      JD01 (Sainðaul Central) ↔ K01, R01, E01, M117, M814, LL01, KD32, SK26, TS13
-     JD02 (Rosemane) ↔ KD31, M324, M142
+     JD02 (Rosemane) ↔ KD31, M324 (M3) — M14: codice da definire (sospeso)
      JD03 (Anagusa Mukai) ↔ KD30, M817, M405
      JD04 (Tsumiji) ↔ M120, KD29
      JD05 (Hayatogaru) ↔ LL10, KD26
@@ -146,6 +147,11 @@
      il ciclo: ogni sotto-cluster (Kawayatsu / Niji-Kawayatsu) è autonomo,
      il collegamento tra i due avviene solo tramite il grafo lineare KW/KS/TS.
 
+   FIX 13 (Rosemane — interscambio simmetrico JD02 ↔ KD31):
+     Aggiunta la voce KD31 (mancava) e rimosso M142 da JD02.
+     Rosemane è anche stazione IR e della metro: M3 = M324;
+     M14 = codice ancora da definire (sospeso).
+
    Nota km Loop Line:
      Distanze progressive reali da rilievo cartografico.
      Circuito totale: 24.41 km (LL01 → ... → LL19 → LL01).
@@ -164,6 +170,8 @@ const SUBURBAN_INTERCHANGE = {
   KD25: ['LL09'],
   KD26: ['LL10'],
   KD30: ['M405'],
+  // Rosemane: M3 = M324; M14 = codice da definire (sospeso)
+  KD31: ['JD02', 'M324'],
   KD32: ['LL01', 'K01', 'R01', 'E01', 'AX06'],
   KD33: ['LL19'],
   KD34: [],
@@ -245,7 +253,8 @@ const SUBURBAN_INTERCHANGE = {
   HD01: ['K17'],
   // Juwon-Kodōn Line (JD) · 中央湖東線
   JD01: ['K01', 'R01', 'E01', 'M117', 'M814', 'LL01', 'KD32', 'SK26', 'TS13'],
-  JD02: ['KD31', 'M324', 'M142'],
+  // Rosemane: M3 = M324; M14 = codice da definire (sospeso)
+  JD02: ['KD31', 'M324'],
   JD03: ['KD30', 'M817', 'M405'],
   JD04: ['M120', 'KD29'],
   JD05: ['LL10', 'KD26'],
@@ -550,7 +559,7 @@ const SUBURBAN_LINES = {
      Interscambi principali:
        JD01 (Sainðaul Central) ↔ K01, R01, E01, M117, M814,
                                    LL01, KD32, SK26, TS13
-       JD02 (Rosemane)         ↔ KD31, M324, M142
+       JD02 (Rosemane)         ↔ KD31, M324 (M3) — M14 da definire
        JD03 (Anagusa Mukai)    ↔ KD30, M817, M405
        JD04 (Tsumiji)          ↔ M120, KD29
        JD05 (Hayatogaru)       ↔ LL10, KD26
