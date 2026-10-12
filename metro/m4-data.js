@@ -4,7 +4,8 @@
    Est. 1937 · Through service since 1976
    Original section (M401–M415): Heinomoji → Kawaei · 15 stations
    Extended section (M416–M425): Abawauri → Ipporai-Senpyan · +10 stations
-   Total: 25 stations · 32.9 km
+   Binno (M452): inserita tra Ogiwata (M402) e Ekinðuka (M403) · +1 station
+   Total: 26 stations · 33.3 km
 
    Thru-service:
      East  → Shinsabu Oitsura Line (beyond Kawaei, future)
@@ -13,6 +14,7 @@
    Codifica:
      M401–M415  sezione storica (Heinomoji → Kawaei), aperta 1937
      M416–M425  estensione ovest (Abawauri → Ipporai-Senpyan)
+     M452       Binno — codice fuori sequenza, posizionata fra M402 e M403
      I codici non seguono l'ordine geografico: M401 è al centro fisico
      della linea. L'ordine canonico è geografico ovest → est.
 
@@ -20,6 +22,9 @@
      Distanze progressive da Ipporai-Senpyan (km 0.0).
      Intervallo fisso Kasakuri(M419) ↔ Nihkyonta(M418) = 3.8 km.
      Intervallo medio restante ≈ 1.265 km.
+     Binno: M402 ↔ M452 = 0.918 km; M452 ↔ M403 = 0.795 km.
+     Le stazioni da M403 in poi sono slittate di +0.448 km rispetto
+     alla versione precedente (1.713 km totali tra M402 e M403).
 ================================================================ */
 'use strict';
 
@@ -38,26 +43,27 @@ const M4_ST = {
   /* ── Sezione storica (1937) ── */
   M401: { n: 'Heinomoji',           k: '駕桃',         km: 15.185 },
   M402: { n: 'Ogiwata',             k: '槃芳',         km: 16.450 },
-  M403: { n: 'Ekinðuka',            k: '虓鵜',         km: 17.715 },
-  M404: { n: 'Aguri 2-sa',          k: '阿久里二沙',   km: 18.980 },
-  M405: { n: 'Anagusa Mukai',       k: '矢模武凱',     km: 20.245 },
-  M406: { n: 'Kushidaru Amiya',     k: '柚艏',         km: 21.510 },
-  M407: { n: 'Tamainoki',           k: '谷伊坂',       km: 22.775 },
-  M408: { n: 'Tamainoki Kokendake', k: '谷伊坂古剣館', km: 24.040 },
-  M409: { n: 'Sumi-Kokendake',      k: '隠古剣館',     km: 25.305 },
-  M410: { n: 'Sojo-Kokendake',      k: '',             km: 26.570 },
-  M411: { n: 'Nuskaitsa',           k: '',             km: 27.835 },
-  M412: { n: 'Juhtasamo',           k: '',             km: 29.100 },
-  M413: { n: 'Ristai-Nyūngu',       k: '立大入口',     km: 30.365 },
-  M414: { n: 'Niji-Kawaei',         k: '西珂夬栄',     km: 31.630 },
-  M415: { n: 'Kawaei',              k: '珂夬栄',       km: 32.895 },
+  M452: { n: 'Binno',               k: '苠喃',         km: 17.368 }, // +0.918 km da M402
+  M403: { n: 'Ekinðuka',            k: '虓鵜',         km: 18.163 }, // +0.795 km da M452
+  M404: { n: 'Aguri 2-sa',          k: '阿久里二沙',   km: 19.428 },
+  M405: { n: 'Anagusa Mukai',       k: '矢模武凱',     km: 20.693 },
+  M406: { n: 'Kushidaru Amiya',     k: '柚艏',         km: 21.958 },
+  M407: { n: 'Tamainoki',           k: '谷伊坂',       km: 23.223 },
+  M408: { n: 'Tamainoki Kokendake', k: '谷伊坂古剣館', km: 24.488 },
+  M409: { n: 'Sumi-Kokendake',      k: '隠古剣館',     km: 25.753 },
+  M410: { n: 'Sojo-Kokendake',      k: '',             km: 27.018 },
+  M411: { n: 'Nuskaitsa',           k: '',             km: 28.283 },
+  M412: { n: 'Juhtasamo',           k: '',             km: 29.548 },
+  M413: { n: 'Ristai-Nyūngu',       k: '立大入口',     km: 30.813 },
+  M414: { n: 'Niji-Kawaei',         k: '西珂夬栄',     km: 32.078 },
+  M415: { n: 'Kawaei',              k: '珂夬栄',       km: 33.343 },
 };
 
 /* Ordine canonico geografico: ovest (Ipporai-Senpyan) → est (Kawaei) */
 const M4_CANONICAL_ORDER = [
   'M425', 'M424', 'M423', 'M422', 'M421', 'M420',
   'M419', 'M418', 'M417', 'M416',
-  'M401', 'M402', 'M403', 'M404', 'M405', 'M406', 'M407', 'M408',
+  'M401', 'M402', 'M452', 'M403', 'M404', 'M405', 'M406', 'M407', 'M408',
   'M409', 'M410', 'M411', 'M412', 'M413', 'M414', 'M415',
 ];
 
@@ -72,10 +78,10 @@ const M4_META = {
   color:        '#FFEF00',   // giallo canarino
   established:  1937,
   thruSince:    1976,
-  totalKm:      32.895,
+  totalKm:      33.343,
   avgSpeedKmh:  30,
   dwellSec:     30,
-  originalSection: { from: 'M401', to: 'M415', stations: 15 },
+  originalSection: { from: 'M401', to: 'M415', stations: 16 },
   thruEast: { operator: 'Shinsabu Oitsura Line', boardingNode: 'M415' },
   thruWest: { sharedWith: 'Line 6', from: 'M425', since: 2013 },
 };
@@ -138,6 +144,9 @@ const M4_SVC = {
    M402 Ogiwata
      ↔ M207 (Line 2)          — stesso nome, banchine separate    3 min
 
+   M452 Binno
+     ↔ LL02 (Loop Line)       — stesso nome (tempo da confermare) 3 min
+
    M403 Ekinðuka
      ↔ M323 (Line 3)          — stesso nome, banchine separate    3 min
 
@@ -176,6 +185,10 @@ const M4_INTERCHANGE = {
   M402: [
     { code: 'M207', network: 'metro', transferMin: 3,
       note: 'M2 Ogiwata — stesso nome, banchine separate' },
+  ],
+  M452: [
+    { code: 'LL02', network: 'suburban', transferMin: 3,
+      note: 'Loop Line — Binno (tempo di cambio da confermare)' },
   ],
   M403: [
     { code: 'M323', network: 'metro', transferMin: 3,
