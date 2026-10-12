@@ -6,6 +6,7 @@
    Distanze progressive da M701 (km 0.000), totale 36.30 km.
 
    Interscambi confermati:
+     M712  M623 (Metro Line 6 — Ezaesomu)
      M714  M509 (Metro Line 5 — Riihisano)
      M719  M503 (Metro Line 5 — Konegisa Eigandan)
      M728  M513 (Metro Line 5 — Pwakkobe)
@@ -73,6 +74,10 @@ const M7_SVC = {
 };
 
 const M7_INTERCHANGE = {
+  M712: [
+    { code: 'M623', network: 'metro', transferMin: 3,
+      note: 'Metro Line 6 — Ezaesomu' },
+  ],
   M714: [
     { code: 'M509', network: 'metro', transferMin: 3,
       note: 'Metro Line 5 — Riihisano' },
