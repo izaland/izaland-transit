@@ -20,9 +20,11 @@
      M509  M714  (Metro Line 7 — Riihisano)
      M510  M15-18 (Metro Line 15 — Eonogi Kōwen)
      M511  HO13  (Honanshū Line — Kadokamahiwa)
+     M513  M728  (Metro Line 7 — Pwakkobe)
+           M17?? (da confermare)
      M514  KD39  (Kidai Line — Jisahara, stesso nome)
 
-   Interscambi M502 (1, 31) e M513 (M17??, M7??) da confermare.
+   Interscambi M502 (1, 31) e M513 (M17??) da confermare.
 ================================================================ */
 'use strict';
 
@@ -31,16 +33,16 @@ const M5_ST = {
   M502: { n: 'Mundōzan',                        k: '門道山',     nodeId: 304405932, km:  0.95 },
   M503: { n: 'Konegisa Eigandan',               k: '干鮃永玵段', nodeId: 123393753, km:  2.05 },
   M504: { n: 'Jaihonmu 3sa',                    k: '際笨武3沙',  nodeId: 136114107, km:  3.10 },
-  M505: { n: 'Kirifunu Kukubān',                k: '礒判國防',   nodeId: 136114106, km:  4.30 },
+  M505: { n: 'Kirifunu Kukubān',                k: '礢判國防',   nodeId: 136114106, km:  4.30 },
   M506: { n: 'Sakanemoto',                      k: '沛岬斗',     nodeId: 123393750, km:  5.20 },
   M507: { n: 'Akagae Nosori',                   k: '蛞外見祖里', nodeId: 147984628, km:  6.35 },
-  M508: { n: 'Pentorawi Kirifunu',              k: '篇土碪礒判', nodeId: 198159780, km:  7.35 },
+  M508: { n: 'Pentorawi Kirifunu',              k: '篡土碪礢判', nodeId: 198159780, km:  7.35 },
   M509: { n: 'Riihisano',                       k: '尾本',       nodeId: 123393747, km:  8.60 },
   M510: { n: 'Eonogi Kōwen',                    k: '',           nodeId: 146814988, km:  9.48 },
   M511: { n: 'Kadokamahiwa',                    k: '',           nodeId: 196658319, km: 10.58 },
   M512: { n: 'Tswikei Daigaku',                 k: '追渓大學',   nodeId: 196658320, km: 11.63 },
   M513: { n: 'Pwakkobe',                        k: '',           nodeId: 196658312, km: 12.55 },
-  M514: { n: 'Jisahara',                        k: '治叉榎',     nodeId: 176782928, km: 13.73 },
+  M514: { n: 'Jisahara',                        k: '治叉槎',     nodeId: 176782928, km: 13.73 },
 };
 
 /* Ordine canonico: M501 (nord/origine) → M514 (sud/fine) */
@@ -126,8 +128,8 @@ const M5_SVC = {
      ↔ HO13  (Honanshū Line)
 
    M513  Pwakkobe
+     ↔ M728  (Metro Line 7)
      ↔ M17?? — da confermare
-     ↔ M7??  — da confermare
 
    M514  Jisahara
      ↔ KD39  (Kidai Line) — stesso nome, stesso impianto
@@ -170,7 +172,9 @@ const M5_INTERCHANGE = {
       note: 'Hoze-Oyehatton Line — Kadokamahiwa' },
   ],
   M513: [
-    // ↔ M17?? e M7?? da confermare
+    { code: 'M728', network: 'metro', transferMin: 3,
+      note: 'Metro Line 7 — Pwakkobe' },
+    // ↔ M17?? da confermare
   ],
   M514: [
     { code: 'KD39', network: 'suburban', transferMin: 3,
