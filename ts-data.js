@@ -60,7 +60,7 @@ const TS_INTERCHANGE = {
          'K01',  'R01',  'E01', 'AX06'], // Sainðaul Central ↔ tutto
   TS14: ['SK33', 'M417', 'M203'],     // Shimamera   ↔ SK33, M4 Shimamera, M2 (7 min walk)
   TS15: ['SK34', 'M418'],             // Nihkyonta   ↔ SK34, M4
-  TS16: ['SK35', 'M419', 'AX04'],    // Kasakuri    ↔ SK35, M4, AX
+  TS16: ['SK35', 'M419', 'AX04', 'M612'], // Kasakuri ↔ SK35, M4, AX, M6
   TS18: ['M425'],                     // Ipporai-Senpyan ↔ M4 capolinea ovest
 };
 
