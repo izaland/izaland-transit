@@ -164,6 +164,7 @@
 ================================================================ */
 const SUBURBAN_INTERCHANGE = {
   LL01: ['K01', 'R01', 'E01', 'AX06'],
+  LL02: ['SK25', 'TS12', 'M452'],
   LL12: ['M409'],
   LL17: ['AX07'],
   KD20: ['R02'],
@@ -184,7 +185,7 @@ const SUBURBAN_INTERCHANGE = {
   SK01: ['WI13'],
   SK12: ['KD14'],
   SK24: ['LL03'],
-  SK25: ['LL02'],
+  SK25: ['LL02', 'TS12', 'M452'],
   SK26: ['LL01', 'KD32'],
   SK27: ['KD33', 'LL19'],
   SK28: ['KD34'],
@@ -211,7 +212,7 @@ const SUBURBAN_INTERCHANGE = {
   TS06: [{ code: 'KW11', transferMin: 2 }, { code: 'KS01', transferMin: 2 }],
   // ── Cluster KAWAYATSU: TS07 | KW10 | KS02 ───────────────────────────────
   TS07: ['E02', { code: 'KW10', transferMin: 2 }, { code: 'KS02', transferMin: 2 }],
-  TS12: ['LL02', 'SK25'],
+  TS12: ['LL02', 'SK25', 'M452'],
   TS13: ['LL01', 'SK26', 'M814', 'K01', 'R01', 'E01', 'AX06'],
   TS14: ['SK33', 'M417', 'M203'],
   TS15: ['SK34', 'M418'],
