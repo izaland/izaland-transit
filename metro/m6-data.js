@@ -20,7 +20,7 @@
      M617 Ipporai - Owonideki      — M424, M1110
      M618 Ipporai-Senpyan          — M425, TS18
      M620 Otsumi-Nawadae           — M1315
-     M623 Ezaesomu                 — M717
+     M623 Ezaesomu                 — M712
      M625 Niji-Urenosomi           — M17?? (TBD)
      M628 Kōtō Satahappi           — KD41
      M631 Pankyō-Nari              — (no interchange listed)
@@ -185,7 +185,7 @@ const M6_INTERCHANGE = {
       note: 'Otsumi-Nawadae — M13 line' },
   ],
   M623: [
-    { code: 'M717',  network: 'metro',    transferMin: 3,
+    { code: 'M712',  network: 'metro',    transferMin: 3,
       note: 'Ezaesomu — M7 line' },
   ],
   M625: [
