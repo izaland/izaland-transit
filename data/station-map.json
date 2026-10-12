@@ -179,5 +179,19 @@
   "183370181": {"STN":"STN-163","name":"Ðaihate","stops":[{"network":"METRO","line":"M3","code":"M332"}]},
   "214014848": {"STN":"STN-164","name":"Kanlikoika Yukashire","stops":[{"network":"METRO","line":"M3","code":"M333"}]},
   "183370158": {"STN":"STN-165","name":"Iyogateri","stops":[{"network":"METRO","line":"M3","code":"M334"}]},
-  "122813475": {"STN":"STN-166","name":"Shakihori","stops":[{"network":"METRO","line":"M3","code":"M3150"}]}
+  "122813475": {"STN":"STN-166","name":"Shakihori","stops":[{"network":"METRO","line":"M3","code":"M3150"}]},
+  "123393742": {"STN":"STN-167","name":"Tsuragoi","name_kanji":"汐蒲","stops":[{"network":"METRO","line":"M5","code":"M501"}]},
+  "304405932": {"STN":"STN-168","name":"Mundōzan","name_kanji":"門道山","stops":[{"network":"METRO","line":"M5","code":"M502"}]},
+  "123393753": {"STN":"STN-169","name":"Konegisa Eigandan","name_kanji":"干鮃永玵段","stops":[{"network":"METRO","line":"M5","code":"M503"}]},
+  "136114107": {"STN":"STN-170","name":"Jaihonmu 3sa","name_kanji":"際笨武3沙","stops":[{"network":"METRO","line":"M5","code":"M504"}]},
+  "136114106": {"STN":"STN-171","name":"Kirifunu Kukubān","name_kanji":"礒判國防","stops":[{"network":"METRO","line":"M5","code":"M505"}]},
+  "123393750": {"STN":"STN-172","name":"Sakanemoto","name_kanji":"沛岬斗","stops":[{"network":"METRO","line":"M5","code":"M506"}]},
+  "147984628": {"STN":"STN-173","name":"Akagae Nosori (Yōdai adae)","name_kanji":"蛞外見祖里〈葉廼前〉","stops":[{"network":"METRO","line":"M5","code":"M507"}]},
+  "198159780": {"STN":"STN-174","name":"Pentorawi Kirifunu","name_kanji":"篇土碪礒判","stops":[{"network":"METRO","line":"M5","code":"M508"}]},
+  "123393747": {"STN":"STN-175","name":"Riihisano","name_kanji":"尾本","stops":[{"network":"METRO","line":"M5","code":"M509"}]},
+  "146814988": {"STN":"STN-176","name":"Eonogi Kōwen","stops":[{"network":"METRO","line":"M5","code":"M510"}]},
+  "196658319": {"STN":"STN-177","name":"Kadokamahiwa","stops":[{"network":"METRO","line":"M5","code":"M511"}]},
+  "196658320": {"STN":"STN-178","name":"Tswikei Daigaku","name_kanji":"追渓大學","stops":[{"network":"METRO","line":"M5","code":"M512"}]},
+  "196658312": {"STN":"STN-179","name":"Pwakkobe","stops":[{"network":"METRO","line":"M5","code":"M513"}]},
+  "176782928": {"STN":"STN-180","name":"Jisahara","name_kanji":"治叉榎","stops":[{"network":"METRO","line":"M5","code":"M514"}]}
 }
