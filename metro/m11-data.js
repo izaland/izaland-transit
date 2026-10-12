@@ -9,10 +9,10 @@
      M1107 Rismyonjen      ↔ CK13, TS17
      M1110 Ipporai-Owonideki ↔ M424 (M4)
      M1112 Kirifunu Kukubān ↔ M505 (M5)
-     M1113 Ushiuruma       ↔ M7?? (TODO — codice da confermare)
+     M1113 Ushiuruma       ↔ M718 (M7)
      M1114 Ðwaishon Tekkapi ↔ HO09
      M1115 Bajikoe Canal Kŏwen ↔ M1503 (M15)
-     M1116 Shutazai        ↔ TS20, M704 (M7), M16?? (TODO)
+     M1116 Shutazai        ↔ TS20, M725 (M7), M16?? (TODO)
      M1120 Jisahara        ↔ KD39, M514 (M5)
 ================================================================ */
 'use strict';
@@ -23,7 +23,7 @@ const M11_ST = {
   M1103: { n: 'Amajakashi',                  k: '',             nodeId: 136187242, km:  2.29 },
   M1104: { n: 'Chetonuku',                   k: '',             nodeId: 136187243, km:  4.00 },
   M1105: { n: 'Sagaisana 2-sa',              k: '',             nodeId: 136187244, km:  5.16 },
-  M1106: { n: 'Takatsura',                   k: '浚鶴',           nodeId: 136187245, km:  6.57 },
+  M1106: { n: 'Takatsura',                   k: '涚鶴',           nodeId: 136187245, km:  6.57 },
   M1107: { n: 'Rismyonjen',                  k: '',             nodeId: 136187246, km:  7.71 },
   M1108: { n: 'Owonideki Zawahan',           k: '吹取--',         nodeId: 136187247, km:  8.61 },
   M1109: { n: 'Bubaijaka',                   k: '',             nodeId: 136187248, km:  9.24 },
@@ -36,8 +36,8 @@ const M11_ST = {
   M1116: { n: 'Shutazai',                    k: '守多彩',           nodeId: 136187238, km: 17.48 },
   M1117: { n: 'Shobeikana Rihasai',          k: '',             nodeId: 196658311, km: 18.45 },
   M1118: { n: 'Futteskaiba',                 k: '',             nodeId: 176789173, km: 19.29 },
-  M1119: { n: 'Shiki-Jisahara',              k: '北治叉榳',           nodeId: 176782927, km: 22.00 },
-  M1120: { n: 'Jisahara',                    k: '治叉榳',             nodeId: 176782928, km: 23.32 },
+  M1119: { n: 'Shiki-Jisahara',              k: '北治叉槳',           nodeId: 176782927, km: 22.00 },
+  M1120: { n: 'Jisahara',                    k: '治叉槳',             nodeId: 176782928, km: 23.32 },
 };
 
 /* Ordine canonico geografico: M1101 → M1120 */
@@ -113,9 +113,8 @@ const M11_INTERCHANGE = {
       note: 'M5 Kirifunu Kukubān — stesso nome' },
   ],
   M1113: [
-    // TODO: codice M7 da confermare
-    { code: 'M7??', network: 'metro', transferMin: 3,
-      note: 'M7 Ushiuruma — codice da confermare' },
+    { code: 'M718', network: 'metro', transferMin: 3,
+      note: 'M7 Ushiuruma — stesso nome' },
   ],
   M1114: [
     { code: 'HO09', network: 'ho', transferMin: 3,
@@ -128,7 +127,7 @@ const M11_INTERCHANGE = {
   M1116: [
     { code: 'TS20', network: 'ts', transferMin: 3,
       note: 'TS20 Shutazai' },
-    { code: 'M704', network: 'metro', transferMin: 3,
+    { code: 'M725', network: 'metro', transferMin: 3,
       note: 'M7 Shutazai — stesso nome' },
     // TODO: codice M16 da confermare
     { code: 'M16??', network: 'metro', transferMin: 3,
