@@ -10,7 +10,7 @@
      M606 Assemikori               — M16??, M17?? (TBD)
      M608 Ishitsuma                — M804
      M609 Abawauri                 — M416
-     M610 Shimamera                — M417, AX05, M203, TS14, M1111
+     M610 Shimamera                — M417, AX05, M203, TS14
      M611 Nihkyonta                — M418, SK34, TS15, CK17
      M612 Kasakuri                 — M419, AX04, KD35, K02
      M613 Buslyu Toshi             — M420
@@ -125,8 +125,6 @@ const M6_INTERCHANGE = {
       note: 'Shimamera — M2 line' },
     { code: 'TS14',   network: 'suburban', transferMin: 4,
       note: 'Shimamera — TS line' },
-    { code: 'M1111',  network: 'metro',    transferMin: 3,
-      note: 'Shimamera — M11 line' },
   ],
   M611: [
     { code: 'M418',  network: 'metro',    transferMin: 3,
@@ -147,6 +145,8 @@ const M6_INTERCHANGE = {
       note: 'Kasakuri — Kidai Line' },
     { code: 'K02',   network: 'suburban', transferMin: 4,
       note: 'Kasakuri — K line' },
+    { code: 'TS16',  network: 'suburban', transferMin: 4,
+      note: 'Kasakuri — TS line' },
   ],
   M613: [
     { code: 'M420',  network: 'metro',    transferMin: 3,
