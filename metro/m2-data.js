@@ -176,6 +176,10 @@ const M2_INTERCHANGE = {
       note: 'M4 Shimamera — 300 m corridor' },
     { code: 'M111', network: 'metro',    transferMin: 7,
       note: 'M1 Shimamera — 300 m corridor' },
+    { code: 'M610', network: 'metro',    transferMin: 7,
+      note: 'M6 Shimamera — 300 m corridor' },
+    { code: 'TS14', network: 'suburban', transferMin: 7,
+      note: 'TS Shimamera — 300 m corridor' },
     /* AX Shimamera: aggiungere codice quando disponibile */
   ],
   /* M206 ↔ M401 (Heinomoji — stesso nome, banchine separate) */
