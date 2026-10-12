@@ -6,10 +6,12 @@
    Distanze progressive da M701 (km 0.000), totale 36.30 km.
 
    Interscambi confermati:
-     M712  M623 (Metro Line 6 — Ezaesomu)
-     M714  M509 (Metro Line 5 — Riihisano)
-     M719  M503 (Metro Line 5 — Konegisa Eigandan)
-     M728  M513 (Metro Line 5 — Pwakkobe)
+     M712  M623  (Metro Line 6 — Ezaesomu)
+     M714  M509  (Metro Line 5 — Riihisano)
+     M718  M1113 (Metro Line 11 — Ushiuruma)
+     M719  M503  (Metro Line 5 — Konegisa Eigandan)
+     M725  M1116 (Metro Line 11 — Shutazai)
+     M728  M513  (Metro Line 5 — Pwakkobe)
 ================================================================ */
 'use strict';
 
@@ -82,9 +84,17 @@ const M7_INTERCHANGE = {
     { code: 'M509', network: 'metro', transferMin: 3,
       note: 'Metro Line 5 — Riihisano' },
   ],
+  M718: [
+    { code: 'M1113', network: 'metro', transferMin: 3,
+      note: 'Metro Line 11 — Ushiuruma' },
+  ],
   M719: [
     { code: 'M503', network: 'metro', transferMin: 3,
       note: 'Metro Line 5 — Konegisa Eigandan' },
+  ],
+  M725: [
+    { code: 'M1116', network: 'metro', transferMin: 3,
+      note: 'Metro Line 11 — Shutazai' },
   ],
   M728: [
     { code: 'M513', network: 'metro', transferMin: 3,
