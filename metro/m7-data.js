@@ -6,6 +6,7 @@
    Distanze progressive da M701 (km 0.000), totale 36.30 km.
 
    Interscambi confermati:
+     M705  AX03  (Airport Express — Riimibaiken)
      M712  M623  (Metro Line 6 — Ezaesomu)
      M714  M509  (Metro Line 5 — Riihisano)
      M718  M1113 (Metro Line 11 — Ushiuruma)
@@ -76,6 +77,10 @@ const M7_SVC = {
 };
 
 const M7_INTERCHANGE = {
+  M705: [
+    { code: 'AX03', network: 'ax', transferMin: 5,
+      note: 'Riimibaiken — Airport Express' },
+  ],
   M712: [
     { code: 'M623', network: 'metro', transferMin: 3,
       note: 'Metro Line 6 — Ezaesomu' },
