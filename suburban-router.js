@@ -205,6 +205,8 @@ const SuburbanRouter = (() => {
   const THRU_TRANSFER_SEC   = THRU_TRANSFER_MIN  * 60;
   const INTRA_TRANSFER_SEC  = 0;   // same-platform intra-line (Rapid→Local)
   const MAX_JOURNEYS  = 12;
+     /* servizi iniettati da register(): { lineId: services[] } */
+  const _extraServices = {};
   const SEARCH_WINDOW = 3 * 3600;
   const AVG_SPEED_KMH = 40;   // fallback globale per linee senza segSpeedKmh
   const DWELL_SEC     = 20;   // sosta di default (suburbano); era 30
@@ -578,6 +580,8 @@ function _getEquivalentCodes(code) {
    * FIX 10: aggiunto branch KS.
    * ---------------------------------------------------------------- */
   function _getTrips(line, iFrom, iTo, depSec) {
+    if (_extraServices[line.id])
+      return _svcTrips(_extraServices[line.id], line, iFrom, iTo, depSec);
     if (line.id === 'SK' && typeof SK_SERVICES !== 'undefined')
       return _svcTrips(SK_SERVICES, line, iFrom, iTo, depSec);
     if (line.id === 'KW' && typeof KW_SERVICES !== 'undefined')
@@ -594,7 +598,9 @@ function _getEquivalentCodes(code) {
    * ---------------------------------------------------------------- */
   function _getExpressTrips(line, iFrom, depSec) {
     let raw = [];
-    if (line.id === 'SK' && typeof SK_SERVICES !== 'undefined')
+    if (_extraServices[line.id])
+      raw = _svcTrips(_extraServices[line.id], line, iFrom, null, depSec);
+    else if (line.id === 'SK' && typeof SK_SERVICES !== 'undefined')
       raw = _svcTrips(SK_SERVICES, line, iFrom, null, depSec);
     else if (line.id === 'KW' && typeof KW_SERVICES !== 'undefined')
       raw = _svcTrips(KW_SERVICES, line, iFrom, null, depSec);
@@ -771,9 +777,9 @@ function _getEquivalentCodes(code) {
     const fromCode  = line.stations[iFrom].code;
     const toCode    = line.stations[iTo].code;
 
-    const results = [];
-
-    const svcs = typeof KW_SERVICES !== 'undefined' && line.id === 'KW' ? KW_SERVICES
+    const extra = _extraServices[line.id];
+    const svcs = extra ? extra
+               : typeof KW_SERVICES !== 'undefined' && line.id === 'KW' ? KW_SERVICES
                : typeof SK_SERVICES !== 'undefined' && line.id === 'SK' ? SK_SERVICES
                : typeof TS_SERVICES !== 'undefined' && line.id === 'TS' ? TS_SERVICES
                : typeof KS_SERVICES !== 'undefined' && line.id === 'KS' ? KS_SERVICES
@@ -1218,11 +1224,56 @@ if (!directOnly) {
     return _buildLeg(line, iFrom, iTo, depSec, trips[0]);
   }
 
-  return {
+     /* ----------------------------------------------------------------
+   * register({ lineId, meta, stations, services, interchange })
+   * Usata dai file *-tt.js (ts, hd, wi, shx).
+   * Se la linea esiste già in SUBURBAN_LINES non ne tocca stazioni e
+   * metadati: registra solo i servizi e unisce gli interscambi.
+   * ---------------------------------------------------------------- */
+  function register(cfg) {
+    const { lineId, meta = {}, stations, services, interchange } = cfg || {};
+    if (!lineId) return;
+
+    if (!SUBURBAN_LINES[lineId]) {
+      if (!Array.isArray(stations) || !stations.length) return;
+      SUBURBAN_LINES[lineId] = {
+        id: lineId,
+        name: meta.name ?? lineId,
+        kanji: meta.kanji ?? '',
+        color: meta.color ?? '#888888',
+        cls: meta.cls ?? 'suburban',
+        circular: false,
+        headwayPeak: 10,
+        headwayOffPeak: 15,
+        totalKm: Math.abs(stations[stations.length - 1].km - stations[0].km),
+        stations,
+      };
+    }
+
+    if (Array.isArray(services) && services.length) _extraServices[lineId] = services;
+
+    if (interchange) {
+      for (const [code, partners] of Object.entries(interchange)) {
+        const cur = SUBURBAN_INTERCHANGE[code] ?? (SUBURBAN_INTERCHANGE[code] = []);
+        const have = new Set(cur.map(p => (typeof p === 'object' && p !== null) ? p.code : p));
+        for (const p of partners) {
+          const c = (typeof p === 'object' && p !== null) ? p.code : p;
+          if (!have.has(c)) { cur.push(p); have.add(c); }
+        }
+      }
+    }
+
+    _suburbanCodeSet = null;
+    _suburbanPartnerMap = null;
+    _inverseMap = null;
+  }
+
+    return {
     search,
     stationName,
     allStations,
     buildLeg,
+    register,
     TRANSFER_MIN,
   };
 
