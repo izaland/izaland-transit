@@ -48,11 +48,11 @@ const SHX_NEARBY = {
     { code: 'M230', node: 126666499, walkMin: 10 },
   ],
   SHX04: [
-    { code: null, node: 186940383, name: 'Nagida Totsu',  kanji: '䲺橋',   distM: 250 },
-    { code: null, node: 176667833, name: 'Tamainoki',     kanji: '谷伊坂', distM: 200 },
+    { code: 'M214', node: 186940383, name: 'Nagida Totsu',  kanji: '䲺橋',   distM: 250 },
+    { code: 'M217', node: 176667833, name: 'Tamainoki',     kanji: '谷伊坂', distM: 200 },
   ],
   SHX03: [
-    { code: null, node: 176669802, name: 'Kushidaru Amiya', kanji: '柚艏冸屋', distM: 200 },
+    { code: 'M210', node: 176669802, name: 'Kushidaru Amiya', kanji: '柚艏冸屋', distM: 200 },
   ],
 };
 
