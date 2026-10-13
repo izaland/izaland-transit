@@ -8,11 +8,7 @@
    FIX 14 (stazioni identiche con codici su reti diverse):
      Alcune stazioni hanno un codice per ogni rete pur essendo la
      STESSA stazione (es. Binno = LL02 / SK25 / TS12 / M452;
-     Anagusa Mukai = KD30 / JD03 / M405). Prima la fase 1 (diretto)
-     cercava solo nella rete di from/to, quindi Binno → Anagusa Mukai
-     sulla Metro M4 (M452 → M405) non veniva mai trovato e il cambio
-     veniva trattato come interscambio da 10 min.
-     Ora:
+     Anagusa Mukai = KD30 / JD03 / M405).
        - SAME_STATION_GROUPS elenca i codici equivalenti;
          registerSameStation(codes) permette di aggiungerne altri.
        - _partnersOf() restituisce transferMin = 0 tra codici dello
@@ -21,13 +17,20 @@
          diretto su ogni coppia di codici della stessa rete.
 
    FIX 15 (treni duplicati):
-       - _journeyKey() non include piu' i codici stazione dei leg:
-         lo stesso treno raggiunto tramite alias diversi (es.
-         LL10 / KD26 / JD05 / SHX06 = Hayatogaru) ora ha la stessa
-         chiave ed e' deduplicato.
        - search() accetta from/to come array o stringa separata da
          virgole ('LL10,KD26,JD05,SHX06'): prova tutte le coppie e
          applica UN SOLO dedup finale.
+
+   FIX 16 (treni ripetuti 4 volte, es. SHX19 -> LL10,KD26,JD05,SHX06):
+     Causa: lo stesso router (es. SuburbanRouter) puo' essere
+     registrato con piu' networkId; _resolveNodes() restituiva quindi
+     lo stesso codice 4 volte e la fase diretta eseguiva la stessa
+     ricerca 4 volte. In piu' la chiave di dedup usava campi (lineId,
+     svcId...) che possono variare tra le copie.
+       - _resolveNodes()/_aliasNodes() deduplicano per (router, codice):
+         un solo nodo per router reale.
+       - _journeyKey() usa solo orari (partenza/arrivo del journey e
+         di ogni leg) + n. cambi, senza id di linea/servizio/stazione.
 ================================================================ */
 
 (function (root, factory) {
@@ -200,6 +203,26 @@
     return new Set(Array.isArray(raw) ? raw.map(s => s.toUpperCase()) : [raw.toUpperCase()]);
   }
 
+  /* FIX 16: identita' del router reale (lo stesso oggetto puo' essere
+     registrato con piu' networkId). */
+  const _routerIds = new Map();
+  function _routerIdOf(networkId) {
+    const r = _routerFor(networkId);
+    if (!r) return 'net:' + networkId;
+    if (!_routerIds.has(r)) _routerIds.set(r, _routerIds.size + 1);
+    return 'r' + _routerIds.get(r);
+  }
+
+  function _uniqueNodes(nodes) {
+    const seen = new Set();
+    return nodes.filter(n => {
+      const k = _routerIdOf(n.networkId) + '|' + n.code;
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }
+
   function _resolveNodes(code, netFilter) {
     const out = [];
     for (const [id, r] of Object.entries(_routers)) {
@@ -212,7 +235,7 @@
       }
       if (found) out.push({ code, networkId: id });
     }
-    return out;
+    return _uniqueNodes(out);
   }
 
   /* Nodi di `code` + alias a 0 min (stessa stazione, altra rete). */
@@ -223,31 +246,17 @@
       if (netFilter && !netFilter.has(p.networkId)) continue;
       out.push({ code: p.code, networkId: p.networkId });
     }
-    const seen = new Set();
-    return out.filter(n => {
-      const k = n.networkId + '|' + n.code;
-      if (seen.has(k)) return false;
-      seen.add(k);
-      return true;
-    });
+    return _uniqueNodes(out);
   }
 
-  /* FIX 15: la chiave NON contiene i codici stazione, che cambiano
-     in base all'alias con cui e' stata fatta la ricerca. Identifica
-     il treno da linea/servizio + orari di salita e discesa. */
+  /* FIX 16: chiave basata SOLO su orari (journey + ogni leg) e n. cambi.
+     Nessun id di linea/servizio/stazione: cambiano con l'alias usato. */
   function _journeyKey(j) {
-    const legKey = j.legs.map(l => [
-      l.lineId  || l.line  || '',
-      l.svcId   || l.serviceId || l.tripId || '',
-      l.boardDep  || l.departureTime || '',
-      l.alightArr || l.arrivalTime   || '',
-    ].join(':')).join('|');
-
-    const blank = legKey.replace(/[:|]/g, '').trim() === '';
-    if (blank) {
-      return `${j.departureTime}~${j.arrivalTime}~${j.transfers ?? 0}~${j.totalMinutes ?? 0}`;
-    }
-    return legKey;
+    const legKey = (j.legs || []).map(l => [
+      l.boardDep  || l.departureTime || l.dep || l.depTime || '',
+      l.alightArr || l.arrivalTime   || l.arr || l.arrTime || '',
+    ].join('>')).join('|');
+    return `${j.departureTime}~${j.arrivalTime}~${j.transfers ?? 0}~${j.totalMinutes ?? 0}~${legKey}`;
   }
 
   function _dedup(journeys) {
@@ -306,11 +315,15 @@
     /* ---- 1. DIRECT (con alias stessa-stazione a 0 min) ---- */
     const fAlias = _aliasNodes(from, netFilter);
     const tAlias = _aliasNodes(to,   netFilter);
+    const doneDirect = new Set();
     for (const fNode of fAlias) {
       for (const tNode of tAlias) {
         if (fNode.networkId !== tNode.networkId) continue;
         const router = _routerFor(fNode.networkId);
         if (!router) continue;
+        const dk = _routerIdOf(fNode.networkId) + '|' + fNode.code + '|' + tNode.code;
+        if (doneDirect.has(dk)) continue;
+        doneDirect.add(dk);
         const results = _safeSearch(router, fNode.networkId, fNode.code, tNode.code, depTime, opts);
         results.forEach(j => {
           journeys.push({
@@ -446,7 +459,7 @@
     return String(x || '').split(',').map(s => s.trim()).filter(Boolean);
   }
 
-  /* FIX 15: from/to possono essere array o stringhe 'A,B,C'.
+  /* from/to possono essere array o stringhe 'A,B,C'.
      Tutte le coppie vengono provate e il dedup e' applicato UNA volta. */
   function search(from, to, depTime, opts = {}) {
     const maxResults = opts.maxResults ?? MAX_JOURNEYS;
