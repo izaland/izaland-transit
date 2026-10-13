@@ -19,6 +19,15 @@
          stesso gruppo appartenenti a reti diverse.
        - La fase 1 espande from/to agli alias a 0 min e prova il
          diretto su ogni coppia di codici della stessa rete.
+
+   FIX 15 (treni duplicati):
+       - _journeyKey() non include piu' i codici stazione dei leg:
+         lo stesso treno raggiunto tramite alias diversi (es.
+         LL10 / KD26 / JD05 / SHX06 = Hayatogaru) ora ha la stessa
+         chiave ed e' deduplicato.
+       - search() accetta from/to come array o stringa separata da
+         virgole ('LL10,KD26,JD05,SHX06'): prova tutte le coppie e
+         applica UN SOLO dedup finale.
 ================================================================ */
 
 (function (root, factory) {
@@ -223,12 +232,13 @@
     });
   }
 
+  /* FIX 15: la chiave NON contiene i codici stazione, che cambiano
+     in base all'alias con cui e' stata fatta la ricerca. Identifica
+     il treno da linea/servizio + orari di salita e discesa. */
   function _journeyKey(j) {
     const legKey = j.legs.map(l => [
       l.lineId  || l.line  || '',
       l.svcId   || l.serviceId || l.tripId || '',
-      l.from    || l.boardCode  || l.fromCode || '',
-      l.to      || l.alightCode || l.toCode   || '',
       l.boardDep  || l.departureTime || '',
       l.alightArr || l.arrivalTime   || '',
     ].join(':')).join('|');
@@ -281,8 +291,9 @@
     return kept;
   }
 
-  function search(from, to, depTime, opts = {}) {
-    const maxResults = opts.maxResults ?? MAX_JOURNEYS;
+  /* Ricerca per una singola coppia di codici; restituisce i journey
+     grezzi (senza dedup finale). */
+  function _searchRaw(from, to, depTime, opts) {
     const directOnly = !!opts.directOnly;
     const netFilter  = _networkFilter(opts);
 
@@ -313,9 +324,7 @@
       }
     }
 
-    if (directOnly) {
-      return _dedup(journeys).slice(0, maxResults);
-    }
+    if (directOnly) return journeys;
 
     /* ---- 2. 2-LEG ---- */
     for (const fNode of fNodes) {
@@ -429,7 +438,28 @@
       }
     }
 
-    return _dedup(journeys).slice(0, maxResults);
+    return journeys;
+  }
+
+  function _toCodeList(x) {
+    if (Array.isArray(x)) return x.map(s => String(s).trim()).filter(Boolean);
+    return String(x || '').split(',').map(s => s.trim()).filter(Boolean);
+  }
+
+  /* FIX 15: from/to possono essere array o stringhe 'A,B,C'.
+     Tutte le coppie vengono provate e il dedup e' applicato UNA volta. */
+  function search(from, to, depTime, opts = {}) {
+    const maxResults = opts.maxResults ?? MAX_JOURNEYS;
+    const froms = _toCodeList(from);
+    const tos   = _toCodeList(to);
+
+    const all = [];
+    for (const f of froms) {
+      for (const t of tos) {
+        _searchRaw(f, t, depTime, opts).forEach(j => all.push(j));
+      }
+    }
+    return _dedup(all).slice(0, maxResults);
   }
 
   return {
@@ -437,6 +467,7 @@
     registerSameStation,
     buildInterchangeIndex,
     search,
+    dedup: _dedup,
     CROSS_TRANSFER_MIN,
   };
 });
