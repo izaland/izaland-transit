@@ -1249,11 +1249,11 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
     }
 
     if (mode === 'prepend') {
-      const existingKeys = new Set(_jpState.all.map(j => j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      const existingKeys = new Set(_jpState.all.map(_jpKey));
       const fresh = journeys.filter(j => !existingKeys.has(j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
       _jpState.all = [...fresh, ..._jpState.all];
     } else if (mode === 'append') {
-      const existingKeys = new Set(_jpState.all.map(j => j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
+      const existingKeys = new Set(_jpState.all.map(_jpKey));
       const fresh = journeys.filter(j => !existingKeys.has(j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '')));
       _jpState.all = [..._jpState.all, ...fresh];
     } else {
@@ -1381,6 +1381,11 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
     }
   }
 
+  function _jpKey(j) {
+  return [j.departureTime, j.arrivalTime, j.transfers ?? 0,
+    (j.legs || []).map(l => (l.lineId || '') + ':' + (l.boardDep || '') + '>' + (l.alightArr || '')).join('/')].join('|');
+}
+
     function _runSearch(from, to, depTime, lineF, directOnly, excludeIzx) {
     const fromCodes = Array.isArray(from) ? from : [from];
     const toCodes   = Array.isArray(to)   ? to   : [to];
@@ -1399,7 +1404,7 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
           ? res.filter(j => !j.legs.some(l => IZX_NETWORKS.has(l.network)))
           : res;
         for (const j of filtered) {
-          const key = j.departureTime + '|' + (j.legs[0]?.trainNumber ?? '') + '|' + f + '>' + t;
+          const key = _jpKey(j);
           if (!seen.has(key)) { seen.add(key); all.push(j); }
         }
       }
@@ -1427,8 +1432,9 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
     if (from[0] === to[0] && from.length === 1 && to.length === 1) { alert('Please select two different stations.'); return; }
     _jpState.from = from; _jpState.to = to; _jpState.lineF = lineF; _jpState.directOnly = directOnly; _jpState.excludeIzx = excludeIzx; _jpState.all = [];
     const fromName = fromSel.selectedOptions[0]?.textContent.split('  [')[0].trim() || _stName(from[0]);
-    const toName   = toSel.selectedOptions[0]?.textContent.split('  [')[0].trim()   || _stName(to[0]);
-    const journeys = _runSearch(from, to, depTime, lineF, directOnly, excludeIzx);
+const toName   = toSel.selectedOptions[0]?.textContent.split('  [')[0].trim()   || _stName(to[0]);
+_jpState.fromName = fromName; _jpState.toName = toName;
+const journeys = _runSearch(from, to, depTime, lineF, directOnly, excludeIzx);
     renderJourneys(journeys, fromName, toName, 'replace');
   });
 
@@ -1446,7 +1452,7 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
       setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
       return;
     }
-    renderJourneys(earlier, _stName(_jpState.from), _stName(_jpState.to), 'prepend');
+    renderJourneys(earlier, _jpState.fromName, _jpState.toName, 'prepend');
   });
 
   document.getElementById('jp-later').addEventListener('click', () => {
@@ -1461,7 +1467,7 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
       setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
       return;
     }
-    renderJourneys(journeys, _stName(_jpState.from), _stName(_jpState.to), 'append');
+    renderJourneys(journeys, _jpState.fromName, _jpState.toName, 'append');
   });
 
 })();
