@@ -52,8 +52,9 @@
      quello di SX1 come limite.
    - SX3 è modellato come corse singole (firstDep = lastDep) per restare
      compatibile con il formato servizi esistente (headway fittizio).
-   - Tempi di percorrenza: calcolati dal router (km / velocità). Qui non
-     è definita alcuna velocità per pattern (rapid/express più veloci).
+   - Tempi di percorrenza: calcolati dal router con il modello
+     cinematico (FIX 14) usando vMaxKmh per servizio (_SHX_VMAX).
+     I valori sono provvisori e vanno tarati sui tempi reali.
 ================================================================ */
 'use strict';
 
@@ -77,6 +78,9 @@ const _SHX_STOPPING = {
 const _shxStopsSB = id => _SHX_ORDER_SB.filter(c => _SHX_STOPPING[id].has(c));
 const _shxStopsNB = id => [..._shxStopsSB(id)].reverse();
 
+/* Velocità massima per servizio (km/h) — provvisoria, da tarare */
+const _SHX_VMAX = { SX1: 100, SX2: 120, SX3: 130, SX4: 120 };
+
 /* Servizio con frequenza fissa in una finestra */
 function _shxSvc(id, dir, desc, firstDep, lastDep, headway) {
   const sb = dir === 'SB';
@@ -87,6 +91,7 @@ function _shxSvc(id, dir, desc, firstDep, lastDep, headway) {
     fromCode: sb ? 'SHX19' : 'SHX01',
     toCode:   sb ? 'SHX01' : 'SHX19',
     firstDep, lastDep, headway,
+    vMaxKmh:  _SHX_VMAX[base],
     stops:    sb ? _shxStopsSB(base) : _shxStopsNB(base),
   };
 }
