@@ -515,15 +515,23 @@ function _getEquivalentCodes(code) {
     const hiIdx    = skipDestCheck ? iFrom : Math.max(iFrom, iTo);
     const allTrips = [];
 
-    for (const svc of services) {
+       for (const svc of services) {
       const svcFromIdx = stCodes.indexOf(svc.fromCode);
       const svcToIdx   = stCodes.indexOf(svc.toCode);
       if (svcFromIdx === -1 || svcToIdx === -1) continue;
 
+      /* FIX 15: servizi con svc.explicitDir = true sono definiti
+         esplicitamente in entrambe le direzioni (es. SHX). Gli altri
+         (SK, KS, ...) mantengono la logica storica: NB derivato da SB. */
+      const explicitDir = svc.explicitDir === true;
+      const svcFwd = explicitDir ? svcFromIdx <= svcToIdx : true;
+      const svcLo  = explicitDir ? Math.min(svcFromIdx, svcToIdx) : svcFromIdx;
+      const svcHi  = explicitDir ? Math.max(svcFromIdx, svcToIdx) : svcToIdx;
+
       if (skipDestCheck) {
-        if (iFrom < svcFromIdx || iFrom > svcToIdx) continue;
+        if (iFrom < svcLo || iFrom > svcHi) continue;
       } else {
-        if (svcFromIdx > loIdx || svcToIdx < hiIdx) continue;
+        if (svcLo > loIdx || svcHi < hiIdx) continue;
       }
 
       const svcStops = svc.stops ?? [];
@@ -533,16 +541,23 @@ function _getEquivalentCodes(code) {
         if (!svcStops.includes(fromCode) || !svcStops.includes(toCode)) continue;
       }
 
+      const sameDir = skipDestCheck || svcFwd === goingFwd;
+      if (!sameDir && explicitDir) {
+        const hasExplicit = services.some(o =>
+          o !== svc && o.fromCode === svc.toCode && o.toCode === svc.fromCode);
+        if (hasExplicit) continue;
+      }
+
       const headwaySec = svc.headway * 60;
       const windows = svc.peakWindows
         ? svc.peakWindows.map(w => ({ from: _hmToSec(w.from), to: _hmToSec(w.to) }))
         : [{ from: _hmToSec(svc.firstDep), to: _hmToSec(svc.lastDep) }];
 
       const fullKm = Math.abs(line.stations[svcToIdx].km - line.stations[svcFromIdx].km);
-      const fullTravelSecNB = _runSec(line, svcToIdx, svcFromIdx, fullKm, svc);
+      const fullTravelSecRev = _runSec(line, svcToIdx, svcFromIdx, fullKm, svc);
 
       for (const win of windows) {
-        if (goingFwd || skipDestCheck) {
+        if (sameDir) {
           const kmToFrom  = Math.abs(line.stations[iFrom].km - line.stations[svcFromIdx].km);
           const offsetSec = _runSec(line, svcFromIdx, iFrom, kmToFrom, svc);
           let t = win.from + offsetSec;
@@ -553,8 +568,8 @@ function _getEquivalentCodes(code) {
             t += headwaySec;
           }
         } else {
-          const firstDepB  = win.from + fullTravelSecNB;
-          const lastDepB   = win.to   + fullTravelSecNB;
+          const firstDepB  = win.from + fullTravelSecRev;
+          const lastDepB   = win.to   + fullTravelSecRev;
           const kmToFrom   = Math.abs(line.stations[iFrom].km - line.stations[svcToIdx].km);
           const offsetSec  = _runSec(line, svcToIdx, iFrom, kmToFrom, svc);
           let t = firstDepB + offsetSec;
