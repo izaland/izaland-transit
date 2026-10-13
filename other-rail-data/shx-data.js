@@ -45,7 +45,7 @@ const SHX_WALK_BUFFER_MIN = 2;
 
 const SHX_NEARBY = {
   SHX07: [
-    { code: null, node: 126666499, walkMin: 10 },
+    { code: 'M230', node: 126666499, walkMin: 10 },
   ],
   SHX04: [
     { code: null, node: 186940383, name: 'Nagida Totsu',  kanji: '䲺橋',   distM: 250 },
