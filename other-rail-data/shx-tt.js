@@ -92,6 +92,7 @@ function _shxSvc(id, dir, desc, firstDep, lastDep, headway) {
     toCode:   sb ? 'SHX01' : 'SHX19',
     firstDep, lastDep, headway,
     vMaxKmh:  _SHX_VMAX[base],
+    explicitDir: true,   /* orari NB espliciti: non derivare dal SB */
     stops:    sb ? _shxStopsSB(base) : _shxStopsNB(base),
   };
 }
