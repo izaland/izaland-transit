@@ -32,6 +32,29 @@
      Questo permette di modellare la progressione urbano→extraurbano
      della Kwōkei Line senza toccare le altre linee.
 
+   FIX 14 (profilo di velocità per servizio):
+     Modello cinematico trapezoidale opzionale, attivo per i servizi che
+     dichiarano `vMaxKmh`. Tra due fermate consecutive EFFETTIVAMENTE
+     servite dal servizio (stops[], altrimenti tutte le stazioni) il treno
+     accelera, fa crociera e frena:
+       cap  = min(svc.vMaxKmh, min(station.vLimitKmh dei segmenti attraversati))
+       vpk  = min(cap, sqrt(2·L·a·b / (a+b)))      (a=accel, b=decel, m/s²)
+       t    = vpk/a + vpk/b + max(0, L − vpk²/2a − vpk²/2b) / vpk
+     Campi opzionali:
+       service.vMaxKmh          — tetto del servizio (es. 175 per Rapid extraurbano)
+       service.accelKmhPerSec   — default 2.5  (classe A000 / GTX-A)
+       service.decelKmhPerSec   — default 3.0
+       service.dwellSec         — sosta del servizio (default DWELL_SEC = 20)
+       station.vLimitKmh        — limite fisico sul segmento DA questa stazione
+                                  ALLA successiva (default: nessun limite)
+       station.dwellSec         — sosta specifica della stazione (ha priorità)
+     Servizi senza vMaxKmh restano sul modello segSpeedKmh/AVG_SPEED_KMH,
+     quindi nulla cambia per le linee non ancora migrate (salvo DWELL_SEC).
+     Un servizio che salta molte fermate ha tratti lunghi e può raggiungere
+     il tetto; un Local con fermate ravvicinate no, a parità di binario.
+
+   DWELL_SEC: 30 → 20 s (suburbano e metro; IZX resta nel proprio router).
+
    Sottoservizi SK / KW / TS / KS:
      Le linee SK, KW, TS e KS usano rispettivamente SK_SERVICES,
      KW_SERVICES, TS_SERVICES e KS_SERVICES invece del singolo headway
@@ -184,7 +207,11 @@ const SuburbanRouter = (() => {
   const MAX_JOURNEYS  = 12;
   const SEARCH_WINDOW = 3 * 3600;
   const AVG_SPEED_KMH = 40;   // fallback globale per linee senza segSpeedKmh
-  const DWELL_SEC     = 30;
+  const DWELL_SEC     = 20;   // sosta di default (suburbano); era 30
+
+  /* profilo cinematico di default (classe A000 / GTX-A) */
+  const DEFAULT_ACCEL_KMHS = 2.5;
+  const DEFAULT_DECEL_KMHS = 3.0;
 
   /* ----------------------------------------------------------------
    * _isMetroCode(code)
@@ -222,6 +249,7 @@ const SuburbanRouter = (() => {
 
   /* ----------------------------------------------------------------
    * _travelSec(line, iFrom, iTo, km)
+   * Modello legacy (velocità media per segmento).
    * ---------------------------------------------------------------- */
   function _travelSec(line, iFrom, iTo, km) {
     if (line.circular) return Math.round((km / AVG_SPEED_KMH) * 3600);
@@ -230,14 +258,68 @@ const SuburbanRouter = (() => {
   }
 
   /* ----------------------------------------------------------------
-   * _countIntermediateStops(line, iFrom, iTo, svcStops)
+   * FIX 14 — profilo cinematico per servizio
    * ---------------------------------------------------------------- */
-  function _countIntermediateStops(line, iFrom, iTo, svcStops) {
+  function _servedIdx(line, iFrom, iTo, svcStops) {
     const a = Math.min(iFrom, iTo);
     const b = Math.max(iFrom, iTo);
-    const sliced = line.stations.slice(a + 1, b);
-    if (svcStops.length === 0) return sliced.length;
-    return sliced.filter(st => svcStops.includes(st.code)).length;
+    const out = [a];
+    for (let i = a + 1; i < b; i++) {
+      if (!svcStops || svcStops.length === 0 || svcStops.includes(line.stations[i].code)) out.push(i);
+    }
+    out.push(b);
+    return out;
+  }
+
+  function _hopSec(line, i, j, svc) {
+    const sts   = line.stations;
+    const lenM  = Math.abs(sts[j].km - sts[i].km) * 1000;
+    if (lenM <= 0) return 0;
+    let cap = svc.vMaxKmh;
+    for (let k = i; k < j; k++) {
+      const lim = sts[k].vLimitKmh;
+      if (lim != null && lim < cap) cap = lim;
+    }
+    const a = (svc.accelKmhPerSec ?? DEFAULT_ACCEL_KMHS) / 3.6;
+    const d = (svc.decelKmhPerSec ?? DEFAULT_DECEL_KMHS) / 3.6;
+    const vCap  = cap / 3.6;
+    const vPeak = Math.min(vCap, Math.sqrt((2 * lenM * a * d) / (a + d)));
+    const accelM = (vPeak * vPeak) / (2 * a);
+    const decelM = (vPeak * vPeak) / (2 * d);
+    const cruiseM = Math.max(0, lenM - accelM - decelM);
+    return vPeak / a + vPeak / d + cruiseM / vPeak;
+  }
+
+  function _profileRunSec(line, iFrom, iTo, svc) {
+    const idx = _servedIdx(line, iFrom, iTo, svc.stops);
+    let t = 0;
+    for (let n = 0; n < idx.length - 1; n++) t += _hopSec(line, idx[n], idx[n + 1], svc);
+    return Math.round(t);
+  }
+
+  /* tempo di marcia tra iFrom e iTo per un dato servizio (profilo o legacy) */
+  function _runSec(line, iFrom, iTo, km, svc) {
+    if (svc && svc.vMaxKmh != null && !line.circular && iFrom !== iTo)
+      return _profileRunSec(line, iFrom, iTo, svc);
+    return _travelSec(line, iFrom, iTo, km);
+  }
+
+  /* ----------------------------------------------------------------
+   * Soste: station.dwellSec > svc.dwellSec > DWELL_SEC
+   * ---------------------------------------------------------------- */
+  function _dwellAt(line, idx, svc) {
+    return line.stations[idx].dwellSec ?? svc?.dwellSec ?? DWELL_SEC;
+  }
+
+  function _intermediateDwellSec(line, iFrom, iTo, svcStops, svc) {
+    const a = Math.min(iFrom, iTo);
+    const b = Math.max(iFrom, iTo);
+    let sum = 0;
+    for (let i = a + 1; i < b; i++) {
+      if (svcStops.length === 0 || svcStops.includes(line.stations[i].code))
+        sum += _dwellAt(line, i, svc);
+    }
+    return sum;
   }
 
   /* ----------------------------------------------------------------
@@ -421,6 +503,7 @@ function _getEquivalentCodes(code) {
 
   /* ----------------------------------------------------------------
    * _svcTrips(services, line, iFrom, iTo, depSec)
+   * FIX 14: gli offset usano _runSec(..., svc); ogni trip porta `svc`.
    * ---------------------------------------------------------------- */
   function _svcTrips(services, line, iFrom, iTo, depSec) {
     const stCodes  = line.stations.map(s => s.code);
@@ -454,30 +537,29 @@ function _getEquivalentCodes(code) {
         : [{ from: _hmToSec(svc.firstDep), to: _hmToSec(svc.lastDep) }];
 
       const fullKm = Math.abs(line.stations[svcToIdx].km - line.stations[svcFromIdx].km);
-      const fullTravelSec   = _travelSec(line, svcFromIdx, svcToIdx, fullKm);
-      const fullTravelSecNB = _travelSec(line, svcToIdx, svcFromIdx, fullKm);
+      const fullTravelSecNB = _runSec(line, svcToIdx, svcFromIdx, fullKm, svc);
 
       for (const win of windows) {
         if (goingFwd || skipDestCheck) {
           const kmToFrom  = Math.abs(line.stations[iFrom].km - line.stations[svcFromIdx].km);
-          const offsetSec = _travelSec(line, svcFromIdx, iFrom, kmToFrom);
+          const offsetSec = _runSec(line, svcFromIdx, iFrom, kmToFrom, svc);
           let t = win.from + offsetSec;
           const lastAtFrom = win.to + offsetSec;
           if (t < depSec) t += Math.ceil((depSec - t) / headwaySec) * headwaySec;
           while (t <= Math.min(lastAtFrom, depSec + SEARCH_WINDOW)) {
-            allTrips.push({ sec: t, svcId: svc.id, svcDesc: svc.desc, stops: svc.stops ?? [] });
+            allTrips.push({ sec: t, svcId: svc.id, svcDesc: svc.desc, stops: svc.stops ?? [], svc });
             t += headwaySec;
           }
         } else {
           const firstDepB  = win.from + fullTravelSecNB;
           const lastDepB   = win.to   + fullTravelSecNB;
           const kmToFrom   = Math.abs(line.stations[iFrom].km - line.stations[svcToIdx].km);
-          const offsetSec  = _travelSec(line, svcToIdx, iFrom, kmToFrom);
+          const offsetSec  = _runSec(line, svcToIdx, iFrom, kmToFrom, svc);
           let t = firstDepB + offsetSec;
           const lastAtFrom = lastDepB + offsetSec;
           if (t < depSec) t += Math.ceil((depSec - t) / headwaySec) * headwaySec;
           while (t <= Math.min(lastAtFrom, depSec + SEARCH_WINDOW)) {
-            allTrips.push({ sec: t, svcId: svc.id, svcDesc: svc.desc, stops: svc.stops ?? [] });
+            allTrips.push({ sec: t, svcId: svc.id, svcDesc: svc.desc, stops: svc.stops ?? [], svc });
             t += headwaySec;
           }
         }
@@ -525,6 +607,7 @@ function _getEquivalentCodes(code) {
 
   /* ----------------------------------------------------------------
    * _buildLeg(line, iFrom, iTo, depSec, trip?)
+   * FIX 14: tempo di marcia e soste dipendono dal servizio (trip.svc).
    * ---------------------------------------------------------------- */
   function _buildLeg(line, iFrom, iTo, depSec, trip) {
     if (!trip) {
@@ -537,14 +620,15 @@ function _getEquivalentCodes(code) {
     const svcId     = trip.svcId;
     const svcDesc   = trip.svcDesc ?? line.name;
     const svcStops  = trip.stops ?? [];
+    const svc       = trip.svc;
 
     const km        = _kmBetween(line, iFrom, iTo);
-    const runSec    = _travelSec(line, iFrom, iTo, km);
+    const runSec    = _runSec(line, iFrom, iTo, km, svc);
 
-    const stopCount    = line.circular
+    const dwellTotal = line.circular
       ? 0
-      : _countIntermediateStops(line, iFrom, iTo, svcStops);
-    const totalTravelSec = runSec + stopCount * DWELL_SEC;
+      : _intermediateDwellSec(line, iFrom, iTo, svcStops, svc);
+    const totalTravelSec = runSec + dwellTotal;
     const alightSec      = boardSec + totalTravelSec;
 
     const dir = line.circular
@@ -566,14 +650,11 @@ function _getEquivalentCodes(code) {
         .map(st => {
           const stIdx      = line.stations.indexOf(st);
           const kmElapsed  = Math.abs(st.km - line.stations[iFrom].km);
-          const partialRun = Math.round((kmElapsed / _segSpeed(line, iFrom, stIdx)) * 3600);
-          const stopsBefore = line.stations
-            .slice(Math.min(iFrom, stIdx) + 1, Math.max(iFrom, stIdx))
-            .filter(s => svcStops.length === 0 || svcStops.includes(s.code))
-            .length;
-          const arrSec = boardSec + partialRun + stopsBefore * DWELL_SEC;
+          const partialRun = _runSec(line, iFrom, stIdx, kmElapsed, svc);
+          const dwellBefore = _intermediateDwellSec(line, iFrom, stIdx, svcStops, svc);
+          const arrSec = boardSec + partialRun + dwellBefore;
           return { code: st.code, name: st.name,
-                   arr: _secToHM(arrSec), dep: _secToHM(arrSec + DWELL_SEC) };
+                   arr: _secToHM(arrSec), dep: _secToHM(arrSec + _dwellAt(line, stIdx, svc)) };
         });
     }
 

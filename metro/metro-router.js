@@ -27,6 +27,11 @@
              (2) il locale accumula dwell su ogni fermata intermedia.
      Aggiornare i valori km in *-data.js aggiorna automaticamente tutti i tempi.
 
+   Sosta (dwell):
+     DWELL_SEC di default = 20 s (era 30). Una linea può sovrascriverlo con
+     meta.dwellSec nel proprio *-data.js: se una linea lo dichiara
+     esplicitamente, quel valore ha la precedenza.
+
    Tempi di trasferimento di default:
      METRO_TRANSFER_MIN  4 min  — metro ↔ metro
 
@@ -41,7 +46,7 @@ const MetroRouter = (() => {
 
   const MAX_JOURNEYS        = 5;
   const SEARCH_WINDOW       = 3 * 3600;
-  const DWELL_SEC           = 30;
+  const DWELL_SEC           = 20;
   const METRO_TRANSFER_MIN  = 4;
 
   const _registry = [];
