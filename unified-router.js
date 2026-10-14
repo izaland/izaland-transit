@@ -28,6 +28,22 @@
        - search() accetta from/to come array o stringa separata da
          virgole ('LL10,KD26,JD05,SHX06'): prova tutte le coppie e
          applica UN SOLO dedup finale.
+
+   FIX 16 (thru services / 相互直通運転):
+     Su alcune stazioni di confine i treni di due reti proseguono
+     l'uno sull'altro (es. M8 <-> KW a Kishagoi-Exhibitown,
+     M801 = KW00): i passeggeri restano a bordo e c'e' solo una
+     sosta breve (cambio macchinista, ~90 s). Non e' un interscambio.
+       - THRU_SERVICES elenca le coppie di codici + durata sosta (s);
+         registerThruService({ codes:[..], stopSec }) ne aggiunge altre.
+       - _partnersOf() marca i partner con thru:true e thruSec.
+       - Fasi 2/3: il secondo leg si cerca a arrivo + stopSec. Se il
+         treno trovato parte entro THRU_TOLERANCE_MIN dall'arrivo e'
+         un vero thru; altrimenti si ricade sul cambio normale
+         (partner.transferMin, es. 10 min) e si ricerca di nuovo.
+       - Il journey ha transferThru[] (uno per cambio, allineato a
+         transferNodes[]), transfers NON conta i thru, e
+         thruService/thruNode sono impostati per la UI.
 ================================================================ */
 
 (function (root, factory) {
@@ -47,6 +63,23 @@
     ['LL02', 'SK25', 'TS12', 'M452'],   // Binno
     ['KD30', 'JD03', 'M405'],           // Anagusa Mukai
   ];
+
+  /* Thru services: i treni proseguono da una rete all'altra (stay on board). */
+  const THRU_TOLERANCE_MIN = 3;   // gap max (min) tra arrivo e partenza per considerarlo thru
+  const THRU_SERVICES = [
+    { codes: ['M801', 'KW00'], stopSec: 90 },   // M8 <-> KW, Kishagoi-Exhibitown
+  ];
+
+  function registerThruService(def) {
+    if (def && Array.isArray(def.codes) && def.codes.length > 1)
+      THRU_SERVICES.push({ codes: def.codes.slice(), stopSec: def.stopSec ?? 90 });
+  }
+
+  function _thruStop(a, b) {
+    for (const t of THRU_SERVICES)
+      if (t.codes.includes(a) && t.codes.includes(b) && a !== b) return t.stopSec;
+    return null;
+  }
 
   function registerSameStation(codes) {
     if (Array.isArray(codes) && codes.length > 1) SAME_STATION_GROUPS.push(codes.slice());
@@ -106,12 +139,23 @@
       const net = _netOfCode(partnerCode);
       if (!net) return;
       const zero = ownNet !== null && net !== ownNet && _sameStation(code, partnerCode);
+      const thruSec = _thruStop(code, partnerCode);
       out.push({
         code: partnerCode,
         networkId: net,
         transferMin: zero ? 0 : (transferMin ?? CROSS_TRANSFER_MIN),
+        thru: thruSec !== null,
+        thruSec: thruSec,
       });
     }
+
+    /* Le coppie thru valgono anche se mancano da INTERCHANGE. */
+    THRU_SERVICES.forEach(t => {
+      if (!t.codes.includes(code)) return;
+      t.codes.filter(c => c !== code).forEach(c => {
+        if (!raw.some(e => e.code === c)) _push(c, CROSS_TRANSFER_MIN);
+      });
+    });
 
     raw.forEach(entry => _push(entry.code, entry.transferMin ?? CROSS_TRANSFER_MIN));
 
@@ -131,7 +175,7 @@
     return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
   }
 
-  function _buildJourney2(j1, j2, midCode, walkMin) {
+  function _buildJourney2(j1, j2, midCode, walkMin, thru) {
     const totalKm = (j1.totalKm != null && j2.totalKm != null)
       ? j1.totalKm + j2.totalKm : null;
     const wkMin = walkMin ?? CROSS_TRANSFER_MIN;
@@ -140,7 +184,10 @@
     );
     const wtMin = Math.max(0, totalGapMin - wkMin);
     const thruFields = {};
-    if (j1.thruService) {
+    if (thru) {
+      thruFields.thruService = true;
+      thruFields.thruNode    = midCode;
+    } else if (j1.thruService) {
       thruFields.thruService = true;
       thruFields.thruNode    = j1.thruNode;
     }
@@ -150,35 +197,40 @@
       arrivalTime:       j2.arrivalTime,
       totalMinutes:      Math.round((_hmToSec(j2.arrivalTime) - _hmToSec(j1.departureTime)) / 60),
       totalKm,
-      transfers:         (j1.transfers + j2.transfers) + 1,
+      transfers:         (j1.transfers + j2.transfers) + (thru ? 0 : 1),
       transferNodes:     [...(j1.transferNodes || []), midCode, ...(j2.transferNodes || [])],
-      transferWalkMin:   [wkMin],
-      transferWaitMin:   [wtMin],
+      transferThru:      [!!thru],
+      transferWalkMin:   [thru ? 0 : wkMin],
+      transferWaitMin:   [thru ? 0 : wtMin],
       ...thruFields,
     };
   }
 
-  function _buildJourney3(j1, j2, j3, midCode1, midCode2, walkMin1, walkMin2) {
+  function _buildJourney3(j1, j2, j3, midCode1, midCode2, walkMin1, walkMin2, thru1, thru2) {
     const totalKm = (j1.totalKm != null && j2.totalKm != null && j3.totalKm != null)
       ? j1.totalKm + j2.totalKm + j3.totalKm : null;
     const wk1 = walkMin1 ?? CROSS_TRANSFER_MIN;
     const wk2 = walkMin2 ?? CROSS_TRANSFER_MIN;
     const gap1 = Math.round((_hmToSec(j2.departureTime) - _hmToSec(j1.arrivalTime)) / 60);
     const gap2 = Math.round((_hmToSec(j3.departureTime) - _hmToSec(j2.arrivalTime)) / 60);
+    const thruAny = !!(thru1 || thru2);
     return {
       legs:              [...j1.legs, ...j2.legs, ...j3.legs],
       departureTime:     j1.departureTime,
       arrivalTime:       j3.arrivalTime,
       totalMinutes:      Math.round((_hmToSec(j3.arrivalTime) - _hmToSec(j1.departureTime)) / 60),
       totalKm,
-      transfers:         (j1.transfers + j2.transfers + j3.transfers) + 2,
+      transfers:         (j1.transfers + j2.transfers + j3.transfers) + 2 - (thru1 ? 1 : 0) - (thru2 ? 1 : 0),
+      thruService:       thruAny || undefined,
+      thruNode:          thruAny ? (thru1 ? midCode1 : midCode2) : undefined,
+      transferThru:      [!!thru1, !!thru2],
       transferNodes:     [
         ...(j1.transferNodes || []), midCode1,
         ...(j2.transferNodes || []), midCode2,
         ...(j3.transferNodes || []),
       ],
-      transferWalkMin:   [wk1, wk2],
-      transferWaitMin:   [Math.max(0, gap1 - wk1), Math.max(0, gap2 - wk2)],
+      transferWalkMin:   [thru1 ? 0 : wk1, thru2 ? 0 : wk2],
+      transferWaitMin:   [thru1 ? 0 : Math.max(0, gap1 - wk1), thru2 ? 0 : Math.max(0, gap2 - wk2)],
     };
   }
 
@@ -192,6 +244,27 @@
     } catch (e) {
       return [];
     }
+  }
+
+  /* Cerca i leg successivi dopo j1 su un partner. Se il partner e' un
+     thru, prova prima a arrivo + stopSec: se il treno parte entro
+     THRU_TOLERANCE_MIN e' un vero thru, altrimenti cambio normale. */
+  function _nextLegs(router, partner, toCode, j1, opts) {
+    const arr = _hmToSec(j1.arrivalTime);
+    if (partner.thru) {
+      const readyHM = _secToHM(arr + partner.thruSec);
+      const list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
+        { ...opts, maxResults: 2, directOnly: true });
+      const thruLegs = list.filter(j2 => {
+        const gap = ((_hmToSec(j2.departureTime) - arr + 86400) % 86400) / 60;
+        return gap <= THRU_TOLERANCE_MIN;
+      }).map(j2 => ({ j2, thru: true }));
+      if (thruLegs.length) return thruLegs;
+    }
+    const tSec = (partner.transferMin ?? CROSS_TRANSFER_MIN) * 60;
+    const readyHM = _secToHM(arr + tSec);
+    return _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
+      { ...opts, maxResults: 2, directOnly: true }).map(j2 => ({ j2, thru: false }));
   }
 
   function _networkFilter(opts) {
@@ -353,15 +426,8 @@
           if (!tNode) continue;
 
           for (const j1 of j1list) {
-            const transferSec = (partner.transferMin ?? CROSS_TRANSFER_MIN) * 60;
-            const readyHM     = _secToHM(_hmToSec(j1.arrivalTime) + transferSec);
-            const j2list = _safeSearch(
-              router2, partner.networkId,
-              partner.code, tNode.code, readyHM,
-              { ...opts, maxResults: 2, directOnly: true }
-            );
-            for (const j2 of j2list)
-              journeys.push(_buildJourney2(j1, j2, midSt.code, partner.transferMin ?? CROSS_TRANSFER_MIN));
+            for (const { j2, thru } of _nextLegs(router2, partner, tNode.code, j1, opts))
+              journeys.push(_buildJourney2(j1, j2, midSt.code, partner.transferMin ?? CROSS_TRANSFER_MIN, thru));
           }
         }
       }
@@ -399,15 +465,8 @@
             if (!partners2.length) continue;
 
             for (const j1 of j1list) {
-              const tSec1  = (p1.transferMin ?? CROSS_TRANSFER_MIN) * 60;
-              const ready1 = _secToHM(_hmToSec(j1.arrivalTime) + tSec1);
-
-              const j2list = _safeSearch(
-                router2, p1.networkId,
-                p1.code, midSt2.code, ready1,
-                { ...opts, maxResults: 2, directOnly: true }
-              );
-              if (!j2list.length) continue;
+              const j2opts = _nextLegs(router2, p1, midSt2.code, j1, opts);
+              if (!j2opts.length) continue;
 
               for (const p2 of partners2) {
                 const router3 = _routerFor(p2.networkId);
@@ -415,20 +474,14 @@
                 const tNode = tNodes.find(n => n.networkId === p2.networkId);
                 if (!tNode) continue;
 
-                for (const j2 of j2list) {
-                  const tSec2  = (p2.transferMin ?? CROSS_TRANSFER_MIN) * 60;
-                  const ready2 = _secToHM(_hmToSec(j2.arrivalTime) + tSec2);
-                  const j3list = _safeSearch(
-                    router3, p2.networkId,
-                    p2.code, tNode.code, ready2,
-                    { ...opts, maxResults: 2, directOnly: true }
-                  );
-                  for (const j3 of j3list)
+                for (const { j2, thru: th1 } of j2opts) {
+                  for (const { j2: j3, thru: th2 } of _nextLegs(router3, p2, tNode.code, j2, opts))
                     journeys.push(_buildJourney3(
                       j1, j2, j3,
                       midSt1.code, midSt2.code,
                       p1.transferMin ?? CROSS_TRANSFER_MIN,
-                      p2.transferMin ?? CROSS_TRANSFER_MIN
+                      p2.transferMin ?? CROSS_TRANSFER_MIN,
+                      th1, th2
                     ));
                 }
               }
@@ -465,6 +518,7 @@
   return {
     registerRouter,
     registerSameStation,
+    registerThruService,
     buildInterchangeIndex,
     search,
     dedup: _dedup,
