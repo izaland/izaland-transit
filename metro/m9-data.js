@@ -38,7 +38,7 @@ const M9_ST = {
   M912: { n: 'Egunsen Botanical Garden',  k: '慧群仙植物園',        nodeId: 128525299, km: 11.69 },
   M913: { n: 'Masuda Agarai',             k: '馬砅任尭',            nodeId: 128669528, km: 12.66 },
   M914: { n: 'Eigan-ji',                  k: '栄鳫寺',              nodeId: 128669527, km: 13.92 },
-  M915: { n: 'Oiseharu (Metro)',          k: '糕墾[地下鐵]',        nodeId: 176668162, km: 15.16 },
+  M915: { n: 'Oiseharu (Metro)',          k: '粕墾[地下鐵]',        nodeId: 176668162, km: 15.16 },
   M916: { n: 'Tomiganei',                 k: '庭ヶ汢',              nodeId: 124066081, km: 16.76 },
   M917: { n: 'Tsurunara',                 k: '守治',                nodeId: 229641679, km: 17.45 },
   M918: { n: 'Shin-Tsaikikori',           k: '新益飯',              nodeId: 183370160, km: 18.39 },
@@ -61,9 +61,18 @@ const M9_META = {
   dwellSec:    30,
 };
 
-/* PROVVISORIO — frequenza da definire */
+/* Frequenze operative (per direzione)
+   10 TPH = 6 min · 12 TPH = 5 min · 20 TPH = 3 min */
 const M9_HEADWAY = [
-  { from: '05:00', to: '23:54', headwayMin: 6 },
+  { from: '05:00', to: '06:00', headwayMin: 6 },
+  { from: '06:00', to: '07:30', headwayMin: 5 },
+  { from: '07:30', to: '09:00', headwayMin: 3 },
+  { from: '09:00', to: '10:00', headwayMin: 5 },
+  { from: '10:00', to: '17:30', headwayMin: 6 },
+  { from: '17:30', to: '18:30', headwayMin: 5 },
+  { from: '18:30', to: '20:00', headwayMin: 3 },
+  { from: '20:00', to: '21:00', headwayMin: 5 },
+  { from: '21:00', to: '23:54', headwayMin: 6 },
 ];
 
 const M9_SVC = {

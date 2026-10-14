@@ -1,8 +1,9 @@
 /* ================================================================
    M9-TT.JS — Metro Line 9 · Timetable
    ================================================================
-   PROVVISORIO: orari e frequenze da definire.
-   Servizio A: all-stop M901↔M921, ogni 6 min, 05:00–23:54.
+   Servizio A: all-stop M901↔M921.
+   10 TPH (6 min) base; 12 TPH (5 min) nei semi-picchi;
+   20 TPH (3 min) nei picchi. Valido in entrambe le direzioni.
 ================================================================ */
 'use strict';
 
@@ -11,8 +12,8 @@ const M9_SERVICES_NORM = [
     id: 'M9', svcLogical: 'A', name: 'All-stop (M901↔M921)',
     color: '#C40062', cls: 'metro', rapid: false,
     stops: M9_CANONICAL_ORDER,
-    headwayOutbound: [{ from: '05:00', to: '23:54', headwayMin: 6 }],
-    headwayInbound:  [{ from: '05:00', to: '23:54', headwayMin: 6 }],
+    headwayOutbound: M9_HEADWAY,
+    headwayInbound:  M9_HEADWAY,
     offsetOutboundMin: 0,
     offsetInboundMin:  0,
   },
