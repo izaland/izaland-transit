@@ -48,21 +48,21 @@ const M2_ST = {
   /* ── Ramo A: for Hintomaui ── */
   M219: { n: 'Otsumi-Makintoshi Meidai-adae',  k: '南馬પ્貴氾・明大前',   km: 20.760 },
   M220: { n: 'Kanasamaki',                      k: '崔赴',               km: 22.030 },
-  M221: { n: 'Sunbui',                          k: '栔芚依',             km: 23.310 },
-  M222: { n: 'Oitsura',                         k: '箕鵲',               km: 24.220 },
-  M223: { n: 'Oitsura Daikōwen',               k: '箕鵲大公園',          km: 25.570 },
-  M224: { n: 'Tsutsuro Uguttaya',              k: '笙呂茊貞',            km: 26.860 },
+  M221: { n: 'Sunbui',                          k: '榔苚依',             km: 23.310 },
+  M222: { n: 'Oitsura',                         k: '篕鵲',               km: 24.220 },
+  M223: { n: 'Oitsura Daikōwen',               k: '篕鵲大公園',          km: 25.570 },
+  M224: { n: 'Tsutsuro Uguttaya',              k: '笙呂葊貞',            km: 26.860 },
   M225: { n: 'Obikasunde',                      k: '吾比加崶',            km: 28.420 },
   M226: { n: 'Hintomaui',                       k: '価園斐',             km: 29.410 },
   /* ── Ramo B: for Mokoba ── */
   M227: { n: 'Ōdahui Kōwen',                  k: '大世公園',            km: 20.260 },
   M228: { n: 'Akaimori',                        k: '蛞生竹',             km: 20.980 },
   M229: { n: 'Shiki-Kawaei',                   k: '北珂夬栄',            km: 21.850 },
-  M230: { n: 'Kawaei',                          k: '珂夬栄',             km: 23.000 },
+  M230: { n: 'Kawaei',                          k: '珂夬栄',               km: 23.000 },
   M231: { n: 'Tayakure',                        k: '貞師',               km: 23.910 },
-  M232: { n: 'Shin-Tsukaso',                   k: '新鬷蒓',              km: 24.720 },
+  M232: { n: 'Shin-Tsukaso',                   k: '新鬬蓒',              km: 24.720 },
   M233: { n: 'Takejori Shimin Kōwen',          k: '館恵市民公園',         km: 25.230 },
-  M234: { n: 'Yamaiki Town',                   k: '倉琶ਠપેપ્',           km: 27.760 },
+  M234: { n: 'Yamaiki Town',                   k: '倉琮ਠપેપ્',           km: 27.760 },
   M235: { n: 'Shiki-Mokoba',                   k: '北母槻',              km: 26.310 },
   M236: { n: 'Mokoba',                          k: '母槻',               km: 27.370 },
 };
@@ -165,8 +165,10 @@ const M2_SVC = {
      M209  ↔ Masuda Agarai:       400 m corridoio
      M211  ↔ M18?? Nagida Kunbai (stazione diversa)
 
-   Interscambi Jōdai Line (JD):
-     M214 Rakkashoni ↔ JD05 Hayatogaru — stesso node 124066078, corridoio  5 min
+   Interscambi Linea Loop / Jōdai Line:
+     M214 Rakkashoni ↔ LL11 Rakkashoni — stesso nome, banchine separate, 4 min
+     (NB: M214 NON è collegata a JD05 Hayatogaru: le due stazioni distano
+      ~1100 m, interscambio rimosso)
      M222 Oitsura    ↔ JD06 Oitsura    — stesso nome, stesso node 201351276 3 min
 ---------------------------------------------------------------- */
 const M2_INTERCHANGE = {
@@ -222,12 +224,10 @@ const M2_INTERCHANGE = {
   M211: [
     /* Codice M18 Nagida Kunbai da aggiungere quando disponibile */
   ],
-  /* M214 Rakkashoni ↔ JD05 Hayatogaru (node 124066078) + LL11 */
+  /* M214 Rakkashoni ↔ LL11 (JD05 Hayatogaru rimosso: ~1100 m, non è un interscambio) */
   M214: [
     { code: 'LL11', network: 'suburban', transferMin: 4,
       note: 'Loop Line Rakkashoni — stesso nome, banchine separate' },
-    { code: 'JD05', network: 'suburban', transferMin: 5,
-      note: 'Jōdai Line — Hayatogaru, corridoio sotterraneo (node 124066078)' },
   ],
   /* M222 Oitsura ↔ JD06 (stesso nome, node 201351276) */
   M222: [
