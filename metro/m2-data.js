@@ -15,13 +15,8 @@
      Ramo B: distanze misurate lungo il ramo, da M218 in poi.
      I valori originali erano in metri; convertiti in km.
 
-   Interscambi dichiarati (cross-network):
-     Stazioni con lo stesso nome su altre reti vengono collegate
-     automaticamente da UnifiedRouter (name-match).
-     Gli interscambi fisici su stazioni diverse (corridoi) sono
-     dichiarati esplicitamente in M2_INTERCHANGE.
-     I codici con ?? verranno aggiornati quando le linee
-     corrispondenti avranno codici definitivi.
+   Regola interscambi: i nuovi collegamenti si aggiungono, quelli
+   esistenti non si rimuovono.
 ================================================================ */
 'use strict';
 
@@ -102,16 +97,6 @@ const M2_META = {
 /* ----------------------------------------------------------------
    Profilo frequenze operative (headway in minuti)
    Valido per entrambi i rami.
-
-   Slot        Da      A       Headway
-   ─────────── ─────── ─────── ───────
-   early       05:00   06:30   10 min
-   pre-peak    06:30   07:00    5 min
-   peak AM     07:00   09:30    3 min
-   off-peak    09:30   17:00    5 min
-   peak PM     17:00   20:00    3 min
-   evening     20:00   22:30    5 min
-   late        22:30   24:30   10 min
 ---------------------------------------------------------------- */
 const M2_HEADWAY = [
   { from: '05:00', to: '06:30', headwayMin: 10 },
@@ -123,86 +108,60 @@ const M2_HEADWAY = [
   { from: '22:30', to: '24:30', headwayMin: 10 },
 ];
 
-/* ----------------------------------------------------------------
-   Servizi
-   A  Ramo A — Gawinosechi → Hintomaui
-   B  Ramo B — Gawinosechi → Mokoba
----------------------------------------------------------------- */
 const M2_SVC = {
   A: {
-    name:    'for Hintomaui',
-    nameJa:  '価園斐行',
-    color:   '#E60026',
-    cls:     'svc-A',
+    name:    'for Hintomaui', nameJa: '価園斐行', color: '#E60026', cls: 'svc-A',
     stops:   [...M2_CANONICAL_COMMON, ...M2_CANONICAL_A.slice(1)],
   },
   B: {
-    name:    'for Mokoba',
-    nameJa:  '母槻行',
-    color:   '#C4001F',
-    cls:     'svc-B',
+    name:    'for Mokoba', nameJa: '母槻行', color: '#C4001F', cls: 'svc-B',
     stops:   [...M2_CANONICAL_COMMON, ...M2_CANONICAL_B.slice(1)],
   },
 };
 
 /* ----------------------------------------------------------------
    Interscambi Metro Line 2 ↔ altre reti
-
-   Le stazioni con lo stesso nome su altre reti sono collegate
-   automaticamente da UnifiedRouter (name-match); qui si dichiarano
-   anche gli interscambi espliciti per simmetria e robustezza.
-
-   TODO — codici con ?? da aggiornare quando disponibili:
-     M201  ↔ M1??, M8??     (Gawinosechi — name-match automatico)
-     M202  ↔ M1??            (Alkuitsa — name-match automatico)
-     M208  ↔ M8??, M9??     (Egunsen Botanical Garden — name-match)
-     M213  ↔ M17??, SX??    (Omenika Jinatsu — name-match)
-     M226  ↔ M1??           (Hintomaui — name-match)
-
-   Corridoi fisici dichiarati:
-     M203  ↔ M417 (M4 Shimamera): 300 m corridoio sotterraneo
-     M208  ↔ K01  (IZX Keishin):  500 m corridoio sotterraneo
-     M209  ↔ Masuda Agarai:       400 m corridoio
-     M211  ↔ M18?? Nagida Kunbai (stazione diversa)
-
-   Interscambi Linea Loop / Jōdai Line:
-     M214 Rakkashoni ↔ LL11 Rakkashoni — stesso nome, banchine separate, 4 min
-     (NB: M214 NON è collegata a JD05 Hayatogaru: le due stazioni distano
-      ~1100 m, interscambio rimosso)
-     M222 Oitsura    ↔ JD06 Oitsura    — stesso nome, stesso node 201351276 3 min
+   Regola: aggiungere i nuovi collegamenti senza rimuovere i vecchi.
 ---------------------------------------------------------------- */
 const M2_INTERCHANGE = {
-  /* M203 ↔ Shimamera (nome diverso: Shimamera Shikiniswae ≠ Shimamera) */
+  M201: [
+    { code: 'M803', network: 'metro', transferMin: 3,
+      note: 'M8 Gawinosechi' },
+  ],
+  M202: [
+    { code: 'M110', network: 'metro', transferMin: 3,
+      note: 'M1 Alkuitsa — stesso edificio, banchine separate' },
+    { code: 'CK18', network: 'suburban', transferMin: 5,
+      note: 'Kawayatsu Line — Alkuitsa, interscambio in superficie' },
+  ],
   M203: [
-    { code: 'M417', network: 'metro',    transferMin: 9,
+    { code: 'M417', network: 'metro', transferMin: 9,
       note: 'M4 Shimamera — 300 m corridor' },
-    { code: 'M111', network: 'metro',    transferMin: 7,
+    { code: 'M111', network: 'metro', transferMin: 7,
       note: 'M1 Shimamera — 300 m corridor' },
-    { code: 'M610', network: 'metro',    transferMin: 7,
+    { code: 'M610', network: 'metro', transferMin: 7,
       note: 'M6 Shimamera — 300 m corridor' },
     { code: 'TS14', network: 'suburban', transferMin: 7,
       note: 'TS Shimamera — 300 m corridor' },
-    /* AX Shimamera: aggiungere codice quando disponibile */
   ],
-  /* M206 ↔ M401 (Heinomoji — stesso nome, banchine separate) */
   M206: [
     { code: 'M401', network: 'metro', transferMin: 3,
       note: 'M4 Heinomoji — stesso nome, banchine separate' },
+    { code: 'M806', network: 'metro', transferMin: 3,
+      note: 'M8 Heinomoji' },
   ],
-  /* M207 ↔ M402 (Ogiwata — stesso nome, banchine separate) */
   M207: [
     { code: 'M402', network: 'metro', transferMin: 3,
       note: 'M4 Ogiwata — stesso nome, banchine separate' },
   ],
-  /* M208 ↔ Sainðaul Central — 500 m underground corridor */
   M208: [
-    { code: 'K01',  network: 'izx',      transferMin: 10,
+    { code: 'K01', network: 'izx', transferMin: 10,
       note: 'IZX Keishin — Sainðaul Central, 500 m underground corridor' },
     { code: 'M8', network: 'metro', transferMin: 2,
       note: 'M815 Egunsen Botanical Garden — stesso nome, banchine separate' },
-    /* Altri codici Sainðaul Central da aggiungere */
+    { code: 'M912', network: 'metro', transferMin: 3,
+      note: 'M9 Egunsen Botanical Garden' },
   ],
-  /* M209 ↔ Masuda Agarai — 400 m corridor */
   M209: [
     { code: 'M118', network: 'metro', transferMin: 9,
       note: 'M1 Masuda Agarai — stazione diversa, 400 m transfer' },
@@ -213,33 +172,39 @@ const M2_INTERCHANGE = {
     { code: 'M911', network: 'metro', transferMin: 12,
       note: 'M9 Masuda Agarai — stazione diversa, 500 m transfer' },
   ],
-  /* M210 ↔ M406 (Kushidaru Amiya — stesso nome, banchine separate) */
   M210: [
     { code: 'M406', network: 'metro', transferMin: 3,
       note: 'M4 Kushidaru Amiya — stesso nome, banchine separate' },
     { code: 'M119', network: 'metro', transferMin: 3,
       note: 'M1 Kushidaru Amiya — stesso nome, banchine separate' },
   ],
-  /* M211 ↔ Nagida Kunbai (M18??) — stazione diversa */
-  M211: [
-    /* Codice M18 Nagida Kunbai da aggiungere quando disponibile */
+  M211: [],
+  M213: [
+    { code: 'SHX05', network: 'suburban', transferMin: 3,
+      note: 'SHX05 Omenika Jinatsu' },
   ],
-  /* M214 Rakkashoni ↔ LL11 (JD05 Hayatogaru rimosso: ~1100 m, non è un interscambio) */
   M214: [
     { code: 'LL11', network: 'suburban', transferMin: 4,
       note: 'Loop Line Rakkashoni — stesso nome, banchine separate' },
   ],
-  /* M222 Oitsura ↔ JD06 (stesso nome, node 201351276) */
   M222: [
     { code: 'JD06', network: 'suburban', transferMin: 3,
       note: 'Jōdai Line — Oitsura, stesso nome e node (201351276)' },
+    { code: 'KS21', network: 'suburban', transferMin: 3,
+      note: 'Kawasabu Line — Oitsura' },
   ],
-  /* M226 ↔ M130 (Hintomaui — stesso nome, banchine separate) */
+  M223: [
+    { code: 'M224', network: 'metro', transferMin: 0,
+      note: 'M224 Tsutsuro Uguttaya — same node (321305795)' },
+  ],
+  M224: [
+    { code: 'M223', network: 'metro', transferMin: 0,
+      note: 'M223 Oitsura Daikōwen — same node (321305795)' },
+  ],
   M226: [
     { code: 'M130', network: 'metro', transferMin: 3,
       note: 'M1 Hintomaui — stesso nome, banchine separate' },
   ],
-  /* M230 ↔ M415 (Kawaei — stesso nome, banchine separate) */
   M230: [
     { code: 'M415', network: 'metro', transferMin: 3,
       note: 'M4 Kawaei — stesso nome, banchine separate' },
@@ -253,7 +218,7 @@ const M2_NODE_IDS = {
   M213: 176667824,  M214: 124066078,  M215: 202909278,  M216: 202909276,
   M217: 202909275,  M218: 321305089,
   M219: 321304870,  M220: 321304869,  M221: 321304867,  M222: 201351276,
-  M223: 321305795,  M224: 321305793,  M225: 321305792,  M226: 188737257,
+  M223: 321305795,  M224: 321305795,  M225: 321305792,  M226: 188737257,
   M227: 202909265,  M228: 202909263,  M229: 202909262,  M230: 126666499,
   M231: 202909005,  M232: 126666498,  M233: 186955500,  M234: 186955501,
   M235: 186955502,  M236: 135394631,
