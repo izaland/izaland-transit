@@ -22,7 +22,7 @@
      M322 Shiitehongi                        — LL03, SK24, CK22
      M323 Ekinðuka                           — M403
      M324 Rosemane                           — M1421, KD31, JD02
-     M325 Masuda Agarai                      — M118, M209, M1413, M1422, M911, M913
+     M325 Masuda Agarai                      — M118, M209, M913, M1413
      M326 Kansāri                            — M1016, M1017, M1414, M1423
      M327 Herubori                           — LL17, AX07, SX01, SB04, HC01, M1209, M1212
      M328 Amachi Kanlikoika                  — TD01
@@ -33,7 +33,8 @@
      M334 Iyogateri                          — PF05
 
    Regola interscambi: i nuovi collegamenti si aggiungono, quelli
-   esistenti non si rimuovono.
+   esistenti non si rimuovono (salvo codici obsoleti/errati).
+   NB: M911 è Kanbata (M9), NON Masuda Agarai. Masuda Agarai su M9 = M913.
 ================================================================ */
 'use strict';
 
@@ -197,10 +198,6 @@ const M3_INTERCHANGE = {
       note: 'M2 Masuda Hibaru — stazione diversa, 400 m transfer corridor' },
     { code: 'M1413', network: 'metro',    transferMin: 3,
       note: 'Masuda Agarai — M14 line (M1413)' },
-    { code: 'M1422', network: 'metro',    transferMin: 3,
-      note: 'Masuda Agarai — M14 line' },
-    { code: 'M911',  network: 'metro',    transferMin: 4,
-      note: 'Masuda Agarai — M9 line' },
     { code: 'M913',  network: 'metro',    transferMin: 4,
       note: 'Masuda Agarai — M9 line (M913)' },
   ],
