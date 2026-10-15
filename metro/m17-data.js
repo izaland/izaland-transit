@@ -5,28 +5,32 @@
    Tipologia: metro pesante sulle due sponde della città, con servizi
    rapidi, thru service su altre linee e due sbinamenti.
 
-   Stazioni: M1701–M1737 (37) + M1720-1 (spur) = 38
+   Stazioni: M1701–M1737 (37) + M1720-1 = 38
    Distanze progressive da M1701 Mewakate Kippai (km 0.00).
 
-   Relazioni principali:
-     1) M1701 → M1736  : uscita dalla linea e prosecuzione (thru service)
-                           su linea suburbana IR (DA DEFINIRE).
-     2) M1720-1, M1720, M1721 → … → M1737 : sbinamento / spur.
-        M1720-1 Kingaus Sangu Shikimun dista 0.83 km da M1720.
+   Struttura (biforcazione a M1720):
+     Ramo A        (M1701–M1719) : Mewakate Kippai → Kishagoi - Exhibitown
+     Ramo B        (M1720-1)     : mini-ramo di UNA sola stazione,
+                                   capolinea M1720-1 Kingaus Sangu Shikimun,
+                                   0.83 km da M1720
+     Tratta comune (M1720–M1737) : Kingaus Sangu → Tswankanami Airport
 
-   Alcuni treni da M1701 terminano a M1737 invece di immettersi
-   sul thru service a M1736.
+   Relazioni:
+     1) M1701 → M1736 : uscita dalla linea e prosecuzione (thru service)
+                        su linea suburbana IR (DA DEFINIRE).
+     2) Alcuni treni da M1701 terminano a M1737 invece di immettersi
+        sul thru service a M1736.
 
    TODO (istruzioni successive):
      - servizi (all-stop / rapidi), pattern di fermata
      - thru service M1736 → linea IR
-     - dettagli sbinamento M1720-1 / M1720 e M1736 / M1737
      - transferMin reali (qui provvisori = 3)
      - kanji mancanti (stringa vuota)
 ================================================================ */
 'use strict';
 
 const M17_ST = {
+  /* ── Ramo A ── */
   M1701:   { n: 'Mewakate Kippai',                    k: '',                    nodeId: 183370188, km:  0.00 },
   M1702:   { n: 'Mewakate - Yōneo Motu',              k: '',                    nodeId: 183370190, km:  2.09 },
   M1703:   { n: 'Koyabisan',                          k: '古谷比山',              nodeId: 183370191, km:  4.65 },
@@ -39,59 +43,67 @@ const M17_ST = {
   M1710:   { n: 'Asumiya Nawakai',                    k: '',                    nodeId: 184652211, km: 13.27 },
   M1711:   { n: 'Tahnakusa',                          k: '',                    nodeId: 148428068, km: 14.00 },
   M1712:   { n: 'Sainðaul Central',                  k: '作安崎中央',            nodeId: 229656494, km: 15.01 },
-  M1713:   { n: 'Binno',                              k: '苠嗃',                nodeId: 229656493, km: 16.69 },
+  M1713:   { n: 'Binno',                              k: '苠喃',                nodeId: 229656493, km: 16.69 },
   M1714:   { n: 'Makkeriya',                          k: '平追',                nodeId: 129227936, km: 18.00 },
-  M1715:   { n: 'Zaajokinsha',                        k: '蔵氝金舎',            nodeId: 146645344, km: 19.25 },
+  M1715:   { n: 'Zaajokinsha',                        k: '蔵汝金舎',            nodeId: 146645344, km: 19.25 },
   M1716:   { n: 'Korishima - Kōwen Shikirihi',       k: '飯渠-公園北域',      nodeId: 146644144, km: 19.83 },
   M1717:   { n: 'Chikayuda',                          k: '宮由駄',              nodeId: 146645343, km: 21.06 },
   M1718:   { n: 'Assemikori',                         k: '刈水飯',              nodeId: 146645342, km: 22.27 },
   M1719:   { n: 'Kishagoi - Exhibitown',              k: '喜舎拘',              nodeId: 169508181, km: 23.55 },
+  /* ── Ramo B: mini-ramo di una stazione (km dal bivio M1720) ── */
+  'M1720-1': { n: 'Kingaus Sangu Shikimun',           k: '錦額山口北門',        nodeId: 193581001, km: 0.83, kmFromM1720: 0.83 },
+  /* ── Tratta comune M1720–M1737 ── */
   M1720:   { n: 'Kingaus Sangu',                      k: '錦額山口',            nodeId: 169508191, km: 25.91 },
-  /* Spur: 0.83 km da M1720 (km progressivo non assegnato) */
-  'M1720-1': { n: 'Kingaus Sangu Shikimun',           k: '錦額山口北門',        nodeId: 193581001, km: null, kmFromM1720: 0.83 },
   M1721:   { n: 'Miyanore',                           k: '',                    nodeId: 194000877, km: 27.09 },
   M1722:   { n: 'Tagukin Kōwen',                     k: '多牛芩公園',          nodeId: 194000878, km: 28.52 },
-  M1723:   { n: 'Urun asāki',                       k: '',                    nodeId: 194000010, km: 29.96 },
+  M1723:   { n: 'Urunasāki',                         k: '',                    nodeId: 194000010, km: 29.96 },
   M1724:   { n: 'Iskehashu Honjō',                   k: '一家跖本町',          nodeId: 194000829, km: 31.29 },
   M1725:   { n: 'Shin-Dodonuka',                      k: '新登戸陥',            nodeId: 194000794, km: 32.71 },
   M1726:   { n: 'Dankore Museum of Modern Art (DMMA)', k: '',                   nodeId: 194000793, km: 33.84 },
-  M1727:   { n: 'Owonideki Zawahan',                  k: '吹取竊氾',            nodeId: 136187247, km: 34.96 },
+  M1727:   { n: 'Owonideki Zawahan',                  k: '吹取窊氾',            nodeId: 136187247, km: 34.96 },
   M1728:   { n: 'Shiki Choyarui',                     k: '',                    nodeId: 194000762, km: 35.96 },
   M1729:   { n: 'Ashihara Zumajihan',                 k: '',                    nodeId: 194000746, km: 36.85 },
   M1730:   { n: 'Gundari Kōwen',                     k: '裙橋公園',            nodeId: 123393486, km: 38.66 },
   M1731:   { n: 'Arekuma',                            k: '枝渫',                nodeId: 193996385, km: 39.92 },
   M1732:   { n: 'Wikkaman',                           k: '昱賀満',              nodeId: 180237682, km: 42.63 },
   M1733:   { n: 'Saikade Onuki',                      k: '賽湊午陥',            nodeId: 146815006, km: 45.09 },
-  M1734:   { n: 'Nari-Tsemuyori Shundai-adae',        k: '東㎽向峻大前',        nodeId: 194212579, km: 46.17 },
-  M1735:   { n: 'Tsemuyori',                          k: '㎽向',                nodeId: 194212578, km: 47.33 },
+  M1734:   { n: 'Nari-Tsemuyori Shundai-adae',        k: '東㽗向峻大前',        nodeId: 194212579, km: 46.17 },
+  M1735:   { n: 'Tsemuyori',                          k: '㽗向',                nodeId: 194212578, km: 47.33 },
   M1736:   { n: 'Bibantori',                          k: '美潘市',              nodeId: 194028355, km: 48.56 },
   M1737:   { n: 'Tswankanami Airport',                k: '芽咲空港',            nodeId: 251115566, km: 49.55 },
 };
 
 /* Ordine canonico geografico */
-const M17_CANONICAL_MAIN = [
+const M17_CANONICAL_A = [
   'M1701','M1702','M1703','M1704','M1705','M1706','M1707','M1708','M1709','M1710',
-  'M1711','M1712','M1713','M1714','M1715','M1716','M1717','M1718','M1719','M1720',
-  'M1721','M1722','M1723','M1724','M1725','M1726','M1727','M1728','M1729','M1730',
-  'M1731','M1732','M1733','M1734','M1735','M1736','M1737',
+  'M1711','M1712','M1713','M1714','M1715','M1716','M1717','M1718','M1719',
 ];
-/* Spur: M1720-1 → M1720 → … → M1737 */
-const M17_CANONICAL_SPUR = ['M1720-1', 'M1720'];
+const M17_CANONICAL_B = ['M1720-1'];   // mini-ramo, si innesta in M1720
+const M17_CANONICAL_COMMON = [
+  'M1720','M1721','M1722','M1723','M1724','M1725','M1726','M1727','M1728','M1729',
+  'M1730','M1731','M1732','M1733','M1734','M1735','M1736','M1737',
+];
+/* Percorsi completi */
+const M17_CANONICAL_MAIN = [...M17_CANONICAL_A, ...M17_CANONICAL_COMMON];
+const M17_CANONICAL_SPUR = [...M17_CANONICAL_B, ...M17_CANONICAL_COMMON];
 
 const M17_META = {
   id:          'M17',
   code:        'M17',
   name:        'Line 17',
   color:       '#f985bb',
-  totalKm:     49.55,
+  totalKmA:    49.55,                // M1701 → M1737
+  totalKmB:    24.45 + 0.83,         // M1720-1 → M1737 (0.83 + 49.55 - 25.91 = 24.47)
   avgSpeedKmh: null,   // da definire
   dwellSec:    null,   // da definire
-  /* Punti di sbinamento / thru service (da dettagliare) */
-  thruService: { at: 'M1736', to: 'IR suburban line (da definire)', from: 'M1701' },
-  branching: {
-    spur:       { start: 'M1720-1', joinsAt: 'M1720', end: 'M1737' },
-    airportEnd: { at: 'M1736', terminus: 'M1737' },
+  junction:    'M1720',
+  branches: {
+    A: { start: 'M1701',   joinsAt: 'M1720' },
+    B: { start: 'M1720-1', joinsAt: 'M1720', stations: 1, kmFromJunction: 0.83 },
   },
+  /* Thru service / terminal (da dettagliare) */
+  thruService: { at: 'M1736', to: 'IR suburban line (da definire)', from: 'M1701' },
+  terminalAlt: { at: 'M1736', terminus: 'M1737' },
 };
 
 /* Placeholder: headway e servizi da definire con le prossime istruzioni */
@@ -127,7 +139,9 @@ const M17_NODE_IDS = Object.fromEntries(
 
 if (typeof module !== 'undefined') {
   module.exports = {
-    M17_META, M17_ST, M17_CANONICAL_MAIN, M17_CANONICAL_SPUR,
+    M17_META, M17_ST,
+    M17_CANONICAL_A, M17_CANONICAL_B, M17_CANONICAL_COMMON,
+    M17_CANONICAL_MAIN, M17_CANONICAL_SPUR,
     M17_HEADWAY, M17_SVC, M17_INTERCHANGE, M17_NODE_IDS,
   };
 }
