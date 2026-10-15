@@ -9,7 +9,7 @@
    Interscambi principali:
      M301 Ansan Shakuiadae                   — KA12
      M303 Sainðaul Univ. of Foreign Studies  — KA10
-     M306 Moriyose                           — MX10, CK33
+     M306 Moriyose                           — MX10, MX101, CK33
      M313 Bibawara                           — KS10
      M3150 Shakihori (branch terminus)       — M1001 (M3100), SK19, CK27, KS11
      M315 Niji-Shakihori                     — M1002
@@ -22,15 +22,18 @@
      M322 Shiitehongi                        — LL03, SK24, CK22
      M323 Ekinðuka                           — M403
      M324 Rosemane                           — M1421, KD31, JD02
-     M325 Masuda Agarai                      — M118, M209, M1422, M911
-     M326 Kansāri                            — M1423, M1017
-     M327 Herubori                           — LL17, AX07, SX01, SB04, HC01, M1209
+     M325 Masuda Agarai                      — M118, M209, M1413, M1422, M911, M913
+     M326 Kansāri                            — M1016, M1017, M1414, M1423
+     M327 Herubori                           — LL17, AX07, SX01, SB04, HC01, M1209, M1212
      M328 Amachi Kanlikoika                  — TD01
-     M329 Yunpotsai Soisuma                  — M1426, M1815
-     M330 Intsushitsa Kuyakujo               — M1211
+     M329 Yunpotsai Soisuma                  — M1417, M1426, M1815
+     M330 Intsushitsa Kuyakujo               — M1211, M1214
      M331 Shin-Tsaikikori                    — M916, M17XX (TBD), SB07
      M332 Ðaihate                            — M17XX (TBD)
      M334 Iyogateri                          — PF05
+
+   Regola interscambi: i nuovi collegamenti si aggiungono, quelli
+   esistenti non si rimuovono.
 ================================================================ */
 'use strict';
 
@@ -39,7 +42,7 @@ const M3_ST = {
   M302:  { n: 'Hattanjima',                             k: '淵湧',                km:  1.31 },
   M303:  { n: 'Sainðaul University of Foreign Studies', k: '作外大前',             km:  3.25 },
   M304:  { n: 'Sanzhō',                                 k: '参淨',                km:  6.01 },
-  M305:  { n: 'Chastano',                               k: '椋見',                km:  8.44 },
+  M305:  { n: 'Chastano',                               k: '椰見',                km:  8.44 },
   M306:  { n: 'Moriyose',                               k: '竹峰',                km:  9.54 },
   M307:  { n: 'Moriyose Nanmun',                        k: '',                    km: 10.34 },
   M308:  { n: 'Kanegodaul',                             k: '',                    km: 11.35 },
@@ -47,15 +50,15 @@ const M3_ST = {
   M310:  { n: 'Gamonate',                               k: '',                    km: 14.03 },
   M311:  { n: 'Innotawa',                               k: '',                    km: 15.32 },
   M312:  { n: 'Nari-Surikato',                          k: '東須里日',             km: 16.58 },
-  M313:  { n: 'Bibawara',                               k: '琵芭緩',               km: 17.88 },
+  M313:  { n: 'Bibawara',                               k: '琥芭緩',               km: 17.88 },
   M314:  { n: 'Gawaraze',                               k: '',                    km: 19.14 },
   M3150: { n: 'Shakihori',                              k: '石登',                km: 18.90 },
   M315:  { n: 'Niji-Shakihori',                         k: '',                    km: 20.42 },
   M316:  { n: 'Rillantsoye',                            k: '',                    km: 21.31 },
-  M317:  { n: 'Shakihori Sports Park',                  k: '石登ટેર૾દ્ઢારઃદ્ડા',  km: 22.48 },
+  M317:  { n: 'Shakihori Sports Park',                  k: '石登ટેીદ્ઢારઃદ્ડા',  km: 22.48 },
   M318:  { n: 'Komayunden - Dōnmus Kōwen',              k: '冬允殿-動物公園',       km: 23.82 },
   M319:  { n: 'Garotsu Lake',                           k: '賀呂都湖',             km: 24.69 },
-  M320:  { n: 'Shin-Makurigawa',                        k: '新炭畦',               km: 26.27 },
+  M320:  { n: 'Shin-Makurigawa',                        k: '新炭畝',               km: 26.27 },
   M321:  { n: 'Tsenduma',                               k: '',                    km: 27.31 },
   M322:  { n: 'Shiitehongi',                            k: '茛本名',               km: 28.94 },
   M323:  { n: 'Ekinðuka',                               k: '虓પ્鵜',               km: 30.40 },
@@ -63,9 +66,9 @@ const M3_ST = {
   M325:  { n: 'Masuda Agarai',                          k: '馬砅任尭',             km: 32.25 },
   M326:  { n: 'Kansāri',                                k: '官川',                km: 33.08 },
   M327:  { n: 'Herubori',                               k: '杏登',                km: 33.99 },
-  M328:  { n: 'Amachi Kanlikoika',                      k: '貽知官梨柳',           km: 35.24 },
+  M328:  { n: 'Amachi Kanlikoika',                      k: '貊知官梨柳',           km: 35.24 },
   M329:  { n: 'Yunpotsai Soisuma',                      k: '',                    km: 36.57 },
-  M330:  { n: 'Intsushitsa Kuyakujo',                   k: '鰤基區役所',           km: 38.09 },
+  M330:  { n: 'Intsushitsa Kuyakujo',                   k: '鰇基區役所',           km: 38.09 },
   M331:  { n: 'Shin-Tsaikikori',                        k: '',                    km: 39.33 },
   M332:  { n: 'Ðaihate',                                k: '',                    km: 40.59 },
   M333:  { n: 'Kanlikoika Yukashire',                   k: '',                    km: 41.69 },
@@ -118,6 +121,8 @@ const M3_INTERCHANGE = {
   M306: [
     { code: 'MX10', network: 'suburban', transferMin: 4,
       note: 'Moriyose — MX line' },
+    { code: 'MX101', network: 'suburban', transferMin: 4,
+      note: 'Moriyose — MX line (MX101)' },
     { code: 'CK33', network: 'suburban', transferMin: 4,
       note: 'Moriyose — CK line' },
   ],
@@ -190,12 +195,20 @@ const M3_INTERCHANGE = {
       note: 'Masuda Agarai — M1 line' },
     { code: 'M209',  network: 'metro',    transferMin: 9,
       note: 'M2 Masuda Hibaru — stazione diversa, 400 m transfer corridor' },
+    { code: 'M1413', network: 'metro',    transferMin: 3,
+      note: 'Masuda Agarai — M14 line (M1413)' },
     { code: 'M1422', network: 'metro',    transferMin: 3,
       note: 'Masuda Agarai — M14 line' },
     { code: 'M911',  network: 'metro',    transferMin: 4,
       note: 'Masuda Agarai — M9 line' },
+    { code: 'M913',  network: 'metro',    transferMin: 4,
+      note: 'Masuda Agarai — M9 line (M913)' },
   ],
   M326: [
+    { code: 'M1016', network: 'metro', transferMin: 3,
+      note: 'Kansāri — M10 line (M1016)' },
+    { code: 'M1414', network: 'metro', transferMin: 3,
+      note: 'Kansāri — M14 line (M1414)' },
     { code: 'M1423', network: 'metro', transferMin: 3,
       note: 'Kansāri — M14 line' },
     { code: 'M1017', network: 'metro', transferMin: 3,
@@ -214,12 +227,16 @@ const M3_INTERCHANGE = {
       note: 'Herubori — HC line' },
     { code: 'M1209', network: 'metro',    transferMin: 3,
       note: 'Herubori — M12 line' },
+    { code: 'M1212', network: 'metro',    transferMin: 3,
+      note: 'Herubori — M12 line (nuova numerazione M12)' },
   ],
   M328: [
     { code: 'TD01', network: 'suburban', transferMin: 4,
       note: 'Amachi Kanlikoika — TD line' },
   ],
   M329: [
+    { code: 'M1417', network: 'metro', transferMin: 3,
+      note: 'Yunpotsai Soisuma — M14 line (M1417)' },
     { code: 'M1426', network: 'metro', transferMin: 3,
       note: 'Yunpotsai Soisuma — M14 line' },
     { code: 'M1815', network: 'metro', transferMin: 3,
@@ -228,6 +245,8 @@ const M3_INTERCHANGE = {
   M330: [
     { code: 'M1211', network: 'metro', transferMin: 3,
       note: 'Intsushitsa Kuyakujo — M12 line' },
+    { code: 'M1214', network: 'metro', transferMin: 3,
+      note: 'Intsushitsa Kuyakujo — M12 line (nuova numerazione M12)' },
   ],
   M331: [
     { code: 'M916', network: 'metro',    transferMin: 3,
