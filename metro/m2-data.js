@@ -13,6 +13,7 @@
    Codifica km:
      Distanze progressive da M201 Gawinosechi (km 0.000).
      Ramo B: distanze misurate lungo il ramo, da M218 in poi.
+     M233–M236: ricalcolate a partire da M232 Shin-Tsukaso (km 24.720).
      I valori originali erano in metri; convertiti in km.
 
    Regola interscambi: i nuovi collegamenti si aggiungono, quelli
@@ -56,10 +57,10 @@ const M2_ST = {
   M230: { n: 'Kawaei',                          k: '珂夬栄',               km: 23.000 },
   M231: { n: 'Tayakure',                        k: '貞師',               km: 23.910 },
   M232: { n: 'Shin-Tsukaso',                   k: '新鬬蓒',              km: 24.720 },
-  M233: { n: 'Takejori Shimin Kōwen',          k: '館恵市民公園',         km: 25.230 },
-  M234: { n: 'Yamaiki Town',                   k: '倉琮ਠપેપ્',           km: 27.760 },
+  M233: { n: 'Takejori Shimin Kōwen',          k: '館恵市民公園',         km: 25.235 },
+  M234: { n: 'Yamaiki Town',                   k: '倉琮ਠપેપ્',           km: 25.724 },
   M235: { n: 'Shiki-Mokoba',                   k: '北母槻',              km: 26.310 },
-  M236: { n: 'Mokoba',                          k: '母槻',               km: 27.370 },
+  M236: { n: 'Mokoba',                          k: '母槻',               km: 27.380 },
 };
 
 /* Ordine canonico geografico per ogni ramo */
@@ -89,7 +90,7 @@ const M2_META = {
     B: { terminus: 'M236', display: 'for Mokoba' },
   },
   totalKmA:    29.410,
-  totalKmB:    27.370,
+  totalKmB:    27.380,
   avgSpeedKmh: 30,
   dwellSec:    30,
 };
