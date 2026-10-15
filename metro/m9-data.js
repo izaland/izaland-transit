@@ -12,14 +12,11 @@
      M910  M807                 (Awasada)
      M911  M1014                (Kanbata)
      M912  M208, M815           (Egunsen Botanical Garden)
-     M913  M118, M325, M1422, M209 (Masuda Agarai; M209 = node 145681683, 5 min a piedi)
+     M913  M118, M325, M1413, M209 (Masuda Agarai; M209 = node 145681683, 5 min a piedi)
      M914  M1017, SHX02         (Eigan-ji)
      M915  LL16                 (Oiseharu, 2 min a piedi)
      M916  LL14                 (Tomiganei)
      M918  M331                 (Shin-Tsaikikori)
-
-   NB: M913 ↔ M14 Masuda Agarai: nei dati delle altre linee il codice
-   è M1422 (non M1413); verificare.
 ================================================================ */
 'use strict';
 
@@ -37,7 +34,7 @@ const M9_ST = {
   M911: { n: 'Kanbata',                   k: '巻岩',                nodeId: 177044015, km: 10.38 },
   M912: { n: 'Egunsen Botanical Garden',  k: '慧群仙植物園',        nodeId: 128525299, km: 11.69 },
   M913: { n: 'Masuda Agarai',             k: '馬砅任尭',            nodeId: 128669528, km: 12.66 },
-  M914: { n: 'Eigan-ji',                  k: '栄鳫寺',              nodeId: 128669527, km: 13.92 },
+  M914: { n: 'Eigan-ji',                  k: '栄鳳寺',              nodeId: 128669527, km: 13.92 },
   M915: { n: 'Oiseharu (Metro)',          k: '粕墾[地下鐵]',        nodeId: 176668162, km: 15.16 },
   M916: { n: 'Tomiganei',                 k: '庭ヶ汢',              nodeId: 124066081, km: 16.76 },
   M917: { n: 'Tsurunara',                 k: '守治',                nodeId: 229641679, km: 17.45 },
@@ -127,7 +124,7 @@ const M9_INTERCHANGE = {
       note: 'M1 Masuda Agarai — corridoio sotterraneo' },
     { code: 'M325',  network: 'metro',   transferMin: 4,
       note: 'M3 Masuda Agarai' },
-    { code: 'M1422', network: 'metro',   transferMin: 3,
+    { code: 'M1413', network: 'metro',   transferMin: 3,
       note: 'M14 Masuda Agarai' },
     { code: 'M209',  network: 'metro',   transferMin: 5,
       note: 'M2 Masuda Hibaru — 5 min a piedi (node 145681683)' },
