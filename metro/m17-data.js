@@ -93,7 +93,7 @@ const M17_META = {
   name:        'Line 17',
   color:       '#f985bb',
   totalKmA:    49.55,                // M1701 → M1737
-  totalKmB:    24.45 + 0.83,         // M1720-1 → M1737 (0.83 + 49.55 - 25.91 = 24.47)
+  totalKmB:    24.47,                // M1720-1 → M1737 (0.83 + 49.55 - 25.91)
   avgSpeedKmh: null,   // da definire
   dwellSec:    null,   // da definire
   junction:    'M1720',
