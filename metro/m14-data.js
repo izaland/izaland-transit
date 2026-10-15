@@ -1,7 +1,7 @@
 /* ================================================================
    M14-DATA.JS — Metro Line 14 (#72E400)
    ================================================================
-   20 stazioni · 22.58 km
+   20 stazioni · 22.58 km · metro pesante (40 km/h commerciali, sosta 20 s)
    Capolinea: Migawarae (M1401) ↔ Tanjānli (M1420)
 
    Interscambi notevoli:
@@ -58,8 +58,8 @@ const M14_META = {
   color:       '#72E400',
   totalKm:     22.58,
   stations:    20,
-  avgSpeedKmh: 30,
-  dwellSec:    30,
+  avgSpeedKmh: 40,   // metro pesante
+  dwellSec:    20,
 };
 
 /* TODO: headway provvisorio (copiato da M11) — da confermare */
