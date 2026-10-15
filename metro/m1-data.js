@@ -7,18 +7,20 @@
    Ordine canonico geografico: M110 (Alkuitsa, ovest) → M144 (Enikezya Forum, est)
 
    Interscambi principali:
-     M117 Sainðaul Central — R01, E01, K01, AX06, M814, LL01, KD32, SK26, TS13, JD01
-     M111 Shimamera        — AX05, TS14, M417, M4
-     M128 Asaji Torimoshi  — R02, KD20
-     M110 Alkuitsa         — CK18, M202
+     M117 Sainðaul Central — M814, LL01, SK26, TS13, JD01
+     M118 Masuda Agarai    — M325, M913, M1413
+     M111 Shimamera        — M417, M610, SK33, TS14
+     M110 Alkuitsa         — M202, CK18
+     M113 Takkurahama      — M908
+     M115 Nimunoðai        — M808
+     M119 Kushidaru Amiya  — M210, M406
      M120 Tsumiji          — JD04
-     M143 Shin-Enikezya    — R03
-     M142 Enikezya         — SK07
+     M121 Upajiya          — M1409
+     M123 Tamanoke-Tsunui  — LL07 (Rupekoppe, 500 m a piedi)
+     M126 Otsunuke 2sa     — M1402
+     M128 Asaji Torimoshi  — KS18
      M130 Hintomaui        — M226
-     M119 Kushidaru Amiya  — M406 (Line 4)
-     M115 Nimunoðai        — M808 (Line 8)
-     M113 Takkurahama      — SK32
-     M134 Watarui          — WI01 (Warohan–Iniha Line)
+     M142 Enikezya         — SK07
 ================================================================ */
 'use strict';
 
@@ -124,94 +126,53 @@ const M1_SVC = {
 
 /* ----------------------------------------------------------------
    Interscambi Metro Line 1 ↔ altre reti
+   (elenco aggiornato; transferMin: valori esistenti, nuovi = provvisori)
 
-   M110 Alkuitsa
-     ↔ CK18 (Kawayatsu Line)   — interscambio in superficie         5 min
-     ↔ M202 (Line 2)           — stesso edificio, banchine separate  3 min
-
-   M111 Shimamera
-     ↔ AX05 (Airport Express)  — Shimamera, piano -1/0              5 min
-     ↔ TS14 (Tandan-Senpyan)   — stesso nome, uscita condivisa      4 min
-     ↔ M417 (Line 4)           — Shimamera, corridoio sotterraneo   5 min
-
-   M113 Takkurahama
-     ↔ SK32 (Seishaku Line)    — stesso nome, banchine adiacenti    3 min
-
-   M115 Nimunoðai
-     ↔ M808 (Line 8)           — stesso nome, banchine separate     3 min
-
-   M117 Sainðaul Central  ← HUB PRINCIPALE
-     ↔ R01  (IZX Ryānkai)      — Niji-Sainðaul / Sainðaul           5 min
-     ↔ E01  (IZX Eira)         — Sainðaul Eira                      5 min
-     ↔ K01  (IZX Keishin)      — Sainðaul Keishin                   5 min
-     ↔ AX06 (Airport Express)  — Sainðaul Central AX                3 min
-     ↔ M814 (Line 8)           — Sainðaul Central M8                2 min
-     ↔ LL01 (Loop Line)        — Sainðaul Central LL                3 min
-     ↔ KD32 (Kidai Line)       — Sainðaul Central Kidai             4 min
-     ↔ SK26 (Seishaku Line)    — Sainðaul Central SK                4 min
-     ↔ TS13 (Tandan-Senpyan)   — Sainðaul Central TS                4 min
-     ↔ JD01 (Jōdai Line)       — Sainðaul Central JD                4 min
-
-   M119 Kushidaru Amiya
-     ↔ M406 (Line 4)           — stesso nome, corridoio sotterraneo  3 min
-
-   M120 Tsumiji
-     ↔ JD04 (Jōdai Line)       — stesso nome, uscita condivisa      3 min
-
-   M128 Asaji Torimoshi
-     ↔ R02  (IZX Ryānkai)      — Asaji Torimoshi IZX               10 min
-     ↔ KD20 (Kidai Line)       — Asaji Torimoshi Kidai               5 min
-
-   M130 Hintomaui
-     ↔ M226 (Line 2)           — stesso nome, banchine separate      3 min
-
-   M134 Watarui
-     ↔ WI01 (Warohan–Iniha Line) — Watarui, stazione adiacente      5 min
-
-   M142 Enikezya
-     ↔ SK07 (Seishaku Line)    — stesso nome, banchine adiacenti    3 min
-
-   M143 Shin-Enikezya
-     ↔ R03  (IZX Ryānkai)      — Shin-Enikezya IZX                  8 min
+   M110 Alkuitsa          ↔ M202, CK18
+   M111 Shimamera         ↔ M417, M610, SK33, TS14
+   M113 Takkurahama       ↔ M908
+   M115 Nimunoðai         ↔ M808
+   M117 Sainðaul Central  ↔ M814, LL01, SK26, TS13, JD01
+   M118 Masuda Agarai     ↔ M325, M913, M1413
+   M119 Kushidaru Amiya   ↔ M210, M406
+   M120 Tsumiji           ↔ JD04
+   M121 Upajiya           ↔ M1409
+   M123 Tamanoke-Tsunui   ↔ LL07 (Rupekoppe, nodo 262111215, 500 m a piedi)
+   M126 Otsunuke 2sa      ↔ M1402
+   M128 Asaji Torimoshi   ↔ KS18
+   M130 Hintomaui         ↔ M226
+   M142 Enikezya          ↔ SK07
 ---------------------------------------------------------------- */
 const M1_INTERCHANGE = {
   M110: [
+    { code: 'M202', network: 'metro', transferMin: 3,
+      note: 'M2 Alkuitsa — stesso edificio, banchine separate' },
     { code: 'CK18', network: 'suburban', transferMin: 5,
       note: 'Kawayatsu Line — Alkuitsa, interscambio in superficie' },
-    { code: 'M202', network: 'metro',    transferMin: 3,
-      note: 'M2 Alkuitsa — stesso edificio, banchine separate' },
   ],
   M111: [
-    { code: 'AX05', network: 'ax',       transferMin: 5,
-      note: 'Airport Express — Shimamera, piano -1/0' },
+    { code: 'M417', network: 'metro', transferMin: 5,
+      note: 'M4 Shimamera — corridoio sotterraneo 300 m' },
+    { code: 'M610', network: 'metro', transferMin: 5,
+      note: 'M6 Shimamera' },
+    { code: 'SK33', network: 'suburban', transferMin: 4,
+      note: 'Seishaku Line — Shimamera' },
     { code: 'TS14', network: 'suburban', transferMin: 4,
       note: 'Tandan-Senpyan — Shimamera, uscita condivisa' },
-    { code: 'M417', network: 'metro',    transferMin: 5,
-      note: 'M4 Shimamera — corridoio sotterraneo 300 m' },
   ],
   M113: [
-    { code: 'SK32', network: 'suburban', transferMin: 3,
-      note: 'Seishaku Line — Takkurahama, banchine adiacenti' },
+    { code: 'M908', network: 'metro', transferMin: 3,
+      note: 'M9 Takkurahama' },
   ],
   M115: [
-    { code: 'M808', network: 'metro',    transferMin: 3,
+    { code: 'M808', network: 'metro', transferMin: 3,
       note: 'M8 Nimunoðai — banchine separate' },
   ],
   M117: [
-    { code: 'R01',  network: 'izx',      transferMin: 5,
-      note: 'IZX Ryānkai — Sainðaul Central' },
-    { code: 'E01',  network: 'izx',      transferMin: 5,
-      note: 'IZX Eira — Sainðaul Central' },
-    { code: 'K01',  network: 'izx',      transferMin: 5,
-      note: 'IZX Keishin — Sainðaul Central' },
-    { code: 'AX06', network: 'ax',       transferMin: 3,
-      note: 'Airport Express — Sainðaul Central AX' },
-    { code: 'M814', network: 'metro',    transferMin: 2,
+    { code: 'M814', network: 'metro', transferMin: 2,
       note: 'M8 Sainðaul Central — banchine separate' },
     { code: 'LL01', network: 'suburban', transferMin: 3,
       note: 'Loop Line — Sainðaul Central' },
-    { code: 'KD32', network: 'suburban', transferMin: 4,
-      note: 'Kidai Line — Sainðaul Central' },
     { code: 'SK26', network: 'suburban', transferMin: 4,
       note: 'Seishaku Line — Sainðaul Central' },
     { code: 'TS13', network: 'suburban', transferMin: 4,
@@ -220,44 +181,46 @@ const M1_INTERCHANGE = {
       note: 'Jōdai Line — Sainðaul Central JD' },
   ],
   M118: [
-    { code: 'M209', network: 'metro',    transferMin: 9,
-      note: 'M2 Masuda Hibaru — corridoio sotterraneo' },
-    { code: 'M325', network: 'metro',    transferMin: 2,
+    { code: 'M325', network: 'metro', transferMin: 2,
       note: 'M3 Masuda Agarai — corridoio sotterraneo' },
-    { code: 'M1422', network: 'metro',    transferMin: 2,
-      note: 'M14 Masuda Agarai — corridoio sotterraneo' },
-    { code: 'M911', network: 'metro',    transferMin: 6,
+    { code: 'M913', network: 'metro', transferMin: 6,
       note: 'M9 Masuda Agarai — corridoio sotterraneo' },
+    { code: 'M1413', network: 'metro', transferMin: 2,
+      note: 'M14 Masuda Agarai — corridoio sotterraneo' },
   ],
   M119: [
-    { code: 'M406', network: 'metro',    transferMin: 3,
+    { code: 'M210', network: 'metro', transferMin: 3,
+      note: 'M2 Kushidaru Amiya' },
+    { code: 'M406', network: 'metro', transferMin: 3,
       note: 'M4 Kushidaru Amiya — corridoio sotterraneo' },
   ],
   M120: [
     { code: 'JD04', network: 'suburban', transferMin: 3,
       note: 'Jōdai Line — Tsumiji, stesso nome, uscita condivisa' },
   ],
+  M121: [
+    { code: 'M1409', network: 'metro', transferMin: 3,
+      note: 'M14 Upajiya' },
+  ],
+  M123: [
+    { code: 'LL07', network: 'suburban', transferMin: 8,
+      note: 'Loop Line — Rupekoppe (nodo 262111215), 500 m a piedi' },
+  ],
+  M126: [
+    { code: 'M1402', network: 'metro', transferMin: 3,
+      note: 'M14 Otsunuke 2sa' },
+  ],
   M128: [
-    { code: 'R02',  network: 'izx',      transferMin: 10,
-      note: 'IZX Ryānkai — Asaji Torimoshi, walkable uscita nord' },
-    { code: 'KD20', network: 'suburban', transferMin: 5,
-      note: 'Kidai Line — Asaji Torimoshi' },
+    { code: 'KS18', network: 'suburban', transferMin: 5,
+      note: 'Kawasabu Line — Asaji Torimoshi' },
   ],
   M130: [
-    { code: 'M226', network: 'metro',    transferMin: 3,
+    { code: 'M226', network: 'metro', transferMin: 3,
       note: 'M2 Hintomaui — banchine separate' },
-  ],
-  M134: [
-    { code: 'WI01', network: 'suburban', transferMin: 5,
-      note: 'Warohan–Iniha Line — Watarui, stazione adiacente' },
   ],
   M142: [
     { code: 'SK07', network: 'suburban', transferMin: 3,
       note: 'Seishaku Line — Enikezya, banchine adiacenti' },
-  ],
-  M143: [
-    { code: 'R03',  network: 'izx',      transferMin: 8,
-      note: 'IZX Ryānkai — Shin-Enikezya, walkable uscita ovest' },
   ],
 };
 
