@@ -21,9 +21,15 @@
      2) Alcuni treni da M1701 terminano a M1737 invece di immettersi
         sul thru service a M1736.
 
+   Servizi (S1–S4), pattern di fermata in M17_PATTERN:
+     S1  M1701 → M1736   ferma in tutte le stazioni del percorso
+     S2  M1701 → M1736   salta alcune stazioni
+     S3  M1720-1 → M1737 solo tratta M1720-1 / M1720–M1737
+     S4  M1701 → M1737   rapido, salta molte stazioni
+
    TODO (istruzioni successive):
-     - servizi (all-stop / rapidi), pattern di fermata
-     - thru service M1736 → linea IR
+     - nomi/tipologia ufficiali dei servizi, headway, ore di servizio
+     - thru service M1736 → linea IR (S1, S2?)
      - transferMin reali (qui provvisori = 3)
      - kanji mancanti (stringa vuota)
 ================================================================ */
@@ -106,9 +112,40 @@ const M17_META = {
   terminalAlt: { at: 'M1736', terminus: 'M1737' },
 };
 
-/* Placeholder: headway e servizi da definire con le prossime istruzioni */
+/* Placeholder: headway da definire con le prossime istruzioni */
 const M17_HEADWAY = [];
-const M17_SVC = {};
+
+/* ----------------------------------------------------------------
+   Pattern di fermata — colonne: S1 S2 S3 S4
+     x = ferma   | = passa senza fermare   - = non servita (n/a)
+   NB: M1720-1 riporta '|' per S2 e S4 come da tabella; i due servizi
+   non fanno capolinea/transito sul mini-ramo (da confermare).
+---------------------------------------------------------------- */
+const M17_PATTERN = {
+  M1701: 'xx-x',  M1702: 'xx-x',  M1703: 'x|-x',  M1704: 'xx-x',  M1705: 'xx-x',
+  M1706: 'x|-x',  M1707: 'x|-x',  M1708: 'xx-x',  M1709: 'xx-x',  M1710: 'x|-x',
+  M1711: 'xx-x',  M1712: 'xx-x',  M1713: 'xx-|',  M1714: 'x|-|',  M1715: 'x|-|',
+  M1716: 'x|-|',  M1717: 'xx-x',  M1718: 'xx-|',  M1719: 'xx-|',
+  'M1720-1': '-|x|',
+  M1720: 'x|x|',  M1721: 'x|x|',  M1722: 'x|x|',  M1723: 'xxxx',  M1724: 'x|x|',
+  M1725: 'xxx|',  M1726: 'x|x|',  M1727: 'xxx|',  M1728: 'xxxx',  M1729: 'xxxx',
+  M1730: 'xxxx',  M1731: 'x|x|',  M1732: 'xxx|',  M1733: 'x|xx',  M1734: 'x|x|',
+  M1735: 'x|x|',  M1736: 'xxx|',  M1737: '--xx',
+};
+
+const _svcStops = (idx, path) =>
+  path.filter(c => M17_PATTERN[c] && M17_PATTERN[c][idx] === 'x');
+
+const M17_SVC = {
+  S1: { name: 'S1', color: '#f985bb', cls: 'svc-S1', thruAt: 'M1736',
+        stops: _svcStops(0, M17_CANONICAL_MAIN.slice(0, M17_CANONICAL_MAIN.indexOf('M1736') + 1)) },
+  S2: { name: 'S2', color: '#f985bb', cls: 'svc-S2', thruAt: 'M1736',
+        stops: _svcStops(1, M17_CANONICAL_MAIN.slice(0, M17_CANONICAL_MAIN.indexOf('M1736') + 1)) },
+  S3: { name: 'S3', color: '#f985bb', cls: 'svc-S3',
+        stops: _svcStops(2, M17_CANONICAL_SPUR) },
+  S4: { name: 'S4', color: '#f985bb', cls: 'svc-S4',
+        stops: _svcStops(3, M17_CANONICAL_MAIN) },
+};
 
 /* ----------------------------------------------------------------
    Interscambi Metro Line 17 ↔ altre reti
@@ -142,6 +179,6 @@ if (typeof module !== 'undefined') {
     M17_META, M17_ST,
     M17_CANONICAL_A, M17_CANONICAL_B, M17_CANONICAL_COMMON,
     M17_CANONICAL_MAIN, M17_CANONICAL_SPUR,
-    M17_HEADWAY, M17_SVC, M17_INTERCHANGE, M17_NODE_IDS,
+    M17_HEADWAY, M17_PATTERN, M17_SVC, M17_INTERCHANGE, M17_NODE_IDS,
   };
 }
