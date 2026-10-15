@@ -16,7 +16,7 @@
      I valori originali erano in metri; convertiti in km.
 
    Regola interscambi: i nuovi collegamenti si aggiungono, quelli
-   esistenti non si rimuovono.
+   esistenti non si rimuovono (salvo codici obsoleti/errati).
 ================================================================ */
 'use strict';
 
@@ -44,14 +44,14 @@ const M2_ST = {
   M219: { n: 'Otsumi-Makintoshi Meidai-adae',  k: '南馬પ્貴氾・明大前',   km: 20.760 },
   M220: { n: 'Kanasamaki',                      k: '崔赴',               km: 22.030 },
   M221: { n: 'Sunbui',                          k: '榔苚依',             km: 23.310 },
-  M222: { n: 'Oitsura',                         k: '篕鵲',               km: 24.220 },
-  M223: { n: 'Oitsura Daikōwen',               k: '篕鵲大公園',          km: 25.570 },
+  M222: { n: 'Oitsura',                         k: '篡鵲',               km: 24.220 },
+  M223: { n: 'Oitsura Daikōwen',               k: '篡鵲大公園',          km: 25.570 },
   M224: { n: 'Tsutsuro Uguttaya',              k: '笙呂葊貞',            km: 26.860 },
   M225: { n: 'Obikasunde',                      k: '吾比加崶',            km: 28.420 },
   M226: { n: 'Hintomaui',                       k: '価園斐',             km: 29.410 },
   /* ── Ramo B: for Mokoba ── */
   M227: { n: 'Ōdahui Kōwen',                  k: '大世公園',            km: 20.260 },
-  M228: { n: 'Akaimori',                        k: '蛞生竹',             km: 20.980 },
+  M228: { n: 'Akaimori',                        k: '蚞生竹',             km: 20.980 },
   M229: { n: 'Shiki-Kawaei',                   k: '北珂夬栄',            km: 21.850 },
   M230: { n: 'Kawaei',                          k: '珂夬栄',               km: 23.000 },
   M231: { n: 'Tayakure',                        k: '貞師',               km: 23.910 },
@@ -121,7 +121,8 @@ const M2_SVC = {
 
 /* ----------------------------------------------------------------
    Interscambi Metro Line 2 ↔ altre reti
-   Regola: aggiungere i nuovi collegamenti senza rimuovere i vecchi.
+   Regola: aggiungere i nuovi collegamenti senza rimuovere i vecchi
+   (salvo codici obsoleti/errati).
 ---------------------------------------------------------------- */
 const M2_INTERCHANGE = {
   M201: [
@@ -167,10 +168,10 @@ const M2_INTERCHANGE = {
       note: 'M1 Masuda Agarai — stazione diversa, 400 m transfer' },
     { code: 'M325', network: 'metro', transferMin: 9,
       note: 'M3 Masuda Agarai — stazione diversa, 400 m transfer' },
-    { code: 'M1422', network: 'metro', transferMin: 9,
+    { code: 'M1413', network: 'metro', transferMin: 9,
       note: 'M14 Masuda Agarai — stazione diversa, 400 m transfer' },
-    { code: 'M911', network: 'metro', transferMin: 12,
-      note: 'M9 Masuda Agarai — stazione diversa, 500 m transfer' },
+    { code: 'M913', network: 'metro', transferMin: 5,
+      note: 'M9 Masuda Agarai — stazione diversa, 5 min a piedi' },
   ],
   M210: [
     { code: 'M406', network: 'metro', transferMin: 3,
