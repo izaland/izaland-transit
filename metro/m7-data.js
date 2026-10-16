@@ -6,7 +6,7 @@
    Distanze progressive da M701 (km 0.000), totale 36.30 km.
 
    Interscambi confermati:
-     M705  AX03  (Airport Express — Riimibaiken)
+     M705  CK08, AX03  (CK line; Airport Express — Riimibaiken)
      M709  M1310 (Metro Line 13 — Niirado Tagawae)
      M711  M1732 (Metro Line 17 — Wikkaman)
      M712  M623  (Metro Line 6 — Ezaesomu)
@@ -14,8 +14,10 @@
      M715  M1318 (Metro Line 13 — Tsuruna Eigandan)
      M718  M1113 (Metro Line 11 — Ushiuruma)
      M719  M503  (Metro Line 5 — Konegisa Eigandan)
-     M721  M1525 (Metro Line 15 — Sakamuso)
-     M725  M1116 (Metro Line 11 — Shutazai)
+     M721  M1525, SK38 (Metro Line 15; Seishaku Line — Sakamuso)
+     M722  SK39  (Seishaku Line — Kashiwaka)
+     M723  SK40  (Seishaku Line — Togamiro)
+     M725  M1116, TS20 (Metro Line 11; TS line — Shutazai)
      M726  M1321 (Metro Line 13 — Sanbonzayo)
      M728  M513  (Metro Line 5 — Pwakkobe)
 ================================================================ */
@@ -83,6 +85,8 @@ const M7_SVC = {
 
 const M7_INTERCHANGE = {
   M705: [
+    { code: 'CK08', network: 'suburban', transferMin: 4,
+      note: 'Riimibaiken — CK line' },
     { code: 'AX03', network: 'ax', transferMin: 5,
       note: 'Riimibaiken — Airport Express' },
   ],
@@ -117,10 +121,22 @@ const M7_INTERCHANGE = {
   M721: [
     { code: 'M1525', network: 'metro', transferMin: 3,
       note: 'Metro Line 15 — Sakamuso' },
+    { code: 'SK38', network: 'suburban', transferMin: 4,
+      note: 'Sakamuso — Seishaku Line' },
+  ],
+  M722: [
+    { code: 'SK39', network: 'suburban', transferMin: 4,
+      note: 'Kashiwaka — Seishaku Line' },
+  ],
+  M723: [
+    { code: 'SK40', network: 'suburban', transferMin: 4,
+      note: 'Togamiro — Seishaku Line' },
   ],
   M725: [
     { code: 'M1116', network: 'metro', transferMin: 3,
       note: 'Metro Line 11 — Shutazai' },
+    { code: 'TS20', network: 'suburban', transferMin: 4,
+      note: 'Shutazai — TS line' },
   ],
   M726: [
     { code: 'M1321', network: 'metro', transferMin: 3,
