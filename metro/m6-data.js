@@ -23,7 +23,7 @@
      M623 Ezaesomu                 — M712
      M625 Niji-Urenosomi           — M1516
      M628 Kōtō Satahappi           — KD41
-     M631 Pwidely-Nari            — (no interchange listed)
+     M631 Pankyō-Nari              — (no interchange listed)
      M635 Panatsawa                — K120
 ================================================================ */
 'use strict';
@@ -33,33 +33,33 @@ const M6_ST = {
   M602: { n: 'Norihoi',                 k: '翼浮',           km:  1.02, nodeId: 229672838 },
   M603: { n: 'Semukudai Kōwen',         k: '世牧臺公園',     km:  2.29, nodeId: 229672839 },
   M604: { n: 'Kiranne',                 k: '',               km:  4.03, nodeId: 129227659 },
-  M605: { n: 'Kumasui Niho',            k: '師馬水二湖',     km:  5.16, nodeId: 229672840 },
+  M605: { n: 'Kumasui Niho',            k: '庫馬水二湖',     km:  5.16, nodeId: 229672840 },
   M606: { n: 'Assemikori',              k: '刈水飯',         km:  6.22, nodeId: 146645342 },
   M607: { n: 'Tassenon',               k: '村溝崘',         km:  7.05, nodeId: 229672841 },
   M608: { n: 'Ishitsuma',               k: '実維',           km:  8.25, nodeId: 129227942 },
   M609: { n: 'Abawauri',               k: '燕宦',           km:  9.64, nodeId: 129227893 },
   M610: { n: 'Shimamera',              k: '渠瀬田',         km: 11.20, nodeId: 368583227 },
-  M611: { n: 'Nihkyonta',              k: '澱角',           km: 12.58, nodeId: 368583226 },
+  M611: { n: 'Nihkyonta',              k: '濱角',           km: 12.58, nodeId: 368583226 },
   M612: { n: 'Kasakuri',               k: '鯛巻',           km: 16.33, nodeId: 127914807 },
   M613: { n: 'Buslyu Toshi',           k: '物流都市',       km: 17.51, nodeId: 136114709 },
   M614: { n: 'Kotoshiruna',            k: '細荒奈',         km: 18.82, nodeId: 136114710 },
   M615: { n: 'Shiki-Hoze',             k: '北舗摧',         km: 20.40, nodeId: 136114711 },
-  M616: { n: 'Ipporai - Konegisa',     k: '一蒲崍干酃',     km: 21.18, nodeId: 136114713 },
+  M616: { n: 'Ipporai - Konegisa',     k: '一蒲崍干鮃',     km: 21.18, nodeId: 136114713 },
   M617: { n: 'Ipporai - Owonideki',    k: '一蒲崍吹取',     km: 22.57, nodeId: 274155028 },
   M618: { n: 'Ipporai-Senpyan',        k: '一蒲崍船駢',     km: 23.72, nodeId: 123393772 },
-  M619: { n: 'Ipporai - Shindari',     k: '一蒲崍新艦',     km: 24.89, nodeId: 136114715 },
+  M619: { n: 'Ipporai - Shindari',     k: '一蒲崍新艏',     km: 24.89, nodeId: 136114715 },
   M620: { n: 'Otsumi-Nawadae',         k: '南兆先',         km: 25.86, nodeId: 123393139 },
   M621: { n: 'Yemendawi',              k: '維綿富',         km: 27.24, nodeId: 146814982 },
   M622: { n: 'Ðunarishi',              k: '享虚',           km: 28.17, nodeId: 146814983 },
   M623: { n: 'Ezaesomu',               k: '皃築',           km: 29.36, nodeId: 123393744 },
-  M624: { n: 'Sofuhaja',               k: '沴波社',         km: 30.36, nodeId: 146814984 },
+  M624: { n: 'Sofuhaja',               k: '泴波社',         km: 30.36, nodeId: 146814984 },
   M625: { n: 'Niji-Urenosomi',         k: '',               km: 31.27, nodeId: 146815008 },
   M626: { n: 'Upōya',                  k: '雨芳野',         km: 32.48, nodeId: 441639507 },
   M627: { n: 'Semeiji',                k: '勢明寺',         km: 33.85, nodeId: 441639506 },
   M628: { n: 'Kōtō Satahappi',         k: '',               km: 35.05, nodeId: 194212210 },
   M629: { n: 'Keiyān Kutīn',           k: '桂陽區廳',       km: 36.19, nodeId: 441639503 },
   M630: { n: 'Kisshōnli',              k: '吉祥里',         km: 37.54, nodeId: 441639504 },
-  M631: { n: 'Pankō-Nari',            k: '塅岦東',         km: 40.42, nodeId: 327318463 },
+  M631: { n: 'Pankyō-Nari',            k: '岅嶠東',         km: 40.42, nodeId: 327318463 },
   M632: { n: 'Nari-Mitsukuno',         k: '東未抖綱',       km: 42.36, nodeId: 411797110 },
   M633: { n: 'Ruisekoi',               k: '聖粋伊',         km: 43.63, nodeId: 292597869 },
   M634: { n: 'Angonnawa',              k: '杏原',           km: 45.20, nodeId: 411797108 },
