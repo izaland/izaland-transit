@@ -51,6 +51,94 @@ const AX_ST = {
 };
 
 /* ----------------------------------------------------------------
+   OSM NODE ID delle stazioni AX (OpenGeoFiction)
+---------------------------------------------------------------- */
+const AX_OSM = {
+  AX01: 126754752,
+  AX02: 126754750,
+  AX03: 126754745,
+  AX20: 123393771,
+  AX21: 167670124,
+  AX30: 167664673,
+  AX31: 260849805,
+  AX32: 347551005,
+  AX33: 154265060,
+  AX34: 154265027,
+  AX04: 127914807,
+  AX05: 368583227,
+  AX06: 229656494,
+  AX07: 124066084,
+  AX08: 126497709,
+  AX09: 126666496,
+};
+
+/* ----------------------------------------------------------------
+   Interscambi AX ↔ Metro / reti suburbane
+   Stesso formato di Mx_INTERCHANGE (metro/*.js).
+   Regola: aggiungere i nuovi collegamenti senza rimuovere i vecchi.
+   transferMin: AX05↔M111 e AX06↔M117 ripresi da M1_INTERCHANGE;
+   tutti gli altri sono PROVVISORI (5 min) da rivedere.
+   Gli interscambi IZX (K/R/E) restano in INTERCHANGE / INTERCHANGE_EXTRA.
+---------------------------------------------------------------- */
+const AX_INTERCHANGE = {
+  AX01: [
+    { code: 'M1302', network: 'metro',    transferMin: 5 },
+    { code: 'M1502', network: 'metro',    transferMin: 5 },
+    { code: 'CK02',  network: 'suburban', transferMin: 5 },
+  ],
+  AX02: [
+    { code: 'CK04',  network: 'suburban', transferMin: 5 },
+  ],
+  AX03: [
+    { code: 'M705',  network: 'metro',    transferMin: 5 },
+    { code: 'CK08',  network: 'suburban', transferMin: 5 },
+  ],
+  AX04: [
+    { code: 'M419',  network: 'metro',    transferMin: 5 },
+    { code: 'M612',  network: 'metro',    transferMin: 5 },
+    { code: 'SK35',  network: 'suburban', transferMin: 5 },
+    { code: 'TS16',  network: 'suburban', transferMin: 5 },
+    { code: 'CK16',  network: 'suburban', transferMin: 5 },
+  ],
+  AX05: [
+    { code: 'M111',  network: 'metro',    transferMin: 5 },
+    { code: 'M417',  network: 'metro',    transferMin: 5 },
+    { code: 'M610',  network: 'metro',    transferMin: 5 },
+    { code: 'SK33',  network: 'suburban', transferMin: 5 },
+    { code: 'TS14',  network: 'suburban', transferMin: 5 },
+  ],
+  AX06: [
+    { code: 'M117',  network: 'metro',    transferMin: 3 },
+    { code: 'M814',  network: 'metro',    transferMin: 5 },
+    { code: 'M1712', network: 'metro',    transferMin: 5 },
+    { code: 'LL01',  network: 'suburban', transferMin: 5 },
+    { code: 'SK26',  network: 'suburban', transferMin: 5 },
+    { code: 'TS13',  network: 'suburban', transferMin: 5 },
+    { code: 'JD01',  network: 'suburban', transferMin: 5 },
+  ],
+  AX07: [
+    { code: 'M327',  network: 'metro',    transferMin: 5 },
+    { code: 'M1212', network: 'metro',    transferMin: 5 },
+    { code: 'LL17',  network: 'suburban', transferMin: 5 },
+    { code: 'SHX01', network: 'suburban', transferMin: 5 },
+  ],
+  AX08: [
+    { code: 'M1027', network: 'metro',    transferMin: 5 },
+  ],
+  AX09: [
+    { code: 'KS28',  network: 'suburban', transferMin: 5 },
+  ],
+  AX20: [
+    { code: 'M717',  network: 'metro',    transferMin: 5 },
+    { code: 'TS19',  network: 'suburban', transferMin: 5 },
+  ],
+  AX21: [
+    { code: 'M1324', network: 'metro',    transferMin: 5 },
+    { code: 'SK43',  network: 'suburban', transferMin: 5 },
+  ],
+};
+
+/* ----------------------------------------------------------------
    CANONICAL ORDER per ogni ramo (oggetto per riferimento interno)
 ---------------------------------------------------------------- */
 const AX_CANONICAL_COMMON = ["AX00","AX01","AX02","AX03"];
@@ -185,6 +273,7 @@ const AX_LINES = {
     TT:        AX_TT,
     FREQ:      AX_FREQ,
     PEAK:      AX_PEAK_WINDOWS,
+    OSM:       AX_OSM,
     /* ----------------------------------------------------------------
        Interscambi AX ↔ IZX
        Ogni entry mappa il codice AX al primo partner IZX; partner
@@ -211,9 +300,10 @@ const AX_LINES = {
     INTERCHANGE_EXTRA: {
       AX06: ["R01", "E01"],  /* Sainðaul Central ↔ RY R01 e EI E01 */
     },
-    /* Nota: AX07 ↔ LL17 (Herubori) è registrato in SUBURBAN_INTERCHANGE
-       in suburban-data.js e gestito da SuburbanRouter. Non figura qui
-       perché LL17 non è un nodo IZX ma un nodo della rete suburbana.   */
+    /* Interscambi con metro e reti suburbane (formato Mx_INTERCHANGE).
+       AX07 ↔ LL17 è registrato anche in SUBURBAN_INTERCHANGE
+       (suburban-data.js) e gestito da SuburbanRouter.              */
+    INTERCHANGE_NETWORK: AX_INTERCHANGE,
     TERMINUS_SPLIT: {
       EST: [{terminus:"AX09", weight:1}],
       BAJ: [{terminus:"AX23", weight:1}],
