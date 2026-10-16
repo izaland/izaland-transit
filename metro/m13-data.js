@@ -31,10 +31,10 @@
 
    Orari (dai capolinea): primo 04:45, ultimo 23:55.
      Morbida : S1 6 TPH, S2 4 TPH, S3 2 TPH
-     Punta   : 07:45–09:30 e 17:45–21:00 (S4 solo in punta)
+     Punta   : S1 6, S2 6, S3 3, S4 5 TPH
+               finestre 07:45–09:30 e 17:45–21:00 (S4 solo in punta)
 
    TODO (istruzioni successive):
-     - TPH di punta per S1, S2, S3 e S4 (non ancora forniti)
      - primo/ultimo treno specifici di S2 e S4 (qui = 04:45/23:55 per
        S2 come assunzione; S4 solo dentro le finestre di punta)
      - velocita', soste (dwell), thru service: tempi
@@ -168,7 +168,7 @@ const M13_SVC = {
 };
 
 /* ----------------------------------------------------------------
-   Frequenze (dai capolinea). tph di punta = null: DA DEFINIRE.
+   Frequenze (dai capolinea).
    S4 e' solo rinforzo di punta: nessuna corsa in morbida.
 ---------------------------------------------------------------- */
 const M13_HEADWAY = {
@@ -176,7 +176,7 @@ const M13_HEADWAY = {
   lastTrain:  '23:55',
   peakWindows: [ ['07:45', '09:30'], ['17:45', '21:00'] ],
   offPeakTph: { S1: 6, S2: 4, S3: 2, S4: 0 },
-  peakTph:    { S1: null, S2: null, S3: null, S4: null },   // da definire
+  peakTph:    { S1: 6, S2: 6, S3: 3, S4: 5 },
 };
 
 /* ----------------------------------------------------------------
