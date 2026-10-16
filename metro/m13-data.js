@@ -3,30 +3,38 @@
    ================================================================
    Colore: #36873c
 
-   Stazioni: M1301–M1324 (24) + 5 stazioni KSM (da definire, v. sotto)
+   Stazioni: M1301–M1324 (24) + KSM02–KSM05 (4) + KSM01 (= Showanul)
    Distanze progressive da M1301 SAIA Cargo Center (km 0.00).
 
-   Percorso: M1301 SAIA Cargo Center → M1324 Showanul  (30.07 km)
+   Struttura:
+     M13 proper             (M1301–M1324) : SAIA Cargo Center → Showanul
+     Kashimochi Railway     (KSM01–KSM05) : Showanul → Kashimochi
+                                            (笂桃電鐵, third sector)
 
-   Sezione KSM (PROVVISORIA — da chiarire):
-     KSM01–KSM04 sono elencate con distanze brevi (0 → 7.51 km): le
-     distanze sembrano misurate da KSM01 e NON da M1301, quindi sono
-     salvate in `kmFromKSM01` e hanno km = null. Il collegamento con
-     M1324 Showanul non e' ancora definito.
-     NB: nella tabella sorgente c'erano DUE righe con codice KSM02
-     (Showanul Bunkwa Plaza e Kajaringa Park & Ride). Kajaringa e'
-     stata salvata con codice provvisorio 'KSM02-1' (km 2.86, tra
-     Bunkwa Plaza 1.48 e Shiki-Kashimochi 5.88): da confermare.
-     KSM01 non ha nome ne' node ID nella tabella sorgente.
+   Showanul (nodeId 167670124) e' la STAZIONE DI CONFINE:
+     - lato M13           : codice M1324
+     - lato Kashimochi Rw : codice KSM01
+     E' la stessa stazione fisica (stesso nodeId): nessun interscambio,
+     transferMin = 0 fra M1324 e KSM01.
+
+   Kashimochi Railway e' una linea third sector che funziona
+   ufficialmente come ESTENSIONE di M13, con THRU SERVICE (come la
+   Midosuji di Osaka con la Kita-Osaka Kyuko). Nel journey planner va
+   mostrata come prosecuzione della stessa corsa, con cambio di
+   operatore a Showanul.
+
+   Distanze: km = progressivo da M1301 (KSM01 = 30.07);
+   kmFromKSM01 = progressivo dalla stazione di confine.
 
    TODO (istruzioni successive):
      - nomi/tipologia dei servizi, headway, ore di servizio
-     - sezione KSM: struttura, codici definitivi, innesto su M1324
+     - quali servizi fanno thru service e quali terminano a M1324
+     - pattern di fermata, velocita', soste
      - kanji mancanti (stringa vuota); M1301 e M1304 avevano caratteri
        corrotti nella tabella sorgente
      - transferMin reali (qui provvisori = 3)
      - aggiungere in m17-data.js l'interscambio inverso
-       M1730 ↔ M1314 (M17_INTERCHANGE non lo contiene ancora)
+       M1730 <-> M1314 (M17_INTERCHANGE non lo contiene ancora)
 ================================================================ */
 'use strict';
 
@@ -54,18 +62,19 @@ const M13_ST = {
   M1321: { n: 'Sanbonzayo',                            k: '三本木',            nodeId: 196658316, km: 26.78 },
   M1322: { n: 'Tsuruna-Mistukane',                     k: '',                  nodeId: 196658314, km: 27.88 },
   M1323: { n: 'Futteskaiba',                           k: '',                  nodeId: 176789173, km: 28.82 },
-  M1324: { n: 'Showanul',                              k: '書瓦崎',            nodeId: 167670124, km: 30.07 },
+  M1324: { n: 'Showanul',                              k: '書瓦崎',            nodeId: 167670124, km: 30.07, boundary: true, altCode: 'KSM01' },
 };
 
 /* ----------------------------------------------------------------
-   Sezione KSM (PROVVISORIA) — distanze progressive da KSM01
+   Kashimochi Railway (笂桃電鐵) — third sector, estensione di M13
+   KSM01 = Showanul (stessa stazione di M1324, stesso nodeId)
 ---------------------------------------------------------------- */
 const M13_KSM_ST = {
-  KSM01:      { n: 'KSM01',                    k: '',              nodeId: null,      km: null, kmFromKSM01: 0.00 },
-  KSM02:      { n: 'Showanul Bunkwa Plaza',    k: '書瓦崎文化PLAZA', nodeId: 381535620, km: null, kmFromKSM01: 1.48 },
-  'KSM02-1':  { n: 'Kajaringa Park & Ride',    k: '',              nodeId: 188446969, km: null, kmFromKSM01: 2.86 },
-  KSM03:      { n: 'Shiki-Kashimochi',         k: '北笂桃',        nodeId: 126143725, km: null, kmFromKSM01: 5.88 },
-  KSM04:      { n: 'Kashimochi',               k: '笂桃',          nodeId: 126143726, km: null, kmFromKSM01: 7.51 },
+  KSM01: { n: 'Showanul',                k: '書瓦崎',              nodeId: 167670124, km: 30.07, kmFromKSM01: 0.00, boundary: true, altCode: 'M1324' },
+  KSM02: { n: 'Showanul Bunkwa Plaza',   k: '書瓦崎文化PLAZA',     nodeId: 381535620, km: 31.55, kmFromKSM01: 1.48 },
+  KSM03: { n: 'Kajaringa Park & Ride',   k: '',                    nodeId: 188446969, km: 32.93, kmFromKSM01: 2.86 },
+  KSM04: { n: 'Shiki-Kashimochi',        k: '北笂桃',              nodeId: 126143725, km: 35.95, kmFromKSM01: 5.88 },
+  KSM05: { n: 'Kashimochi',              k: '笂桃',                nodeId: 126143726, km: 37.58, kmFromKSM01: 7.51 },
 };
 
 /* Ordine canonico geografico */
@@ -74,18 +83,41 @@ const M13_CANONICAL_MAIN = [
   'M1311','M1312','M1313','M1314','M1315','M1316','M1317','M1318','M1319','M1320',
   'M1321','M1322','M1323','M1324',
 ];
-const M13_CANONICAL_KSM = ['KSM01','KSM02','KSM02-1','KSM03','KSM04'];
+/* KSM01 e' la stessa stazione di M1324: la rotta thru la attraversa una volta sola */
+const M13_CANONICAL_KSM = ['KSM01','KSM02','KSM03','KSM04','KSM05'];
+const M13_CANONICAL_THRU = [
+  ...M13_CANONICAL_MAIN,
+  ...M13_CANONICAL_KSM.slice(1),
+];
+
+/* Operatori */
+const M13_OPERATORS = {
+  M13: { name: 'Metro Line 13', kind: 'metro', stations: 'M1301–M1324' },
+  KSM: { name: 'Kashimochi Railway', kanji: '笂桃電鐵', kind: 'third-sector',
+         stations: 'KSM01–KSM05', color: '#36873c', note: 'estensione ufficiale di M13' },
+};
 
 const M13_META = {
   id:          'M13',
   code:        'M13',
   name:        'Line 13',
   color:       '#36873c',
-  totalKm:     30.07,               // M1301 → M1324
-  totalKmA:    30.07,
+  totalKmM13:  30.07,                // M1301 → M1324 / KSM01
+  totalKmKSM:  7.51,                 // KSM01 → KSM05
+  totalKmThru: 37.58,                // M1301 → KSM05
   avgSpeedKmh: null,   // da definire
   dwellSec:    null,   // da definire
-  ksm: { startsAt: 'KSM01', totalKmFromKSM01: 7.51, status: 'da definire' },
+  boundary: { station: 'Showanul', nodeId: 167670124, codes: { M13: 'M1324', KSM: 'KSM01' } },
+  /* Thru service: M13 ⇄ Kashimochi Railway (cfr. Midosuji ⇄ Kita-Osaka Kyuko) */
+  thruService: {
+    at: 'M1324',
+    atAlt: 'KSM01',
+    to: 'Kashimochi Railway (笂桃電鐵)',
+    operatorChange: true,
+    from: 'M1301',
+    terminus: 'KSM05',
+    note: 'da definire quali servizi fanno thru e quali terminano a M1324',
+  },
 };
 
 /* Placeholder: servizi e headway da definire con le prossime istruzioni */
@@ -95,10 +127,12 @@ const M13_SVC = {};
 /* ----------------------------------------------------------------
    Interscambi Metro Line 13 ↔ altre reti
    transferMin PROVVISORIO = 3 (non fornito)
+   M1324 ↔ KSM01: STESSA stazione, transferMin = 0 (thru, no cambio)
 ---------------------------------------------------------------- */
 const _ic13 = (code, network) => ({ code, network, transferMin: 3, note: '' });
 const _m13 = (c) => _ic13(c, 'metro');
 const _s13 = (c) => _ic13(c, 'suburban');
+const _thru13 = (c) => ({ code: c, network: 'thru', transferMin: 0, note: 'stessa stazione: thru service' });
 
 const M13_INTERCHANGE = {
   M1301: [_m13('M1501')],
@@ -114,7 +148,8 @@ const M13_INTERCHANGE = {
   M1320: [_m13('M1521')],
   M1321: [_m13('M726')],
   M1323: [_m13('M1118')],
-  M1324: [_s13('SK43')],
+  M1324: [_thru13('KSM01'), _s13('SK43')],
+  KSM01: [_thru13('M1324'), _s13('SK43')],
 };
 
 const M13_NODE_IDS = Object.fromEntries(
@@ -123,8 +158,8 @@ const M13_NODE_IDS = Object.fromEntries(
 
 if (typeof module !== 'undefined') {
   module.exports = {
-    M13_META, M13_ST, M13_KSM_ST,
-    M13_CANONICAL_MAIN, M13_CANONICAL_KSM,
+    M13_META, M13_OPERATORS, M13_ST, M13_KSM_ST,
+    M13_CANONICAL_MAIN, M13_CANONICAL_KSM, M13_CANONICAL_THRU,
     M13_HEADWAY, M13_SVC, M13_INTERCHANGE, M13_NODE_IDS,
   };
 }
