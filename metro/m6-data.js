@@ -59,10 +59,150 @@ const M6_ST = {
   M628: { n: 'Kōtō Satahappi',         k: '',               km: 35.05, nodeId: 194212210 },
   M629: { n: 'Keiyān Kutīn',           k: '桂陽區廳',       km: 36.19, nodeId: 441639503 },
   M630: { n: 'Kisshōnli',              k: '吉祥里',         km: 37.54, nodeId: 441639504 },
-  M631: { n: 'Pwidely-Nari',            k: '塅岦東',         km: 40.42, nodeId: 327318463 },
+  M631: { n: 'Pankō-Nari',            k: '塅岦東',         km: 40.42, nodeId: 327318463 },
   M632: { n: 'Nari-Mitsukuno',         k: '東未抖綱',       km: 42.36, nodeId: 411797110 },
   M633: { n: 'Ruisekoi',               k: '聖粋伊',         km: 43.63, nodeId: 292597869 },
   M634: { n: 'Angonnawa',              k: '杏原',           km: 45.20, nodeId: 411797108 },
   M635: { n: 'Panatsawa',              k: '若林',           km: 46.42, nodeId: 259962168 },
   M636: { n: 'Saibu Panatsawa',        k: '西部若林',       km: 47.44, nodeId: 259962136 },
 };
+
+const M6_CANONICAL_ORDER = [
+  'M601', 'M602', 'M603', 'M604', 'M605', 'M606', 'M607', 'M608',
+  'M609', 'M610', 'M611', 'M612', 'M613', 'M614', 'M615', 'M616',
+  'M617', 'M618', 'M619', 'M620', 'M621', 'M622', 'M623', 'M624',
+  'M625', 'M626', 'M627', 'M628', 'M629', 'M630', 'M631', 'M632',
+  'M633', 'M634', 'M635', 'M636',
+];
+
+const M6_META = {
+  id:          'M6',
+  code:        'M6',
+  name:        'Line 6',
+  nameJa:      '',
+  color:       '#3465a4',
+  totalKm:     47.44,
+  stations:    36,
+  avgSpeedKmh: 35,
+  dwellSec:    20,
+};
+
+/* ----------------------------------------------------------------
+   Interscambi Metro Line 6 ↔ altre reti
+---------------------------------------------------------------- */
+const M6_INTERCHANGE = {
+  M601: [
+    { code: 'M1801', network: 'metro',    transferMin: 3,
+      note: 'Nari-Gotsurindai — M18 line' },
+  ],
+  M602: [
+    { code: 'M1802', network: 'metro',    transferMin: 3,
+      note: 'Norihoi — M18 line' },
+  ],
+  M604: [
+    { code: 'KW01',  network: 'suburban', transferMin: 4,
+      note: 'Kiranne — KW line' },
+  ],
+  M606: [
+    { code: 'M1718', network: 'metro',    transferMin: 3,
+      note: 'Assemikori — M17 line' },
+    // M16: codice stazione TBD
+    // { code: 'M16XX', network: 'metro', transferMin: 3, note: 'Assemikori — M16 line (TBD)' },
+  ],
+  M608: [
+    { code: 'M804',  network: 'metro',    transferMin: 3,
+      note: 'Ishitsuma — M8 line' },
+  ],
+  M609: [
+    { code: 'M416',  network: 'metro',    transferMin: 3,
+      note: 'Abawauri — M4 line' },
+  ],
+  M610: [
+    { code: 'M417',   network: 'metro',    transferMin: 3,
+      note: 'Shimamera — M4 line' },
+    { code: 'AX05',   network: 'ax',       transferMin: 5,
+      note: 'Shimamera — Airport Express' },
+    { code: 'M203',   network: 'metro',    transferMin: 3,
+      note: 'Shimamera — M2 line' },
+    { code: 'TS14',   network: 'suburban', transferMin: 4,
+      note: 'Shimamera — TS line' },
+  ],
+  M611: [
+    { code: 'M418',  network: 'metro',    transferMin: 3,
+      note: 'Nihkyonta — M4 line' },
+    { code: 'SK34',  network: 'suburban', transferMin: 4,
+      note: 'Nihkyonta — Seishaku Line' },
+    { code: 'TS15',  network: 'suburban', transferMin: 4,
+      note: 'Nihkyonta — TS line' },
+    { code: 'CK17',  network: 'suburban', transferMin: 4,
+      note: 'Nihkyonta — CK line' },
+  ],
+  M612: [
+    { code: 'M419',  network: 'metro',    transferMin: 3,
+      note: 'Kasakuri — M4 line' },
+    { code: 'AX04',  network: 'ax',       transferMin: 5,
+      note: 'Kasakuri — Airport Express' },
+    { code: 'KD35',  network: 'suburban', transferMin: 4,
+      note: 'Kasakuri — Kidai Line' },
+    { code: 'K02',   network: 'suburban', transferMin: 4,
+      note: 'Kasakuri — K line' },
+    { code: 'TS16',  network: 'suburban', transferMin: 4,
+      note: 'Kasakuri — TS line' },
+  ],
+  M613: [
+    { code: 'M420',  network: 'metro',    transferMin: 3,
+      note: 'Buslyu Toshi — M4 line' },
+  ],
+  M614: [
+    { code: 'M421',  network: 'metro',    transferMin: 3,
+      note: 'Kotoshiruna — M4 line' },
+    { code: 'SK36',  network: 'suburban', transferMin: 4,
+      note: 'Kotoshiruna — Seishaku Line' },
+  ],
+  M615: [
+    { code: 'M422',  network: 'metro',    transferMin: 3,
+      note: 'Shiki-Hoze — M4 line' },
+    { code: 'HO04',  network: 'suburban', transferMin: 4,
+      note: 'Shiki-Hoze — HO line' },
+  ],
+  M616: [
+    { code: 'M423',  network: 'metro',    transferMin: 3,
+      note: 'Ipporai - Konegisa — M4 line' },
+  ],
+  M617: [
+    { code: 'M424',  network: 'metro',    transferMin: 3,
+      note: 'Ipporai - Owonideki — M4 line' },
+    { code: 'M1110', network: 'metro',    transferMin: 3,
+      note: 'Ipporai - Owonideki — M11 line' },
+  ],
+  M618: [
+    { code: 'M425',  network: 'metro',    transferMin: 3,
+      note: 'Ipporai-Senpyan — M4 line' },
+    { code: 'TS18',  network: 'suburban', transferMin: 4,
+      note: 'Ipporai-Senpyan — TS line' },
+  ],
+  M620: [
+    { code: 'M1316', network: 'metro',    transferMin: 3,
+      note: 'Otsumi-Nawadae — M13 line' },
+  ],
+  M623: [
+    { code: 'M712',  network: 'metro',    transferMin: 3,
+      note: 'Ezaesomu — M7 line' },
+  ],
+  M625: [
+    { code: 'M1516', network: 'metro',    transferMin: 3,
+      note: 'Niji-Urenosomi — M15 line' },
+  ],
+  M628: [
+    { code: 'KD41',  network: 'suburban', transferMin: 4,
+      note: 'Kōtō Satahappi — Kidai Line' },
+  ],
+  M635: [
+    { code: 'K120',  network: 'suburban', transferMin: 4,
+      note: 'Panatsawa — K line' },
+  ],
+};
+
+if (typeof module !== 'undefined') {
+  module.exports = { M6_META, M6_ST, M6_CANONICAL_ORDER, M6_INTERCHANGE };
+}
