@@ -17,11 +17,14 @@
      Morbida   05:30–07:00 / 22:30–24:00  12    20
 
    Sfasamento express: offsetMin 5 (partenze alle :05 + n·headway).
-   Con 5 non coincide mai con le partenze del locale (4, 10, 12 min)
-   e di giorno cade a metà tra due locali.
 
-   Velocità (km/h): LO 35, EX 150 (picco indicato; il router la usa
-   come velocità commerciale + dwell sulle fermate intermedie).
+   Modello cinematico (M20_KIN): entrambi i servizi accelerano,
+   viaggiano in crociera a 150 km/h quando la tratta lo consente e
+   frenano. Tempi risultanti con i valori sotto (senza attesa):
+     Locale  M2001→M2007  ~12.7 min (7 fermate)
+     Express M2001→M2007  ~8.2 min  (3 fermate)
+   Tratte brevi (1.3–3 km) non raggiungono 150 km/h; solo la
+   M2005–M2006 (5.69 km) si avvicina alla crociera piena.
 
    Interscambi:
      M2001  M117, M814, M1712 (metro)
@@ -61,12 +64,19 @@ const M20_META = {
   nameJa:      '20号線',
   color:       '#0F1F5C',
   totalKm:     15.55,
-  avgSpeedKmh: 35,    // locale — TODO: provvisorio
+  avgSpeedKmh: 60,    // solo fallback: i servizi usano M20_KIN
   dwellSec:    30,
 };
 
-/* Velocità (km/h) — EX: 150 km/h di picco */
-const M20_SPD = { LO: 35, EX: 150 };
+/* Modello cinematico — TODO: valori provvisori da confermare
+   vmaxKmh  velocità di crociera massima
+   accel    accelerazione (m/s²)
+   decel    decelerazione di servizio (m/s²)
+   dwellSec sosta alle fermate intermedie (s) */
+const M20_KIN = {
+  LO: { vmaxKmh: 150, accel: 1.0, decel: 1.1, dwellSec: 30 },
+  EX: { vmaxKmh: 150, accel: 1.0, decel: 1.1, dwellSec: 40 },
+};
 
 /* Sfasamento partenze express (minuti) */
 const M20_EX_OFFSET_MIN = 5;
@@ -151,7 +161,7 @@ const M20_INTERCHANGE = {
 
 if (typeof module !== 'undefined') {
   module.exports = {
-    M20_META, M20_ST, M20_CANONICAL_ORDER, M20_EXPRESS_STOPS, M20_SPD, M20_EX_OFFSET_MIN,
+    M20_META, M20_ST, M20_CANONICAL_ORDER, M20_EXPRESS_STOPS, M20_KIN, M20_EX_OFFSET_MIN,
     M20_HEADWAY_LO, M20_HEADWAY_EX, M20_SVC, M20_INTERCHANGE,
   };
 }
