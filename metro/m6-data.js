@@ -15,7 +15,7 @@
      M612 Kasakuri                 — M419, AX04, KD35, K02
      M613 Buslyu Toshi             — M420
      M614 Kotoshiruna              — M421, SK36
-     M615 Shiki-Hoze               — M422, HO04
+     M615 Shiki-Hoze               — M422, HOY04
      M616 Ipporai - Konegisa       — M423
      M617 Ipporai - Owonideki      — M424, M1110
      M618 Ipporai-Senpyan          — M425, TS18
