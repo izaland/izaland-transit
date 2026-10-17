@@ -9,13 +9,9 @@
    Servizio: unico schema tutto-fermate (no rapidi).
 
    Interscambi:
-     M501  M114  (Metro Line 1 — Tsuragoi)
-           SK37  (Seishaku Line — Tsuragoi, stesso nome)
-     M502  M204  (Metro Line 2 — Mundōzan)
-     M503  M303  (Metro Line 3 — Konegisa Eigandan)
-           M719  (Metro Line 7 — Konegisa Eigandan)
+     M501  SK37  (Seishaku Line — Tsuragoi, stesso nome)
+     M503  M719  (Metro Line 7 — Konegisa Eigandan)
            HOY07 (Hoze-Oyehatton Line — Konegisa Eigandan)
-     M504  M424  (Metro Line 4 — Jaihonmu 3sa)
      M505  M1112 (Metro Line 11 — Kirifunu Kukubān)
      M506  RI09  (Sakanemoto)
      M509  M714  (Metro Line 7 — Riihisano)
@@ -24,7 +20,7 @@
      M513  M728  (Metro Line 7 — Pwakkobe)
      M514  M1120 (Metro Line 11 — Jisahara)
            KD39  (Kidai Line — Jisahara, stesso nome)
-     M507, M508, M512: nessun interscambio
+     M502, M504, M507, M508, M512: nessun interscambio
 ================================================================ */
 'use strict';
 
@@ -99,26 +95,14 @@ const M5_SVC = {
 ---------------------------------------------------------------- */
 const M5_INTERCHANGE = {
   M501: [
-    { code: 'M114', network: 'metro', transferMin: 3,
-      note: 'Metro Line 1 — Tsuragoi' },
     { code: 'SK37', network: 'suburban', transferMin: 3,
       note: 'Seishaku Line — Tsuragoi, stesso nome' },
   ],
-  M502: [
-    { code: 'M204', network: 'metro', transferMin: 3,
-      note: 'Metro Line 2 — Mundōzan' },
-  ],
   M503: [
-    { code: 'M303', network: 'metro', transferMin: 3,
-      note: 'Metro Line 3 — Konegisa Eigandan' },
     { code: 'M719', network: 'metro', transferMin: 3,
       note: 'Metro Line 7 — Konegisa Eigandan' },
     { code: 'HOY07', network: 'metro', transferMin: 3,
       note: 'Hoze-Oyehatton Line — Konegisa Eigandan' },
-  ],
-  M504: [
-    { code: 'M424', network: 'metro', transferMin: 3,
-      note: 'Metro Line 4 — Jaihonmu 3sa' },
   ],
   M505: [
     { code: 'M1112', network: 'metro', transferMin: 3,
