@@ -178,7 +178,7 @@ const SUBURBAN_INTERCHANGE = {
   KD34: [],
   KD35: ['AX04', 'M419'],
   KD36: ['K101'],
-  KD37: ['K102', 'AX21'],
+  KD37: ['K102', 'AX21', 'RI15'],
   KD46: ['K31'],
   KD54: ['K32'],
   // Seishaku Line (SK)
@@ -191,10 +191,17 @@ const SUBURBAN_INTERCHANGE = {
   SK28: ['KD34'],
   SK35: ['KD35'],
   SK38: ['KD36'],
-  SK43: ['KD37'],
+  SK43: ['KD37', 'RI15'],
+  SK44: ['RI16'],
+  SK45: ['RI17'],
+  SK46: ['RI171'],
+  SK47: ['RI18'],
+  SK48: ['RI19'],
+  SK49: ['RI20'],
+  SK50: ['RI21'],
   // Kwōkei Line (KW)
   KW00: ['M801'],
-  KW02: ['IR'],
+  KW02: ['IR'],   // TODO: sostituire 'IR' col codice RI corretto (non presente in RI01–RI40)
   KW03: [],
   // ── Cluster KAWAYATSU: KW10 | KS02 | TS07 ──────────────────────────────
   // NON includere partner del cluster NIJI-KAWAYATSU (KW11/KS01/TS06) qui:
@@ -218,13 +225,18 @@ const SUBURBAN_INTERCHANGE = {
   TS15: ['SK34', 'M418'],
   // TS16 Kasakuri: stesso nodo di interscambio di K02 Niji-Sainðaul (IZX Keishin)
   TS16: ['SK35', 'M419', 'AX04', 'K02'],
-  TS18: ['M425'],
-  TS19: ['M717', 'AX20'],
+  TS18: ['M425', 'RI08'],
+  TS19: ['M717', 'AX20', 'RI10'],
+  TS20: ['M725', 'M1116', 'RI14'],
   // Chukkūn Line (CK)
   CK01: ['AX00'],
   CK02: ['AX01', 'KE03'],
   CK04: ['AX02'],
-  CK08: ['AX03'],
+  CK08: ['AX03', 'RI01'],
+  CK09: ['RI02'],
+  CK10: ['RI03'],
+  CK11: ['RI04'],
+  CK12: ['RI05'],
   CK13: ['TS17'],
   CK16: ['TS16', 'AX04', 'M419', 'SK35', 'KD35'],
   CK17: ['TS15', 'SK34'],
@@ -253,6 +265,30 @@ const SUBURBAN_INTERCHANGE = {
   KS28: ['AX09'],
   // Handai Electric Railway Main Line (HD)
   HD01: ['K17'],
+  // RI Line (IR) · Riimibaiken ↔ Illashiya
+  RI01:  ['M705', 'CK08', 'AX03'],
+  RI02:  ['CK09'],
+  RI03:  ['CK10'],
+  RI04:  ['CK11'],
+  RI05:  ['CK12'],
+  RI08:  ['M425', 'M618', 'TS18'],
+  RI09:  ['M506'],
+  RI10:  ['M717', 'TS19', 'AX20'],
+  RI13:  ['M1522'],
+  RI14:  ['M725', 'M1116', 'TS20'],
+  RI15:  ['M1324', 'SK43', 'KD37', 'AX21'],
+  RI16:  ['SK44'],
+  RI17:  ['SK45'],
+  RI171: ['SK46'],
+  RI18:  ['SK47'],
+  RI19:  ['SK48'],
+  RI20:  ['SK49'],
+  RI21:  ['SK50'],
+  RI23:  ['AX30'],
+  RI25:  ['AX31'],
+  RI31:  ['AX32'],
+  RI34:  ['AX33'],
+  RI40:  ['AX34', 'IL112'],
   // Juwon-Kodōn Line (JD) · 中央湖東線
   JD01: ['K01', 'R01', 'E01', 'M117', 'M814', 'LL01', 'KD32', 'SK26', 'TS13'],
   // Rosemane: M3 = M324; M14 = codice da definire (sospeso)
@@ -263,7 +299,6 @@ const SUBURBAN_INTERCHANGE = {
   JD06: ['M222', 'KS21'],
   JD10: ['SK01'],
 };
-
 const SUBURBAN_LINES = {
 
   /* ────────────────────────────────────────────────
@@ -368,6 +403,67 @@ const SUBURBAN_LINES = {
       { code: 'KD54', name: 'Nagayamatsu',              kanji: '—',              km: 156.87 },
     ],
   },
+
+     /* ────────────────────────────────────────────────
+     RI — Riimiilla Line · 𠝏狐線
+     41 stazioni · 100.56 km
+  ──────────────────────────────────────────────── */
+
+     RI: {
+    id: 'RI',
+    name: 'Riimiilla Line',
+    nameJa: '',                // TODO
+    color: '#ffd320',
+    circular: false,
+    headwayPeak: 10,           // TODO: provvisorio
+    headwayOffPeak: 15,        // TODO: provvisorio
+    totalKm: 100.56,
+    stations: [
+      { code: 'RI01',  name: 'Riimibaiken',        kanji: '𠝏卞',         km:   0.00 },
+      { code: 'RI02',  name: 'Shin-Tsuruna',       kanji: '新鵺',         km:   1.48 },
+      { code: 'RI03',  name: 'Tsaibako',           kanji: '済鴫',         km:   2.58 },
+      { code: 'RI04',  name: 'Tsurunarikki',       kanji: '鵺陸起',       km:   3.60 },
+      { code: 'RI05',  name: 'Eikunna',            kanji: '栄勳那',       km:   4.76 },
+      { code: 'RI06',  name: 'Zawahan Nojima',     kanji: '窊氾濃湧',     km:   5.76 },
+      { code: 'RI07',  name: 'Choyarui',           kanji: '—',            km:   6.59 },
+      { code: 'RI08',  name: 'Ipporai-Senpyan',    kanji: '一蒲崍船駢',   km:   8.08 },
+      { code: 'RI09',  name: 'Sakanemoto',         kanji: '沛岬斗',       km:   9.60 },
+      { code: 'RI10',  name: 'Eigandan Senpyan',   kanji: '永玵段船駢',   km:  10.71 },
+      { code: 'RI11',  name: 'Shiittaru Senpyan',  kanji: '—',            km:  11.68 },
+      { code: 'RI12',  name: 'Senpyan - Murakami', kanji: '船駢門良釜',   km:  12.58 },
+      { code: 'RI13',  name: 'Urenosomi Senpyan',  kanji: '—',            km:  13.29 },
+      { code: 'RI14',  name: 'Shutazai',           kanji: '守多彩',       km:  14.89 },
+      { code: 'RI15',  name: 'Showanul',           kanji: '書瓦崎',       km:  17.17 },
+      { code: 'RI16',  name: 'Chaihamosu',         kanji: '—',            km:  18.35 },
+      { code: 'RI17',  name: 'Kojushire',          kanji: '—',            km:  19.76 },
+      { code: 'RI171', name: 'Kainos Ufuwani',     kanji: '—',            km:  20.91 },
+      { code: 'RI18',  name: 'Waneki',             kanji: '窑名',         km:  23.55 },
+      { code: 'RI19',  name: 'Shin-Waneki',        kanji: '新窑名',       km:  26.43 },
+      { code: 'RI20',  name: 'Hamuchika',          kanji: '鷲宮',         km:  28.99 },
+      { code: 'RI21',  name: 'Piskadoshi',         kanji: '滋氾',         km:  30.15 },
+      { code: 'RI22',  name: 'Nadekaku',           kanji: '豆小',         km:  32.32 },
+      { code: 'RI23',  name: 'Shin-Erigowa',       kanji: '新繰緊',       km:  35.88 },
+      { code: 'RI24',  name: 'Irikata',            kanji: '弓太',         km:  40.13 },
+      { code: 'RI25',  name: 'Sejisebu',           kanji: '井終',         km:  43.24 },
+      { code: 'RI26',  name: 'Gōryāndai',          kanji: '豪掚臺',       km:  44.75 },
+      { code: 'RI27',  name: 'Moritakutsa',        kanji: '竹踔嵯',       km:  46.76 },
+      { code: 'RI28',  name: 'Natsebe-Sāriwi',     kanji: '芝末川上',     km:  50.04 },
+      { code: 'RI29',  name: 'Gaimuka',            kanji: '崖椋',         km:  53.15 },
+      { code: 'RI30',  name: 'Nento Akumuhai',     kanji: '—',            km:  56.18 },
+      { code: 'RI31',  name: 'Yutsukabul',         kanji: '柚鷸武崎',     km:  58.20 },
+      { code: 'RI32',  name: 'Shumuzo',            kanji: '—',            km:  66.24 },
+      { code: 'RI33',  name: 'Wakodase',           kanji: '—',            km:  70.51 },
+      { code: 'RI34',  name: 'Akkosoi',            kanji: '穂網',         km:  86.29 },
+      { code: 'RI35',  name: 'Tsumada',            kanji: '—',            km:  88.99 },
+      { code: 'RI36',  name: 'Niji-Tsumada',       kanji: '—',            km:  91.09 },
+      { code: 'RI37',  name: 'Kakinusa',           kanji: '—',            km:  93.10 },
+      { code: 'RI38',  name: 'Takkaechuna',        kanji: '—',            km:  94.69 },
+      { code: 'RI39',  name: 'Kinshigen Nanmun',   kanji: '錦志玄南門',   km:  96.63 },
+      { code: 'RI40',  name: 'Illashiya',          kanji: '狐棲',         km: 100.56 },
+    ],
+  },
+
+   
 
   /* ────────────────────────────────────────────────
      SK — Seishaku Line · 盛石線
