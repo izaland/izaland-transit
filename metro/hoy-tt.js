@@ -6,8 +6,14 @@
      Punta (peak):          ogni 2 min
      Medio (average):       ogni 5 min
      Morbida (off-peak):    ogni 7 min
-   NOTA: formato basato sulle convenzioni dei file *-data.js;
-   da allineare a m15-tt.js se il loader richiede altro.
+
+   Il timetable è generato runtime da MetroRouter (stesso schema di
+   m5-tt.js). La linea DEVE chiamare MetroRouter.register() in fondo,
+   altrimenti le stazioni non compaiono nel Journey Planner.
+
+   Servizi:
+     A_N  HOY01 Takatsura → HOY13 Kadokamahiwa
+     A_S  HOY13 Kadokamahiwa → HOY01 Takatsura
 ================================================================ */
 'use strict';
 
@@ -29,6 +35,39 @@ const HOY_TT = {
   headway:   HOY_HEADWAY,
 };
 
+const HOY_SERVICES_NORM = [
+  {
+    id:         'HOY',
+    svcLogical: 'A_N',
+    name:       'All-stop (HOY01→HOY13)',
+    color:      '#3588cc',
+    cls:        'metro',
+    rapid:      false,
+    headway:    HOY_HEADWAY,
+    stops:      HOY_CANONICAL_ORDER,
+  },
+  {
+    id:         'HOY',
+    svcLogical: 'A_S',
+    name:       'All-stop (HOY13→HOY01)',
+    color:      '#3588cc',
+    cls:        'metro',
+    rapid:      false,
+    headway:    HOY_HEADWAY,
+    stops:      [...HOY_CANONICAL_ORDER].reverse(),
+  },
+];
+
+if (typeof MetroRouter !== 'undefined') {
+  MetroRouter.register({
+    lineId:      'HOY',
+    meta:        HOY_META,
+    st:          HOY_ST,
+    services:    HOY_SERVICES_NORM,
+    interchange: HOY_INTERCHANGE,
+  });
+}
+
 if (typeof module !== 'undefined') {
-  module.exports = { HOY_HEADWAY, HOY_TT };
+  module.exports = { HOY_HEADWAY, HOY_TT, HOY_SERVICES_NORM };
 }
