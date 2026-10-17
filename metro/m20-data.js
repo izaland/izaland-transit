@@ -5,7 +5,16 @@
    Colore: #0F1F5C (blu notte)
 
    Distanze progressive da M2001 (km 0.00), ricavate dalla colonna
-   distance_from_M1701. Servizio: unico schema tutto-fermate.
+   distance_from_M1701.
+
+   Servizi:
+     LO  Locale, tutte le fermate (M2001–M2007)
+     EX  Express, solo M2001 · M2004 · M2007
+
+   Frequenze (min):          LO    EX
+     Punta     07:00–09:30 / 17:30–20:00   4     6
+     Diurno    09:30–17:30 / 20:00–22:30  10    10
+     Morbida   05:30–07:00 / 22:30–24:00  12    20
 
    Interscambi:
      M2001  M117, M814, M1712 (metro)
@@ -36,6 +45,8 @@ const M20_CANONICAL_ORDER = [
   'M2001', 'M2002', 'M2003', 'M2004', 'M2005', 'M2006', 'M2007',
 ];
 
+const M20_EXPRESS_STOPS = ['M2001', 'M2004', 'M2007'];
+
 const M20_META = {
   id:          'M20',
   code:        'M20',
@@ -43,27 +54,46 @@ const M20_META = {
   nameJa:      '20号線',
   color:       '#0F1F5C',
   totalKm:     15.55,
-  avgSpeedKmh: 35,    // TODO: provvisorio — da confermare
+  avgSpeedKmh: 35,    // locale — TODO: provvisorio
   dwellSec:    30,
 };
 
-/* TODO: frequenze provvisorie, da confermare */
-const M20_HEADWAY = [
-  { from: '05:30', to: '07:00', headwayMin: 10 },
-  { from: '07:00', to: '09:30', headwayMin:  3 },
-  { from: '09:30', to: '17:30', headwayMin:  6 },
-  { from: '17:30', to: '20:00', headwayMin:  3 },
-  { from: '20:00', to: '22:30', headwayMin:  6 },
-  { from: '22:30', to: '24:00', headwayMin: 10 },
+/* Velocità commerciali (km/h) — TODO: provvisorie, da confermare */
+const M20_SPD = { LO: 35, EX: 50 };
+
+/* Frequenze per servizio */
+const M20_HEADWAY_LO = [
+  { from: '05:30', to: '07:00', headwayMin: 12 },  // off-peak
+  { from: '07:00', to: '09:30', headwayMin:  4 },  // peak
+  { from: '09:30', to: '17:30', headwayMin: 10 },  // daytime
+  { from: '17:30', to: '20:00', headwayMin:  4 },  // peak
+  { from: '20:00', to: '22:30', headwayMin: 10 },  // daytime
+  { from: '22:30', to: '24:00', headwayMin: 12 },  // off-peak
+];
+
+const M20_HEADWAY_EX = [
+  { from: '05:30', to: '07:00', headwayMin: 20 },  // off-peak
+  { from: '07:00', to: '09:30', headwayMin:  6 },  // peak
+  { from: '09:30', to: '17:30', headwayMin: 10 },  // daytime
+  { from: '17:30', to: '20:00', headwayMin:  6 },  // peak
+  { from: '20:00', to: '22:30', headwayMin: 10 },  // daytime
+  { from: '22:30', to: '24:00', headwayMin: 20 },  // off-peak
 ];
 
 const M20_SVC = {
-  A: {
-    name:   'All-stop',
+  LO: {
+    name:   'Local',
     nameJa: '各駅停車',
     color:  '#0F1F5C',
-    cls:    'svc-A',
+    cls:    'svc-LO',
     stops:  M20_CANONICAL_ORDER,
+  },
+  EX: {
+    name:   'Express',
+    nameJa: '急行',
+    color:  '#0F1F5C',
+    cls:    'svc-EX',
+    stops:  M20_EXPRESS_STOPS,
   },
 };
 
@@ -110,5 +140,8 @@ const M20_INTERCHANGE = {
 };
 
 if (typeof module !== 'undefined') {
-  module.exports = { M20_META, M20_ST, M20_CANONICAL_ORDER, M20_HEADWAY, M20_SVC, M20_INTERCHANGE };
+  module.exports = {
+    M20_META, M20_ST, M20_CANONICAL_ORDER, M20_EXPRESS_STOPS, M20_SPD,
+    M20_HEADWAY_LO, M20_HEADWAY_EX, M20_SVC, M20_INTERCHANGE,
+  };
 }

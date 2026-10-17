@@ -1,35 +1,37 @@
 /* ================================================================
    M20-TT.JS — Metro Line 20 · Timetable
    ================================================================
-   Il timetable è generato runtime da MetroRouter usando M20_HEADWAY
-   e avgSpeedKmh definiti in m20-data.js.
+   Il timetable è generato runtime da MetroRouter usando le frequenze
+   e le velocità definite in m20-data.js.
 
-   Servizi:
-     A_N  M2001 Sainðaul Central → M2007 Sakamuso
-     A_S  M2007 Sakamuso → M2001 Sainðaul Central
+   Servizi (ognuno in due direzioni):
+     LO_N / LO_S  Locale, tutte le fermate (M2001↔M2007)
+     EX_N / EX_S  Express, solo M2001 · M2004 · M2007
 ================================================================ */
 'use strict';
 
+const M20_REV = (a) => [...a].reverse();
+
 const M20_SERVICES_NORM = [
   {
-    id:         'M20',
-    svcLogical: 'A_N',
-    name:       'All-stop (M2001→M2007)',
-    color:      '#0F1F5C',
-    cls:        'metro',
-    rapid:      false,
-    headway:    M20_HEADWAY,
-    stops:      M20_CANONICAL_ORDER,
+    id: 'M20', svcLogical: 'LO_N', name: 'Local (M2001→M2007)',
+    color: '#0F1F5C', cls: 'svc-LO', rapid: false, speedKmh: M20_SPD.LO,
+    headway: M20_HEADWAY_LO, stops: M20_SVC.LO.stops,
   },
   {
-    id:         'M20',
-    svcLogical: 'A_S',
-    name:       'All-stop (M2007→M2001)',
-    color:      '#0F1F5C',
-    cls:        'metro',
-    rapid:      false,
-    headway:    M20_HEADWAY,
-    stops:      [...M20_CANONICAL_ORDER].reverse(),
+    id: 'M20', svcLogical: 'LO_S', name: 'Local (M2007→M2001)',
+    color: '#0F1F5C', cls: 'svc-LO', rapid: false, speedKmh: M20_SPD.LO,
+    headway: M20_HEADWAY_LO, stops: M20_REV(M20_SVC.LO.stops),
+  },
+  {
+    id: 'M20', svcLogical: 'EX_N', name: 'Express (M2001→M2007)',
+    color: '#0F1F5C', cls: 'svc-EX', rapid: true, speedKmh: M20_SPD.EX,
+    headway: M20_HEADWAY_EX, stops: M20_SVC.EX.stops,
+  },
+  {
+    id: 'M20', svcLogical: 'EX_S', name: 'Express (M2007→M2001)',
+    color: '#0F1F5C', cls: 'svc-EX', rapid: true, speedKmh: M20_SPD.EX,
+    headway: M20_HEADWAY_EX, stops: M20_REV(M20_SVC.EX.stops),
   },
 ];
 
