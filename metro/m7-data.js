@@ -12,6 +12,7 @@
      M712  M623  (Metro Line 6 — Ezaesomu)
      M714  M509  (Metro Line 5 — Riihisano)
      M715  M1318 (Metro Line 13 — Tsuruna Eigandan)
+     M717  AX20, TS19 (Airport Express; TS line — Eigandan Senpyan)
      M718  M1113 (Metro Line 11 — Ushiuruma)
      M719  M503  (Metro Line 5 — Konegisa Eigandan)
      M721  M1525, SK38 (Metro Line 15; Seishaku Line — Sakamuso)
@@ -109,6 +110,12 @@ const M7_INTERCHANGE = {
   M715: [
     { code: 'M1318', network: 'metro', transferMin: 3,
       note: 'Metro Line 13 — Tsuruna Eigandan' },
+  ],
+  M717: [
+    { code: 'AX20', network: 'ax', transferMin: 5,
+      note: 'Eigandan Senpyan — Airport Express' },
+    { code: 'TS19', network: 'suburban', transferMin: 5,
+      note: 'Eigandan Senpyan — TS line' },
   ],
   M718: [
     { code: 'M1113', network: 'metro', transferMin: 3,
