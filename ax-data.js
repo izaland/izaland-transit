@@ -82,16 +82,16 @@ const AX_OSM = {
 ---------------------------------------------------------------- */
 const AX_INTERCHANGE = {
   AX01: [
-    { code: 'M1302', network: 'metro',    transferMin: 5 },
-    { code: 'M1502', network: 'metro',    transferMin: 5 },
-    { code: 'CK02',  network: 'suburban', transferMin: 5 },
+    { code: 'M1302', network: 'metro',    transferMin: 7 },
+    { code: 'M1502', network: 'metro',    transferMin: 7 },
+    { code: 'CK02',  network: 'suburban', transferMin: 4 },
   ],
   AX02: [
-    { code: 'CK04',  network: 'suburban', transferMin: 5 },
+    { code: 'CK04',  network: 'suburban', transferMin: 2 },
   ],
   AX03: [
     { code: 'M705',  network: 'metro',    transferMin: 5 },
-    { code: 'CK08',  network: 'suburban', transferMin: 5 },
+    { code: 'CK08',  network: 'suburban', transferMin: 2 },
   ],
   AX04: [
     { code: 'M419',  network: 'metro',    transferMin: 5 },
@@ -101,40 +101,40 @@ const AX_INTERCHANGE = {
     { code: 'CK16',  network: 'suburban', transferMin: 5 },
   ],
   AX05: [
-    { code: 'M111',  network: 'metro',    transferMin: 5 },
+    { code: 'M111',  network: 'metro',    transferMin: 8 },
     { code: 'M417',  network: 'metro',    transferMin: 5 },
     { code: 'M610',  network: 'metro',    transferMin: 5 },
-    { code: 'SK33',  network: 'suburban', transferMin: 5 },
-    { code: 'TS14',  network: 'suburban', transferMin: 5 },
+    { code: 'SK33',  network: 'suburban', transferMin: 3 },
+    { code: 'TS14',  network: 'suburban', transferMin: 3 },
   ],
   AX06: [
-    { code: 'M117',  network: 'metro',    transferMin: 3 },
+    { code: 'M117',  network: 'metro',    transferMin: 4 },
     { code: 'M814',  network: 'metro',    transferMin: 5 },
-    { code: 'M1712', network: 'metro',    transferMin: 5 },
-    { code: 'LL01',  network: 'suburban', transferMin: 5 },
-    { code: 'SK26',  network: 'suburban', transferMin: 5 },
-    { code: 'TS13',  network: 'suburban', transferMin: 5 },
-    { code: 'JD01',  network: 'suburban', transferMin: 5 },
+    { code: 'M1712', network: 'metro',    transferMin: 7 },
+    { code: 'LL01',  network: 'suburban', transferMin: 3 },
+    { code: 'SK26',  network: 'suburban', transferMin: 3 },
+    { code: 'TS13',  network: 'suburban', transferMin: 3 },
+    { code: 'JD01',  network: 'suburban', transferMin: 3 },
   ],
   AX07: [
     { code: 'M327',  network: 'metro',    transferMin: 5 },
     { code: 'M1212', network: 'metro',    transferMin: 5 },
-    { code: 'LL17',  network: 'suburban', transferMin: 5 },
-    { code: 'SHX01', network: 'suburban', transferMin: 5 },
+    { code: 'LL17',  network: 'suburban', transferMin: 2 },
+    { code: 'SHX01', network: 'suburban', transferMin: 6 },
   ],
   AX08: [
     { code: 'M1027', network: 'metro',    transferMin: 5 },
   ],
   AX09: [
-    { code: 'KS28',  network: 'suburban', transferMin: 5 },
+    { code: 'KS28',  network: 'suburban', transferMin: 2 },
   ],
   AX20: [
     { code: 'M717',  network: 'metro',    transferMin: 5 },
-    { code: 'TS19',  network: 'suburban', transferMin: 5 },
+    { code: 'TS19',  network: 'suburban', transferMin: 1 },
   ],
   AX21: [
     { code: 'M1324', network: 'metro',    transferMin: 5 },
-    { code: 'SK43',  network: 'suburban', transferMin: 5 },
+    { code: 'SK43',  network: 'suburban', transferMin: 1 },
   ],
 };
 
