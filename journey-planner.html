@@ -166,6 +166,7 @@
 <script src="other-rail-data/wi-tt.js"></script>
 <script src="other-rail-data/shx-data.js"></script>
 <script src="other-rail-data/shx-tt.js"></script>
+<script src="other-rail-data/shx-tt.js"></script>
 <script src="izx-data.js"></script>
 <script src="ax-data.js"></script>
 <script src="fare-engine.js"></script>
@@ -572,15 +573,16 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
         }
       }
     }
-    all.sort((a, b) => _parseMins(a.departureTime) - _parseMins(b.departureTime));
-    return all.slice(0, 8);
+    const merged = directOnly ? all : IZXUnifiedRouter.dedup(all);
+    merged.sort((a, b) => _parseMins(a.departureTime) - _parseMins(b.departureTime));
+    return merged.slice(0, 8);
   }
 
   buildPlannerSelects();
 
   document.getElementById('jp-swap').addEventListener('click', () => {
     const f = document.getElementById('jp-from'), t = document.getElementById('jp-to');
-    const tmp = f.value; f.value = t.value; t.value = tmp;
+    const tmp = f.value; f.value = t.value; f.value = t.value; t.value = tmp;
   });
 
   document.getElementById('jp-search').addEventListener('click', () => {
