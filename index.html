@@ -49,6 +49,8 @@
     .nav-links>a{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;font-weight:500;transition:color var(--transition);}
     .nav-links>a:hover{color:var(--text);}
     .nav-links>a.active{color:var(--accent);}
+    .nav-links>a.nav-cta{color:var(--accent);font-weight:700;border:1px solid var(--accent);border-radius:var(--radius-md);padding:var(--space-1) var(--space-3);}
+    .nav-links>a.nav-cta:hover{background:var(--accent);color:#fff;}
     .theme-btn{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:var(--radius-md);padding:var(--space-2);cursor:pointer;display:flex;transition:color var(--transition),border-color var(--transition);}
     .theme-btn:hover{color:var(--text);border-color:var(--text-muted);}
     /* DROPDOWN */
@@ -125,6 +127,7 @@
     </a>
     <div class="nav-links">
       <a href="index.html" class="active">Home</a>
+      <a href="journey-planner.html" class="nav-cta">Toryo</a>
 
       <div class="nav-item">
         <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Railways</button>
