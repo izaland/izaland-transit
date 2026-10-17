@@ -219,6 +219,7 @@ const SUBURBAN_INTERCHANGE = {
   // TS16 Kasakuri: stesso nodo di interscambio di K02 Niji-Sainðaul (IZX Keishin)
   TS16: ['SK35', 'M419', 'AX04', 'K02'],
   TS18: ['M425'],
+  TS19: ['M717', 'AX20'],
   // Chukkūn Line (CK)
   CK01: ['AX00'],
   CK02: ['AX01', 'KE03'],
