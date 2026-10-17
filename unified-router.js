@@ -58,6 +58,46 @@
 
   const _routers = {};
 
+  /* PERFORMANCE: cache (dati statici). Svuotate quando cambiano router,
+     interscambi, alias o thru. */
+  const SEARCH_BUDGET_MS = 2500;       // tempo massimo per una richiesta (anche se la UI chiama search() piu' volte di fila)
+  let _lastEnd = 0, _batchDeadline = 0;
+  let _netCache      = new Map();      // codice -> networkId
+  let _stationsCache = new Map();      // networkId -> allStations()
+  let _partnersCache = new Map();      // codice -> partner[]
+  let _bridgeCache   = new Map();      // networkId -> stazioni con partner
+  let _memo          = new Map();      // risultati dei sotto-ricerca
+  let _deadline      = Infinity;
+  let _truncated     = false;
+
+  function _clearCaches() {
+    _netCache.clear(); _stationsCache.clear(); _partnersCache.clear();
+    _bridgeCache.clear(); _memo.clear();
+  }
+  function _timeUp() {
+    if (Date.now() > _deadline) { _truncated = true; return true; }
+    return false;
+  }
+  function _stationsOf(networkId) {
+    let v = _stationsCache.get(networkId);
+    if (!v) {
+      const r = _routers[networkId];
+      v = (r && typeof r.allStations === 'function') ? (r.allStations() || []) : [];
+      _stationsCache.set(networkId, v);
+    }
+    return v;
+  }
+  /* Solo le stazioni che hanno almeno un interscambio possono essere
+     nodi intermedi: evita di scandire centinaia di stazioni inutili. */
+  function _bridgesOf(networkId) {
+    let v = _bridgeCache.get(networkId);
+    if (!v) {
+      v = _stationsOf(networkId).filter(st => _partnersOf(st.code).length > 0);
+      _bridgeCache.set(networkId, v);
+    }
+    return v;
+  }
+
   /* Gruppi di codici che indicano la stessa stazione fisica su reti diverse. */
   const SAME_STATION_GROUPS = [
     ['LL02', 'SK25', 'TS12', 'M452'],   // Binno
@@ -73,6 +113,7 @@
   function registerThruService(def) {
     if (def && Array.isArray(def.codes) && def.codes.length > 1)
       THRU_SERVICES.push({ codes: def.codes.slice(), stopSec: def.stopSec ?? 90 });
+    _clearCaches();
   }
 
   function _thruStop(a, b) {
@@ -83,6 +124,7 @@
 
   function registerSameStation(codes) {
     if (Array.isArray(codes) && codes.length > 1) SAME_STATION_GROUPS.push(codes.slice());
+    _clearCaches();
   }
 
   function _sameStation(a, b) {
@@ -91,6 +133,7 @@
 
   function registerRouter(networkId, routerObj) {
     _routers[networkId.toUpperCase()] = routerObj;
+    _clearCaches();
   }
 
   function _routerFor(networkId) {
@@ -98,13 +141,14 @@
   }
 
   function _netOfCode(code) {
+    if (_netCache.has(code)) return _netCache.get(code);
+    let found = null;
     for (const [id, r] of Object.entries(_routers)) {
-      if (typeof r.hasStation === 'function' && r.hasStation(code)) return id;
-      if (typeof r.allStations === 'function') {
-        if (r.allStations().some(s => s.code === code)) return id;
-      }
+      if (typeof r.hasStation === 'function' && r.hasStation(code)) { found = id; break; }
+      if (_stationsOf(id).some(s => s.code === code)) { found = id; break; }
     }
-    return null;
+    _netCache.set(code, found);
+    return found;
   }
 
   const _ixIndex = {};
@@ -120,6 +164,7 @@
   }
 
   function buildInterchangeIndex(interchangeData) {
+    _clearCaches();
     if (Array.isArray(interchangeData)) {
       interchangeData.forEach(ix => _add(ix.codeA, ix.codeB, ix.transferMin));
       return;
@@ -131,6 +176,12 @@
   }
 
   function _partnersOf(code) {
+    let c = _partnersCache.get(code);
+    if (!c) { c = _partnersOfRaw(code); _partnersCache.set(code, c); }
+    return c;
+  }
+
+  function _partnersOfRaw(code) {
     const raw = _ixIndex[code] || [];
     const out = [];
     const ownNet = raw.some(e => _sameStation(code, e.code)) ? _netOfCode(code) : null;
@@ -235,15 +286,25 @@
   }
 
   function _safeSearch(router, networkId, from, to, depTime, opts) {
+    if (from === to) return [];
+    const key = networkId + '|' + from + '|' + to + '|' + depTime + '|' +
+      (opts.directOnly ? 1 : 0) + '|' + (opts.maxResults ?? '') + '|' +
+      (opts.networks ? [].concat(opts.networks).join(',') : '');
+    const hit = _memo.get(key);
+    if (hit) return hit;
+    let out = [];
     try {
-      if (from === to) return [];
       const fn = router.search || router.findJourneys;
-      if (typeof fn !== 'function') return [];
-      const results = fn.call(router, from, to, depTime, opts);
-      return Array.isArray(results) ? results : [];
+      if (typeof fn === 'function') {
+        const results = fn.call(router, from, to, depTime, opts);
+        out = Array.isArray(results) ? results : [];
+      }
     } catch (e) {
-      return [];
+      out = [];
     }
+    if (_memo.size > 150000) _memo.clear();
+    _memo.set(key, out);
+    return out;
   }
 
   /* Cerca i leg successivi dopo j1 su un partner. Se il partner e' un
@@ -280,8 +341,8 @@
       let found = false;
       if (typeof r.hasStation === 'function') {
         found = r.hasStation(code);
-      } else if (typeof r.allStations === 'function') {
-        found = r.allStations().some(s => s.code === code);
+      } else {
+        found = _stationsOf(id).some(s => s.code === code);
       }
       if (found) out.push({ code, networkId: id });
     }
@@ -405,7 +466,8 @@
       const router1 = _routerFor(fNode.networkId);
       if (!router1 || typeof router1.allStations !== 'function') continue;
 
-      for (const midSt of router1.allStations()) {
+      for (const midSt of _bridgesOf(fNode.networkId)) {
+        if (_timeUp()) break;
         const partners = _partnersOf(midSt.code).filter(p => {
           if (netFilter && !netFilter.has(p.networkId)) return false;
           return tNodes.some(t => t.networkId === p.networkId);
@@ -433,13 +495,19 @@
       }
     }
 
-    /* ---- 3. 3-LEG ---- */
+    /* ---- 3. 3-LEG ----
+       PERFORMANCE: e' la fase piu' costosa (migliaia di sotto-ricerche).
+       Se diretto + 1 cambio hanno gia' dato abbastanza alternative,
+       non serve cercare le soluzioni a 2 cambi. */
+    const enough = opts.minBeforeThreeLeg ?? 3;
+    if (_dedup(journeys.slice()).length >= enough) return journeys;
     for (const fNode of fNodes) {
       if (netFilter && !netFilter.has(fNode.networkId)) continue;
       const router1 = _routerFor(fNode.networkId);
       if (!router1 || typeof router1.allStations !== 'function') continue;
 
-      for (const midSt1 of router1.allStations()) {
+      for (const midSt1 of _bridgesOf(fNode.networkId)) {
+        if (_timeUp()) break;
         const partners1 = _partnersOf(midSt1.code);
         if (!partners1.length) continue;
 
@@ -457,7 +525,8 @@
           const router2 = _routerFor(p1.networkId);
           if (!router2 || typeof router2.allStations !== 'function') continue;
 
-          for (const midSt2 of router2.allStations()) {
+          for (const midSt2 of _bridgesOf(p1.networkId)) {
+            if (_timeUp()) break;
             const partners2 = _partnersOf(midSt2.code).filter(p => {
               if (netFilter && !netFilter.has(p.networkId)) return false;
               return tNodes.some(t => t.networkId === p.networkId);
@@ -500,22 +569,37 @@
   }
 
   /* FIX 15: from/to possono essere array o stringhe 'A,B,C'.
-     Tutte le coppie vengono provate e il dedup e' applicato UNA volta. */
+     Tutte le coppie vengono provate e il dedup e' applicato UNA volta.
+     FIX 17 (performance): budget di tempo per richiesta; se scade, si
+     restituiscono i risultati parziali (api.lastSearchTruncated = true). */
   function search(from, to, depTime, opts = {}) {
     const maxResults = opts.maxResults ?? MAX_JOURNEYS;
     const froms = _toCodeList(from);
     const tos   = _toCodeList(to);
 
+    _truncated = false;
+    const _now = Date.now();
+    if (_now - _lastEnd < 50 && _batchDeadline > _now) _deadline = _batchDeadline;   // stessa richiesta UI
+    else _deadline = _batchDeadline = _now + (opts.timeBudgetMs ?? SEARCH_BUDGET_MS);
     const all = [];
-    for (const f of froms) {
-      for (const t of tos) {
-        _searchRaw(f, t, depTime, opts).forEach(j => all.push(j));
+    try {
+      for (const f of froms) {
+        for (const t of tos) {
+          if (_timeUp()) break;
+          _searchRaw(f, t, depTime, opts).forEach(j => all.push(j));
+        }
       }
+    } finally {
+      _deadline = Infinity;
+      _lastEnd = Date.now();
     }
-    return _dedup(all).slice(0, maxResults);
+    const res = _dedup(all).slice(0, maxResults);
+    api.lastSearchTruncated = _truncated;
+    return res;
   }
 
-  return {
+  const api = {
+    lastSearchTruncated: false,
     registerRouter,
     registerSameStation,
     registerThruService,
@@ -524,4 +608,5 @@
     dedup: _dedup,
     CROSS_TRANSFER_MIN,
   };
+  return api;
 });
