@@ -1,13 +1,16 @@
 /* ================================================================
    M20-TT.JS — Metro Line 20 · Timetable
    ================================================================
-   Il timetable è generato runtime da MetroRouter usando le frequenze,
-   le velocità e l'offset definiti in m20-data.js.
+   Il timetable è generato runtime da MetroRouter usando frequenze,
+   offset e modello cinematico definiti in m20-data.js.
 
    Servizi (ognuno in due direzioni):
      LO_N / LO_S  Locale, tutte le fermate (M2001↔M2007)
      EX_N / EX_S  Express, solo M2001 · M2004 · M2007
                   (offsetMin 5: partenze alle :05 + n·headway)
+
+   I tempi usano svc.kin (accelerazione, crociera a vmax, frenata,
+   sosta): vedi M20_KIN in m20-data.js.
 ================================================================ */
 'use strict';
 
@@ -16,23 +19,23 @@ const M20_REV = (a) => [...a].reverse();
 const M20_SERVICES_NORM = [
   {
     id: 'M20', svcLogical: 'LO_N', name: 'Local (M2001→M2007)',
-    color: '#0F1F5C', cls: 'svc-LO', rapid: false, speedKmh: M20_SPD.LO,
+    color: '#0F1F5C', cls: 'svc-LO', rapid: false, kin: M20_KIN.LO,
     headway: M20_HEADWAY_LO, stops: M20_SVC.LO.stops,
   },
   {
     id: 'M20', svcLogical: 'LO_S', name: 'Local (M2007→M2001)',
-    color: '#0F1F5C', cls: 'svc-LO', rapid: false, speedKmh: M20_SPD.LO,
+    color: '#0F1F5C', cls: 'svc-LO', rapid: false, kin: M20_KIN.LO,
     headway: M20_HEADWAY_LO, stops: M20_REV(M20_SVC.LO.stops),
   },
   {
     id: 'M20', svcLogical: 'EX_N', name: 'Express (M2001→M2007)',
-    color: '#0F1F5C', cls: 'svc-EX', rapid: true, speedKmh: M20_SPD.EX,
+    color: '#0F1F5C', cls: 'svc-EX', rapid: true, kin: M20_KIN.EX,
     offsetMin: M20_EX_OFFSET_MIN,
     headway: M20_HEADWAY_EX, stops: M20_SVC.EX.stops,
   },
   {
     id: 'M20', svcLogical: 'EX_S', name: 'Express (M2007→M2001)',
-    color: '#0F1F5C', cls: 'svc-EX', rapid: true, speedKmh: M20_SPD.EX,
+    color: '#0F1F5C', cls: 'svc-EX', rapid: true, kin: M20_KIN.EX,
     offsetMin: M20_EX_OFFSET_MIN,
     headway: M20_HEADWAY_EX, stops: M20_REV(M20_SVC.EX.stops),
   },

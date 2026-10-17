@@ -19,13 +19,28 @@
      svc.speedKmh    — velocità commerciale del servizio in km/h. Sovrascrive
                         meta.avgSpeedKmh. Utile per differenziare express (più
                         veloce) da all-stop (più lento).
+     svc.kin         — (opzionale) modello cinematico { vmaxKmh, accel,
+                        decel, dwellSec? } con accel/decel in m/s². Se presente
+                        sostituisce il calcolo speedKmh: ogni tratta tra due
+                        fermate consecutive del servizio è percorsa con
+                        accelerazione, crociera a vmax (se la tratta è lunga
+                        abbastanza) e frenata; la sosta in ogni fermata
+                        intermedia è kin.dwellSec ?? line.dwellSec.
+                        I servizi senza kin non cambiano comportamento.
 
-   Calcolo tempi di percorrenza:
+   Calcolo tempi di percorrenza (senza svc.kin):
      travelSec = (km / speedKmh) * 3600  +  fermate_intermedie * dwellSec
      Questo produce tempi diversi tra express e locale anche a pari distanza,
      perché: (1) l’express ha speedKmh più alta (meno acc/frenate),
              (2) il locale accumula dwell su ogni fermata intermedia.
      Aggiornare i valori km in *-data.js aggiorna automaticamente tutti i tempi.
+
+   Calcolo tempi con svc.kin:
+     per ogni tratta d (m) tra fermate consecutive:
+       se d >= v²/2a + v²/2b :  t = v/a + v/b + (d - v²/2a - v²/2b) / v
+       altrimenti (vmax non raggiunta): vp = sqrt(2d / (1/a + 1/b)),
+                                         t = vp/a + vp/b
+     travelSec = somma tratte + fermate_intermedie * dwell
 
    Sosta (dwell):
      DWELL_SEC di default = 20 s (era 30). Una linea può sovrascriverlo con
@@ -107,14 +122,51 @@ const MetroRouter = (() => {
   }
 
   /* ----------------------------------------------------------------
+   * _segSec(dMeters, vMax, accel, decel)
+   * Tempo (s) per una tratta con accelerazione, crociera e frenata.
+   * ---------------------------------------------------------------- */
+  function _segSec(d, v, a, b) {
+    const dAcc = (v * v) / (2 * a);
+    const dDec = (v * v) / (2 * b);
+    if (d >= dAcc + dDec) return v / a + v / b + (d - dAcc - dDec) / v;
+    const vp = Math.sqrt((2 * d) / (1 / a + 1 / b));
+    return vp / a + vp / b;
+  }
+
+  /* ----------------------------------------------------------------
+   * _kinTimes(line, svc, ordered)
+   * Restituisce { arr: [sec dall'inizio per ogni fermata], total, dwell }
+   * oppure null se mancano i km o svc.kin.
+   * ---------------------------------------------------------------- */
+  function _kinTimes(line, svc, ordered) {
+    const kin = svc.kin;
+    if (!kin) return null;
+    const v = (kin.vmaxKmh ?? 100) / 3.6;
+    const a = kin.accel ?? 1.0;
+    const b = kin.decel ?? 1.0;
+    const dwell = kin.dwellSec ?? line.dwellSec;
+    const kms = ordered.map(code => line.st[code]?.km);
+    if (kms.some(k => k === undefined || k === null)) return null;
+    const arr = [0];
+    let t = 0;
+    for (let i = 1; i < ordered.length; i++) {
+      t += _segSec(Math.abs(kms[i] - kms[i - 1]) * 1000, v, a, b);
+      arr.push(t);
+      if (i < ordered.length - 1) t += dwell;
+    }
+    return { arr, total: Math.round(t), dwell };
+  }
+
+  /* ----------------------------------------------------------------
    * _buildLegForService(line, svc, boardCode, alightCode, depSec)
    *
-   * Tempo di percorrenza:
+   * Tempo di percorrenza (senza svc.kin):
    *   runSec   = distanza_km / speedKmh * 3600
    *   dwellSec = fermate_intermedie * line.dwellSec
    *   total    = runSec + dwellSec
    *
    * speedKmh = svc.speedKmh ?? line.avgSpeedKmh
+   * Con svc.kin: vedi _kinTimes.
    * ---------------------------------------------------------------- */
   function _buildLegForService(line, svc, boardCode, alightCode, depSec) {
     const stops = svc.stops;
@@ -140,24 +192,40 @@ const MetroRouter = (() => {
       : stops.slice(iT, iF + 1).reverse();
     const between = ordered.slice(1, -1);
 
-    // Velocità commerciale: svc.speedKmh sovrascrive line.avgSpeedKmh
-    const speedKmh  = svc.speedKmh ?? line.avgSpeedKmh;
-    const runSec    = Math.round((km / speedKmh) * 3600);
-    const travelSec = runSec + between.length * line.dwellSec;
-    const alightSec = alignSec + travelSec;
+    const kt = _kinTimes(line, svc, ordered);
 
-    const intermediateStops = between.map(code => {
-      const st     = line.st[code];
-      const kmEl   = Math.abs((st?.km ?? kmF) - kmF);
-      const arrSec = alignSec + Math.round((kmEl / km) * runSec)
-                     + between.slice(0, between.indexOf(code)).length * line.dwellSec;
-      return {
-        code,
-        name: st?.n ?? code,
-        arr:  _secToHM(arrSec),
-        dep:  _secToHM(arrSec + line.dwellSec),
-      };
-    });
+    let travelSec, intermediateStops;
+    if (kt) {
+      travelSec = kt.total;
+      intermediateStops = between.map((code, idx) => {
+        const arrSec = alignSec + Math.round(kt.arr[idx + 1]);
+        return {
+          code,
+          name: line.st[code]?.n ?? code,
+          arr:  _secToHM(arrSec),
+          dep:  _secToHM(arrSec + kt.dwell),
+        };
+      });
+    } else {
+      // Velocità commerciale: svc.speedKmh sovrascrive line.avgSpeedKmh
+      const speedKmh  = svc.speedKmh ?? line.avgSpeedKmh;
+      const runSec    = Math.round((km / speedKmh) * 3600);
+      travelSec = runSec + between.length * line.dwellSec;
+
+      intermediateStops = between.map(code => {
+        const st     = line.st[code];
+        const kmEl   = Math.abs((st?.km ?? kmF) - kmF);
+        const arrSec = alignSec + Math.round((kmEl / km) * runSec)
+                       + between.slice(0, between.indexOf(code)).length * line.dwellSec;
+        return {
+          code,
+          name: st?.n ?? code,
+          arr:  _secToHM(arrSec),
+          dep:  _secToHM(arrSec + line.dwellSec),
+        };
+      });
+    }
+    const alightSec = alignSec + travelSec;
 
     return {
       lineId:       line.lineId,
