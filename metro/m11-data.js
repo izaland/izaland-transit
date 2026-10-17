@@ -5,14 +5,16 @@
    Capolinea: Itsayuki Tonjo (M1101) ↔ Jisahara (M1120)
 
    Interscambi notevoli:
-     M1106 Takatsura       ↔ HO01
+     M1106 Takatsura       ↔ HOY01 (Hoze-Oyehatton Line)
      M1107 Rismyonjen      ↔ CK13, TS17
-     M1110 Ipporai-Owonideki ↔ M424 (M4)
+     M1108 Owonideki Zawahan ↔ M1727 (M17)
+     M1110 Ipporai-Owonideki ↔ M424 (M4), M617 (M6)
      M1112 Kirifunu Kukubān ↔ M505 (M5)
      M1113 Ushiuruma       ↔ M718 (M7)
-     M1114 Ðwaishon Tekkapi ↔ HO09
-     M1115 Bajikoe Canal Kŏwen ↔ M1503 (M15)
-     M1116 Shutazai        ↔ TS20, M725 (M7), M16?? (TODO)
+     M1114 Ðwaishon Tekkapi ↔ HOY09 (Hoze-Oyehatton Line)
+     M1115 Bajikoe Canal Kŏwen ↔ M1523 (M15)
+     M1116 Shutazai        ↔ TS20, M725 (M7)
+     M1118 Futteskaiba     ↔ M1323 (M13)
      M1120 Jisahara        ↔ KD39, M514 (M5)
 ================================================================ */
 'use strict';
@@ -95,8 +97,8 @@ const M11_SVC = {
 ---------------------------------------------------------------- */
 const M11_INTERCHANGE = {
   M1106: [
-    { code: 'HO01', network: 'ho', transferMin: 3,
-      note: 'HO01 Takatsura' },
+    { code: 'HOY01', network: 'metro', transferMin: 3,
+      note: 'HOY01 Takatsura — Hoze-Oyehatton Line' },
   ],
   M1107: [
     { code: 'CK13', network: 'ck', transferMin: 3,
@@ -104,9 +106,15 @@ const M11_INTERCHANGE = {
     { code: 'TS17', network: 'ts', transferMin: 3,
       note: 'TS17 Rismyonjen' },
   ],
+  M1108: [
+    { code: 'M1727', network: 'metro', transferMin: 3,
+      note: 'M17 Owonideki Zawahan' },
+  ],
   M1110: [
     { code: 'M424', network: 'metro', transferMin: 3,
       note: 'M4 Ipporai-Owonideki — banchine adiacenti' },
+    { code: 'M617', network: 'metro', transferMin: 3,
+      note: 'M6 Ipporai-Owonideki' },
   ],
   M1112: [
     { code: 'M505', network: 'metro', transferMin: 3,
@@ -117,11 +125,11 @@ const M11_INTERCHANGE = {
       note: 'M7 Ushiuruma — stesso nome' },
   ],
   M1114: [
-    { code: 'HO09', network: 'ho', transferMin: 3,
-      note: 'HO09 Ðwaishon Tekkapi' },
+    { code: 'HOY09', network: 'metro', transferMin: 3,
+      note: 'HOY09 Ðwaishon Tekkapi — Hoze-Oyehatton Line' },
   ],
   M1115: [
-    { code: 'M1503', network: 'metro', transferMin: 3,
+    { code: 'M1523', network: 'metro', transferMin: 3,
       note: 'M15 Bajikoe Canal Kŏwen' },
   ],
   M1116: [
@@ -129,9 +137,10 @@ const M11_INTERCHANGE = {
       note: 'TS20 Shutazai' },
     { code: 'M725', network: 'metro', transferMin: 3,
       note: 'M7 Shutazai — stesso nome' },
-    // TODO: codice M16 da confermare
-    { code: 'M16??', network: 'metro', transferMin: 3,
-      note: 'M16 Shutazai — codice da confermare' },
+  ],
+  M1118: [
+    { code: 'M1323', network: 'metro', transferMin: 3,
+      note: 'M13 Futteskaiba' },
   ],
   M1120: [
     { code: 'KD39', network: 'suburban', transferMin: 3,
