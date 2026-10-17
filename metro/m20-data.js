@@ -16,6 +16,13 @@
      Diurno    09:30–17:30 / 20:00–22:30  10    10
      Morbida   05:30–07:00 / 22:30–24:00  12    20
 
+   Sfasamento express: offsetMin 5 (partenze alle :05 + n·headway).
+   Con 5 non coincide mai con le partenze del locale (4, 10, 12 min)
+   e di giorno cade a metà tra due locali.
+
+   Velocità (km/h): LO 35, EX 150 (picco indicato; il router la usa
+   come velocità commerciale + dwell sulle fermate intermedie).
+
    Interscambi:
      M2001  M117, M814, M1712 (metro)
             LL01, SK26, TS13, JD01 (suburban)
@@ -58,8 +65,11 @@ const M20_META = {
   dwellSec:    30,
 };
 
-/* Velocità commerciali (km/h) — TODO: provvisorie, da confermare */
-const M20_SPD = { LO: 35, EX: 50 };
+/* Velocità (km/h) — EX: 150 km/h di picco */
+const M20_SPD = { LO: 35, EX: 150 };
+
+/* Sfasamento partenze express (minuti) */
+const M20_EX_OFFSET_MIN = 5;
 
 /* Frequenze per servizio */
 const M20_HEADWAY_LO = [
@@ -141,7 +151,7 @@ const M20_INTERCHANGE = {
 
 if (typeof module !== 'undefined') {
   module.exports = {
-    M20_META, M20_ST, M20_CANONICAL_ORDER, M20_EXPRESS_STOPS, M20_SPD,
+    M20_META, M20_ST, M20_CANONICAL_ORDER, M20_EXPRESS_STOPS, M20_SPD, M20_EX_OFFSET_MIN,
     M20_HEADWAY_LO, M20_HEADWAY_EX, M20_SVC, M20_INTERCHANGE,
   };
 }

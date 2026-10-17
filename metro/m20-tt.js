@@ -1,12 +1,13 @@
 /* ================================================================
    M20-TT.JS — Metro Line 20 · Timetable
    ================================================================
-   Il timetable è generato runtime da MetroRouter usando le frequenze
-   e le velocità definite in m20-data.js.
+   Il timetable è generato runtime da MetroRouter usando le frequenze,
+   le velocità e l'offset definiti in m20-data.js.
 
    Servizi (ognuno in due direzioni):
      LO_N / LO_S  Locale, tutte le fermate (M2001↔M2007)
      EX_N / EX_S  Express, solo M2001 · M2004 · M2007
+                  (offsetMin 5: partenze alle :05 + n·headway)
 ================================================================ */
 'use strict';
 
@@ -26,11 +27,13 @@ const M20_SERVICES_NORM = [
   {
     id: 'M20', svcLogical: 'EX_N', name: 'Express (M2001→M2007)',
     color: '#0F1F5C', cls: 'svc-EX', rapid: true, speedKmh: M20_SPD.EX,
+    offsetMin: M20_EX_OFFSET_MIN,
     headway: M20_HEADWAY_EX, stops: M20_SVC.EX.stops,
   },
   {
     id: 'M20', svcLogical: 'EX_S', name: 'Express (M2007→M2001)',
     color: '#0F1F5C', cls: 'svc-EX', rapid: true, speedKmh: M20_SPD.EX,
+    offsetMin: M20_EX_OFFSET_MIN,
     headway: M20_HEADWAY_EX, stops: M20_REV(M20_SVC.EX.stops),
   },
 ];
