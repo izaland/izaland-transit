@@ -8,23 +8,23 @@
    Spaziatura media: ~1 050 m tra stazioni (900–1 200 m).
    Servizio: unico schema tutto-fermate (no rapidi).
 
-   Interscambi confermati:
-     M501  SK37  (Seishaku Line — Tsuragoi, stesso nome)
-     M503  HO07  (Honanshū Line — Konegisa Eigandan)
+   Interscambi:
+     M501  M114  (Metro Line 1 — Tsuragoi)
+           SK37  (Seishaku Line — Tsuragoi, stesso nome)
+     M502  M204  (Metro Line 2 — Mundōzan)
+     M503  M303  (Metro Line 3 — Konegisa Eigandan)
            M719  (Metro Line 7 — Konegisa Eigandan)
-           SB??  (da confermare)
-           M17?? (da confermare)
-     M505  M11-10 (Metro Line 11 — Kirifunu Kukubān)
-     M506  IR??  (da confermare)
-     M507  RK??  (da confermare)
+           HOY07 (Hoze-Oyehatton Line — Konegisa Eigandan)
+     M504  M424  (Metro Line 4 — Jaihonmu 3sa)
+     M505  M1112 (Metro Line 11 — Kirifunu Kukubān)
+     M506  RI09  (Sakanemoto)
      M509  M714  (Metro Line 7 — Riihisano)
      M510  M1519 (Metro Line 15 — Eonogi Kōwen)
-     M511  HO13  (Honanshū Line — Kadokamahiwa)
+     M511  HOY13 (Hoze-Oyehatton Line — Kadokamahiwa)
      M513  M728  (Metro Line 7 — Pwakkobe)
-           M17?? (da confermare)
-     M514  KD39  (Kidai Line — Jisahara, stesso nome)
-
-   Interscambi M502 (1, 31) e M513 (M17??) da confermare.
+     M514  M1120 (Metro Line 11 — Jisahara)
+           KD39  (Kidai Line — Jisahara, stesso nome)
+     M507, M508, M512: nessun interscambio
 ================================================================ */
 'use strict';
 
@@ -96,68 +96,37 @@ const M5_SVC = {
 
 /* ----------------------------------------------------------------
    Interscambi Metro Line 5 ↔ altre reti
-
-   M501  Tsuragoi
-     ↔ SK37 (Seishaku Line) — stesso nome, stesso impianto
-
-   M502  Mundōzan
-     ↔ 1??, 31??  — da confermare (codici rete sconosciuta)
-
-   M503  Konegisa Eigandan
-     ↔ HO07  (Honanshū Line)
-     ↔ M719  (Metro Line 7)
-     ↔ SB??  — da confermare
-     ↔ M17?? — da confermare
-
-   M505  Kirifunu Kukubān
-     ↔ M11-10 (Metro Line 11)
-
-   M506  Sakanemoto
-     ↔ IR??  — da confermare
-
-   M507  Akagae Nosori  (Yōdai adae)
-     ↔ RK??  — da confermare
-
-   M509  Riihisano
-     ↔ M714  (Metro Line 7)
-
-   M510  Eonogi Kōwen
-     ↔ M1519 (Metro Line 15)
-
-   M511  Kadokamahiwa
-     ↔ HO13  (Honanshū Line)
-
-   M513  Pwakkobe
-     ↔ M728  (Metro Line 7)
-     ↔ M17?? — da confermare
-
-   M514  Jisahara
-     ↔ KD39  (Kidai Line) — stesso nome, stesso impianto
 ---------------------------------------------------------------- */
 const M5_INTERCHANGE = {
   M501: [
+    { code: 'M114', network: 'metro', transferMin: 3,
+      note: 'Metro Line 1 — Tsuragoi' },
     { code: 'SK37', network: 'suburban', transferMin: 3,
       note: 'Seishaku Line — Tsuragoi, stesso nome' },
   ],
   M502: [
-    // ↔ 1?? e 31?? da confermare
+    { code: 'M204', network: 'metro', transferMin: 3,
+      note: 'Metro Line 2 — Mundōzan' },
   ],
   M503: [
-    { code: 'HO07', network: 'ho',    transferMin: 3,
-      note: 'Honanshū Line — Konegisa Eigandan' },
+    { code: 'M303', network: 'metro', transferMin: 3,
+      note: 'Metro Line 3 — Konegisa Eigandan' },
     { code: 'M719', network: 'metro', transferMin: 3,
       note: 'Metro Line 7 — Konegisa Eigandan' },
-    // ↔ SB?? e M17?? da confermare
+    { code: 'HOY07', network: 'metro', transferMin: 3,
+      note: 'Hoze-Oyehatton Line — Konegisa Eigandan' },
+  ],
+  M504: [
+    { code: 'M424', network: 'metro', transferMin: 3,
+      note: 'Metro Line 4 — Jaihonmu 3sa' },
   ],
   M505: [
     { code: 'M1112', network: 'metro', transferMin: 3,
       note: 'Metro Line 11 — Kirifunu Kukubān' },
   ],
   M506: [
-    // ↔ IR?? da confermare
-  ],
-  M507: [
-    // ↔ RK?? da confermare
+    { code: 'RI09', network: 'suburban', transferMin: 3,
+      note: 'RI09 Sakanemoto' },
   ],
   M509: [
     { code: 'M714', network: 'metro', transferMin: 3,
@@ -168,19 +137,18 @@ const M5_INTERCHANGE = {
       note: 'Metro Line 15 — Eonogi Kōwen' },
   ],
   M511: [
-    { code: 'HO13', network: 'ho',    transferMin: 3,
+    { code: 'HOY13', network: 'metro', transferMin: 3,
       note: 'Hoze-Oyehatton Line — Kadokamahiwa' },
   ],
   M513: [
     { code: 'M728', network: 'metro', transferMin: 3,
       note: 'Metro Line 7 — Pwakkobe' },
-    // ↔ M17?? da confermare
   ],
   M514: [
+    { code: 'M1120', network: 'metro', transferMin: 3,
+      note: 'Metro Line 11 — Jisahara, stesso nome' },
     { code: 'KD39', network: 'suburban', transferMin: 3,
       note: 'Kidai Line — Jisahara, stesso nome' },
-    { code: 'M1120', network: 'suburban', transferMin: 3,
-      note: 'Metro Line 11 — Jisahara, stesso nome' },
   ],
 };
 

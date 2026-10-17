@@ -100,6 +100,12 @@
   <script src="metro/m8-data.js"></script>
   <script src="metro/m9-data.js"></script>
   <script src="metro/m11-data.js"></script>
+  <script src="metro/m12-data.js"></script>
+  <script src="metro/m13-data.js"></script>
+  <script src="metro/m14-data.js"></script>
+  <script src="metro/m15-data.js"></script>
+  <script src="metro/m17-data.js"></script>
+  <script src="metro/hoy-data.js"></script>
   <script src="suburban-data.js"></script>
   <script src="ts-data.js"></script>
   <script src="ck-data.js"></script>
@@ -159,6 +165,18 @@
                typeof M9_META  !== 'undefined' ? M9_META  : undefined);
   addMetroLine(typeof M11_ST !== 'undefined' ? M11_ST : undefined,
                typeof M11_META !== 'undefined' ? M11_META : undefined);
+  addMetroLine(typeof M12_ST !== 'undefined' ? M12_ST : undefined,
+               typeof M12_META !== 'undefined' ? M12_META : undefined);
+  addMetroLine(typeof M13_ST !== 'undefined' ? M13_ST : undefined,
+               typeof M13_META !== 'undefined' ? M13_META : undefined);
+  addMetroLine(typeof M14_ST !== 'undefined' ? M14_ST : undefined,
+               typeof M14_META !== 'undefined' ? M14_META : undefined);
+  addMetroLine(typeof M15_ST !== 'undefined' ? M15_ST : undefined,
+               typeof M15_META !== 'undefined' ? M15_META : undefined);
+  addMetroLine(typeof M17_ST !== 'undefined' ? M17_ST : undefined,
+               typeof M17_META !== 'undefined' ? M17_META : undefined);
+  addMetroLine(typeof HOY_ST !== 'undefined' ? HOY_ST : undefined,
+               typeof HOY_META !== 'undefined' ? HOY_META : undefined);
 
   /* Suburban */
   if (typeof SUBURBAN_LINES !== 'undefined') {
@@ -307,6 +325,12 @@
     ['M8',  typeof M8_INTERCHANGE  !== 'undefined' ? M8_INTERCHANGE  : null],
     ['M9',  typeof M9_INTERCHANGE  !== 'undefined' ? M9_INTERCHANGE  : null],
     ['M11', typeof M11_INTERCHANGE !== 'undefined' ? M11_INTERCHANGE : null],
+    ['M12', typeof M12_INTERCHANGE !== 'undefined' ? M12_INTERCHANGE : null],
+    ['M13', typeof M13_INTERCHANGE !== 'undefined' ? M13_INTERCHANGE : null],
+    ['M14', typeof M14_INTERCHANGE !== 'undefined' ? M14_INTERCHANGE : null],
+    ['M15', typeof M15_INTERCHANGE !== 'undefined' ? M15_INTERCHANGE : null],
+    ['M17', typeof M17_INTERCHANGE !== 'undefined' ? M17_INTERCHANGE : null],
+    ['HOY', typeof HOY_INTERCHANGE !== 'undefined' ? HOY_INTERCHANGE : null],
   ].forEach(([id, obj]) => { if (obj) METRO_INTERCHANGE_MAP[id] = obj; });
 
   /* ── Interscambi "flat" (key → [codici]) di tutte le reti non-metro ── */
