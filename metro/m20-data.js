@@ -17,7 +17,7 @@
      M2004  M111, M417, M610 (metro) · SK33, TS14 (suburban) · AX05 (AX)
      M2005  M906, M1203
      M2006  nessun interscambio
-     M2007  M721, M1525 (metro) · SK38 (suburban) · K10 (IZX)
+     M2007  M721, M1525 (metro) · SK38 (suburban) · K101 (IZX)
 ================================================================ */
 'use strict';
 
@@ -105,7 +105,7 @@ const M20_INTERCHANGE = {
     { code: 'M721',  network: 'metro',    transferMin: 3, note: 'Metro Line 7 — Sakamuso' },
     { code: 'M1525', network: 'metro',    transferMin: 3, note: 'Metro Line 15 — Sakamuso' },
     { code: 'SK38',  network: 'suburban', transferMin: 4, note: 'SK38 Sakamuso' },
-    { code: 'K10',   network: 'izx',      transferMin: 5, note: 'IZX K10 Sakamuso' },
+    { code: 'K101',  network: 'izx',      transferMin: 5, note: 'IZX K101 Sakamuso' },
   ],
 };
 
