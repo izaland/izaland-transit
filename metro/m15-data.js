@@ -92,7 +92,7 @@ const M15_SVC = {
 };
 
 /* TODO: transferMin provvisorio 3 min per tutti i nodi — da rivedere.
-   TODO: network di AX01 e STW04 da verificare. */
+   TODO: network di STW04 da verificare. */
 const M15_INTERCHANGE = {
   M1501: [
     { code: 'M1301', network: 'metro', transferMin: 3, note: 'M1301 SAIA Cargo Center' }
@@ -100,7 +100,7 @@ const M15_INTERCHANGE = {
   M1502: [
     { code: 'M1302', network: 'metro', transferMin: 3, note: 'M1302 Asunahama International Airport' },
     { code: 'CK02', network: 'suburban', transferMin: 3, note: 'CK02 Asunahama International Airport' },
-    { code: 'AX01', network: 'suburban', transferMin: 3, note: 'AX01 Asunahama Airport (Airport Express)' }
+    { code: 'AX01', network: 'ax', transferMin: 3, note: 'AX01 Asunahama Airport (Airport Express)' }
   ],
   M1503: [
     { code: 'M1303', network: 'metro', transferMin: 3, note: 'M1303 Asunahama Airport Terminal 2' }

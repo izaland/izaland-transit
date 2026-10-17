@@ -18,7 +18,7 @@
      M506  IR??  (da confermare)
      M507  RK??  (da confermare)
      M509  M714  (Metro Line 7 — Riihisano)
-     M510  M15-18 (Metro Line 15 — Eonogi Kōwen)
+     M510  M1519 (Metro Line 15 — Eonogi Kōwen)
      M511  HO13  (Honanshū Line — Kadokamahiwa)
      M513  M728  (Metro Line 7 — Pwakkobe)
            M17?? (da confermare)
@@ -122,7 +122,7 @@ const M5_SVC = {
      ↔ M714  (Metro Line 7)
 
    M510  Eonogi Kōwen
-     ↔ M15-18 (Metro Line 15)
+     ↔ M1519 (Metro Line 15)
 
    M511  Kadokamahiwa
      ↔ HO13  (Honanshū Line)
@@ -164,7 +164,7 @@ const M5_INTERCHANGE = {
       note: 'Metro Line 7 — Riihisano' },
   ],
   M510: [
-    { code: 'M1518', network: 'metro', transferMin: 3,
+    { code: 'M1519', network: 'metro', transferMin: 3,
       note: 'Metro Line 15 — Eonogi Kōwen' },
   ],
   M511: [

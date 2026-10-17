@@ -187,11 +187,12 @@ const M13_HEADWAY = {
 const _ic13 = (code, network) => ({ code, network, transferMin: 3, note: '' });
 const _m13 = (c) => _ic13(c, 'metro');
 const _s13 = (c) => _ic13(c, 'suburban');
+const _ax13 = (c) => _ic13(c, 'ax');
 const _thru13 = (c) => ({ code: c, network: 'thru', transferMin: 0, note: 'stessa stazione: thru service' });
 
 const M13_INTERCHANGE = {
   M1301: [_m13('M1501')],
-  M1302: [_m13('M1502'), _s13('CK02')],
+  M1302: [_m13('M1502'), _s13('CK02'), _ax13('AX01')],
   M1303: [_m13('M1503')],
   M1304: [_m13('M1504')],
   M1305: [_m13('M1505')],

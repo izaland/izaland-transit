@@ -167,7 +167,9 @@ const M17_INTERCHANGE = {
   M1718: [_m('M606')],
   M1719: [_m('M801'), _m('M901'), _s('KW00')],
   M1727: [_m('M1108')],
+  M1730: [_m('M1314')],
   M1732: [_m('M711')],
+  M1733: [_m('M1514')],
 };
 
 const M17_NODE_IDS = Object.fromEntries(

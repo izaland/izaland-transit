@@ -6,12 +6,20 @@
    Distanze progressive da M701 (km 0.000), totale 36.30 km.
 
    Interscambi confermati:
-     M705  AX03  (Airport Express — Riimibaiken)
+     M705  CK08, AX03  (CK line; Airport Express — Riimibaiken)
+     M709  M1310 (Metro Line 13 — Niirado Tagawae)
+     M711  M1732 (Metro Line 17 — Wikkaman)
      M712  M623  (Metro Line 6 — Ezaesomu)
      M714  M509  (Metro Line 5 — Riihisano)
+     M715  M1318 (Metro Line 13 — Tsuruna Eigandan)
+     M717  AX20, TS19 (Airport Express; TS line — Eigandan Senpyan)
      M718  M1113 (Metro Line 11 — Ushiuruma)
      M719  M503  (Metro Line 5 — Konegisa Eigandan)
-     M725  M1116 (Metro Line 11 — Shutazai)
+     M721  M1525, SK38 (Metro Line 15; Seishaku Line — Sakamuso)
+     M722  SK39  (Seishaku Line — Kashiwaka)
+     M723  SK40  (Seishaku Line — Togamiro)
+     M725  M1116, TS20 (Metro Line 11; TS line — Shutazai)
+     M726  M1321 (Metro Line 13 — Sanbonzayo)
      M728  M513  (Metro Line 5 — Pwakkobe)
 ================================================================ */
 'use strict';
@@ -35,7 +43,7 @@ const M7_ST = {
   M716: { n: 'Bawangitan',           k: '',            nodeId: 123393743, km: 20.40 },
   M717: { n: 'Eigandan Senpyan',     k: '永玵段船駢',   nodeId: 123393771, km: 21.30 },
   M718: { n: 'Ushiuruma',            k: '',            nodeId: 123393751, km: 22.32 },
-  M719: { n: 'Konegisa Eigandan',    k: '干鮃永玵段',   nodeId: 123393753, km: 23.74 },
+  M719: { n: 'Konegisa Eigandan',    k: '干酃永玵段',   nodeId: 123393753, km: 23.74 },
   M720: { n: 'Himatoshi',            k: '妃満氾',       nodeId: 123393752, km: 24.90 },
   M721: { n: 'Sakamuso',             k: '沛坤',         nodeId: 176874425, km: 26.04 },
   M722: { n: 'Kashiwaka',            k: '笂旄',         nodeId: 147382474, km: 27.52 },
@@ -78,8 +86,18 @@ const M7_SVC = {
 
 const M7_INTERCHANGE = {
   M705: [
+    { code: 'CK08', network: 'suburban', transferMin: 4,
+      note: 'Riimibaiken — CK line' },
     { code: 'AX03', network: 'ax', transferMin: 5,
       note: 'Riimibaiken — Airport Express' },
+  ],
+  M709: [
+    { code: 'M1310', network: 'metro', transferMin: 3,
+      note: 'Metro Line 13 — Niirado Tagawae' },
+  ],
+  M711: [
+    { code: 'M1732', network: 'metro', transferMin: 3,
+      note: 'Metro Line 17 — Wikkaman' },
   ],
   M712: [
     { code: 'M623', network: 'metro', transferMin: 3,
@@ -89,6 +107,16 @@ const M7_INTERCHANGE = {
     { code: 'M509', network: 'metro', transferMin: 3,
       note: 'Metro Line 5 — Riihisano' },
   ],
+  M715: [
+    { code: 'M1318', network: 'metro', transferMin: 3,
+      note: 'Metro Line 13 — Tsuruna Eigandan' },
+  ],
+  M717: [
+    { code: 'AX20', network: 'ax', transferMin: 5,
+      note: 'Eigandan Senpyan — Airport Express' },
+    { code: 'TS19', network: 'suburban', transferMin: 5,
+      note: 'Eigandan Senpyan — TS line' },
+  ],
   M718: [
     { code: 'M1113', network: 'metro', transferMin: 3,
       note: 'Metro Line 11 — Ushiuruma' },
@@ -97,9 +125,29 @@ const M7_INTERCHANGE = {
     { code: 'M503', network: 'metro', transferMin: 3,
       note: 'Metro Line 5 — Konegisa Eigandan' },
   ],
+  M721: [
+    { code: 'M1525', network: 'metro', transferMin: 3,
+      note: 'Metro Line 15 — Sakamuso' },
+    { code: 'SK38', network: 'suburban', transferMin: 4,
+      note: 'Sakamuso — Seishaku Line' },
+  ],
+  M722: [
+    { code: 'SK39', network: 'suburban', transferMin: 4,
+      note: 'Kashiwaka — Seishaku Line' },
+  ],
+  M723: [
+    { code: 'SK40', network: 'suburban', transferMin: 4,
+      note: 'Togamiro — Seishaku Line' },
+  ],
   M725: [
     { code: 'M1116', network: 'metro', transferMin: 3,
       note: 'Metro Line 11 — Shutazai' },
+    { code: 'TS20', network: 'suburban', transferMin: 4,
+      note: 'Shutazai — TS line' },
+  ],
+  M726: [
+    { code: 'M1321', network: 'metro', transferMin: 3,
+      note: 'Metro Line 13 — Sanbonzayo' },
   ],
   M728: [
     { code: 'M513', network: 'metro', transferMin: 3,

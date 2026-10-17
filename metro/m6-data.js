@@ -7,7 +7,7 @@
    Interscambi principali:
      M601 Nari-Gotsurindai         — M1801
      M602 Norihoi                  — M1802
-     M606 Assemikori               — M16??, M17?? (TBD)
+     M606 Assemikori               — M1718, M16?? (TBD)
      M608 Ishitsuma                — M804
      M609 Abawauri                 — M416
      M610 Shimamera                — M417, AX05, M203, TS14
@@ -19,9 +19,9 @@
      M616 Ipporai - Konegisa       — M423
      M617 Ipporai - Owonideki      — M424, M1110
      M618 Ipporai-Senpyan          — M425, TS18
-     M620 Otsumi-Nawadae           — M1315
+     M620 Otsumi-Nawadae           — M1316
      M623 Ezaesomu                 — M712
-     M625 Niji-Urenosomi           — M17?? (TBD)
+     M625 Niji-Urenosomi           — M1516
      M628 Kōtō Satahappi           — KD41
      M631 Pankyō-Nari              — (no interchange listed)
      M635 Panatsawa                — K120
@@ -104,9 +104,10 @@ const M6_INTERCHANGE = {
       note: 'Kiranne — KW line' },
   ],
   M606: [
-    // M16 e M17: codici stazione TBD
+    { code: 'M1718', network: 'metro',    transferMin: 3,
+      note: 'Assemikori — M17 line' },
+    // M16: codice stazione TBD
     // { code: 'M16XX', network: 'metro', transferMin: 3, note: 'Assemikori — M16 line (TBD)' },
-    // { code: 'M17XX', network: 'metro', transferMin: 3, note: 'Assemikori — M17 line (TBD)' },
   ],
   M608: [
     { code: 'M804',  network: 'metro',    transferMin: 3,
@@ -181,7 +182,7 @@ const M6_INTERCHANGE = {
       note: 'Ipporai-Senpyan — TS line' },
   ],
   M620: [
-    { code: 'M1315', network: 'metro',    transferMin: 3,
+    { code: 'M1316', network: 'metro',    transferMin: 3,
       note: 'Otsumi-Nawadae — M13 line' },
   ],
   M623: [
@@ -189,8 +190,8 @@ const M6_INTERCHANGE = {
       note: 'Ezaesomu — M7 line' },
   ],
   M625: [
-    // M17: codice stazione TBD
-    // { code: 'M17XX', network: 'metro', transferMin: 3, note: 'Niji-Urenosomi — M17 line (TBD)' },
+    { code: 'M1516', network: 'metro',    transferMin: 3,
+      note: 'Niji-Urenosomi — M15 line' },
   ],
   M628: [
     { code: 'KD41',  network: 'suburban', transferMin: 4,
