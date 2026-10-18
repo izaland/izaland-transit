@@ -4,38 +4,82 @@
    Capolinea: CO01 Oitsura ↔ CO41 Chikawari
    58.32 km · 41 stazioni (CO01–CO41)
 
-   Servizi (formato ri-data.js / ks-data.js):
-     CO1  Local  CO01 ↔ CO41  tutte le fermate
+   Per i passeggeri è un unico servizio; internamente la linea
+   è percorsa da tre servizi (S1 non opera su CO):
+     S2  CO01 ↔ CO41  tutte le fermate  3 tph tutto il giorno (20 min)
+     S3  CO01 ↔ CO08  tutte le fermate  2 tph solo in punta (30 min)
+     S4  CO24 ↔ CO41  tutte le fermate  2 tph solo in punta (30 min)
+   Frequenza effettiva in punta: CO01–CO08 e CO24–CO41 5 tph (~12 min);
+   CO08–CO24 3 tph (20 min).
 
    Interscambi RI ↔ CO (stesse stazioni, stessi nodeId):
      CO28 Eikunna ↔ RI05 · CO29 Tsurunarikki ↔ RI04 · CO30 Tsaibako ↔ RI03
      CO31 Shin-Tsuruna ↔ RI02 · CO32 Riimibaiken ↔ RI01
 
-   TODO: servizi, prima/ultima corsa, fasce di punta e headway sono
-         PROVVISORI (copiati dallo schema RI), da sostituire con i dati reali.
+   NOTA: la linea sarà estesa prima di CO01 e dopo CO41; i capolinea
+         dei servizi S2/S3/S4 andranno rivisti.
+   TODO: prima/ultima corsa e fasce di punta sono PROVVISORI
+         (fasce copiate dallo schema RI), da confermare.
    TODO: nameJa, kanji mancanti (CO02, CO04, CO25, CO38).
    TODO: interscambi reciproci in suburban-data.js.
 ================================================================ */
 'use strict';
 
 const CO_SERVICES = [
+  /* ---- S2 — tutto il giorno, 3 tph ---- */
   {
-    id: 'CO1', desc: 'Local', fromCode: 'CO01', toCode: 'CO41',
-    headway: 15, stops: [],
+    id: 'S2', desc: 'Local', fromCode: 'CO01', toCode: 'CO41',
+    headway: 20, stops: [],
     firstDep: '05:00', lastDep: '23:30',
-    peakWindows: [
-      { from: '07:00', to: '09:30', headway: 10 },
-      { from: '17:00', to: '20:00', headway: 10 },
-    ],
   },
   {
-    id: 'CO1', desc: 'Local', fromCode: 'CO41', toCode: 'CO01',
-    headway: 15, stops: [],
+    id: 'S2', desc: 'Local', fromCode: 'CO41', toCode: 'CO01',
+    headway: 20, stops: [],
     firstDep: '05:00', lastDep: '23:30',
-    peakWindows: [
-      { from: '07:00', to: '09:30', headway: 10 },
-      { from: '17:00', to: '20:00', headway: 10 },
-    ],
+  },
+
+  /* ---- S3 — CO01 ↔ CO08, 2 tph solo in punta ---- */
+  {
+    id: 'S3', desc: 'Local (punta)', fromCode: 'CO01', toCode: 'CO08',
+    headway: 30, stops: [],
+    firstDep: '07:00', lastDep: '09:30',
+  },
+  {
+    id: 'S3', desc: 'Local (punta)', fromCode: 'CO01', toCode: 'CO08',
+    headway: 30, stops: [],
+    firstDep: '17:00', lastDep: '20:00',
+  },
+  {
+    id: 'S3', desc: 'Local (punta)', fromCode: 'CO08', toCode: 'CO01',
+    headway: 30, stops: [],
+    firstDep: '07:00', lastDep: '09:30',
+  },
+  {
+    id: 'S3', desc: 'Local (punta)', fromCode: 'CO08', toCode: 'CO01',
+    headway: 30, stops: [],
+    firstDep: '17:00', lastDep: '20:00',
+  },
+
+  /* ---- S4 — CO24 ↔ CO41, 2 tph solo in punta ---- */
+  {
+    id: 'S4', desc: 'Local (punta)', fromCode: 'CO24', toCode: 'CO41',
+    headway: 30, stops: [],
+    firstDep: '07:00', lastDep: '09:30',
+  },
+  {
+    id: 'S4', desc: 'Local (punta)', fromCode: 'CO24', toCode: 'CO41',
+    headway: 30, stops: [],
+    firstDep: '17:00', lastDep: '20:00',
+  },
+  {
+    id: 'S4', desc: 'Local (punta)', fromCode: 'CO41', toCode: 'CO24',
+    headway: 30, stops: [],
+    firstDep: '07:00', lastDep: '09:30',
+  },
+  {
+    id: 'S4', desc: 'Local (punta)', fromCode: 'CO41', toCode: 'CO24',
+    headway: 30, stops: [],
+    firstDep: '17:00', lastDep: '20:00',
   },
 ];
 
@@ -45,8 +89,8 @@ const CO_META = {
   nameJa: '',                 // TODO
   color: '#FF3333',
   circular: false,
-  headwayPeak: 10,
-  headwayOffPeak: 15,
+  headwayPeak: 12,            // CO01–CO08 e CO24–CO41 (5 tph); CO08–CO24: 20 min
+  headwayOffPeak: 20,         // 3 tph (S2) su tutta la linea
   totalKm: 58.32,
 };
 
