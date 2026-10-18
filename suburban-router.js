@@ -174,9 +174,12 @@
      ritorna alla stazione di partenza del journey.
 
    Tempi di trasferimento:
-     TRANSFER_MIN            3 min  — interscambio suburban ↔ suburban (stazione normale)
-     HUB_TRANSFER_MIN        8 min  — interscambio suburban ↔ suburban (grande nodo)
-     CROSS_TRANSFER_MIN     10 min  — interscambio suburbana ↔ IZX/AX/Metro
+     TRANSFER_MIN            2 min  — interscambio suburban ↔ suburban (regola generale)
+     BUSY_TRANSFER_MIN       3 min  — idem, se la stazione ha più di 3 linee suburbane
+     HUB_TRANSFER_MIN        5 min  — idem, se la stazione ha più di 5 linee suburbane
+     CROSS_TRANSFER_MIN      5 min  — interscambio suburbana ↔ IZX/AX/Metro
+     (ogni valore è sovrascrivibile con { code, transferMin } in SUBURBAN_INTERCHANGE;
+      le linee si contano sull'intero gruppo di stazioni collegate in SUBURBAN_INTERCHANGE)
      METRO_TRANSFER_MIN      5 min  — interscambio Metro ↔ Metro (riserva; oggi gestito in MetroRouter)
      THRU_TRANSFER_MIN       2 min  — thru-service KW↔Metro (solo cambio operatore)
      INTRA_TRANSFER_SEC      0 sec  — same-platform intra-line (Rapid→Local KW)
@@ -193,9 +196,12 @@
 
 const SuburbanRouter = (() => {
 
-  const TRANSFER_MIN        = 3;
-  const HUB_TRANSFER_MIN    = 8;   // grande nodo di scambio suburban↔suburban
-  const CROSS_TRANSFER_MIN  = 10;
+  const TRANSFER_MIN        = 2;   // regola generale suburban↔suburban
+  const BUSY_TRANSFER_MIN   = 3;   // stazione con più di BUSY_LINES linee
+  const HUB_TRANSFER_MIN    = 5;   // stazione con più di HUB_LINES linee
+  const BUSY_LINES          = 3;
+  const HUB_LINES           = 5;
+  const CROSS_TRANSFER_MIN  = 5;   // suburbana ↔ IZX/AX/Metro (override con transferMin)
   const METRO_TRANSFER_MIN  = 5;   // metro↔metro (riserva; oggi gestito in MetroRouter)
   const THRU_TRANSFER_MIN   = 2;   // thru-service: cambio operatore senza scendere
   const TRANSFER_SEC        = TRANSFER_MIN       * 60;
@@ -367,22 +373,59 @@ const SuburbanRouter = (() => {
   /* ----------------------------------------------------------------
    * _subTransferSec(nodeCode, partnerCode)
    * ---------------------------------------------------------------- */
+  function _explicitTransferSec(nodeCode, partnerCode) {
+    for (const [a, b] of [[nodeCode, partnerCode], [partnerCode, nodeCode]]) {
+      const list = SUBURBAN_INTERCHANGE[a];
+      if (!list) continue;
+      for (const p of list) {
+        if (typeof p === 'object' && p !== null && p.code === b && p.transferMin != null)
+          return p.transferMin * 60;
+      }
+    }
+    return null;
+  }
+
+  /* Numero di linee suburbane distinte nel gruppo di stazioni collegate a `code`. */
+  let _lineOfCode = null;
+  function _lineCountAt(code) {
+    if (!_lineOfCode) {
+      _lineOfCode = {};
+      for (const line of Object.values(SUBURBAN_LINES))
+        for (const st of line.stations) _lineOfCode[st.code] = line.id;
+    }
+    const map = _getSuburbanPartnerMap();
+    const seen = new Set([code]);
+    const queue = [code];
+    while (queue.length) {
+      const c = queue.pop();
+      for (const n of (map[c] || [])) if (!seen.has(n)) { seen.add(n); queue.push(n); }
+    }
+    const lines = new Set();
+    for (const c of seen) if (_lineOfCode[c]) lines.add(_lineOfCode[c]);
+    return lines.size;
+  }
+
+  /* Cambio suburban ↔ suburban: override → regola per numero di linee. */
   function _subTransferSec(nodeCode, partnerCode) {
-    const partnersA = SUBURBAN_INTERCHANGE[nodeCode];
-    if (partnersA) {
-      for (const p of partnersA) {
-        if (typeof p === 'object' && p !== null && p.code === partnerCode && p.transferMin != null)
-          return p.transferMin * 60;
-      }
-    }
-    const partnersB = SUBURBAN_INTERCHANGE[partnerCode];
-    if (partnersB) {
-      for (const p of partnersB) {
-        if (typeof p === 'object' && p !== null && p.code === nodeCode && p.transferMin != null)
-          return p.transferMin * 60;
-      }
-    }
+    const ex = _explicitTransferSec(nodeCode, partnerCode);
+    if (ex !== null) return ex;
+    const n = _lineCountAt(nodeCode);
+    if (n > HUB_LINES)  return HUB_TRANSFER_MIN  * 60;
+    if (n > BUSY_LINES) return BUSY_TRANSFER_MIN * 60;
     return TRANSFER_SEC;
+  }
+
+  /* Cambio suburbana ↔ IZX/AX/Metro: override → CROSS_TRANSFER_MIN. */
+  function _crossSec(subCode, otherCode) {
+    return _explicitTransferSec(subCode, otherCode) ?? CROSS_TRANSFER_SEC;
+  }
+
+  /* minuti a piedi tra due codici (usato anche da UnifiedRouter) */
+  function transferMin(codeA, codeB) {
+    const subs = _getSuburbanCodeSet();
+    const sec = subs.has(codeA) && subs.has(codeB)
+      ? _subTransferSec(codeA, codeB) : _crossSec(codeA, codeB);
+    return sec / 60;
   }
 
   let _inverseMap = null;
@@ -966,10 +1009,11 @@ if (!directOnly) {
           if (iMid === -1 || iMid === iF) continue;
           const leg1 = _buildLeg(line, iF, iMid, depSec);
           if (!leg1) continue;
-          const transferReadySec = leg1.alightArrSec + CROSS_TRANSFER_SEC;
           for (const p of izxPartners) {
             const izxNode = (typeof p === 'object' && p !== null) ? p.code : p;
             if (_isMetroCode(izxNode)) continue;
+            const xferSec = _crossSec(subNode.code, izxNode);
+            const transferReadySec = leg1.alightArrSec + xferSec;
             for (const [lineId2, line2] of Object.entries(IZX_LINES)) {
               if (!line2.ST[izxNode] || !line2.ST[to]) continue;
               for (const svcId2 of Object.keys(line2.SVC)) {
@@ -983,7 +1027,8 @@ if (!directOnly) {
                   legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
                   totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
                   totalKm, transfers: 1, transferNodes: [subNode.code],
-                  transferWaitMin: Math.round(waitSec / 60),
+                  transferWalkMin: xferSec / 60,
+                  transferWaitMin: Math.max(0, Math.round((waitSec - xferSec) / 60)),
                 });
               }
             }
@@ -1012,7 +1057,7 @@ if (!directOnly) {
           if (!leg1) continue;
           for (const metroNode of metroPartners) {
             const isThru = _isThruNode(subNode.code, metroNode);
-            const xferSec = isThru ? THRU_TRANSFER_SEC : CROSS_TRANSFER_SEC;
+            const xferSec = isThru ? THRU_TRANSFER_SEC : _crossSec(subNode.code, metroNode);
             const transferReadySec = leg1.alightArrSec + xferSec;
             const _mResult2 = MetroRouter.buildMultiLeg?.(metroNode, to, transferReadySec);
             if (!_mResult2) continue;
@@ -1025,7 +1070,8 @@ if (!directOnly) {
               legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
               totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
               totalKm, transfers: 1, transferNodes: [metroNode],
-              transferWaitMin: Math.round(waitSec / 60),
+              transferWalkMin: isThru ? 0 : xferSec / 60,
+              transferWaitMin: Math.max(0, Math.round((waitSec - (isThru ? 0 : xferSec)) / 60)),
               thruService: isThru,
               thruNode: isThru ? subNode.code : undefined,
             });
@@ -1055,7 +1101,8 @@ if (!directOnly) {
                 if (!line1.TT[svcId1]) continue;
                 const leg1 = IZXRouter.buildLeg?.(lineId1, svcId1, from, izxNode, depSec);
                 if (!leg1) continue;
-                const transferReadySec = leg1.alightArrSec + CROSS_TRANSFER_SEC;
+                const xferSec = _crossSec(subNode.code, izxNode);
+                const transferReadySec = leg1.alightArrSec + xferSec;
                 const leg2 = _buildLeg(line, iMid, iT, transferReadySec);
                 if (!leg2) continue;
                 if (_hasLoop([leg1, leg2])) continue;
@@ -1065,7 +1112,8 @@ if (!directOnly) {
                   legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
                   totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
                   totalKm, transfers: 1, transferNodes: [izxNode],
-                  transferWaitMin: Math.round(waitSec / 60),
+                  transferWalkMin: xferSec / 60,
+                  transferWaitMin: Math.max(0, Math.round((waitSec - xferSec) / 60)),
                 });
               }
             }
@@ -1096,7 +1144,7 @@ if (!directOnly) {
             const leg1 = _mResult1.legs.at(-1);
             if (!leg1) continue;
             const isThru = _isThruNode(subNode.code, metroNode);
-            const xferSec = isThru ? THRU_TRANSFER_SEC : CROSS_TRANSFER_SEC;
+            const xferSec = isThru ? THRU_TRANSFER_SEC : _crossSec(subNode.code, metroNode);
             const transferReadySec = leg1.alightArrSec + xferSec;
             const leg2 = _buildLeg(line, iMid, iT, transferReadySec);
             if (!leg2) continue;
@@ -1107,7 +1155,8 @@ if (!directOnly) {
               legs: [leg1, leg2], departureTime: leg1.boardDep, arrivalTime: leg2.alightArr,
               totalMinutes: Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
               totalKm, transfers: 1, transferNodes: [metroNode],
-              transferWaitMin: Math.round(waitSec / 60),
+              transferWalkMin: isThru ? 0 : xferSec / 60,
+              transferWaitMin: Math.max(0, Math.round((waitSec - (isThru ? 0 : xferSec)) / 60)),
               thruService: isThru,
               thruNode: isThru ? subNode.code : undefined,
             });
@@ -1140,10 +1189,9 @@ if (!directOnly) {
       if (!legs1.length) continue;
 
       for (const leg1 of legs1) {
-        const xferSec = _subTransferSec(subNode.code, partners[0]);
-        const transferReadySec = leg1.alightArrSec + xferSec;
-
         for (const partnerCode of partners) {
+          const xferSec = _subTransferSec(subNode.code, partnerCode);
+          const transferReadySec = leg1.alightArrSec + xferSec;
           for (const line2 of Object.values(SUBURBAN_LINES)) {
             if (line2.id === line.id) continue;
             if (!line2.stations.length) continue;
@@ -1168,8 +1216,10 @@ if (!directOnly) {
   arrivalTime:   leg2.alightArr,
   totalMinutes:  Math.round((leg2.alightArrSec - leg1.boardDepSec) / 60),
   totalKm, transfers: 1, transferNodes: [subNode.code],
-  transferWalkMin: leg1.lineId === leg2.lineId ? 0 : undefined,
-  transferWaitMin: Math.round(waitSec / 60),
+  transferWalkMin: leg1.lineId === leg2.lineId ? 0 : xferSec / 60,
+  transferWaitMin: leg1.lineId === leg2.lineId
+    ? Math.round(waitSec / 60)
+    : Math.max(0, Math.round((waitSec - xferSec) / 60)),
 });
             }
           }
@@ -1290,6 +1340,7 @@ if (!directOnly) {
     buildLeg,
     register,
     TRANSFER_MIN,
+    transferMin,
   };
 
 })();
