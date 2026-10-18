@@ -39,6 +39,13 @@ const _JD_JD1_STOPS_NB = [..._JD_JD1_STOPS_SB].reverse();
 /* ================================================================
    JD_TT_SERVICES — formato compatibile con SuburbanRouter _svcTrips()
 ================================================================ */
+/* Profilo cinematico (FIX 14): tetto 160 km/h, accelerazione/frenata (km/h al secondo)
+   e sosta tarate per ~18 min su Oitsura → Igattarun Juwon (3 fermate). */
+const JD_VMAX_KMH   = 160;
+const JD_ACCEL_KMHS = 1.0;
+const JD_DECEL_KMHS = 1.2;
+const JD_DWELL_SEC  = 20;
+
 const JD_TT_SERVICES = [
   /* ----------------------------------------------------------------
      JD1 — Servizio base tutto il giorno
@@ -52,6 +59,10 @@ const JD_TT_SERVICES = [
     lastDep:  '23:42',
     headway:  8,
     stops:    _JD_JD1_STOPS_SB,
+    vMaxKmh:  JD_VMAX_KMH,
+    accelKmhPerSec: JD_ACCEL_KMHS,
+    decelKmhPerSec: JD_DECEL_KMHS,
+    dwellSec: JD_DWELL_SEC,
   },
   {
     id:       'JD1_NB',
@@ -62,6 +73,10 @@ const JD_TT_SERVICES = [
     lastDep:  '23:42',
     headway:  8,
     stops:    _JD_JD1_STOPS_NB,
+    vMaxKmh:  JD_VMAX_KMH,
+    accelKmhPerSec: JD_ACCEL_KMHS,
+    decelKmhPerSec: JD_DECEL_KMHS,
+    dwellSec: JD_DWELL_SEC,
   },
 
   /* ----------------------------------------------------------------
@@ -78,6 +93,10 @@ const JD_TT_SERVICES = [
     lastDep:  '09:35',
     headway:  15,
     stops:    _JD_JD1_STOPS_NB,
+    vMaxKmh:  JD_VMAX_KMH,
+    accelKmhPerSec: JD_ACCEL_KMHS,
+    decelKmhPerSec: JD_DECEL_KMHS,
+    dwellSec: JD_DWELL_SEC,
   },
 
   /* ----------------------------------------------------------------
@@ -94,6 +113,10 @@ const JD_TT_SERVICES = [
     lastDep:  '20:10',
     headway:  15,
     stops:    _JD_JD1_STOPS_SB,
+    vMaxKmh:  JD_VMAX_KMH,
+    accelKmhPerSec: JD_ACCEL_KMHS,
+    decelKmhPerSec: JD_DECEL_KMHS,
+    dwellSec: JD_DWELL_SEC,
   },
 
   /*
@@ -107,7 +130,7 @@ const JD_TT_SERVICES = [
     firstDep: 'HH:MM',
     lastDep:  'HH:MM',
     headway:  16,
-    stops:    ['JD01', /* fermate selezionate */ 'JD25'],
+    stops:    ['JD01', 'JD25']  // fermate selezionate,
   },
   {
     id:       'JD2_NB',
@@ -117,7 +140,7 @@ const JD_TT_SERVICES = [
     firstDep: 'HH:MM',
     lastDep:  'HH:MM',
     headway:  16,
-    stops:    ['JD25', /* fermate selezionate */ 'JD01'],
+    stops:    ['JD25', 'JD01']  // fermate selezionate,
   },
   */
 ];
