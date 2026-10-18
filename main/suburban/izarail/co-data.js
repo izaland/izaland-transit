@@ -1,24 +1,28 @@
 /* ================================================================
    CO-DATA.JS — Chikaoi Line
    ================================================================
-   Capolinea fisici: CO73 Tsutaru ↔ CO41 Chikawari (servizi S2/S3/S4 ancora CO01–CO41)
-   90.68 km · 56 stazioni (CO59–CO73 a nord di CO01 + CO01–CO41)
-   Numerazione: CO42–CO58 non assegnati. Km progressivi da CO73 (km 0.00).
+   Capolinea fisici: CO73 Tsutaru ↔ CO58 Tsukuwa
+   143.48 km · 73 stazioni (CO59–CO73 a nord di CO01, CO01–CO41, CO42–CO58 a sud)
+   Km progressivi da CO73 (km 0.00).
 
    Per i passeggeri è un unico servizio; internamente la linea
-   è percorsa da tre servizi (S1 non opera su CO):
+   è percorsa da quattro servizi:
+     S1  CO73 ↔ CO58  tutte le fermate  3 tph solo in punta (20 min)
      S2  CO01 ↔ CO41  tutte le fermate  3 tph tutto il giorno (20 min)
-     S3  CO01 ↔ CO08  tutte le fermate  2 tph solo in punta (30 min)
-     S4  CO24 ↔ CO41  tutte le fermate  2 tph solo in punta (30 min)
-   Frequenza effettiva in punta: CO01–CO08 e CO24–CO41 5 tph (~12 min);
-   CO08–CO24 3 tph (20 min).
+     S3  CO73 ↔ CO08  tutte le fermate  2 tph solo in punta (30 min)
+     S4  CO24 ↔ CO58  tutte le fermate  2 tph solo in punta (30 min)
+   Frequenza effettiva in punta (S1+S2+S3+S4):
+     CO73–CO01 5 tph · CO01–CO08 8 tph · CO08–CO24 6 tph · CO24–CO41 8 tph
+     CO41–CO58 5 tph.
+   Fuori punta: solo S2 (CO01–CO41, 3 tph); CO73–CO01 e CO41–CO58 senza servizio.
+   Interscambio con IZX Keishin: CO55 ↔ K04 (solo lato CO).
 
    Interscambi RI ↔ CO (stesse stazioni, stessi nodeId):
      CO28 Eikunna ↔ RI05 · CO29 Tsurunarikki ↔ RI04 · CO30 Tsaibako ↔ RI03
      CO31 Shin-Tsuruna ↔ RI02 · CO32 Riimibaiken ↔ RI01
 
-   NOTA: tratto nord CO59–CO73 aggiunto (parallelo alla JD); la linea sarà estesa ancora dopo CO41; i capolinea
-         dei servizi S2/S3/S4 andranno rivisti.
+   NOTA: tratto nord CO59–CO73 aggiunto (parallelo alla JD);
+         tratto sud CO42–CO58 aggiunto. Capolinea dei servizi da rivedere.
    TODO: prima/ultima corsa e fasce di punta sono PROVVISORI
          (fasce copiate dallo schema RI), da confermare.
    TODO: nameJa, kanji mancanti (CO02, CO04, CO25, CO38).
@@ -27,6 +31,28 @@
 'use strict';
 
 const CO_SERVICES = [
+  /* ---- S1 — CO73 ↔ CO58, 3 tph solo in punta ---- */
+  {
+    id: 'S1', desc: 'Local (punta)', fromCode: 'CO73', toCode: 'CO58',
+    headway: 20, stops: [],
+    firstDep: '07:00', lastDep: '09:30',
+  },
+  {
+    id: 'S1', desc: 'Local (punta)', fromCode: 'CO73', toCode: 'CO58',
+    headway: 20, stops: [],
+    firstDep: '17:00', lastDep: '20:00',
+  },
+  {
+    id: 'S1', desc: 'Local (punta)', fromCode: 'CO58', toCode: 'CO73',
+    headway: 20, stops: [],
+    firstDep: '07:00', lastDep: '09:30',
+  },
+  {
+    id: 'S1', desc: 'Local (punta)', fromCode: 'CO58', toCode: 'CO73',
+    headway: 20, stops: [],
+    firstDep: '17:00', lastDep: '20:00',
+  },
+
   /* ---- S2 — tutto il giorno, 3 tph ---- */
   {
     id: 'S2', desc: 'Local', fromCode: 'CO01', toCode: 'CO41',
@@ -39,46 +65,46 @@ const CO_SERVICES = [
     firstDep: '05:00', lastDep: '23:30',
   },
 
-  /* ---- S3 — CO01 ↔ CO08, 2 tph solo in punta ---- */
+  /* ---- S3 — CO73 ↔ CO08, 2 tph solo in punta ---- */
   {
-    id: 'S3', desc: 'Local (punta)', fromCode: 'CO01', toCode: 'CO08',
+    id: 'S3', desc: 'Local (punta)', fromCode: 'CO73', toCode: 'CO08',
     headway: 30, stops: [],
     firstDep: '07:00', lastDep: '09:30',
   },
   {
-    id: 'S3', desc: 'Local (punta)', fromCode: 'CO01', toCode: 'CO08',
+    id: 'S3', desc: 'Local (punta)', fromCode: 'CO73', toCode: 'CO08',
     headway: 30, stops: [],
     firstDep: '17:00', lastDep: '20:00',
   },
   {
-    id: 'S3', desc: 'Local (punta)', fromCode: 'CO08', toCode: 'CO01',
+    id: 'S3', desc: 'Local (punta)', fromCode: 'CO08', toCode: 'CO73',
     headway: 30, stops: [],
     firstDep: '07:00', lastDep: '09:30',
   },
   {
-    id: 'S3', desc: 'Local (punta)', fromCode: 'CO08', toCode: 'CO01',
+    id: 'S3', desc: 'Local (punta)', fromCode: 'CO08', toCode: 'CO73',
     headway: 30, stops: [],
     firstDep: '17:00', lastDep: '20:00',
   },
 
-  /* ---- S4 — CO24 ↔ CO41, 2 tph solo in punta ---- */
+  /* ---- S4 — CO24 ↔ CO58, 2 tph solo in punta ---- */
   {
-    id: 'S4', desc: 'Local (punta)', fromCode: 'CO24', toCode: 'CO41',
+    id: 'S4', desc: 'Local (punta)', fromCode: 'CO24', toCode: 'CO58',
     headway: 30, stops: [],
     firstDep: '07:00', lastDep: '09:30',
   },
   {
-    id: 'S4', desc: 'Local (punta)', fromCode: 'CO24', toCode: 'CO41',
+    id: 'S4', desc: 'Local (punta)', fromCode: 'CO24', toCode: 'CO58',
     headway: 30, stops: [],
     firstDep: '17:00', lastDep: '20:00',
   },
   {
-    id: 'S4', desc: 'Local (punta)', fromCode: 'CO41', toCode: 'CO24',
+    id: 'S4', desc: 'Local (punta)', fromCode: 'CO58', toCode: 'CO24',
     headway: 30, stops: [],
     firstDep: '07:00', lastDep: '09:30',
   },
   {
-    id: 'S4', desc: 'Local (punta)', fromCode: 'CO41', toCode: 'CO24',
+    id: 'S4', desc: 'Local (punta)', fromCode: 'CO58', toCode: 'CO24',
     headway: 30, stops: [],
     firstDep: '17:00', lastDep: '20:00',
   },
@@ -90,9 +116,9 @@ const CO_META = {
   nameJa: '',                 // TODO
   color: '#FF3333',
   circular: false,
-  headwayPeak: 12,            // CO01–CO08 e CO24–CO41 (5 tph); CO08–CO24: 20 min
+  headwayPeak: 12,            // TODO: provvisorio — in punta varia per tratta (5–8 tph), vedi testata
   headwayOffPeak: 20,         // 3 tph (S2) su tutta la linea
-  totalKm: 90.68,
+  totalKm: 143.48,
 };
 
 const CO_STATIONS = [
@@ -152,6 +178,23 @@ const CO_STATIONS = [
   { code: 'CO39', name: 'Taikinda',         kanji: '台金太',       nodeId: 126754754, km:   85.36 },
   { code: 'CO40', name: 'Chikawari Mikawa', kanji: '宮祭ーー',     nodeId: 126754755, km:   88.27 },
   { code: 'CO41', name: 'Chikawari',        kanji: '宮祭',         nodeId: 354211990, km:   90.68 },
+  { code: 'CO42', name: 'Heikudān',    kanji: '兵駈堂',         nodeId: 354434437, km: 92.36 },
+  { code: 'CO43', name: 'Naesoya',     kanji: '春蘇谷',         nodeId: 126754756, km: 93.54 },
+  { code: 'CO44', name: 'Poritushi',   kanji: '—',           nodeId: 126754757, km: 96.61 },
+  { code: 'CO45', name: 'Hokabi',      kanji: '火加尾',         nodeId: 240561069, km: 98.33 },
+  { code: 'CO46', name: 'Sārisswae',   kanji: '川口',          nodeId: 126754758, km:  101.67 },
+  { code: 'CO47', name: 'Otsumi-Sakkudemo', kanji: '—',      nodeId: 240561513, km:  105.83 },
+  { code: 'CO48', name: 'Sakkudemo',   kanji: '—',           nodeId: 240561514, km:  108.42 },
+  { code: 'CO49', name: 'Shimurahi',   kanji: '—',           nodeId: 215372743, km:  117.23 },
+  { code: 'CO50', name: 'Nikahaki',    kanji: '—',           nodeId: 215660170, km:  120.96 },
+  { code: 'CO51', name: 'Aijoreko',    kanji: '—',           nodeId: 215372744, km:  123.14 },
+  { code: 'CO52', name: 'Irikodai',    kanji: '—',           nodeId: 251024232, km:  125.10 },
+  { code: 'CO53', name: 'Kayumanagi',  kanji: '—',           nodeId: 215372745, km:  127.24 },
+  { code: 'CO54', name: 'Otsumi-Hashimakori', kanji: '—',    nodeId: 126754764, km:  129.91 },
+  { code: 'CO55', name: 'Hashimakori-Juwon', kanji: '示万飯中央', nodeId: 126754765, km:  131.16 },
+  { code: 'CO56', name: 'Kotoname',    kanji: '—',           nodeId: 215108473, km:  136.52 },
+  { code: 'CO57', name: 'Tsukuwa Tadatsori', kanji: '黄凪多々投', nodeId: 126754767, km:  141.75 },
+  { code: 'CO58', name: 'Tsukuwa',     kanji: '黄凪',          nodeId: 126754769, km:  143.48 },
 ];
 
 const CO_INTERCHANGE = {
@@ -195,4 +238,5 @@ const CO_INTERCHANGE = {
   CO35: ['CK05'],
   CO36: ['CK04', 'AX02'],
   CO37: ['M1305', 'M1505'],
+  CO55: ['K04'],
 };
