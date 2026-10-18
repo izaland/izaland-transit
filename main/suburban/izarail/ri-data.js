@@ -71,14 +71,14 @@ const RI_META = {
 const RI_STATIONS = [
   { code: 'RI01',  name: 'Riimibaiken',        kanji: '𠝏卞',         nodeId: 126754745, km:   0.00 },
   { code: 'RI02',  name: 'Shin-Tsuruna',       kanji: '新鵺',         nodeId: 126754744, km:   1.48 },
-  { code: 'RI03',  name: 'Tsaibako',           kanji: '済鵫',         nodeId: 126754743, km:   2.58 },
+  { code: 'RI03',  name: 'Tsaibako',           kanji: '済鴫',         nodeId: 126754743, km:   2.58 },
   { code: 'RI04',  name: 'Tsurunarikki',       kanji: '鵺陸起',       nodeId: 126754742, km:   3.60 },
   { code: 'RI05',  name: 'Eikunna',            kanji: '栄勳那',       nodeId: 126754741, km:   4.76 },
   { code: 'RI06',  name: 'Zawahan Nojima',     kanji: '竊氾濃湧',     nodeId: 126754740, km:   5.76 },
   { code: 'RI07',  name: 'Choyarui',           kanji: '—',            nodeId: 123393748, km:   6.59 },
   { code: 'RI08',  name: 'Ipporai-Senpyan',    kanji: '一蒲崍船駢',   nodeId: 123393772, km:   8.08 },
   { code: 'RI09',  name: 'Sakanemoto',         kanji: '沛岬斗',       nodeId: 123393750, km:   9.60 },
-  { code: 'RI10',  name: 'Eigandan Senpyan',   kanji: '永玵段船駢',   nodeId: 123393771, km:  10.71 },
+  { code: 'RI10',  name: 'Eigandan Senpyan',   kanji: '永瀵段船駢',   nodeId: 123393771, km:  10.71 },
   { code: 'RI11',  name: 'Shiittaru Senpyan',  kanji: '—',            nodeId: 136187240, km:  11.68 },
   { code: 'RI12',  name: 'Senpyan - Murakami', kanji: '船駢門良釜',   nodeId: 136187239, km:  12.58 },
   { code: 'RI13',  name: 'Urenosomi Senpyan',  kanji: '—',            nodeId: 123393770, km:  13.29 },
@@ -113,11 +113,11 @@ const RI_STATIONS = [
 ];
 
 const RI_INTERCHANGE = {
-  RI01:  ['M705', 'CK08', 'AX03'],
-  RI02:  ['CK09'],
-  RI03:  ['CK10'],
-  RI04:  ['CK11'],
-  RI05:  ['CK12'],
+  RI01:  ['M705', 'CK08', 'AX03', 'CO32'],
+  RI02:  ['CK09', 'CO31'],
+  RI03:  ['CK10', 'CO30'],
+  RI04:  ['CK11', 'CO29'],
+  RI05:  ['CK12', 'CO28'],
   RI08:  ['M425', 'M618', 'TS18'],
   RI09:  ['M506'],
   RI10:  ['M717', 'TS19', 'AX20'],
