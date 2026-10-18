@@ -212,4 +212,42 @@
   margin-top:1px;
 }
 
-@media(max-width:640px){ .jp-nav-bar{flex-wrap:wrap;} }
+/* ── MOBILE ── (sostituisce: @media(max-width:640px){ .jp-nav-bar{flex-wrap:wrap;} }) */
+@media (max-width: 640px) {
+  .field-select, .field-input { font-size: 16px; min-height: 44px; width: 100%; max-width: 100%; text-overflow: ellipsis; }
+  .sim-row { display: grid; grid-template-columns: 1fr 44px; gap: var(--space-3); align-items: end; }
+  .sim-row .field-group:first-child { grid-column: 1; }
+  .sim-row .sim-swap { grid-column: 2; grid-row: 1; align-self: center; min-width: 44px; min-height: 44px; transform: rotate(90deg); }
+  .sim-row .field-group:last-child { grid-column: 1 / -1; }
+  .sim-options { display: grid; grid-template-columns: 1fr; gap: var(--space-3); }
+  .sim-btn { width: 100%; min-height: 48px; }
+  .toggle-track { width: 48px; height: 28px; }
+  .toggle-slider::before { width: 22px; height: 22px; }
+  .toggle-track input:checked + .toggle-slider::before { transform: translateX(20px); }
+  .toggle-label { font-size: .8rem; }
+
+  .journey-card { padding: var(--space-3) var(--space-4); }
+  .journey-times { font-size: var(--text-lg); }
+
+  .leg-row { display: grid; grid-template-columns: 1fr auto; gap: 2px var(--space-3); padding: 8px 0; }
+  .leg-svc { min-width: 0; grid-column: 1; flex-wrap: wrap; }
+  .leg-meta { grid-column: 2; grid-row: 1; justify-content: flex-end; }
+  .leg-times { min-width: 0; grid-column: 1 / -1; font-weight: 600; color: var(--text); }
+  .leg-stations { grid-column: 1 / -1; }
+  .leg-train { font-size: .75rem; }
+  .leg-km { font-size: .75rem; }
+  .leg-expand-btn { font-size: .78rem; min-height: 32px; padding: 4px 8px; }
+
+  .leg-intermediates { padding-left: var(--space-4); margin-left: 4px; }
+  .leg-int-row { font-size: .78rem; }
+  .leg-int-time { min-width: 96px; }
+  .transfer-row, .thru-row { padding-left: var(--space-4); margin-left: 8px; }
+  .transfer-time-label { font-size: .72rem; }
+
+  .jp-nav-bar { display: grid; grid-template-columns: 1fr 1fr; }
+  .jp-time-chip { grid-column: 1 / -1; grid-row: 1; padding-bottom: var(--space-1); }
+  .jp-nav-btn { justify-content: center; min-height: 44px; font-size: .8rem; }
+
+  .kw-svc-pill { font-size: .7rem; }
+  .journey-dur .transfer-badge { font-size: .75rem; }
+}
