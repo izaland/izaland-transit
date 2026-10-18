@@ -153,8 +153,20 @@
 
   const _ixIndex = {};
 
+  /* Default dei cambi senza override: suburbana↔suburbana → regola per numero
+     di linee (SuburbanRouter.transferMin); suburbana↔altra rete → 5 min;
+     altre combinazioni → CROSS_TRANSFER_MIN. */
+  const SUB_CROSS_TRANSFER_MIN = 5;
+  function _defaultTransferMin(codeA, codeB) {
+    const na = _netOfCode(codeA), nb = _netOfCode(codeB);
+    if (na === 'SUB' && nb === 'SUB' && typeof _routers.SUB?.transferMin === 'function')
+      return _routers.SUB.transferMin(codeA, codeB);
+    if (na === 'SUB' || nb === 'SUB') return SUB_CROSS_TRANSFER_MIN;
+    return CROSS_TRANSFER_MIN;
+  }
+
   function _add(codeA, codeB, transferMin) {
-    const t = transferMin ?? CROSS_TRANSFER_MIN;
+    const t = transferMin ?? _defaultTransferMin(codeA, codeB);
     if (!_ixIndex[codeA]) _ixIndex[codeA] = [];
     if (!_ixIndex[codeB]) _ixIndex[codeB] = [];
     if (!_ixIndex[codeA].some(e => e.code === codeB))
@@ -171,7 +183,7 @@
     }
     Object.entries(interchangeData).forEach(([stCode, partners]) => {
       const pArr = Array.isArray(partners) ? partners : [partners];
-      for (const b of pArr) _add(stCode, b.code ?? b, b.transferMin ?? CROSS_TRANSFER_MIN);
+      for (const b of pArr) _add(stCode, b.code ?? b, b.transferMin);
     });
   }
 
