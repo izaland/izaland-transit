@@ -17,17 +17,17 @@
      M317 Shakihori Sports Park              — M1004
      M318 Komayunden-Dōnmus Kōwen           — M1005, M824
      M319 Garotsu Lake                       — M1006
-     M320 Shin-Makurigawa                    — M1806
+     M320 Shin-Makurigawa                    — (nessuno)
      M321 Tsenduma                           — M17XX (TBD)
      M322 Shiitehongi                        — LL03, SK24, CK22
      M323 Ekinðuka                           — M403
-     M324 Rosemane                           — M1421, KD31, JD02
-     M325 Masuda Agarai                      — M118, M209, M913, M1413
-     M326 Kansāri                            — M1016, M1017, M1414, M1423
-     M327 Herubori                           — LL17, AX07, SX01, SB04, HC01, M1209, M1212
+     M324 Rosemane                           — M1421, KD31
+     M325 Masuda Agarai                      — M118, M913, M1413
+     M326 Kansāri                            — M1017, M1414
+     M327 Herubori                           — LL17, AX07, SX01, SB04, HC01, M1209
      M328 Amachi Kanlikoika                  — TD01
-     M329 Yunpotsai Soisuma                  — M1417, M1426, M1815
-     M330 Intsushitsa Kuyakujo               — M1211, M1214
+     M329 Yunpotsai Soisuma                  — M1417
+     M330 Intsushitsa Kuyakujo               — M1214
      M331 Shin-Tsaikikori                    — M916, M17XX (TBD), SB07
      M332 Ðaihate                            — M17XX (TBD)
      M334 Iyogateri                          — PF05
@@ -164,8 +164,6 @@ const M3_INTERCHANGE = {
       note: 'Garotsu Lake — M3 internal node' },
   ],
   M320: [
-    { code: 'M1806', network: 'metro', transferMin: 3,
-      note: 'Shin-Makurigawa — M18 line' },
   ],
   M321: [
     // M17XX — interscambio con M17, codice stazione TBD
@@ -188,28 +186,20 @@ const M3_INTERCHANGE = {
       note: 'Rosemane — M14 line' },
     { code: 'KD31',  network: 'suburban', transferMin: 4,
       note: 'Rosemane — Kidai Line' },
-    { code: 'JD02',  network: 'suburban', transferMin: 4,
-      note: 'Jōdai Line — Rosemane, stesso nome (node 146642920)' },
   ],
   M325: [
     { code: 'M118',  network: 'metro',    transferMin: 3,
       note: 'Masuda Agarai — M1 line' },
-    { code: 'M209',  network: 'metro',    transferMin: 9,
-      note: 'M2 Masuda Hibaru — stazione diversa, 400 m transfer corridor' },
     { code: 'M1413', network: 'metro',    transferMin: 3,
       note: 'Masuda Agarai — M14 line (M1413)' },
     { code: 'M913',  network: 'metro',    transferMin: 4,
       note: 'Masuda Agarai — M9 line (M913)' },
   ],
   M326: [
-    { code: 'M1016', network: 'metro', transferMin: 3,
-      note: 'Kansāri — M10 line (M1016)' },
     { code: 'M1414', network: 'metro', transferMin: 3,
       note: 'Kansāri — M14 line (M1414)' },
-    { code: 'M1423', network: 'metro', transferMin: 3,
-      note: 'Kansāri — M14 line' },
     { code: 'M1017', network: 'metro', transferMin: 3,
-      note: 'Kansāri — M3 internal node' },
+      note: 'Kansāri — M10 line (M1017)' },
   ],
   M327: [
     { code: 'LL17',  network: 'suburban', transferMin: 4,
@@ -224,8 +214,6 @@ const M3_INTERCHANGE = {
       note: 'Herubori — HC line' },
     { code: 'M1209', network: 'metro',    transferMin: 3,
       note: 'Herubori — M12 line' },
-    { code: 'M1212', network: 'metro',    transferMin: 3,
-      note: 'Herubori — M12 line (nuova numerazione M12)' },
   ],
   M328: [
     { code: 'TD01', network: 'suburban', transferMin: 4,
@@ -234,16 +222,10 @@ const M3_INTERCHANGE = {
   M329: [
     { code: 'M1417', network: 'metro', transferMin: 3,
       note: 'Yunpotsai Soisuma — M14 line (M1417)' },
-    { code: 'M1426', network: 'metro', transferMin: 3,
-      note: 'Yunpotsai Soisuma — M14 line' },
-    { code: 'M1815', network: 'metro', transferMin: 3,
-      note: 'Yunpotsai Soisuma — M18 line' },
   ],
   M330: [
-    { code: 'M1211', network: 'metro', transferMin: 3,
-      note: 'Intsushitsa Kuyakujo — M12 line' },
     { code: 'M1214', network: 'metro', transferMin: 3,
-      note: 'Intsushitsa Kuyakujo — M12 line (nuova numerazione M12)' },
+      note: 'Intsushitsa Kuyakujo — M12 line' },
   ],
   M331: [
     { code: 'M916', network: 'metro',    transferMin: 3,
