@@ -747,20 +747,20 @@ function _getEquivalentCodes(code) {
   /* ----------------------------------------------------------------
    * _buildLegsAllSvcs(line, iFrom, iTo, depSec)
    * ---------------------------------------------------------------- */
-  function _buildLegsAllSvcs(line, iFrom, iTo, depSec) {
-    const trips = _getTrips(line, iFrom, iTo, depSec);
-    if (!trips.length) return [];
-    const byId = new Map();
-    for (const trip of trips) {
-      if (!byId.has(trip.svcId)) byId.set(trip.svcId, trip);
-    }
-    const legs = [];
-    for (const trip of byId.values()) {
-      const leg = _buildLeg(line, iFrom, iTo, depSec, trip);
-      if (leg) legs.push(leg);
-    }
-    return legs;
+  function _buildLegsAllSvcs(line, iFrom, iTo, depSec, perSvc = 1) {
+  const trips = _getTrips(line, iFrom, iTo, depSec);
+  if (!trips.length) return [];
+  const count = new Map();
+  const legs = [];
+  for (const trip of trips) {
+    const n = count.get(trip.svcId) ?? 0;
+    if (n >= perSvc) continue;
+    count.set(trip.svcId, n + 1);
+    const leg = _buildLeg(line, iFrom, iTo, depSec, trip);
+    if (leg) legs.push(leg);
   }
+  return legs;
+}
 
   /* ----------------------------------------------------------------
    * _buildIntraLineTransfers(line, iFrom, iTo, depSec)   FIX 6+7+8
@@ -945,7 +945,7 @@ for (const line of Object.values(SUBURBAN_LINES)) {
       const iF = _idx(line, fCode);
       const iT = _idx(line, tCode);
       if (iF === -1 || iT === -1 || iF === iT) continue;
-      for (const leg of _buildLegsAllSvcs(line, iF, iT, depSec)) {
+      for (const leg of _buildLegsAllSvcs(line, iF, iT, depSec, 4)) {
         journeys.push({
           legs: [leg],
           departureTime: leg.boardDep,
