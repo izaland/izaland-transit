@@ -99,6 +99,7 @@
   <script src="metro/m7-data.js"></script>
   <script src="metro/m8-data.js"></script>
   <script src="metro/m9-data.js"></script>
+  <script src="metro/m10-data.js"></script>
   <script src="metro/m11-data.js"></script>
   <script src="metro/m12-data.js"></script>
   <script src="metro/m13-data.js"></script>
@@ -164,6 +165,8 @@
                typeof M8_META  !== 'undefined' ? M8_META  : undefined);
   addMetroLine(typeof M9_ST  !== 'undefined' ? M9_ST  : undefined,
                typeof M9_META  !== 'undefined' ? M9_META  : undefined);
+  addMetroLine(typeof M10_ST !== 'undefined' ? M10_ST : undefined,
+             typeof M10_META !== 'undefined' ? M10_META : undefined);
   addMetroLine(typeof M11_ST !== 'undefined' ? M11_ST : undefined,
                typeof M11_META !== 'undefined' ? M11_META : undefined);
   addMetroLine(typeof M12_ST !== 'undefined' ? M12_ST : undefined,
@@ -326,6 +329,7 @@
     ['M7',  typeof M7_INTERCHANGE  !== 'undefined' ? M7_INTERCHANGE  : null],
     ['M8',  typeof M8_INTERCHANGE  !== 'undefined' ? M8_INTERCHANGE  : null],
     ['M9',  typeof M9_INTERCHANGE  !== 'undefined' ? M9_INTERCHANGE  : null],
+    ['M10', typeof M9_INTERCHANGE  !== 'undefined' ? M9_INTERCHANGE  : null],
     ['M11', typeof M11_INTERCHANGE !== 'undefined' ? M11_INTERCHANGE : null],
     ['M12', typeof M12_INTERCHANGE !== 'undefined' ? M12_INTERCHANGE : null],
     ['M13', typeof M13_INTERCHANGE !== 'undefined' ? M13_INTERCHANGE : null],
@@ -343,7 +347,7 @@
     ['HD',       typeof HD_INTERCHANGE         !== 'undefined' ? HD_INTERCHANGE         : null],
     ['WI',       typeof WI_INTERCHANGE         !== 'undefined' ? WI_INTERCHANGE         : null],
     ['SHX',      typeof SHX_INTERCHANGE        !== 'undefined' ? SHX_INTERCHANGE        : null],
-    ['SSK', typeof SSK_INTERCHANGE !== 'undefined' ? SSK_INTERCHANGE : null],
+    ['SSK',      typeof SSK_INTERCHANGE        !== 'undefined' ? SSK_INTERCHANGE : null],
   ];
   const FLAT_IX = [];
   (function () {
