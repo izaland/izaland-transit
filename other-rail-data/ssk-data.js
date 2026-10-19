@@ -6,15 +6,13 @@
    Lunghezza : 14.02 km · 13 stazioni
 
    NOTE SUI DATI
-   - km = distanza progressiva indicata nel foglio dati ("total distance
-     from SSK1"): SSK01 = 2.01, SSK13 = 14.02 (valori riportati così
-     come forniti, senza ribasare a 0).
+   - km = distanza progressiva da SSK01 (SSK01 = 0.00).
    - SSK_INTERCHANGE: interscambi nella stessa stazione.
      M1026 (metro M10) non ha ancora un file dati: il codice è
      dichiarato ma il router lo ignora finché non esiste.
    - Sostituisce i codici provvisori SKS05/SKS07/SKS09 usati in
      shx-data.js (ora SSK06/SSK08/SSK10).
-   - Nessun servizio/orario ancora definito: SSK_SERVICES è vuoto.
+   - Orari: vedi ssk-tt.js.
 ================================================================ */
 'use strict';
 
@@ -47,7 +45,7 @@ const SSK_LINES = {
     totalKm:       14.02,
     totalStations: 13,
     stations: [
-      { code: 'SSK01', name: 'Kanui Airport T1',  kanji: '嘉枡空港T1',              km:  2.01 },  /* node 126497710 */
+      { code: 'SSK01', name: 'Kanui Airport T1',  kanji: '嘉枡空港T1',              km:  0.00 },  /* node 126497710 */
       { code: 'SSK02', name: 'Nari-Osenude',      kanji: '東防斉',                 km:  2.33 },  /* node 207757222 */
       { code: 'SSK03', name: 'Shin-Tsukaso',      kanji: '新鷸蘇',                 km:  2.95 },  /* node 126666498 */
       { code: 'SSK04', name: 'Kantsude',          kanji: '',                    km:  4.65 },  /* node 254515988 */
@@ -63,11 +61,6 @@ const SSK_LINES = {
     ],
   },
 };
-
-/* ----------------------------------------------------------------
-   SSK_SERVICES — da definire (tipologie di servizio, orari, frequenze)
----------------------------------------------------------------- */
-const SSK_SERVICES = [];
 
 /* ----------------------------------------------------------------
    MERGE in SUBURBAN_LINES e SUBURBAN_INTERCHANGE
