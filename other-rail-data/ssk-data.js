@@ -8,8 +8,7 @@
    NOTE SUI DATI
    - km = distanza progressiva da SSK01 (SSK01 = 0.00).
    - SSK_INTERCHANGE: interscambi nella stessa stazione.
-     M1026 (metro M10) non ha ancora un file dati: il codice è
-     dichiarato ma il router lo ignora finché non esiste.
+     SSK01 ↔ M1027 (metro M10, Kanui Airport T1).
    - Sostituisce i codici provvisori SKS05/SKS07/SKS09 usati in
      shx-data.js (ora SSK06/SSK08/SSK10).
    - Orari: vedi ssk-tt.js.
@@ -20,7 +19,7 @@
    SSK_INTERCHANGE — interscambi nella stessa stazione (tempo standard)
 ---------------------------------------------------------------- */
 const SSK_INTERCHANGE = {
-  SSK01: ['M1026'],
+  SSK01: ['M1027'],
   SSK03: ['M232'],
   SSK06: ['SHX08'],
   SSK08: ['SHX09'],
