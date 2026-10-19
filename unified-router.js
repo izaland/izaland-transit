@@ -44,6 +44,15 @@
        - Il journey ha transferThru[] (uno per cambio, allineato a
          transferNodes[]), transfers NON conta i thru, e
          thruService/thruNode sono impostati per la UI.
+
+   FIX 18 (array per-cambio allineati a transferNodes[]):
+     _buildJourney2/3 sovrascrivevano transferThru / transferWalkMin /
+     transferWaitMin con un solo elemento, scartando i cambi interni
+     dei leg gia' composti (es. KS -> KW dentro SuburbanRouter + thru
+     KW -> M8): l'indice 0 (Kawayatsu) riceveva il valore del cambio
+     successivo. Ora gli array dei sotto-journey vengono concatenati
+     (_xferArrays) e restano lunghi quanto transferNodes[]. La UI deve
+     usare transferThru[li] e non il flag globale thruService.
 ================================================================ */
 
 (function (root, factory) {
@@ -238,6 +247,26 @@
     return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
   }
 
+  /* FIX 18: array per-cambio di un sotto-journey, lunghi quanto
+     transferNodes[]. Se il sotto-journey non li espone (es. leg
+     interno di SuburbanRouter), thru ricade sul flag globale e
+     walk/wait restano null (la UI usa i propri default con ??). */
+  function _xferArrays(j) {
+    const n = (j.transferNodes || []).length;
+    const fill = v => Array.from({ length: n }, () => v);
+    const thru = (Array.isArray(j.transferThru) && j.transferThru.length === n)
+      ? j.transferThru.slice() : fill(!!j.thruService);
+    let walk;
+    if (Array.isArray(j.transferWalkMin) && j.transferWalkMin.length === n) walk = j.transferWalkMin.slice();
+    else if (typeof j.transferWalkMin === 'number') walk = fill(j.transferWalkMin);
+    else walk = fill(null);
+    let wait;
+    if (Array.isArray(j.transferWaitMin) && j.transferWaitMin.length === n) wait = j.transferWaitMin.slice();
+    else if (typeof j.transferWaitMin === 'number') wait = fill(null).map((_, i) => i === 0 ? j.transferWaitMin : null);
+    else wait = fill(null);
+    return { thru, walk, wait };
+  }
+
   function _buildJourney2(j1, j2, midCode, walkMin, thru) {
     const totalKm = (j1.totalKm != null && j2.totalKm != null)
       ? j1.totalKm + j2.totalKm : null;
@@ -246,13 +275,14 @@
       (_hmToSec(j2.departureTime) - _hmToSec(j1.arrivalTime)) / 60
     );
     const wtMin = Math.max(0, totalGapMin - wkMin);
+    const a = _xferArrays(j1), b = _xferArrays(j2);
+    const transferThru = [...a.thru, !!thru, ...b.thru];
     const thruFields = {};
-    if (thru) {
+    const thruIdx = transferThru.indexOf(true);
+    if (thruIdx !== -1 || j1.thruService || j2.thruService) {
+      const nodes = [...(j1.transferNodes || []), midCode, ...(j2.transferNodes || [])];
       thruFields.thruService = true;
-      thruFields.thruNode    = midCode;
-    } else if (j1.thruService) {
-      thruFields.thruService = true;
-      thruFields.thruNode    = j1.thruNode;
+      thruFields.thruNode    = thruIdx !== -1 ? nodes[thruIdx] : (j1.thruNode ?? j2.thruNode);
     }
     return {
       legs:              [...j1.legs, ...j2.legs],
@@ -262,9 +292,9 @@
       totalKm,
       transfers:         (j1.transfers + j2.transfers) + (thru ? 0 : 1),
       transferNodes:     [...(j1.transferNodes || []), midCode, ...(j2.transferNodes || [])],
-      transferThru:      [!!thru],
-      transferWalkMin:   [thru ? 0 : wkMin],
-      transferWaitMin:   [thru ? 0 : wtMin],
+      transferThru,
+      transferWalkMin:   [...a.walk, thru ? 0 : wkMin, ...b.walk],
+      transferWaitMin:   [...a.wait, thru ? 0 : wtMin, ...b.wait],
       ...thruFields,
     };
   }
@@ -276,7 +306,15 @@
     const wk2 = walkMin2 ?? CROSS_TRANSFER_MIN;
     const gap1 = Math.round((_hmToSec(j2.departureTime) - _hmToSec(j1.arrivalTime)) / 60);
     const gap2 = Math.round((_hmToSec(j3.departureTime) - _hmToSec(j2.arrivalTime)) / 60);
-    const thruAny = !!(thru1 || thru2);
+    const a = _xferArrays(j1), b = _xferArrays(j2), c = _xferArrays(j3);
+    const transferThru = [...a.thru, !!thru1, ...b.thru, !!thru2, ...c.thru];
+    const transferNodes = [
+      ...(j1.transferNodes || []), midCode1,
+      ...(j2.transferNodes || []), midCode2,
+      ...(j3.transferNodes || []),
+    ];
+    const thruIdx = transferThru.indexOf(true);
+    const thruAny = thruIdx !== -1 || !!(j1.thruService || j2.thruService || j3.thruService);
     return {
       legs:              [...j1.legs, ...j2.legs, ...j3.legs],
       departureTime:     j1.departureTime,
@@ -285,15 +323,11 @@
       totalKm,
       transfers:         (j1.transfers + j2.transfers + j3.transfers) + 2 - (thru1 ? 1 : 0) - (thru2 ? 1 : 0),
       thruService:       thruAny || undefined,
-      thruNode:          thruAny ? (thru1 ? midCode1 : midCode2) : undefined,
-      transferThru:      [!!thru1, !!thru2],
-      transferNodes:     [
-        ...(j1.transferNodes || []), midCode1,
-        ...(j2.transferNodes || []), midCode2,
-        ...(j3.transferNodes || []),
-      ],
-      transferWalkMin:   [thru1 ? 0 : wk1, thru2 ? 0 : wk2],
-      transferWaitMin:   [thru1 ? 0 : Math.max(0, gap1 - wk1), thru2 ? 0 : Math.max(0, gap2 - wk2)],
+      thruNode:          thruAny ? (thruIdx !== -1 ? transferNodes[thruIdx] : (j1.thruNode ?? j2.thruNode ?? j3.thruNode)) : undefined,
+      transferThru,
+      transferNodes,
+      transferWalkMin:   [...a.walk, thru1 ? 0 : wk1, ...b.walk, thru2 ? 0 : wk2, ...c.walk],
+      transferWaitMin:   [...a.wait, thru1 ? 0 : Math.max(0, gap1 - wk1), ...b.wait, thru2 ? 0 : Math.max(0, gap2 - wk2), ...c.wait],
     };
   }
 
