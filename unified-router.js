@@ -117,6 +117,7 @@
   const THRU_TOLERANCE_MIN = 3;   // gap max (min) tra arrivo e partenza per considerarlo thru
   const THRU_SERVICES = [
     { codes: ['M801', 'KW00'], stopSec: 90 },   // M8 <-> KW, Kishagoi-Exhibitown
+    { codes: ['M1027', 'SSK01'], stopSec: 90 },   // M10 <-> SSK, Kanui Airport T1
   ];
 
   function registerThruService(def) {
