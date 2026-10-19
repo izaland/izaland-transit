@@ -18,7 +18,7 @@
    M1001/M1006 sono calcolate a ritroso col modello cinematico (svc.kin).
 
    Verso M10 (S*_N): il treno SSK13→SSK01 arriva a SSK01 dopo
-   _SSK_RUN_SEC (19:19, da ssk-tt.js) e riparte da M1027 UN MINUTO
+   _M10_SSK_RUN_SEC (19:19, da ssk-tt.js) e riparte da M1027 UN MINUTO
    DOPO l'arrivo. Gli slot (k) sono gli stessi dell'andata, riferiti
    alla partenza da SSK13 (fasce SSK identiche nei due versi).
 
@@ -26,14 +26,17 @@
      punta        (10 slot, ogni 6 min)  S2: 0,2,3,5,7,8   S3: 1,4,6,9
      fuori punta  ( 6 slot, ogni 10 min) S2: 0,2,3,5       S3: 1,4
 
-   Le fasce SSK (_SSK_BANDS) replicano ssk-tt.js: aggiornarle insieme.
+   Le fasce (_M10_SSK_BANDS) replicano _SSK_BANDS di ssk-tt.js: aggiornarle
+   insieme. NB: i nomi hanno prefisso _M10_ perché gli script classici
+   condividono lo scope globale; un `const _SSK_BANDS` duplicato farebbe
+   fallire l'intero file (SyntaxError) e la linea non verrebbe registrata.
    Ogni slot è un servizio con headway 60 min e offsetMin frazionario
    (stessa tecnica di W2 in kw-tt.js). La finestra oraria è riferita
    all'orario di partenza dal capolinea M10 (M1001/M1006 o M1027).
 
    PARAMETRI PROVVISORI: vmax 100 km/h, accel/decel 1.0 m/s², sosta 20 s.
    Orari S1 (05:00–24:00, offset :05) provvisori.
-   _SSK_RUN_SEC = 1159 s (≈19:19, stima di ssk-tt.js): aggiornare se cambia.
+   _M10_SSK_RUN_SEC = 1159 s (≈19:19, stima di ssk-tt.js): aggiornare se cambia.
    Le partenze da M1027 oltre le 24:00 usano un secondo slot 00:00–xx:xx
    (il router confronta HH:MM come stringhe, vedi M8).
    Dipende da: m10-data.js. Caricato dopo m10-data.js nell'HTML.
@@ -43,10 +46,10 @@
 const _M10_KIN = { vmaxKmh: 100, accel: 1.0, decel: 1.0, dwellSec: 20 };
 const _M10_THRU_ARR_BEFORE_SSK_SEC = 60;   /* verso SSK: arrivo a M1027 = partenza SSK01 − 60 s */
 const _M10_THRU_DEP_AFTER_SSK_SEC  = 60;   /* verso M10: partenza M1027 = arrivo SSK01 + 60 s */
-const _SSK_RUN_SEC = 1159;                 /* SSK13 → SSK01 ≈ 19:19 */
+const _M10_SSK_RUN_SEC = 1159;             /* SSK13 → SSK01 ≈ 19:19 */
 
 /* Fasce SSK: [prima partenza da capolinea SSK, ultima partenza, headway min] */
-const _SSK_BANDS = [
+const _M10_SSK_BANDS = [
   ['05:00', '06:50', 10],
   ['07:00', '09:24',  6],
   ['09:30', '16:50', 10],
@@ -90,10 +93,10 @@ function _m10ThruServices(logical, name, origin, northbound) {
   const T = _m10RunSec(stops);
   /* secondi tra la partenza SSK di riferimento e la partenza dal capolinea M10 */
   const shift = northbound
-    ? _SSK_RUN_SEC + _M10_THRU_DEP_AFTER_SSK_SEC     /* M1027 dep = SSK13 dep + shift */
-    : -(_M10_THRU_ARR_BEFORE_SSK_SEC + T);           /* M1001/6 dep = SSK01 dep + shift */
+    ? _M10_SSK_RUN_SEC + _M10_THRU_DEP_AFTER_SSK_SEC     /* M1027 dep = SSK13 dep + shift */
+    : -(_M10_THRU_ARR_BEFORE_SSK_SEC + T);               /* M1001/6 dep = SSK01 dep + shift */
   const out = [];
-  for (const [from, to, hw] of _SSK_BANDS) {
+  for (const [from, to, hw] of _M10_SSK_BANDS) {
     const slots = _M10_SLOTS[hw === 6 ? 'peak' : 'off'][logical];
     const first = _m10HmToSec(from) + shift;
     const last  = _m10HmToSec(to)   + shift;
