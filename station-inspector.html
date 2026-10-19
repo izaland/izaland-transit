@@ -112,6 +112,7 @@
   <script src="other-rail-data/hd-data.js"></script>
   <script src="other-rail-data/wi-data.js"></script>
   <script src="other-rail-data/shx-data.js"></script>
+  <script src="other-rail-data/ssk-data.js"></script>
   <script src="izx-data.js"></script>
   <script src="ax-data.js"></script>
 
@@ -203,7 +204,8 @@
   addStationArrayLines(typeof HD_LINES  !== 'undefined' ? HD_LINES  : null, 'other');
   addStationArrayLines(typeof WI_LINES  !== 'undefined' ? WI_LINES  : null, 'other');
   addStationArrayLines(typeof SHX_LINES !== 'undefined' ? SHX_LINES : null, 'other');
-
+  addStationArrayLines(typeof SSK_LINES !== 'undefined' ? SSK_LINES : null, 'other');
+    
   /* TS (AI + tronco + tratto KW condiviso) */
   (function () {
     const groups = [typeof TS_AI_STATIONS   !== 'undefined' ? TS_AI_STATIONS   : [],
@@ -341,6 +343,7 @@
     ['HD',       typeof HD_INTERCHANGE         !== 'undefined' ? HD_INTERCHANGE         : null],
     ['WI',       typeof WI_INTERCHANGE         !== 'undefined' ? WI_INTERCHANGE         : null],
     ['SHX',      typeof SHX_INTERCHANGE        !== 'undefined' ? SHX_INTERCHANGE        : null],
+    ['SSK', typeof SSK_INTERCHANGE !== 'undefined' ? SSK_INTERCHANGE : null],
   ];
   const FLAT_IX = [];
   (function () {
