@@ -705,7 +705,7 @@ const journeys = _runSearch(from, to, depTime, lineF, directOnly, excludeIzx);
   box.setAttribute('aria-label', 'Database statistics');
   box.innerHTML =
     '<div class="db-stat"><span class="db-stat-num">' + fmt(nLines) + '</span><span class="db-stat-lbl">Lines</span></div>' +
-    '<div class="db-stat"><span class="db-stat-num">' + fmt(nStations) + '</span><span class="db-stat-lbl">Station codes</span></div>' +
+    '<div class="db-stat"><span class="db-stat-num">' + fmt(nStations) + '</span><span class="db-stat-lbl">Stations</span></div>' +
     '<div class="db-stat"><span class="db-stat-num">' + fmt(nCodes) + '</span><span class="db-stat-lbl">Station codes</span></div>';
   panel.insertBefore(box, panel.firstChild);
 })();
