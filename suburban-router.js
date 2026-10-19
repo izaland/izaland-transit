@@ -857,6 +857,7 @@ function _getEquivalentCodes(code) {
     });
 
     if (!expressSvcs.length) return [];
+     const results = [];
 
     for (const svc of expressSvcs) {
       const candidates = line.stations
