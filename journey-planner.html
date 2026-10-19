@@ -484,7 +484,17 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
                 if (li < j.legs.length - 1) {
   const node = _stName(j.transferNodes[li]);
 
-  if (j.thruService) {
+  /* La riga thru va mostrata solo nel cambio che e' davvero un thru.
+     - transferThru[] e' affidabile solo se ha un elemento per cambio
+       (legs - 1); altrimenti non e' allineato a transferNodes[]
+       (journey composti da leg che hanno gia' cambi interni).
+     - In quel caso si confronta il nodo del cambio con thruNode. */
+  const nTransfers = j.legs.length - 1;
+  const isThru = (Array.isArray(j.transferThru) && j.transferThru.length === nTransfers)
+    ? !!j.transferThru[li]
+    : (!!j.thruService && (j.thruNode == null || j.transferNodes[li] === j.thruNode));
+
+  if (isThru) {
     // Thru-service: cambio operatore, i passeggeri restano a bordo
     legsHTML += `
       <div class="thru-row">
@@ -695,7 +705,7 @@ const journeys = _runSearch(from, to, depTime, lineF, directOnly, excludeIzx);
   box.setAttribute('aria-label', 'Database statistics');
   box.innerHTML =
     '<div class="db-stat"><span class="db-stat-num">' + fmt(nLines) + '</span><span class="db-stat-lbl">Lines</span></div>' +
-    '<div class="db-stat"><span class="db-stat-num">' + fmt(nStations) + '</span><span class="db-stat-lbl">Stations</span></div>' +
+    '<div class="db-stat"><span class="db-stat-num">' + fmt(nStations) + '</span><span class="db-stat-lbl">Station codes</span></div>' +
     '<div class="db-stat"><span class="db-stat-num">' + fmt(nCodes) + '</span><span class="db-stat-lbl">Station codes</span></div>';
   panel.insertBefore(box, panel.firstChild);
 })();
