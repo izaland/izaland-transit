@@ -13,7 +13,7 @@
      M1411 Aguri 2-sa      ↔ M404 (M4)
      M1412 Rosemane        ↔ M324 (M3), JD02
      M1413 Masuda Agarai   ↔ M118 (M1), M325 (M3), M913 (M9)
-     M1414 Kansāri         ↔ M326 (M3), M1016 (M10)
+     M1414 Kansāri         ↔ M326 (M3), M1017 (M10)
      M1415 Ōbakura         ↔ M1211 (M12), LL18
      M1416 Sainðaul National University ↔ M1708 (M17)
      M1417 Yunpotsai Soisuma ↔ M329 (M3)
@@ -127,8 +127,8 @@ const M14_INTERCHANGE = {
   M1414: [
     { code: 'M326', network: 'metro', transferMin: 3,
       note: 'M326 Kansāri' },
-    { code: 'M1016', network: 'metro', transferMin: 3,
-      note: 'M1016 Kansāri' }
+    { code: 'M1017', network: 'metro', transferMin: 3,
+      note: 'M1017 Kansāri' }
   ],
   M1415: [
     { code: 'M1211', network: 'metro', transferMin: 3,
