@@ -14,8 +14,10 @@
      M1412 Rosemane        ↔ M324 (M3), JD02
      M1413 Masuda Agarai   ↔ M118 (M1), M325 (M3), M913 (M9)
      M1414 Kansāri         ↔ M326 (M3), M1016 (M10)
-     M1415 Ōbakura         ↔ LL18
+     M1415 Ōbakura         ↔ M1211 (M12), LL18
+     M1416 Sainðaul National University ↔ M1708 (M17)
      M1417 Yunpotsai Soisuma ↔ M329 (M3)
+     M1420 Tanjānli        ↔ M1216 (M12)
 ================================================================ */
 'use strict';
 
@@ -129,12 +131,22 @@ const M14_INTERCHANGE = {
       note: 'M1016 Kansāri' }
   ],
   M1415: [
+    { code: 'M1211', network: 'metro', transferMin: 3,
+      note: 'M1211 Ōbakura' },
     { code: 'LL18', network: 'suburban', transferMin: 3,
       note: 'LL18 Ōbakura' }
+  ],
+  M1416: [
+    { code: 'M1708', network: 'metro', transferMin: 3,
+      note: 'M1708 Sainðaul National University' }
   ],
   M1417: [
     { code: 'M329', network: 'metro', transferMin: 3,
       note: 'M329 Yunpotsai Soisuma' }
+  ],
+  M1420: [
+    { code: 'M1216', network: 'metro', transferMin: 3,
+      note: 'M1216 Tanjānli' }
   ],
 };
 
