@@ -106,6 +106,7 @@
   <script src="metro/m14-data.js"></script>
   <script src="metro/m15-data.js"></script>
   <script src="metro/m17-data.js"></script>
+  <script src="metro/m20-data.js"></script>
   <script src="metro/hoy-data.js"></script>
   <script src="suburban-data.js"></script>
   <script src="ts-data.js"></script>
@@ -179,6 +180,8 @@
                typeof M15_META !== 'undefined' ? M15_META : undefined);
   addMetroLine(typeof M17_ST !== 'undefined' ? M17_ST : undefined,
                typeof M17_META !== 'undefined' ? M17_META : undefined);
+  addMetroLine(typeof M20_ST !== 'undefined' ? M20_ST : undefined,
+               typeof M20_META !== 'undefined' ? M20_META : undefined);
   addMetroLine(typeof HOY_ST !== 'undefined' ? HOY_ST : undefined,
                typeof HOY_META !== 'undefined' ? HOY_META : undefined);
 
@@ -336,6 +339,7 @@
     ['M14', typeof M14_INTERCHANGE !== 'undefined' ? M14_INTERCHANGE : null],
     ['M15', typeof M15_INTERCHANGE !== 'undefined' ? M15_INTERCHANGE : null],
     ['M17', typeof M17_INTERCHANGE !== 'undefined' ? M17_INTERCHANGE : null],
+    ['M20', typeof M20_INTERCHANGE !== 'undefined' ? M20_INTERCHANGE : null],
     ['HOY', typeof HOY_INTERCHANGE !== 'undefined' ? HOY_INTERCHANGE : null],
   ].forEach(([id, obj]) => { if (obj) METRO_INTERCHANGE_MAP[id] = obj; });
 
