@@ -229,12 +229,15 @@ const SuburbanRouter = (() => {
   }
 
   /* ----------------------------------------------------------------
-   * _isThruNode(subCode, metroCode)
-   * ---------------------------------------------------------------- */
-  const THRU_PAIRS = new Set(['KW00|M801', 'M801|KW00']);
-  function _isThruNode(subCode, metroCode) {
-    return THRU_PAIRS.has(`${subCode}|${metroCode}`);
-  }
+ * _isThruNode(subCode, metroCode)
+ * ---------------------------------------------------------------- */
+const THRU_PAIRS = new Set([
+  'KW00|M801', 'M801|KW00',
+  'SBO07|M415', 'M415|SBO07',
+]);
+function _isThruNode(subCode, metroCode) {
+  return THRU_PAIRS.has(`${subCode}|${metroCode}`);
+}
 
   /* ----------------------------------------------------------------
    * _segSpeed(line, iFrom, iTo)
