@@ -12,40 +12,47 @@
      SBO1 / SBO1_NB  Local — tutte le fermate (SBO01–SBO07)
      SBO2 / SBO2_NB  Rapid — SBO01, SBO05, SBO07  (SOLO fasce di punta)
 
-   FASCE
-     Fuori punta : solo Local, un treno ogni 10 min.
-     Punta       : Local + Rapid, ciascuno ogni 4 min (= 2 × headway M4,
-                   perché metà dei treni M4 prosegue su SBO).
-     Punta SB (da SBO01)  : 07:00–09:28 e 17:00–19:58 (stesse di M4).
-     Punta NB (da SBO07)  : spostata dal tempo di percorrenza M4:
-                   Rapid 08:14–10:42 e 18:14–21:10
-                   Local 08:21–10:49 e 18:21–21:17
+   ALLINEAMENTO NB CON M4 (thru M415 <-> SBO07, Kawaei)
+     Ogni partenza NB da SBO07 coincide con un arrivo M4 a Kawaei (M415)
+     + sosta thru. Riferimento dal planner (MetroRouter, fasce M4_HEADWAY
+     applicate all'orario nella stazione di salita):
+       M4 parte da M413 (Ristai-Nyūngu) alle 08:00, 08:02, ...
+       e arriva a M415 alle 08:05, 08:07, ...   (5 min)
+       sosta thru 90 s  ->  partenza SBO07 = arrivo M415 + 2 min
+                           (08:07, 08:09, ...)
+     Quindi le partenze SBO07 sono le partenze M4 da M413 + 7 min.
+     Con questo la coincidenza M4 -> SBO resta entro THRU_TOLERANCE_MIN
+     (unified-router.js) e viene trattata come thru, senza cambio.
+
+     Quali treni M4 proseguono su SBO:
+       Punta (M4 ogni 2 min): tutti. Si alternano Local e Rapid, ciascuno
+         ogni 4 min (Local 07:07, 07:11, ...; Rapid 07:09, 07:13, ...).
+       Fuori punta: Local, un treno M4 su N per mantenere il passo SBO
+         storico (10 min dove M4 e' a 5 o 10 min; 8 min dove M4 e' a 4).
+
+   FASCE M4 (da M4_HEADWAY) e relative partenze NB da SBO07
+     05:00–06:30  M4 10 min   -> SBO 10 min (tutti i treni)   05:37–06:27
+     06:30–07:00  M4  5 min   -> SBO 10 min (1 su 2)           06:37–06:57
+     07:00–09:30  M4  2 min   -> SBO Local+Rapid ogni 4 min     07:07/07:09 – 09:35/09:33
+     09:30–17:00  M4  4 min   -> SBO 8 min (1 su 2)            09:37–16:57
+     17:00–20:00  M4  2 min   -> SBO Local+Rapid ogni 4 min     17:07/17:09 – 20:03/20:05
+     20:00–22:30  M4  5 min   -> SBO 10 min (1 su 2)           20:07–22:27
+     22:30–24:30  M4 10 min   -> SBO 10 min (tutti i treni)    22:37–24:27
 
    PRIME PARTENZE NB (mattina presto)
      05:00–05:30  Local da DEPOSITO a SBO07, ogni 10 min (4 treni).
-     05:42–06:12  Local thru da M4 che si originano a Ogiwata (M402):
-                   partenze da M402 05:00–05:30 ogni 10 min; percorrenza
-                   M402→M415 = 40 min 17 s + sosta thru 2 min.
-     06:21        primo Local thru da M425 (All-stop M4).
-
-   THRU SERVICE CON M4 (Kokendake Line)
-     - NB in punta: partenza da SBO07 = partenza da M425 + percorrenza
-       M4 + sosta thru (2 min).
-         M4 Rapid  M425→M415 = 72 min 11 s
-         M4 Local  M425→M415 = 78 min 41 s
-       Verificato sul planner: Anagusa Mukai → Kawaei Rapid = 27 min
-       (12.65 km a 30 km/h + 4 soste da 30 s).
-     - Fuori punta la griglia a 10 min è indipendente da M4 (non tutti
-       i Local SBO corrispondono a un thru M4).
-     - SB: partenza da SBO01, poi i treni thru proseguono su M4.
+     05:37 in poi: Local thru da M4, secondo la tabella sopra.
 
    NOTE / ASSUNZIONI (da verificare)
-   - Ultimo NB da SBO07: 24:05 (Local). Ultimo SB da SBO01: 24:20.
+   - Ultimo NB da SBO07: 24:27 (Local).  Ultimo SB da SBO01: 24:20.
+   - La corsa M413->M415 e' 5 min nel planner; se cambia la velocita'
+     o la sosta di M4, vanno ritoccati gli offset (+7 min) qui sotto.
+   - Il SB (da SBO01) non e' stato riallineato: M4 da M415 verso ovest
+     non ha ancora una coppia thru SBO->M4 nel router.
    - Deposito SBO assunto vicino a SBO07 (treni a vuoto non modellati).
    - vMax 90 km/h provvisoria: Local ~10 min 20 s, Rapid ~6 min 50 s.
    - Il router applica le fasce all'orario nella stazione di salita.
-   - Il flag thruService nel SuburbanRouter va esteso con la coppia
-     'M415|SBO07'.
+   - La coppia thru 'M415|SBO07' e' in THRU_SERVICES di unified-router.js.
 ================================================================ */
 'use strict';
 
@@ -67,19 +74,18 @@ const _SBO_BANDS = {
     ['07:00', '09:28',  4],
     ['17:00', '19:58',  4],
   ],
-  /* NB = da SBO07 (Kawaei) */
+  /* NB = da SBO07 (Kawaei): allineate agli arrivi M4 a M415 + 2 min */
   LOCAL_NB: [
     ['05:00', '05:30', 10],   /* deposito */
-    ['05:42', '06:12', 10],   /* thru da Ogiwata (M4 M402) */
-    ['06:21', '08:11', 10],
-    ['08:21', '10:49',  4],
-    ['10:59', '18:09', 10],
-    ['18:21', '21:17',  4],
-    ['21:25', '24:05', 10],
+    ['05:37', '06:57', 10],   /* M4 10 min (tutti) + M4 5 min (1 su 2) */
+    ['07:07', '09:35',  4],   /* punta: M4 ogni 2 min, Local = treni pari */
+    ['09:37', '16:57',  8],   /* M4 ogni 4 min, 1 su 2 */
+    ['17:07', '20:03',  4],   /* punta */
+    ['20:07', '24:27', 10],   /* M4 5 min (1 su 2) + M4 10 min (tutti) */
   ],
   RAPID_NB: [
-    ['08:14', '10:42',  4],
-    ['18:14', '21:10',  4],
+    ['07:09', '09:33',  4],   /* punta: treni dispari */
+    ['17:09', '20:05',  4],
   ],
 };
 
