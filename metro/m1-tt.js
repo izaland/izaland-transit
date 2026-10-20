@@ -8,18 +8,20 @@
    ├────────┼─────────────────────────────┼─────────────────┼─────────┼─────────┼─────────┤
    │ A_W    │ M110 → M144 (all-stop)      │ 05:30 – 23:30   │  varia  │  +3 min │  28 k/h │
    │ A_E    │ M144 → M110 (all-stop)      │ 05:30 – 23:30   │  varia  │  +3 min │  28 k/h │
-   │ B_W    │ M110 → M128 (limited)       │ 05:30 – 06:30   │  10 min │  +3 min │  28 k/h │
-   │ B_E    │ M128 → M110 (limited)       │ 05:30 – 06:30   │  10 min │  +3 min │  28 k/h │
-   │ B2_W   │ M110 → M128 (limited)       │ 09:30 – 17:00   │  10 min │  +6 min │  28 k/h │
-   │ B2_E   │ M128 → M110 (limited)       │ 09:30 – 17:00   │  10 min │  +6 min │  28 k/h │
-   │ B3_W   │ M110 → M128 (limited)       │ 20:00 – 23:30   │  15 min │  +6 min │  28 k/h │
-   │ B3_E   │ M128 → M110 (limited)       │ 20:00 – 23:30   │  15 min │  +6 min │  28 k/h │
+   │ B_W    │ M110 → M128 (limited)       │ 05:30 – 06:30   │  20 min │  +3 min │  28 k/h │
+   │ B_E    │ M128 → M110 (limited)       │ 05:30 – 06:30   │  20 min │  +3 min │  28 k/h │
+   │ B2_W   │ M110 → M128 (limited)       │ 09:30 – 17:00   │  20 min │  +6 min │  28 k/h │
+   │ B2_E   │ M128 → M110 (limited)       │ 09:30 – 17:00   │  20 min │  +6 min │  28 k/h │
+   │ B3_W   │ M110 → M128 (limited)       │ 20:00 – 23:30   │  60 min │  +6 min │  28 k/h │
+   │ B3_E   │ M128 → M110 (limited)       │ 20:00 – 23:30   │  60 min │  +6 min │  28 k/h │
    │ E_W    │ M111 → M144 (express)       │ 07:00 – 22:00   │  varia  │    :00  │  40 k/h │
    │ EC_E   │ M144 → M110 (commuter rp.)  │ 07:00 – 09:00   │   5 min │    :00  │  38 k/h │
    │ E_E    │ M144 → M111 (express)       │ 09:00 – 22:00   │  varia  │    :00  │  40 k/h │
    │ LN1_W  │ M110 → M128 (notte)         │ 23:30 – 24:00   │  30 min │  +3 min │  28 k/h │
    │ LN1_E  │ M128 → M110 (notte)         │ 23:30 – 24:00   │  30 min │  +3 min │  28 k/h │
    │ LN2_W  │ M110 → M122 (notte)         │ 24:00 – 24:30   │  30 min │  +3 min │  28 k/h │
+   │ T_W    │ M110 → M128 (thru KS/CO)    │ 05:30 – 23:30   │  20 min │  +0 min │  28 k/h │
+   │ T_E    │ M128 → M110 (thru KS/CO)    │ 05:30 – 23:30   │  20 min │  +8 min │  28 k/h │
    └────────┴─────────────────────────────┴─────────────────┴─────────┴─────────┴─────────┘
 
    VELOCITÀ COMMERCIALI
@@ -66,9 +68,9 @@ const M1_HW_ALLSTOP = [
   { from: '20:00', to: '23:30', headwayMin:  7 },
 ];
 
-const M1_HW_B_EARLY = [{ from: '05:30', to: '06:30', headwayMin: 10 }];
-const M1_HW_B2      = [{ from: '09:30', to: '17:00', headwayMin: 10 }];
-const M1_HW_B3      = [{ from: '20:00', to: '23:30', headwayMin: 15 }];
+const M1_HW_B_EARLY = [{ from: '05:30', to: '06:30', headwayMin: 20 }];  // 3 tph ceduti al thru
+const M1_HW_B2      = [{ from: '09:30', to: '17:00', headwayMin: 20 }];  // 3 tph ceduti al thru
+const M1_HW_B3      = [{ from: '20:00', to: '23:30', headwayMin: 60 }];  // 3 tph ceduti al thru
 
 const M1_HW_EXPRESS_W = [
   { from: '07:00', to: '09:30', headwayMin:  5 },
@@ -86,8 +88,15 @@ const M1_HW_EXPRESS_E = [
   { from: '20:00', to: '22:00', headwayMin: 15 },
 ];
 
+/* Thru M1 <-> KS <-> CO: 3 tph (20 min). Sostituisce 3 tph di B dove B esiste. */
+const M1_HW_THRU = [{ from: '05:30', to: '23:30', headwayMin: 20 }];
+
 const M1_HW_LN1 = [{ from: '23:30', to: '24:00', headwayMin: 30 }];
 const M1_HW_LN2 = [{ from: '24:00', to: '24:30', headwayMin: 30 }];
+
+/* Offset thru allineati ai KT in ks-data.js (sosta 90 s a M128/KS18) */
+const M1_THRU_OFFSET_W = 0;
+const M1_THRU_OFFSET_E = 8;
 
 /* ----------------------------------------------------------------
    Servizi
@@ -164,6 +173,18 @@ const M1_SERVICES_NORM = [
     offsetMin: 3, speedKmh: 28, headway: M1_HW_LN2,
     stops: M1_STOPS_TO_M122 },
 
+  /* Thru (相互直通運転): M110 <-> M128, poi prosegue su KS18 -> KS21 e CO01 -> CO68.
+     Aspetto M1 identico agli altri treni; oltre M128 non proseguono su M1. */
+  { id: 'M1', svcLogical: 'T_W', name: 'Through service (westbound, to Asaji Torimoshi)',
+    color: '#F77F00', cls: 'metro', rapid: false,
+    offsetMin: M1_THRU_OFFSET_W, speedKmh: 28, headway: M1_HW_THRU,
+    stops: M1_STOPS_TO_M128 },
+
+  { id: 'M1', svcLogical: 'T_E', name: 'Through service (eastbound, to Alkuitsa)',
+    color: '#F77F00', cls: 'metro', rapid: false,
+    offsetMin: M1_THRU_OFFSET_E, speedKmh: 28, headway: M1_HW_THRU,
+    stops: [...M1_STOPS_TO_M128].reverse() },
+
 ];
 
 if (typeof MetroRouter !== 'undefined') {
@@ -173,6 +194,15 @@ if (typeof MetroRouter !== 'undefined') {
     st:          M1_ST,
     services:    M1_SERVICES_NORM,
     interchange: M1_INTERCHANGE,
+  });
+}
+
+/* Thru M1 <-> KS a Asaji Torimoshi (M128 = KS18), sosta 90 s.
+   unified-router.js e' caricato dopo i *-tt.js: registrazione a DOM pronto. */
+if (typeof window !== 'undefined') {
+  window.addEventListener('DOMContentLoaded', function () {
+    if (typeof IZXUnifiedRouter !== 'undefined' && IZXUnifiedRouter.registerThruService)
+      IZXUnifiedRouter.registerThruService({ codes: ['M128', 'KS18'], stopSec: 90 });
   });
 }
 
