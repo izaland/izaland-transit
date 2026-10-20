@@ -21,6 +21,13 @@
                    Rapid 08:14–10:42 e 18:14–21:10
                    Local 08:21–10:49 e 18:21–21:17
 
+   PRIME PARTENZE NB (mattina presto)
+     05:00–05:30  Local da DEPOSITO a SBO07, ogni 10 min (4 treni).
+     05:42–06:12  Local thru da M4 che si originano a Ogiwata (M402):
+                   partenze da M402 05:00–05:30 ogni 10 min; percorrenza
+                   M402→M415 = 40 min 17 s + sosta thru 2 min.
+     06:21        primo Local thru da M425 (All-stop M4).
+
    THRU SERVICE CON M4 (Kokendake Line)
      - NB in punta: partenza da SBO07 = partenza da M425 + percorrenza
        M4 + sosta thru (2 min).
@@ -34,7 +41,7 @@
 
    NOTE / ASSUNZIONI (da verificare)
    - Ultimo NB da SBO07: 24:05 (Local). Ultimo SB da SBO01: 24:20.
-   - Primo NB da SBO07: 06:21 (primo Local M4 in arrivo + 2 min).
+   - Deposito SBO assunto vicino a SBO07 (treni a vuoto non modellati).
    - vMax 90 km/h provvisoria: Local ~10 min 20 s, Rapid ~6 min 50 s.
    - Il router applica le fasce all'orario nella stazione di salita.
    - Il flag thruService nel SuburbanRouter va esteso con la coppia
@@ -62,6 +69,8 @@ const _SBO_BANDS = {
   ],
   /* NB = da SBO07 (Kawaei) */
   LOCAL_NB: [
+    ['05:00', '05:30', 10],   /* deposito */
+    ['05:42', '06:12', 10],   /* thru da Ogiwata (M4 M402) */
     ['06:21', '08:11', 10],
     ['08:21', '10:49',  4],
     ['10:59', '18:09', 10],
