@@ -29,7 +29,7 @@
          virgole ('LL10,KD26,JD05,SHX06'): prova tutte le coppie e
          applica UN SOLO dedup finale.
 
-   FIX 16 (thru services / 相互直通運転):
+   FIX 16 (treni passanti / 相互直通運転):
      Su alcune stazioni di confine i treni di due reti proseguono
      l'uno sull'altro (es. M8 <-> KW a Kishagoi-Exhibitown,
      M801 = KW00): i passeggeri restano a bordo e c'e' solo una
@@ -37,10 +37,10 @@
        - THRU_SERVICES elenca le coppie di codici + durata sosta (s);
          registerThruService({ codes:[..], stopSec }) ne aggiunge altre.
        - _partnersOf() marca i partner con thru:true e thruSec.
-       - Fasi 2/3: il secondo leg si cerca a arrivo + stopSec. Se il
-         treno trovato parte entro THRU_TOLERANCE_MIN dall'arrivo e'
-         un vero thru; altrimenti si ricade sul cambio normale
-         (partner.transferMin, es. 10 min) e si ricerca di nuovo.
+       - Fasi 2/3: solo LA PRIMA partenza disponibile dopo arrivo +
+         stopSec puo' essere un thru. Se parte entro THRU_TOLERANCE_MIN
+         dall'arrivo e' un vero thru; ogni corsa successiva resta un
+         cambio normale, anche se temporalmente vicina.
        - Il journey ha transferThru[] (uno per cambio, allineato a
          transferNodes[]), transfers NON conta i thru, e
          thruService/thruNode sono impostati per la UI.
@@ -356,19 +356,20 @@
   }
 
   /* Cerca i leg successivi dopo j1 su un partner. Se il partner e' un
-     thru, prova prima a arrivo + stopSec: se il treno parte entro
-     THRU_TOLERANCE_MIN e' un vero thru, altrimenti cambio normale. */
+     thru, prova solo la prima partenza disponibile dopo arrivo + stopSec.
+     Se quella corsa parte entro THRU_TOLERANCE_MIN e' un vero thru;
+     ogni corsa successiva, anche entro la tolleranza, e' un cambio normale. */
   function _nextLegs(router, partner, toCode, j1, opts) {
     const arr = _hmToSec(j1.arrivalTime);
     if (partner.thru) {
       const readyHM = _secToHM(arr + partner.thruSec);
       const list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
         { ...opts, maxResults: 2, directOnly: true });
-      const thruLegs = list.filter(j2 => {
-        const gap = ((_hmToSec(j2.departureTime) - arr + 86400) % 86400) / 60;
-        return gap <= THRU_TOLERANCE_MIN;
-      }).map(j2 => ({ j2, thru: true }));
-      if (thruLegs.length) return thruLegs;
+      const first = list[0];
+      if (first) {
+        const gap = ((_hmToSec(first.departureTime) - arr + 86400) % 86400) / 60;
+        if (gap <= THRU_TOLERANCE_MIN) return [{ j2: first, thru: true }];
+      }
     }
     const tSec = (partner.transferMin ?? CROSS_TRANSFER_MIN) * 60;
     const readyHM = _secToHM(arr + tSec);
