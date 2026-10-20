@@ -9,33 +9,34 @@
      NB = SBO07 → SBO01   (Kawaei → Oitsura)   ← arrivo da M4 (thru)
 
    Servizi:
-     SBO1 / SBO1_NB  Local  — tutte le fermate (SBO01–SBO07)
-     SBO2 / SBO2_NB  Rapid  — SBO01, SBO05, SBO07
+     SBO1 / SBO1_NB  Local — tutte le fermate (SBO01–SBO07)
+     SBO2 / SBO2_NB  Rapid — SBO01, SBO05, SBO07  (SOLO fasce di punta)
+
+   FASCE
+     Fuori punta : solo Local, un treno ogni 10 min.
+     Punta       : Local + Rapid, ciascuno ogni 4 min (= 2 × headway M4,
+                   perché metà dei treni M4 prosegue su SBO).
+     Punta SB (da SBO01)  : 07:00–09:28 e 17:00–19:58 (stesse di M4).
+     Punta NB (da SBO07)  : spostata dal tempo di percorrenza M4:
+                   Rapid 08:14–10:42 e 18:14–21:10
+                   Local 08:21–10:49 e 18:21–21:17
 
    THRU SERVICE CON M4 (Kokendake Line)
-     - Metà dei treni M4 prosegue su SBO, metà termina a Kawaei (M415).
-       → headway SBO = 2 × headway M4 (stesse fasce di M4_HEADWAY).
-     - I Local M4 (B) proseguono come Local SBO1, i Rapid M4 (A) come
-       Rapid SBO2.
-     - NB: la prima partenza di ogni fascia da SBO07 = partenza da M425
-       + tempo di percorrenza M4 + sosta thru (THRU_MIN = 2 min).
-         M4 Rapid  M425→M415 = 72 min 11 s  (11 soste intermedie da 30 s)
-         M4 Local  M425→M415 = 78 min 41 s  (24 soste intermedie da 30 s)
+     - NB in punta: partenza da SBO07 = partenza da M425 + percorrenza
+       M4 + sosta thru (2 min).
+         M4 Rapid  M425→M415 = 72 min 11 s
+         M4 Local  M425→M415 = 78 min 41 s
        Verificato sul planner: Anagusa Mukai → Kawaei Rapid = 27 min
        (12.65 km a 30 km/h + 4 soste da 30 s).
-     - SB: partenza da SBO01 con le stesse fasce di M4 (headway doppio);
-       i treni proseguono su M4 verso M425 dopo la sosta a SBO07.
+     - Fuori punta la griglia a 10 min è indipendente da M4 (non tutti
+       i Local SBO corrispondono a un thru M4).
+     - SB: partenza da SBO01, poi i treni thru proseguono su M4.
 
    NOTE / ASSUNZIONI (da verificare)
-   - vMax 90 km/h provvisoria. Con accel 2.5 / decel 3.0 km/h/s e sosta
-     20 s: Local ~10 min 20 s, Rapid ~6 min 50 s (SBO01 ↔ SBO07).
-   - Il router applica le fasce all'orario nella stazione di salita
-     (non c'è un orario unico per linea): la sincronia perfetta con M4
-     vale solo sulle partenze da SBO07 (NB) e SBO01 (SB).
-   - Ultimo treno SB: 24:20 da SBO01. Ultimo NB: ultimo M4 arrivato a
-     Kawaei (~01:34 Rapid, ~01:41 Local).
-   - Metà dei treni = ogni secondo treno; non è modellata l'alternanza
-     esatta (quali treni M4 proseguono).
+   - Ultimo NB da SBO07: 24:05 (Local). Ultimo SB da SBO01: 24:20.
+   - Primo NB da SBO07: 06:21 (primo Local M4 in arrivo + 2 min).
+   - vMax 90 km/h provvisoria: Local ~10 min 20 s, Rapid ~6 min 50 s.
+   - Il router applica le fasce all'orario nella stazione di salita.
    - Il flag thruService nel SuburbanRouter va esteso con la coppia
      'M415|SBO07'.
 ================================================================ */
@@ -45,40 +46,36 @@ const _SBO_ORDER_SB = ['SBO01','SBO02','SBO03','SBO04','SBO05','SBO06','SBO07'];
 const _SBO_ORDER_RAPID_SB = ['SBO01','SBO05','SBO07'];
 const _SBO_VMAX = 90;
 
-/* SB: [da, a, headway]  — fasce M4 con headway doppio */
-const _SBO_BANDS_SB = [
-  ['05:00', '06:20', 20],
-  ['06:30', '06:55', 10],
-  ['07:00', '09:28',  4],
-  ['09:30', '16:56',  8],
-  ['17:00', '19:58',  4],
-  ['20:00', '22:25', 10],
-  ['22:30', '24:20', 20],
-];
-
-/* NB Rapid: aligned to M4 Rapid arrivals at M415 (+72m11s +2 min) */
-const _SBO_BANDS_NB_RAPID = [
-  ['06:14', '07:34', 20],
-  ['07:44', '08:09', 10],
-  ['08:14', '10:42',  4],
-  ['10:44', '18:10',  8],
-  ['18:14', '21:12',  4],
-  ['21:14', '23:39', 10],
-  ['23:44', '25:34', 20],
-];
-
-/* NB Local: aligned to M4 All-stop arrivals at M415 (+78m41s +2 min) */
-const _SBO_BANDS_NB_LOCAL = [
-  ['06:21', '07:41', 20],
-  ['07:51', '08:16', 10],
-  ['08:21', '10:49',  4],
-  ['10:51', '18:17',  8],
-  ['18:21', '21:19',  4],
-  ['21:21', '23:46', 10],
-  ['23:51', '25:41', 20],
-];
+/* Fasce: [da, a, headway]  (a = ultima partenza della fascia) */
+const _SBO_BANDS = {
+  /* SB = da SBO01 */
+  LOCAL_SB: [
+    ['05:00', '06:50', 10],
+    ['07:00', '09:28',  4],
+    ['09:30', '16:50', 10],
+    ['17:00', '19:58',  4],
+    ['20:00', '24:20', 10],
+  ],
+  RAPID_SB: [
+    ['07:00', '09:28',  4],
+    ['17:00', '19:58',  4],
+  ],
+  /* NB = da SBO07 (Kawaei) */
+  LOCAL_NB: [
+    ['06:21', '08:11', 10],
+    ['08:21', '10:49',  4],
+    ['10:59', '18:09', 10],
+    ['18:21', '21:17',  4],
+    ['21:25', '24:05', 10],
+  ],
+  RAPID_NB: [
+    ['08:14', '10:42',  4],
+    ['18:14', '21:10',  4],
+  ],
+};
 
 function _sboSvc(id, rapid, sb, from, to, headway) {
+  const order = rapid ? _SBO_ORDER_RAPID_SB : _SBO_ORDER_SB;
   return {
     id,
     desc:     (rapid ? 'Rapid' : 'Local') + (sb ? ' · SBO01 → SBO07' : ' · SBO07 → SBO01'),
@@ -89,10 +86,7 @@ function _sboSvc(id, rapid, sb, from, to, headway) {
     headway,
     vMaxKmh:  _SBO_VMAX,
     explicitDir: true,
-    stops:    (() => {
-      const o = rapid ? _SBO_ORDER_RAPID_SB : _SBO_ORDER_SB;
-      return sb ? o : [...o].reverse();
-    })(),
+    stops:    sb ? order : [...order].reverse(),
   };
 }
 
@@ -100,16 +94,10 @@ function _sboSvc(id, rapid, sb, from, to, headway) {
    SBO_TT_SERVICES — formato compatibile con SuburbanRouter _svcTrips()
 ================================================================ */
 const SBO_TT_SERVICES = [];
-for (const [from, to, hw] of _SBO_BANDS_SB) {
-  SBO_TT_SERVICES.push(_sboSvc('SBO1',    false, true,  from, to, hw));
-  SBO_TT_SERVICES.push(_sboSvc('SBO2',    true,  true,  from, to, hw));
-}
-for (const [from, to, hw] of _SBO_BANDS_NB_LOCAL) {
-  SBO_TT_SERVICES.push(_sboSvc('SBO1_NB', false, false, from, to, hw));
-}
-for (const [from, to, hw] of _SBO_BANDS_NB_RAPID) {
-  SBO_TT_SERVICES.push(_sboSvc('SBO2_NB', true,  false, from, to, hw));
-}
+for (const [f, t, h] of _SBO_BANDS.LOCAL_SB)  SBO_TT_SERVICES.push(_sboSvc('SBO1',    false, true,  f, t, h));
+for (const [f, t, h] of _SBO_BANDS.RAPID_SB)  SBO_TT_SERVICES.push(_sboSvc('SBO2',    true,  true,  f, t, h));
+for (const [f, t, h] of _SBO_BANDS.LOCAL_NB)  SBO_TT_SERVICES.push(_sboSvc('SBO1_NB', false, false, f, t, h));
+for (const [f, t, h] of _SBO_BANDS.RAPID_NB)  SBO_TT_SERVICES.push(_sboSvc('SBO2_NB', true,  false, f, t, h));
 
 /* ================================================================
    REGISTRAZIONE nel SuburbanRouter
