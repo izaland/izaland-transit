@@ -1,13 +1,15 @@
 /* ================================================================
    SUBURBAN-INTERCHANGE-LL.JS
-   Interscambi Loop Line → Metro (lato suburbano), cosi' che i
-   collegamenti metro ↔ Loop Line siano bidirezionali.
+   Interscambi Loop Line -> Metro (lato suburbano), cosi' che i
+   collegamenti metro <-> Loop Line siano bidirezionali.
 
    Caricare DOPO suburban-data.js (e dopo hd-data.js se presente).
    Non modifica voci esistenti: aggiunge solo i codici mancanti.
 
-   LL05 Jufurai Kowen Niji ↔ M1636  (provvisorio 3 min, come lato M16)
-   LL06 Punoidan           ↔ M1637, M122  (5 min a piedi, Tensari Omuhate)
+   LL05 Jufurai Kowen Niji <-> M1636  (provvisorio 3 min, come lato M16)
+   LL06 Punoidan           <-> M1637, M122  (5 min a piedi, Tensari Omuhate)
+   LL12 Sumi-Kokendake     <-> M1641  (7 min a piedi, esterno alla stazione;
+                                       si aggiunge a M409 gia' presente)
 
    TODO: quando si rimette mano a suburban-data.js, spostare queste
    voci dentro SUBURBAN_INTERCHANGE e cancellare questo file.
@@ -20,6 +22,7 @@
   const ADD = {
     LL05: [{ code: 'M1636', transferMin: 3 }],
     LL06: [{ code: 'M1637', transferMin: 5 }, { code: 'M122', transferMin: 5 }],
+    LL12: [{ code: 'M1641', transferMin: 7 }],
   };
 
   const codeOf = (e) => (typeof e === 'string' ? e : e.code);
