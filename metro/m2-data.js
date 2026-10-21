@@ -180,7 +180,10 @@ const M2_INTERCHANGE = {
     { code: 'M119', network: 'metro', transferMin: 3,
       note: 'M1 Kushidaru Amiya — stesso nome, banchine separate' },
   ],
-  M211: [],
+  M211: [
+    { code: 'M1811', network: 'metro', transferMin: 6,
+      note: 'M18 Tsūnguhai — a piedi, in superficie' },
+  ],
   M213: [
     { code: 'SHX05', network: 'suburban', transferMin: 3,
       note: 'SHX05 Omenika Jinatsu' },
