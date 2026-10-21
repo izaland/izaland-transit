@@ -28,7 +28,7 @@
      M328 Amachi Kanlikoika                  — TD01
      M329 Yunpotsai Soisuma                  — M1417
      M330 Intsushitsa Kuyakujo               — M1214
-     M331 Shin-Tsaikikori                    — M916, M1644 (corridoio), SB07
+     M331 Shin-Tsaikikori                    — M918, M1644 (corridoio), SB07
      M332 Ðaihate                            — M1645
      M334 Iyogateri                          — PF05
 
@@ -228,7 +228,7 @@ const M3_INTERCHANGE = {
       note: 'Intsushitsa Kuyakujo — M12 line' },
   ],
   M331: [
-    { code: 'M916', network: 'metro',    transferMin: 3,
+    { code: 'M918', network: 'metro',    transferMin: 3,
       note: 'Shin-Tsaikikori — M9 line' },
     { code: 'M1644', network: 'metro',   transferMin: 9,
       note: 'M16 Zohakoshi Panahidano — stazione separata, corridoio sotterraneo' },
