@@ -21,11 +21,15 @@
 
    Orario di servizio (M16_HOURS): dalle 04:45 all'01:00 (ultimo treno
    in arrivo al capolinea, anche intermedio).
-   Frequenze S1 (M16_HEADWAY): 5 min base; punta 2 min
-   (07:00–09:30, 17:00–20:00, come M11/M14/M15); super punta 90 s
-   (07:45–08:30).
+   Frequenze S1 (M16_HEADWAY):
+     alba 04:45–06:50 e sera 22:00–01:00 : 8 min
+     giorno 5 min; punta 2 min (07:00–09:30, 17:00–20:00, come
+     M11/M14/M15); super punta 90 s (07:45–08:30).
    Frequenze S2 rapido (M16_S2_HEADWAY): ogni 15 min, 06:30–22:30,
    entrambe le direzioni.
+   Frequenze S3 / S4: 1 S3 e 1 S4 ogni 4 S1 (headway = 4 x S1 in
+   ogni fascia): 20 min giorno, 8 punta, 6 super punta, 32 min
+   alba/sera.
 
    Thru service: NESSUNO.
    M1628 Kishagoi-Exhibitown ha M801/KW00 come interscambio normale
@@ -35,7 +39,7 @@
 
    TODO:
      - sosta (dwellSec) provvisoria 20 s (come M15) — da confermare
-     - frequenze S3 e S4 — non ancora fornite
+     - orari di servizio di S3/S4: assunti = S1 (04:45–01:00)
      - ultime partenze (M16_HOURS.lastDep) derivate da un modello
        cinematico (0.9/1.0 m/s2, 20 s sosta, ~85.5 km/h di punta):
        da ricalcolare con m16-tt.js
@@ -180,17 +184,20 @@ const M16_HOURS = {
 
 /* ----------------------------------------------------------------
    Frequenze S1 (headwayMin in minuti; 1.5 = 90 s)
-   Base 5 min. Punta come M11/M14/M15: 07:00–09:30 e 17:00–20:00 a
-   2 min. Super punta 07:45–08:30 a 90 s.
+   Alba (04:45–06:50) e sera (22:00–01:00): 8 min. Giorno 5 min.
+   Punta come M11/M14/M15: 07:00–09:30 e 17:00–20:00 a 2 min.
+   Super punta 07:45–08:30 a 90 s.
 ---------------------------------------------------------------- */
 const M16_HEADWAY = [
-  { from: '04:45', to: '07:00', headwayMin: 5 },
+  { from: '04:45', to: '06:50', headwayMin: 8 },
+  { from: '06:50', to: '07:00', headwayMin: 5 },
   { from: '07:00', to: '07:45', headwayMin: 2 },
   { from: '07:45', to: '08:30', headwayMin: 1.5 },
   { from: '08:30', to: '09:30', headwayMin: 2 },
   { from: '09:30', to: '17:00', headwayMin: 5 },
   { from: '17:00', to: '20:00', headwayMin: 2 },
-  { from: '20:00', to: '25:00', headwayMin: 5 },
+  { from: '20:00', to: '22:00', headwayMin: 5 },
+  { from: '22:00', to: '25:00', headwayMin: 8 },
 ];
 
 /* Frequenze S2 rapido: ogni 15 min, entrambe le direzioni */
@@ -198,7 +205,9 @@ const M16_S2_HEADWAY = [
   { from: '06:30', to: '22:30', headwayMin: 15 },
 ];
 
-/* TODO: frequenze S3 e S4 non ancora fornite */
+/* S3 e S4: 1 S3 e 1 S4 ogni 4 S1 → headway = 4 x headway S1 */
+const M16_S3_HEADWAY = M16_HEADWAY.map(b => ({ ...b, headwayMin: b.headwayMin * 4 }));
+const M16_S4_HEADWAY = M16_HEADWAY.map(b => ({ ...b, headwayMin: b.headwayMin * 4 }));
 
 /* ----------------------------------------------------------------
    Interscambi (NESSUN thru service)
@@ -242,6 +251,6 @@ if (typeof module !== 'undefined') {
   module.exports = {
     M16_META, M16_ST, M16_CANONICAL_ORDER, M16_S2_STOPS,
     M16_SVC, M16_ORIGINS, M16_HOURS, M16_HEADWAY, M16_S2_HEADWAY,
-    M16_INTERCHANGE, M16_NODE_IDS,
+    M16_S3_HEADWAY, M16_S4_HEADWAY, M16_INTERCHANGE, M16_NODE_IDS,
   };
 }
