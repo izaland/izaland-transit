@@ -23,7 +23,7 @@
 
 const M2_ST = {
   /* ── Sezione comune ── */
-  M201: { n: 'Gawinosechi',                    k: 'ણૃપા之溝',           km:  0.000 },
+  M201: { n: 'Gawinosechi',                    k: 'ણૃપ之溝',           km:  0.000 },
   M202: { n: 'Alkuitsa',                        k: '潮屺',               km:  1.004 },
   M203: { n: 'Shimamera Shikiniswae',           k: '渠瀬田北口',          km:  2.001 },
   M204: { n: 'Shinnibuhama',                    k: '新中島',              km:  3.150 },
@@ -32,8 +32,8 @@ const M2_ST = {
   M207: { n: 'Ogiwata',                         k: '槃芳',               km:  6.570 },
   M208: { n: 'Egunsen Botanical Garden',        k: '慧群仙植物園',         km:  8.220 },
   M209: { n: 'Masuda Hibaru',                   k: '馬砅任尭',            km:  9.120 },
-  M210: { n: 'Kushidaru Amiya',                 k: '柚艏',               km: 10.770 },
-  M211: { n: 'Nagida Totsu',                    k: '鑲橋',               km: 11.820 },
+  M210: { n: 'Kushidaru Amiya',                 k: '柚賸',               km: 10.770 },
+  M211: { n: 'Nagida Totsu',                    k: '鑑橋',               km: 11.820 },
   M212: { n: 'National Opera House',            k: '國立歌劇院',          km: 12.840 },
   M213: { n: 'Omenika Jinatsu',                 k: '弁丹佳治芝',          km: 13.980 },
   M214: { n: 'Rakkashoni',                      k: '鳳脚',               km: 14.910 },
@@ -52,7 +52,7 @@ const M2_ST = {
   M226: { n: 'Hintomaui',                       k: '価園斐',             km: 29.410 },
   /* ── Ramo B: for Mokoba ── */
   M227: { n: 'Ōdahui Kōwen',                  k: '大世公園',            km: 20.260 },
-  M228: { n: 'Akaimori',                        k: '蚞生竹',             km: 20.980 },
+  M228: { n: 'Akaimori',                        k: '螞生竹',             km: 20.980 },
   M229: { n: 'Shiki-Kawaei',                   k: '北珂夬栄',            km: 21.850 },
   M230: { n: 'Kawaei',                          k: '珂夬栄',               km: 23.000 },
   M231: { n: 'Tayakure',                        k: '貞師',               km: 23.910 },
@@ -158,7 +158,7 @@ const M2_INTERCHANGE = {
   ],
   M208: [
     { code: 'K01', network: 'izx', transferMin: 10,
-      note: 'IZX Keishin — Sainðaul Central, 500 m underground corridor' },
+      note: 'IZX Keishin — Saindðaul Central, 500 m underground corridor' },
     { code: 'M8', network: 'metro', transferMin: 2,
       note: 'M815 Egunsen Botanical Garden — stesso nome, banchine separate' },
     { code: 'M912', network: 'metro', transferMin: 3,
@@ -184,6 +184,8 @@ const M2_INTERCHANGE = {
   M213: [
     { code: 'SHX05', network: 'suburban', transferMin: 3,
       note: 'SHX05 Omenika Jinatsu' },
+    { code: 'M1640', network: 'metro', transferMin: 3,
+      note: 'M16 Omenika Jinatsu' },
   ],
   M214: [
     { code: 'LL11', network: 'suburban', transferMin: 4,

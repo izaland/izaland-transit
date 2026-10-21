@@ -2,7 +2,7 @@
    M16-DATA.JS — Metro Line 16 (#816cb1)  (SOLO DATI — m16-tt.js da definire)
    ================================================================
    52 stazioni · 76.09 km · la linea piu' lunga del sistema
-   Velocita' commerciale 50 km/h
+   Velocita' commerciale ~44.8 km/h (S1, sosta inclusa)
    Capolinea: Tsukitonai (M1601) ↔ Kamaishi Kaiyan Kōwen (M1652)
 
    Servizi:
@@ -37,11 +37,17 @@
 
    Interscambi a piedi: M1644 ↔ M918 (9 min a piedi, Shin-Tsaikikori).
 
+   Ricalibrazione tempi: il modello precedente (sosta 20 s, 85.5 km/h
+   di punta, 50 km/h commerciali) era troppo veloce per una linea
+   all-stop (es. M1601→M1610, 13 km / 9 tratte, ~15.5 min). Nuovi
+   parametri, in linea con le metro urbane pesanti di Seul (linee 5/7):
+   sosta 30 s, 80 km/h di punta, acc 0.9 / dec 1.0 m/s2.
+
    TODO:
-     - sosta (dwellSec) provvisoria 20 s (come M15) — da confermare
+     - sosta (dwellSec) 30 s — da confermare
      - orari di servizio di S3/S4: assunti = S1 (04:45–01:00)
      - ultime partenze (M16_HOURS.lastDep) derivate da un modello
-       cinematico (0.9/1.0 m/s2, 20 s sosta, ~85.5 km/h di punta):
+       cinematico (0.9/1.0 m/s2, 30 s sosta, 80 km/h di punta):
        da ricalcolare con m16-tt.js
      - transferMin provvisorio 3 min (tranne M918 = 9) — da rivedere
      - kanji mancanti (stringa vuota)
@@ -116,8 +122,8 @@ const M16_META = {
   color:       '#816cb1',
   totalKm:     76.09,
   stations:    52,
-  avgSpeedKmh: 50,
-  dwellSec:    20,   // TODO: provvisorio (come M15)
+  avgSpeedKmh: 44.8,
+  dwellSec:    30,   // TODO: da confermare (era 20 s, troppo veloce)
 };
 
 /* ----------------------------------------------------------------
@@ -168,17 +174,18 @@ const M16_ORIGINS = [
    Orario di servizio
    Primo treno 04:45; l'ultimo treno ARRIVA al capolinea (anche
    intermedio) alle 01:00 (= '25:00'). lastDep derivato (arrotondato
-   per difetto al minuto) dai tempi S1 del modello cinematico.
+   per difetto al minuto) dai tempi S1 del modello cinematico
+   (S1 101:58 · da M1609 86:00 · da M1617 69:37 · da M1641 81:40).
 ---------------------------------------------------------------- */
 const M16_HOURS = {
   first:       '04:45',
   lastArrival: '25:00',
   lastDep: {
-    'M1601>M1652': '23:28',
-    'M1609>M1652': '23:42',
-    'M1617>M1652': '23:57',
-    'M1641>M1601': '23:46',
-    'M1652>M1601': '23:28',
+    'M1601>M1652': '23:18',
+    'M1609>M1652': '23:33',
+    'M1617>M1652': '23:50',
+    'M1641>M1601': '23:38',
+    'M1652>M1601': '23:18',
   },
 };
 

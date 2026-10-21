@@ -21,22 +21,27 @@
    ancora arrivato (apertura) e dopo la fine delle corse dal capolinea
    (chiusura):
      apertura  : da 04:45 fino al passaggio del primo S1 dal
-                 capolinea (04:45 + tempo di percorrenza):
-                 M1609 04:45–04:59 · M1617 04:45–05:14 · M1641 04:45–05:03
+                 capolinea (04:45 + tempo di percorrenza, arrotondato
+                 per eccesso):
+                 M1609 04:45–05:01 · M1617 04:45–05:17 · M1641 04:45–05:05
      chiusura  : dall'ultima partenza del capolinea fino all'ultima
                  partenza dell'origine (M16_HOURS.lastDep):
-                 M1609 23:29–23:43 · M1617 23:43–23:58 · M1641 23:29–23:47
+                 M1609 23:19–23:34 · M1617 23:34–23:51 · M1641 23:19–23:39
    Frequenza nelle finestre: 8 min (alba/sera).
 
    Modello tempi (kinematico, come M13/M17): acc 0.9 m/s2,
-   dec 1.0 m/s2, sosta 20 s, vmax ~85.5 km/h calibrata perche' S1
-   M1601→M1652 duri 91:18 (= 76.09 km a 50 km/h commerciali, sosta
-   inclusa). Il router usa km/speedKmh + fermate intermedie x dwell:
-   la speedKmh di ogni servizio e' derivata in modo che il tempo
-   totale coincida con quello del modello.
+   dec 1.0 m/s2, sosta 30 s, vmax 80 km/h. Con queste ipotesi S1
+   M1601→M1652 dura 101:58 (76.09 km a ~44.8 km/h commerciali,
+   sosta inclusa). Parametri scelti per avvicinarsi alle metro
+   urbane pesanti di Seul (linee 5/7): a 1 km di interstazione il
+   modello da' ~36 km/h commerciali, ma M16 ha interstazioni medie
+   di 1.49 km. Il router usa km/speedKmh + fermate intermedie x
+   dwell: la speedKmh di ogni servizio e' la velocita' di marcia
+   (sosta esclusa) derivata in modo che il tempo totale coincida
+   con quello del modello.
    Tempi totali:
-     S1 91:18 · S2 73:20 · S3 39:55 · S4 45:27
-     S1 da M1609 77:02 · da M1617 62:22 · da M1641 73:15
+     S1 101:58 · S2 80:37 · S3 44:28 · S4 50:43
+     S1 da M1609 86:00 · da M1617 69:37 · da M1641 81:40
 
    LIMITI NOTI DEL ROUTER (non modificato, come in M13):
      - la finestra oraria e' valutata sull'ora della richiesta, non
@@ -47,21 +52,24 @@
    TODO:
      - verificare che il router accetti headwayMin non intero (1.5)
      - orari di servizio di S3/S4 assunti = S1
-     - sosta 20 s e transferMin da confermare
+     - sosta 30 s e transferMin da confermare
+     - finestre di apertura delle origini: stimate (non ricalcolate
+       con lo script del modello) e arrotondate per eccesso
 ================================================================ */
 'use strict';
 
 const M16_COLOR = M16_META.color;
 
-/* Tempi (s, sosta inclusa), km e fermate intermedie dal modello */
+/* Tempi (s, sosta inclusa), km e fermate intermedie dal modello.
+   speedKmh = km / (sec - between * dwellSec) * 3600 */
 const M16_BASE = {
-  S1:    { km: 76.09, between: 50, sec: 5478, speedKmh: 61.2 },
-  S2:    { km: 76.09, between: 26, sec: 4400, speedKmh: 70.6 },
-  S3:    { km: 33.88, between: 21, sec: 2395, speedKmh: 61.8 },
-  S4:    { km: 37.41, between: 25, sec: 2727, speedKmh: 60.5 },
-  O1609: { km: 64.31, between: 42, sec: 4622, speedKmh: 61.2 },
-  O1617: { km: 51.97, between: 34, sec: 3742, speedKmh: 61.1 },
-  O1641: { km: 62.06, between: 39, sec: 4395, speedKmh: 61.8 },
+  S1:    { km: 76.09, between: 50, sec: 6118, speedKmh: 59.3 },
+  S2:    { km: 76.09, between: 26, sec: 4837, speedKmh: 67.5 },
+  S3:    { km: 33.88, between: 21, sec: 2668, speedKmh: 59.9 },
+  S4:    { km: 37.41, between: 25, sec: 3043, speedKmh: 58.7 },
+  O1609: { km: 64.31, between: 42, sec: 5160, speedKmh: 59.4 },
+  O1617: { km: 51.97, between: 34, sec: 4177, speedKmh: 59.3 },
+  O1641: { km: 62.06, between: 39, sec: 4900, speedKmh: 59.9 },
 };
 
 const _rev16 = (a) => a.slice().reverse();
@@ -75,7 +83,7 @@ const _clip16 = (bands, from, to) => bands
   .filter(b => _tmin16(b.from) < _tmin16(b.to));
 
 /* Ultima partenza S1 dal capolinea (+1 min come estremo escluso) */
-const M16_LAST_END = '23:29';
+const M16_LAST_END = '23:19';
 
 const M16_HW_S1 = _clip16(M16_HEADWAY, '04:45', M16_LAST_END);
 
@@ -88,9 +96,9 @@ const _mk16 = (logical, name, base, stops, headway, extra = {}) => ({
 /* Finestre di apertura/chiusura delle origini intermedie (8 min) */
 const _win16 = (from, to) => ({ from, to, headwayMin: 8 });
 const M16_ORIGIN_WIN = {
-  M1609: [_win16('04:45', '04:59'), _win16('23:29', '23:43')],
-  M1617: [_win16('04:45', '05:14'), _win16('23:43', '23:58')],
-  M1641: [_win16('04:45', '05:03'), _win16('23:29', '23:47')],
+  M1609: [_win16('04:45', '05:01'), _win16('23:19', '23:34')],
+  M1617: [_win16('04:45', '05:17'), _win16('23:34', '23:51')],
+  M1641: [_win16('04:45', '05:05'), _win16('23:19', '23:39')],
 };
 
 const _origin16 = (from) => M16_ORIGINS.find(o => o.from === from);

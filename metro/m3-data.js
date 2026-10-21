@@ -18,7 +18,7 @@
      M318 Komayunden-Dōnmus Kōwen           — M1005, M824
      M319 Garotsu Lake                       — M1006
      M320 Shin-Makurigawa                    — (nessuno)
-     M321 Tsenduma                           — M17XX (TBD)
+     M321 Tsenduma                           — M1633
      M322 Shiitehongi                        — LL03, SK24, CK22
      M323 Ekinðuka                           — M403
      M324 Rosemane                           — M1421, KD31
@@ -28,8 +28,8 @@
      M328 Amachi Kanlikoika                  — TD01
      M329 Yunpotsai Soisuma                  — M1417
      M330 Intsushitsa Kuyakujo               — M1214
-     M331 Shin-Tsaikikori                    — M916, M17XX (TBD), SB07
-     M332 Ðaihate                            — M17XX (TBD)
+     M331 Shin-Tsaikikori                    — M918, M1644 (corridoio), SB07
+     M332 Ðaihate                            — M1645
      M334 Iyogateri                          — PF05
 
    Regola interscambi: i nuovi collegamenti si aggiungono, quelli
@@ -166,8 +166,8 @@ const M3_INTERCHANGE = {
   M320: [
   ],
   M321: [
-    // M17XX — interscambio con M17, codice stazione TBD
-    // { code: 'M17XX', network: 'metro', transferMin: 3, note: 'Tsenduma — M17 line (TBD)' },
+    { code: 'M1633', network: 'metro', transferMin: 3,
+      note: 'Tsenduma — M16 line' },
   ],
   M322: [
     { code: 'LL03', network: 'suburban', transferMin: 4,
@@ -228,16 +228,16 @@ const M3_INTERCHANGE = {
       note: 'Intsushitsa Kuyakujo — M12 line' },
   ],
   M331: [
-    { code: 'M916', network: 'metro',    transferMin: 3,
+    { code: 'M918', network: 'metro',    transferMin: 3,
       note: 'Shin-Tsaikikori — M9 line' },
-    // M17XX TBD
-    // { code: 'M17XX', network: 'metro', transferMin: 3, note: 'Shin-Tsaikikori — M17 line (TBD)' },
+    { code: 'M1644', network: 'metro',   transferMin: 9,
+      note: 'M16 Zohakoshi Panahidano — stazione separata, corridoio sotterraneo' },
     { code: 'SB07', network: 'suburban', transferMin: 4,
       note: 'Shin-Tsaikikori — SB line' },
   ],
   M332: [
-    // M17XX TBD
-    // { code: 'M17XX', network: 'metro', transferMin: 3, note: 'Ðaihate — M17 line (TBD)' },
+    { code: 'M1645', network: 'metro', transferMin: 3,
+      note: 'Ðaihate — M16 line' },
   ],
   M334: [
     { code: 'PF05', network: 'suburban', transferMin: 4,

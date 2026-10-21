@@ -14,13 +14,13 @@
      M715  M1318 (Metro Line 13 — Tsuruna Eigandan)
      M717  AX20, TS19 (Airport Express; TS line — Eigandan Senpyan)
      M718  M1113 (Metro Line 11 — Ushiuruma)
-     M719  M503  (Metro Line 5 — Konegisa Eigandan)
+     M719  M503, M1619 (Metro Line 5; Metro Line 16 — Konegisa Eigandan)
      M721  M1525, SK38 (Metro Line 15; Seishaku Line — Sakamuso)
      M722  SK39  (Seishaku Line — Kashiwaka)
      M723  SK40  (Seishaku Line — Togamiro)
-     M725  M1116, TS20 (Metro Line 11; TS line — Shutazai)
+     M725  M1116, M1614, TS20 (Metro Line 11; Metro Line 16; TS line — Shutazai)
      M726  M1321 (Metro Line 13 — Sanbonzayo)
-     M728  M513  (Metro Line 5 — Pwakkobe)
+     M728  M513, M1612 (Metro Line 5; Metro Line 16 — Pwakkobe)
 ================================================================ */
 'use strict';
 
@@ -29,13 +29,13 @@ const M7_ST = {
   M702: { n: 'Otsohejan',            k: '',            nodeId: 147466402, km:  0.81 },
   M703: { n: 'Tentsorussan',         k: '',            nodeId: 147466403, km:  1.79 },
   M704: { n: 'Okushiba',             k: '',            nodeId: 147466404, km:  2.83 },
-  M705: { n: 'Riimibaiken',          k: '𠝏卞',         nodeId: 126754745, km:  3.48 },
+  M705: { n: 'Riimibaiken',          k: '𠽏卾',         nodeId: 126754745, km:  3.48 },
   M706: { n: 'Tsuruna Niji IC',      k: '鵺西IC',       nodeId: 147654873, km:  4.89 },
   M707: { n: 'Nokatsuta',            k: '',            nodeId: 147654872, km:  6.14 },
   M708: { n: 'Wedeimos',             k: '',            nodeId: 147654871, km:  7.02 },
   M709: { n: 'Niirado Tagawae',      k: '',            nodeId: 146814994, km:  7.84 },
   M710: { n: 'Sangyau Tsiiku',       k: '産業地域',     nodeId: 194463494, km:  9.45 },
-  M711: { n: 'Wikkaman',             k: '昱賀満',       nodeId: 180237682, km: 13.17 },
+  M711: { n: 'Wikkaman',             k: '昺賀満',       nodeId: 180237682, km: 13.17 },
   M712: { n: 'Ezaesomu',             k: '皃築',         nodeId: 123393744, km: 15.91 },
   M713: { n: 'Riihisano 2sa',        k: '尾本2沙',      nodeId: 123393745, km: 17.14 },
   M714: { n: 'Riihisano',            k: '尾本',         nodeId: 123393747, km: 18.01 },
@@ -43,7 +43,7 @@ const M7_ST = {
   M716: { n: 'Bawangitan',           k: '',            nodeId: 123393743, km: 20.40 },
   M717: { n: 'Eigandan Senpyan',     k: '永玵段船駢',   nodeId: 123393771, km: 21.30 },
   M718: { n: 'Ushiuruma',            k: '',            nodeId: 123393751, km: 22.32 },
-  M719: { n: 'Konegisa Eigandan',    k: '干酃永玵段',   nodeId: 123393753, km: 23.74 },
+  M719: { n: 'Konegisa Eigandan',    k: '干醃永玵段',   nodeId: 123393753, km: 23.74 },
   M720: { n: 'Himatoshi',            k: '妃満氾',       nodeId: 123393752, km: 24.90 },
   M721: { n: 'Sakamuso',             k: '沛坤',         nodeId: 176874425, km: 26.04 },
   M722: { n: 'Kashiwaka',            k: '笂旄',         nodeId: 147382474, km: 27.52 },
@@ -124,6 +124,8 @@ const M7_INTERCHANGE = {
   M719: [
     { code: 'M503', network: 'metro', transferMin: 3,
       note: 'Metro Line 5 — Konegisa Eigandan' },
+    { code: 'M1619', network: 'metro', transferMin: 3,
+      note: 'Metro Line 16 — Konegisa Eigandan' },
   ],
   M721: [
     { code: 'M1525', network: 'metro', transferMin: 3,
@@ -142,6 +144,8 @@ const M7_INTERCHANGE = {
   M725: [
     { code: 'M1116', network: 'metro', transferMin: 3,
       note: 'Metro Line 11 — Shutazai' },
+    { code: 'M1614', network: 'metro', transferMin: 3,
+      note: 'Metro Line 16 — Shutazai' },
     { code: 'TS20', network: 'suburban', transferMin: 4,
       note: 'Shutazai — TS line' },
   ],
@@ -152,6 +156,8 @@ const M7_INTERCHANGE = {
   M728: [
     { code: 'M513', network: 'metro', transferMin: 3,
       note: 'Metro Line 5 — Pwakkobe' },
+    { code: 'M1612', network: 'metro', transferMin: 3,
+      note: 'Metro Line 16 — Pwakkobe' },
   ],
 };
 

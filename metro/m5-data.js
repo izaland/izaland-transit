@@ -18,6 +18,7 @@
      M510  M1519 (Metro Line 15 — Eonogi Kōwen)
      M511  HOY13 (Hoze-Oyehatton Line — Kadokamahiwa)
      M513  M728  (Metro Line 7 — Pwakkobe)
+           M1612 (Metro Line 16 — Pwakkobe)
      M514  M1120 (Metro Line 11 — Jisahara)
            KD39  (Kidai Line — Jisahara, stesso nome)
      M502, M504, M507, M508, M512: nessun interscambio
@@ -27,11 +28,11 @@
 const M5_ST = {
   M501: { n: 'Tsuragoi',                       k: '汐蒲',       nodeId: 123393742, km:  0.00 },
   M502: { n: 'Mundōzan',                        k: '門道山',     nodeId: 304405932, km:  0.95 },
-  M503: { n: 'Konegisa Eigandan',               k: '干鮃永玵段', nodeId: 123393753, km:  2.05 },
-  M504: { n: 'Jaihonmu 3sa',                    k: '際笨武3沙',  nodeId: 136114107, km:  3.10 },
+  M503: { n: 'Konegisa Eigandan',               k: '干鯃永玵段', nodeId: 123393753, km:  2.05 },
+  M504: { n: 'Jaihonmu 3sa',                    k: '際笨条3沙',  nodeId: 136114107, km:  3.10 },
   M505: { n: 'Kirifunu Kukubān',                k: '礢判國防',   nodeId: 136114106, km:  4.30 },
   M506: { n: 'Sakanemoto',                      k: '沛岬斗',     nodeId: 123393750, km:  5.20 },
-  M507: { n: 'Akagae Nosori',                   k: '蛞外見祖里', nodeId: 147984628, km:  6.35 },
+  M507: { n: 'Akagae Nosori',                   k: '鐞外見祖里', nodeId: 147984628, km:  6.35 },
   M508: { n: 'Pentorawi Kirifunu',              k: '篡土碪礢判', nodeId: 198159780, km:  7.35 },
   M509: { n: 'Riihisano',                       k: '尾本',       nodeId: 123393747, km:  8.60 },
   M510: { n: 'Eonogi Kōwen',                    k: '',           nodeId: 146814988, km:  9.48 },
@@ -127,6 +128,8 @@ const M5_INTERCHANGE = {
   M513: [
     { code: 'M728', network: 'metro', transferMin: 3,
       note: 'Metro Line 7 — Pwakkobe' },
+    { code: 'M1612', network: 'metro', transferMin: 3,
+      note: 'Metro Line 16 — Pwakkobe' },
   ],
   M514: [
     { code: 'M1120', network: 'metro', transferMin: 3,
