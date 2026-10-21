@@ -15,6 +15,7 @@
      M1014  M911                        (Kanbata)
      M1017  M326, M1414                 (Kansāri)
      M1018  M914, SHX02                 (Eigan-ji)
+     M1019  M1812                       (sotterraneo, 3 min — Gwannowin-Adae, M18)
      M1021  LL13, CO11                  (Oritoku)
      M1027  SSK01                       (Kanui Airport T1)
      M1028  AX08                        (Osenude)
@@ -42,8 +43,8 @@ const M10_ST = {
   M1015: { n: 'Sainðaul Central',                k: '作安崎中央',               nodeId: 229656494, km: 18.45 },
   M1016: { n: 'Tikkamoto',                       k: '',                    nodeId: 128525370, km: 19.46 },
   M1017: { n: 'Kansāri',                         k: '官川',                  nodeId: 128525371, km: 20.29 },
-  M1018: { n: 'Eigan-ji',                        k: '栄鳫寺',                 nodeId: 128669527, km: 21.25 },
-  M1019: { n: 'Sōshitoya Otsumi-Kokendake',      k: '聡司塒南古剣館',             nodeId: 183739922, km: 22.24 },
+  M1018: { n: 'Eigan-ji',                        k: '栄鳳寺',                 nodeId: 128669527, km: 21.25 },
+  M1019: { n: 'Sōshitoya Otsumi-Kokendake',      k: '聡司塒南古剑館',             nodeId: 183739922, km: 22.24 },
   M1020: { n: 'Mawaketsuki',                     k: '',                    nodeId: 183739921, km: 23.37 },
   M1021: { n: 'Oritoku',                         k: '壌外',                  nodeId: 124066080, km: 24.38 },
   M1022: { n: 'Sasakuma',                        k: '',                    nodeId: 124295466, km: 25.88 },
@@ -101,6 +102,7 @@ const M10_INTERCHANGE = {
   M1014: [_m10('M911')],
   M1017: [_m10('M326'), _m10('M1414')],
   M1018: [_m10('M914'), _ic10('SHX02', 'other')],
+  M1019: [_m10('M1812', 3, 'collegamento sotterraneo (nodo e nome diversi) — Gwannowin-Adae, M18')],
   M1021: [_s10('LL13'), _s10('CO11')],
   M1027: [_ic10('SSK01', 'other')],
   M1028: [_ic10('AX08', 'ax', 5, 'Airport Express — Osenude')],

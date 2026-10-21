@@ -37,7 +37,9 @@
 
    Interscambi a piedi: M1644 ↔ M918 (9 min a piedi, Shin-Tsaikikori);
    M1637 ↔ LL06 (5 min a piedi, Punoidan — Loop Line; stesso
-   collegamento da M122 in m1-data.js).
+   collegamento da M122 in m1-data.js);
+   M1641 ↔ LL12 (7 min a piedi, esterno alla stazione, Kushigae ↔
+   Sumi-Kokendake — Loop Line).
 
    Ricalibrazione tempi: il modello precedente (sosta 20 s, 85.5 km/h
    di punta, 50 km/h commerciali) era troppo veloce per una linea
@@ -51,7 +53,8 @@
      - ultime partenze (M16_HOURS.lastDep) derivate da un modello
        cinematico (0.9/1.0 m/s2, 30 s sosta, 80 km/h di punta):
        da ricalcolare con m16-tt.js
-     - transferMin provvisorio 3 min (tranne M918 = 9, LL06 = 5) — da rivedere
+     - transferMin provvisorio 3 min (tranne M918 = 9, LL06 = 5,
+       LL12 = 7) — da rivedere
      - kanji mancanti (stringa vuota)
      - registrazione in station-inspector.html e interscambi inversi
        nelle altre linee: NON ancora fatta
@@ -220,8 +223,8 @@ const M16_S4_HEADWAY = M16_HEADWAY.map(b => ({ ...b, headwayMin: b.headwayMin * 
 
 /* ----------------------------------------------------------------
    Interscambi (NESSUN thru service)
-   transferMin PROVVISORIO = 3, tranne M1644 ↔ M918 = 9 (a piedi)
-   e M1637 ↔ LL06 = 5 (a piedi)
+   transferMin PROVVISORIO = 3, tranne M1644 ↔ M918 = 9 (a piedi),
+   M1637 ↔ LL06 = 5 (a piedi) e M1641 ↔ LL12 = 7 (a piedi)
 ---------------------------------------------------------------- */
 const _ic16 = (code, network, transferMin = 3, note = '') => ({ code, network, transferMin, note });
 const _m16 = (c) => _ic16(c, 'metro');
@@ -247,6 +250,7 @@ const M16_INTERCHANGE = {
   M1637: [_m16('M122'), _ic16('LL06', 'suburban', 5, 'a piedi, Punoidan (Loop Line)')],
   M1638: [_m16('M1408')],
   M1640: [_m16('M213'), _s16('SHX05')],
+  M1641: [_ic16('LL12', 'suburban', 7, 'a piedi, esterno alla stazione, Sumi-Kokendake (Loop Line)')],
   M1643: [_m16('M1022')],
   M1644: [_m16('M331'), _ic16('M918', 'metro', 9, 'a piedi, Shin-Tsaikikori')],
   M1645: [_m16('M332')],
