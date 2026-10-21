@@ -8,13 +8,15 @@
    Thru service: NESSUNO.
 
    Interscambi in superficie (a piedi):
-     M1811 ↔ M211 (6 min), M1811 ↔ SHX04 (10 min), M1812 ↔ M1019 (3 min).
+     M1811 ↔ M211 (6 min), M1811 ↔ SHX04 (10 min).
+   M1812 ↔ M1019: collegamento sotterraneo (stazioni con nome e nodo
+   diversi ma connesse sottoterra), 3 min.
 
    TODO:
      - orario di servizio (M18_HOURS) e frequenze (M18_HEADWAY): da definire
      - sosta (dwellSec), velocita' commerciale e nameJa: da definire
-     - transferMin provvisorio 3 min (tranne M211 = 6, SHX04 = 10,
-       M1019 = 3 in superficie) — da rivedere
+     - transferMin provvisorio 3 min (tranne M211 = 6, SHX04 = 10 in
+       superficie) — da rivedere
      - kanji mancanti (stringa vuota)
      - registrazione in station-inspector.html e interscambi inversi
        nelle altre linee: NON ancora fatta (vedi M18_INTERCHANGE)
@@ -71,7 +73,8 @@ const M18_SVC = {
 /* ----------------------------------------------------------------
    Interscambi (NESSUN thru service)
    transferMin PROVVISORIO = 3, tranne gli interscambi in superficie:
-   M1811 ↔ M211 = 6, M1811 ↔ SHX04 = 10, M1812 ↔ M1019 = 3 (a piedi)
+   M1811 ↔ M211 = 6, M1811 ↔ SHX04 = 10 (a piedi).
+   M1812 ↔ M1019 = 3: sotterraneo (nodo e nome diversi, ma connesse).
 ---------------------------------------------------------------- */
 const _ic18 = (code, network, transferMin = 3, note = '') => ({ code, network, transferMin, note });
 const _m18 = (c) => _ic18(c, 'metro');
@@ -89,7 +92,7 @@ const M18_INTERCHANGE = {
   M1810: [_m18('M120'), _s18('JD04')],
   M1811: [_ic18('M211', 'metro', 6, 'a piedi, in superficie'),
           _ic18('SHX04', 'suburban', 10, 'a piedi, in superficie')],
-  M1812: [_ic18('M1019', 'metro', 3, 'a piedi, in superficie')],
+  M1812: [_ic18('M1019', 'metro', 3, 'collegamento sotterraneo (nodo e nome diversi)')],
   M1813: [_m18('M915')],
   M1814: [_m18('M1213')],
   M1815: [_m18('M329'), _m18('M1417')],
