@@ -7,7 +7,7 @@
    Interscambi principali:
      M601 Nari-Gotsurindai         — M1801
      M602 Norihoi                  — M1802
-     M606 Assemikori               — M1718, M16?? (TBD)
+     M606 Assemikori               — M1718, M1629
      M608 Ishitsuma                — M804
      M609 Abawauri                 — M416
      M610 Shimamera                — M417, AX05, M203, TS14
@@ -16,7 +16,7 @@
      M613 Buslyu Toshi             — M420
      M614 Kotoshiruna              — M421, SK36
      M615 Shiki-Hoze               — M422, HOY04
-     M616 Ipporai - Konegisa       — M423
+     M616 Ipporai - Konegisa       — M423, M1621
      M617 Ipporai - Owonideki      — M424, M1110
      M618 Ipporai-Senpyan          — M425, TS18
      M620 Otsumi-Nawadae           — M1316
@@ -106,8 +106,8 @@ const M6_INTERCHANGE = {
   M606: [
     { code: 'M1718', network: 'metro',    transferMin: 3,
       note: 'Assemikori — M17 line' },
-    // M16: codice stazione TBD
-    // { code: 'M16XX', network: 'metro', transferMin: 3, note: 'Assemikori — M16 line (TBD)' },
+    { code: 'M1629', network: 'metro',    transferMin: 3,
+      note: 'Assemikori — M16 line' },
   ],
   M608: [
     { code: 'M804',  network: 'metro',    transferMin: 3,
@@ -162,12 +162,14 @@ const M6_INTERCHANGE = {
   M615: [
     { code: 'M422',  network: 'metro',    transferMin: 3,
       note: 'Shiki-Hoze — M4 line' },
-    { code: 'HO04',  network: 'suburban', transferMin: 4,
+    { code: 'HOY04', network: 'suburban', transferMin: 4,
       note: 'Shiki-Hoze — HO line' },
   ],
   M616: [
     { code: 'M423',  network: 'metro',    transferMin: 3,
       note: 'Ipporai - Konegisa — M4 line' },
+    { code: 'M1621', network: 'metro',    transferMin: 3,
+      note: 'Ipporai - Konegisa — M16 line' },
   ],
   M617: [
     { code: 'M424',  network: 'metro',    transferMin: 3,
