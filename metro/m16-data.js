@@ -12,6 +12,13 @@
      S4  Limitato 2 M1601 → M1627   tutte le stazioni del tratto
    (M1628 e M1629 non sono coperte da S3/S4: solo S1/S2)
 
+   Origini intermedie (M16_ORIGINS) — SOLO S1, per far entrare i
+   treni in linea all'apertura e per le ultime corse (stesse origini):
+     M1601 → M1652 | M1609 → M1652 | M1617 → M1652
+     M1641 → M1601 | M1652 → M1601
+   Ogni corsa va verso il capolinea PIU' LONTANO/opposto. Le stazioni
+   hanno infrastruttura di inversione / invio in deposito.
+
    Thru service: NESSUNO.
    M1628 Kishagoi-Exhibitown ha M801/KW00 come interscambio normale
    (non e' un thru per M16).
@@ -21,6 +28,7 @@
    TODO:
      - sosta (dwellSec) provvisoria 20 s (come M15) — da confermare
      - headway / frequenze per servizio — da definire (m16-tt.js)
+     - primo/ultimo treno per ciascuna origine — da definire
      - transferMin provvisorio 3 min (tranne M918 = 9) — da rivedere
      - kanji mancanti (stringa vuota)
      - registrazione in station-inspector.html e interscambi inversi
@@ -122,6 +130,26 @@ const M16_SVC = {
         peakOnly: false, thruAt: null, stops: _range16('M1601', 'M1627') },
 };
 
+/* ----------------------------------------------------------------
+   Origini intermedie — SOLO S1
+   Servono a far entrare i treni in linea all'apertura e per le
+   ultime corse (stesse origini). Ogni corsa va verso il capolinea
+   piu' lontano/opposto. 'fwd' = M1601 → M1652, 'rev' = M1652 → M1601.
+   Le stazioni supportano inversione / invio in deposito.
+---------------------------------------------------------------- */
+const M16_ORIGINS = [
+  { from: 'M1601', to: 'M1652', dir: 'fwd', service: 'S1' },
+  { from: 'M1609', to: 'M1652', dir: 'fwd', service: 'S1' },
+  { from: 'M1617', to: 'M1652', dir: 'fwd', service: 'S1' },
+  { from: 'M1641', to: 'M1601', dir: 'rev', service: 'S1' },
+  { from: 'M1652', to: 'M1601', dir: 'rev', service: 'S1' },
+].map(o => ({
+  ...o,
+  stops: o.dir === 'fwd'
+    ? _range16(o.from, o.to)
+    : _range16(o.to, o.from).slice().reverse(),
+}));
+
 /* TODO: frequenze per servizio non ancora fornite (m16-tt.js) */
 const M16_HEADWAY = null;
 
@@ -166,6 +194,6 @@ const M16_NODE_IDS = Object.fromEntries(Object.entries(M16_ST).map(([c, s]) => [
 if (typeof module !== 'undefined') {
   module.exports = {
     M16_META, M16_ST, M16_CANONICAL_ORDER, M16_S2_STOPS,
-    M16_SVC, M16_HEADWAY, M16_INTERCHANGE, M16_NODE_IDS,
+    M16_SVC, M16_ORIGINS, M16_HEADWAY, M16_INTERCHANGE, M16_NODE_IDS,
   };
 }
