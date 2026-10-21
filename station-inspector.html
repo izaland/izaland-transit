@@ -89,7 +89,7 @@
   <div id="no-result">No station found.</div>
   <div id="results"></div>
 
-  <!-- ═══ DATA FILES ══════════════════════════════════════════════════ -->
+  <!-- ═══ DATA FILES ═════════════════════════════════════════════════════ -->
   <script src="metro/m1-data.js"></script>
   <script src="metro/m2-data.js"></script>
   <script src="metro/m3-data.js"></script>
@@ -105,7 +105,9 @@
   <script src="metro/m13-data.js"></script>
   <script src="metro/m14-data.js"></script>
   <script src="metro/m15-data.js"></script>
+  <script src="metro/m16-data.js"></script>
   <script src="metro/m17-data.js"></script>
+  <script src="metro/m18-data.js"></script>
   <script src="metro/m20-data.js"></script>
   <script src="metro/hoy-data.js"></script>
   <script src="suburban-data.js"></script>
@@ -137,7 +139,7 @@
     return luminance(hex || '#888') > 0.35 ? '#000' : '#fff';
   }
 
-  /* ── Build unified station index ────────────────────────────────────── */
+  /* ── Build unified station index ──────────────────────────────────────────── */
   const ALL_STATIONS = [];
 
   function addMetroLine(ST, META) {
@@ -178,8 +180,12 @@
                typeof M14_META !== 'undefined' ? M14_META : undefined);
   addMetroLine(typeof M15_ST !== 'undefined' ? M15_ST : undefined,
                typeof M15_META !== 'undefined' ? M15_META : undefined);
+  addMetroLine(typeof M16_ST !== 'undefined' ? M16_ST : undefined,
+               typeof M16_META !== 'undefined' ? M16_META : undefined);
   addMetroLine(typeof M17_ST !== 'undefined' ? M17_ST : undefined,
                typeof M17_META !== 'undefined' ? M17_META : undefined);
+  addMetroLine(typeof M18_ST !== 'undefined' ? M18_ST : undefined,
+               typeof M18_META !== 'undefined' ? M18_META : undefined);
   addMetroLine(typeof M20_ST !== 'undefined' ? M20_ST : undefined,
                typeof M20_META !== 'undefined' ? M20_META : undefined);
   addMetroLine(typeof HOY_ST !== 'undefined' ? HOY_ST : undefined,
@@ -258,12 +264,12 @@
     }
   }
 
-  /* ── Kanji helper ──────────────────────────────────────────── */
+  /* ── Kanji helper ─────────────────────────────────────────────── */
   function kanjiSpan(k, cls = 'irow-kanji') {
     return k ? ` <span class="${cls}">${k}</span>` : '';
   }
 
-  /* ── Badge con colore testo automatico ────────────────────────── */
+  /* ── Badge con colore testo automatico ──────────────────────────── */
   function lineBadge(lineId, lineColor, lineName, network) {
     const col = lineColor || '#888';
     const txt = contrastColor(col);
@@ -275,7 +281,7 @@
          + `<span style="font-size:0.8rem;color:#888;margin-right:12px">${lineName}</span>`;
   }
 
-  /* ── Autocomplete ─────────────────────────────────────────── */
+  /* ── Autocomplete ────────────────────────────────────────────────────── */
   const qEl   = document.getElementById('query');
   const sugEl = document.getElementById('suggestions');
 
@@ -320,7 +326,7 @@
   });
   qEl.addEventListener('keydown', e => { if (e.key === 'Enter') inspect(); });
 
-  /* ── Interchange map ──────────────────────────────────────────── */
+  /* ── Interchange map ────────────────────────────────────────────────── */
   const METRO_INTERCHANGE_MAP = {};
   [
     ['M1',  typeof M1_INTERCHANGE  !== 'undefined' ? M1_INTERCHANGE  : null],
@@ -332,13 +338,15 @@
     ['M7',  typeof M7_INTERCHANGE  !== 'undefined' ? M7_INTERCHANGE  : null],
     ['M8',  typeof M8_INTERCHANGE  !== 'undefined' ? M8_INTERCHANGE  : null],
     ['M9',  typeof M9_INTERCHANGE  !== 'undefined' ? M9_INTERCHANGE  : null],
-    ['M10', typeof M9_INTERCHANGE  !== 'undefined' ? M9_INTERCHANGE  : null],
+    ['M10', typeof M10_INTERCHANGE !== 'undefined' ? M10_INTERCHANGE : null],
     ['M11', typeof M11_INTERCHANGE !== 'undefined' ? M11_INTERCHANGE : null],
     ['M12', typeof M12_INTERCHANGE !== 'undefined' ? M12_INTERCHANGE : null],
     ['M13', typeof M13_INTERCHANGE !== 'undefined' ? M13_INTERCHANGE : null],
     ['M14', typeof M14_INTERCHANGE !== 'undefined' ? M14_INTERCHANGE : null],
     ['M15', typeof M15_INTERCHANGE !== 'undefined' ? M15_INTERCHANGE : null],
+    ['M16', typeof M16_INTERCHANGE !== 'undefined' ? M16_INTERCHANGE : null],
     ['M17', typeof M17_INTERCHANGE !== 'undefined' ? M17_INTERCHANGE : null],
+    ['M18', typeof M18_INTERCHANGE !== 'undefined' ? M18_INTERCHANGE : null],
     ['M20', typeof M20_INTERCHANGE !== 'undefined' ? M20_INTERCHANGE : null],
     ['HOY', typeof HOY_INTERCHANGE !== 'undefined' ? HOY_INTERCHANGE : null],
   ].forEach(([id, obj]) => { if (obj) METRO_INTERCHANGE_MAP[id] = obj; });
@@ -423,7 +431,7 @@
     resultsEl.style.display = 'block';
   }
 
-  /* ── Core inspect() ────────────────────────────────────────── */
+  /* ── Core inspect() ────────────────────────────────────────────────── */
   function inspect() {
     sugEl.style.display = 'none';
     const raw = qEl.value.trim();
