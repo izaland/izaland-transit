@@ -18,6 +18,7 @@
      M119 Kushidaru Amiya  — M210, M406
      M120 Tsumiji          — JD04
      M121 Upajiya          — M1409
+     M122 Tensari Omuhate  — M1637 (M16), LL06 (Punoidan, 5 min a piedi)
      M123 Tamanoke-Tsunui  — LL07 (Rupekoppe, 500 m a piedi)
      M126 Otsunuke 2sa     — M1402
      M128 Asaji Torimoshi  — R02, KD20, KS18
@@ -207,6 +208,12 @@ const M1_INTERCHANGE = {
   M121: [
     { code: 'M1409', network: 'metro', transferMin: 3,
       note: 'M14 Upajiya' },
+  ],
+  M122: [
+    { code: 'M1637', network: 'metro', transferMin: 3,
+      note: 'M16 Tensari Omuhate (provvisorio, come lato M16)' },
+    { code: 'LL06', network: 'suburban', transferMin: 5,
+      note: 'Loop Line — Punoidan, 5 min a piedi' },
   ],
   M123: [
     { code: 'LL07', network: 'suburban', transferMin: 8,
