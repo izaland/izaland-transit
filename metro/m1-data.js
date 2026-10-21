@@ -18,6 +18,7 @@
      M119 Kushidaru Amiya  — M210, M406
      M120 Tsumiji          — JD04
      M121 Upajiya          — M1409
+     M122 Tensari Omuhate  — LL06 (Punoidan, 5 min a piedi)
      M123 Tamanoke-Tsunui  — LL07 (Rupekoppe, 500 m a piedi)
      M126 Otsunuke 2sa     — M1402
      M128 Asaji Torimoshi  — R02, KD20, KS18
@@ -38,32 +39,32 @@ const M1_ST = {
   M116: { n: 'Okoromachi',             k: '',                km:  5.65 },
   M117: { n: 'Sainðaul Central',       k: '作安崎中央',      km:  6.86 },
   M118: { n: 'Masuda Agarai',          k: '馬砅任尭',        km:  8.19 },
-  M119: { n: 'Kushidaru Amiya',        k: '柚艏',            km:  9.98 },
+  M119: { n: 'Kushidaru Amiya',        k: '柚贏',            km:  9.98 },
   M120: { n: 'Tsumiji',                k: '都巳治',          km: 11.20 },
   M121: { n: 'Upajiya',                k: '袁棲',            km: 12.39 },
   M122: { n: 'Tensari Omuhate',        k: '典河〇蔦',        km: 13.73 },
   M123: { n: 'Tamanoke-Tsunui',        k: '谷坂淡枡',        km: 14.95 },
   M124: { n: 'Oebatsun Resort',        k: '',                km: 16.71 },
-  M125: { n: 'Nandamoigon Sumatai',    k: '凬浪社',          km: 18.80 },
+  M125: { n: 'Nandamoigon Sumatai',    k: '塬浪社',          km: 18.80 },
   M126: { n: 'Otsunuke 2sa',           k: '',                km: 19.81 },
   M127: { n: 'Shin-Pakkishoi',         k: '',                km: 21.78 },
   M128: { n: 'Asaji Torimoshi',        k: '安佐寺狛篠',      km: 23.02 },
   M129: { n: 'Minotase Kōwen',         k: '蓑村公園',        km: 24.04 },
   M130: { n: 'Hintomaui',              k: '価園斐',          km: 24.87 },
-  M131: { n: 'Furukobe',               k: '福絽杷',          km: 26.24 },
-  M132: { n: 'Otsumi-Furukobe',        k: '南福絽杷',        km: 27.40 },
+  M131: { n: 'Furukobe',               k: '福絡杷',          km: 26.24 },
+  M132: { n: 'Otsumi-Furukobe',        k: '南福絡杷',        km: 27.40 },
   M133: { n: 'Watarui Azenami',        k: '芳聖刈咲',        km: 29.01 },
   M134: { n: 'Watarui',                k: '芳聖',            km: 32.22 },
   M135: { n: 'Shin-Watarui',           k: '新芳聖',          km: 33.72 },
-  M136: { n: 'Shinojawi',              k: '櫂枳',            km: 36.01 },
+  M136: { n: 'Shinojawi',              k: '椂枳',            km: 36.01 },
   M137: { n: 'Tomori Dantsi',          k: '土母里團地',      km: 37.40 },
   M138: { n: 'Takawidama',             k: '浚位谷',          km: 39.49 },
   M139: { n: 'Enikezya Sports Park',   k: '盛狩運動公園',    km: 40.77 },
   M140: { n: 'Jiroidan',               k: '治蕾丹',          km: 42.06 },
-  M141: { n: 'Akashima Seisan',        k: '蛞渠精参',        km: 42.98 },
+  M141: { n: 'Akashima Seisan',        k: '薞渠精参',        km: 42.98 },
   M142: { n: 'Enikezya',               k: '盛狩',            km: 43.74 },
   M143: { n: 'Shin-Enikezya',          k: '新盛狩',          km: 45.29 },
-  M144: { n: 'Enikezya Forum',         k: '盛狩ળ૾દપ્',      km: 46.60 },
+  M144: { n: 'Enikezya Forum',         k: '盛狩ಳૂદપ્',      km: 46.60 },
 };
 
 /* Ordine canonico geografico: ovest (Alkuitsa) → est (Enikezya Forum) */
@@ -207,6 +208,10 @@ const M1_INTERCHANGE = {
   M121: [
     { code: 'M1409', network: 'metro', transferMin: 3,
       note: 'M14 Upajiya' },
+  ],
+  M122: [
+    { code: 'LL06', network: 'suburban', transferMin: 5,
+      note: 'Loop Line — Punoidan, 5 min a piedi' },
   ],
   M123: [
     { code: 'LL07', network: 'suburban', transferMin: 8,
