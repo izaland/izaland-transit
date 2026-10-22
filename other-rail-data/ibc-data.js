@@ -1,0 +1,104 @@
+/* ================================================================
+   IBC-DATA.JS — Ibaches Main Line
+   齒琉能電鐵 (Ibaruno Dyenches) — Linea privata suburbana
+
+   Operatore : Ibaruno Dyenches (齒琉能電鐵)
+   Tipo      : Privata suburbana (rete estesa, stile Tobu/Kintetsu;
+               altre linee verranno aggiunte gradualmente)
+   Capolinea : IBC01 Anagusa Mukai (Ibaches) ↔ IBC23 Ibaruno
+   Lunghezza : 28.10 km · 23 stazioni
+
+   Interscambi:
+     IBC03 (Jufurai)             ↔ M818, M1410, M1809
+     IBC07 (Oizato)              ↔ M823, SK20, CK26
+     IBC11 (Shakihori)           ↔ M1001, SK19, CK27, KS11
+     IBC18 (Shin-Dankau)         ↔ SK13
+
+   Servizi (IBC_SERVICES):
+     IBC1  Local  IBC01 ↔ IBC23  tutte le fermate  6 tph (ogni 10 min)
+                    Prima corsa: 05:00 da entrambi i capolinea
+                    Ultima corsa: 23:30 da entrambi i capolinea
+
+   TODO:
+     — Servizio provvisorio: frequenze e orari da definire.
+     — IBC01 e IBC23: interscambi non indicati. Anagusa Mukai (Ibaches)
+       ha lo stesso kanji di KD30; Ibaruno e' anche KD10. Da chiarire.
+     — Tempi di trasferimento (transferMin) non specificati: default router.
+     — km: progressiva da IBC01 (=0).
+================================================================ */
+'use strict';
+
+const IBC_INTERCHANGE = {
+  IBC03: ['M818', 'M1410', 'M1809'],
+  IBC07: ['M823', 'SK20', 'CK26'],
+  IBC11: ['M1001', 'SK19', 'CK27', 'KS11'],
+  IBC18: ['SK13'],
+};
+
+const IBC_LINES = {
+  IBC: {
+    id:            'IBC',
+    name:          'Ibaches Main Line',
+    nameJa:        '齒琉能電鐵',
+    color:         '#FF9999',
+    operator:      'Ibaruno Dyenches',
+    operatorJa:    '齒琉能電鐵',
+    type:          'private',
+    region:        'Ibaruno',
+    circular:      false,
+    totalKm:       28.1,
+    totalStations: 23,
+    headwayPeak:    10,
+    headwayOffPeak: 10,
+    stations: [
+      { code: 'IBC01', name: 'Anagusa Mukai (Ibaches)', kanji: '矢模武凱', km:  0.0   },  /* node 229536854 */
+      { code: 'IBC02', name: 'Ōdabara',                 kanji: '大津',     km:  0.7   },  /* node 452184785 */
+      { code: 'IBC03', name: 'Jufurai',                 kanji: '朱布来',   km:  1.48  },  /* node 135876986 */
+      { code: 'IBC04', name: 'Shin-Higikura',           kanji: '新矢九田', km:  2.8   },  /* node 219979573 */
+      { code: 'IBC05', name: 'Ibaches Makurigawa',      kanji: '齒鐵炭畦', km:  4.03  },  /* node 219979572 */
+      { code: 'IBC06', name: 'Karajitsa',               kanji: '次矯',     km:  4.97  },  /* node 219979571 */
+      { code: 'IBC07', name: 'Oizato',                  kanji: '粕穫',     km:  6.39  },  /* node 124064341 */
+      { code: 'IBC08', name: 'Dendokuri',               kanji: '殿土巻',   km:  7.55  },  /* node 124064340 */
+      { code: 'IBC09', name: 'Amitoya',                 kanji: '安砂',     km:  8.51  },  /* node 124064339 */
+      { code: 'IBC10', name: 'Otsumi-Shakihori',        kanji: '南石登',   km:  9.63  },  /* node 124064338 */
+      { code: 'IBC11', name: 'Shakihori',               kanji: '石登',     km: 10.26  },  /* node 122813475 */
+      { code: 'IBC12', name: 'Nari-Tonomuri',           kanji: '東殿弖',   km: 11.87  },  /* node 378136780 */
+      { code: 'IBC13', name: 'Saikametotsu',            kanji: '斎肩橋',   km: 12.46  },  /* node 225874016 */
+      { code: 'IBC14', name: 'Otsumi-Kīttokaru',        kanji: '南謝松',   km: 13.52  },  /* node 225874015 */
+      { code: 'IBC15', name: 'Sayasama',                kanji: '餝宗',     km: 15.25  },  /* node 225874014 */
+      { code: 'IBC16', name: 'Katanase Tea',            kanji: '泉那施下', km: 16.5   },  /* node 292488855 */
+      { code: 'IBC17', name: 'Samakisamo',              kanji: '蒔山',     km: 18.2   },  /* node 409739998 */
+      { code: 'IBC18', name: 'Shin-Dankau',             kanji: '新檀洪',   km: 20.46  },  /* node 250818684 */
+      { code: 'IBC19', name: 'Ibaches Dankau',          kanji: '齒鐵檀洪', km: 21.48  },  /* node 250818581 */
+      { code: 'IBC20', name: 'Seirenji',                kanji: '誠蓮寺',   km: 22.79  },  /* node 452184851 */
+      { code: 'IBC21', name: 'Chidai Seimun',           kanji: '齒大正門', km: 24.25  },  /* node 232186875 */
+      { code: 'IBC22', name: 'Kaibaji',                 kanji: '界馬寺',   km: 26.25  },  /* node 250818546 */
+      { code: 'IBC23', name: 'Ibaruno',                 kanji: '齒琉能',   km: 28.1   },  /* node 128607532 */
+    ],
+  },
+};
+
+const IBC_SERVICES = [
+  { id: 'IBC1',    desc: 'Local', fromCode: 'IBC01', toCode: 'IBC23', headway: 10, stops: [], firstDep: '05:00', lastDep: '23:30' },
+  { id: 'IBC1_NB', desc: 'Local', fromCode: 'IBC23', toCode: 'IBC01', headway: 10, stops: [], firstDep: '05:00', lastDep: '23:30' },
+];
+
+/* MERGE in SUBURBAN_LINES e SUBURBAN_INTERCHANGE (bidirezionale).
+   I codici metro (M…) sono dichiarati dal lato metro: qui il reverse
+   viene aggiunto solo per le altre linee suburbane. */
+if (typeof SUBURBAN_LINES !== 'undefined') {
+  Object.assign(SUBURBAN_LINES, IBC_LINES);
+}
+if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
+  const codeOf = (e) => (typeof e === 'string' ? e : e.code);
+  const addTo = (key, code) => {
+    const list = SUBURBAN_INTERCHANGE[key] || (SUBURBAN_INTERCHANGE[key] = []);
+    if (!list.some((e) => codeOf(e) === code)) list.push(code);
+  };
+  Object.keys(IBC_INTERCHANGE).forEach((st) => {
+    IBC_INTERCHANGE[st].forEach((code) => {
+      addTo(st, code);
+      if (!/^M\d/.test(code)) addTo(code, st);
+    });
+  });
+}
