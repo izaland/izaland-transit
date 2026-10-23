@@ -14,8 +14,12 @@
           - da IBC34: 09:02 – 16:42 (calcolato a ritroso, vedi note)
           - fermate: IBC01, 03, 05, 07, 11, 15, 18, 19, 21, 23,
                      28, 30, 33, 34
+     IBC3  Limited Express  IBC01 ↔ IBC33  5 fermate  headway 60 min (1 tph)
+          - da IBC01: 07:09 – 21:09 (minuto :09)
+          - da IBC33: 06:38 – 20:38 (minuto :38)
+          - fermate: IBC01, 03, 11, 23, 33
 
-   Profilo cinematico (FIX 14 del router), uguale per Local e Rapid:
+   Profilo cinematico (FIX 14 del router), uguale per Local, Rapid e LEX:
      vMaxKmh 140 · accel 3.3 km/h/s · decel 4.0 km/h/s (tipo Odakyu)
      sosta 30 s a ogni fermata intermedia.
 
@@ -50,6 +54,9 @@ const _IBC_RAPID_SB = [
   'IBC28','IBC30','IBC33','IBC34',
 ];
 const _IBC_RAPID_NB = [..._IBC_RAPID_SB].reverse();
+
+const _IBC_LEX_SB = ['IBC01','IBC03','IBC11','IBC23','IBC33'];
+const _IBC_LEX_NB = [..._IBC_LEX_SB].reverse();
 
 /* profilo cinematico comune (metropolitano, tipo Odakyu) */
 const _IBC_PROFILE = {
@@ -103,6 +110,28 @@ const IBC_TT_SERVICES = [
     lastDep:  '16:42',
     headway:  20,
     stops:    _IBC_RAPID_NB,
+    ..._IBC_PROFILE,
+  },
+  {
+    id:       'IBC3',
+    desc:     'Limited Express — Anagusa Mukai (Ibaches) → IBC33',
+    fromCode: 'IBC01',
+    toCode:   'IBC33',
+    firstDep: '07:09',
+    lastDep:  '21:09',
+    headway:  60,
+    stops:    _IBC_LEX_SB,
+    ..._IBC_PROFILE,
+  },
+  {
+    id:       'IBC3_NB',
+    desc:     'Limited Express NB — IBC33 → Anagusa Mukai (Ibaches)',
+    fromCode: 'IBC33',
+    toCode:   'IBC01',
+    firstDep: '06:38',
+    lastDep:  '20:38',
+    headway:  60,
+    stops:    _IBC_LEX_NB,
     ..._IBC_PROFILE,
   },
 ];
