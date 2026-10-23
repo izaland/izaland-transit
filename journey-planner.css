@@ -139,20 +139,23 @@
       background:var(--border);
     }
 
-    /* ── KW service-type pill ── */
-.kw-svc-pill {
+    /* ── Service-type pill ── */
+.svc-pill {
   font-size: .62rem;
   font-weight: 700;
   padding: 1px 6px;
   border-radius: 3px;
-  letter-spacing: .04em;
+  letter-spacing: .06em;
   white-space: nowrap;
   border: 1px solid currentColor;
   line-height: 1.5;
+  cursor: help;
 }
-.kw-svc-pill.rapid          { color: #e07b00; border-color: #e07b00; }
-.kw-svc-pill.commuter-rapid { color: #c0392b; border-color: #c0392b; }
-.kw-svc-pill.semi-rapid { color: #b45309; border-color: #b45309; }
+.svc-pill.rapid           { color: #e07b00; border-color: #e07b00; }
+.svc-pill.commuter-rapid  { color: #c0392b; border-color: #c0392b; }
+.svc-pill.semi-rapid      { color: #b45309; border-color: #b45309; }
+.svc-pill.express         { color: #3ddc84; background: #1c2025; border-color: #1c2025; }
+.svc-pill.limited-express { color: #ff4d4d; background: #1c2025; border-color: #1c2025; }
 
     /* ── DIRECT-ONLY TOGGLE ── */
 .toggle-track{
