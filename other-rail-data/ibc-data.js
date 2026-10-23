@@ -1,12 +1,12 @@
 /* ================================================================
    IBC-DATA.JS — Ibaches Main Line
-   齒琉能電鉄 (Ibaruno Dyenches) — Linea privata suburbana
+   齒琉能電鐵 (Ibaruno Dyenches) — Linea privata suburbana
 
-   Operatore : Ibaruno Dyenches (齒琉能電鉄)
+   Operatore : Ibaruno Dyenches (齒琉能電鐵)
    Tipo      : Privata suburbana (rete estesa, stile Tobu/Kintetsu;
                altre linee verranno aggiunte gradualmente)
-   Capolinea : IBC01 Anagusa Mukai (Ibaches) ↔ IBC23 Ibaruno
-   Lunghezza : 28.10 km · 23 stazioni
+   Capolinea : IBC01 Anagusa Mukai (Ibaches) ↔ IBC34 Hetsannui-Nari
+   Lunghezza : 51.59 km · 34 stazioni
 
    Interscambi:
      IBC01 (Anagusa Mukai)       ↔ M817 (5 min), KD30
@@ -16,18 +16,23 @@
      IBC18 (Shin-Dankau)         ↔ SK13
      IBC23 (Ibaruno)             ↔ KD10
      IBC19 (Ibaches Dankau)      — nessun interscambio (centinaia di metri da KD14/SK12)
+     IBC24–IBC34                 — nessun interscambio definito (da completare)
 
    Servizi (IBC_SERVICES):
-     IBC1  Local  IBC01 ↔ IBC23  tutte le fermate  6 tph (ogni 10 min)
+     IBC1  Local  IBC01 ↔ IBC34  tutte le fermate  6 tph (ogni 10 min)
                     Prima corsa: 05:00 da entrambi i capolinea
                     Ultima corsa: 23:30 da entrambi i capolinea
+     IBC2  Rapid  IBC01 ↔ IBC34  (definito in ibc-tt.js)
 
    Note:
      — M8 e IBC NON condividono i binari. Da M818 la M8 si sbina e
        entra in servizio diretto su IBC (dettagli da definire).
      — Servizio provvisorio: frequenze e orari da definire.
      — Tempi di trasferimento: solo dove indicati; altrimenti default router.
-     — km: progressiva da IBC01 (=0).
+     — km: progressiva da IBC01 (=0). Per IBC24–IBC34 le distanze sono state
+       rilevate da IBC23 e sommate a 28.1 km.
+     — Ordine fisico: IBC30 (km 39.24) precede IBC29 (km 40.66); l'array
+       stations segue l'ordine fisico, non quello numerico dei codici.
 ================================================================ */
 'use strict';
 
@@ -44,15 +49,15 @@ const IBC_LINES = {
   IBC: {
     id:            'IBC',
     name:          'Ibaches Main Line',
-    nameJa:        '齒琉能電鉄',
+    nameJa:        '齒琉能電鐵',
     color:         '#FF9999',
     operator:      'Ibaruno Dyenches',
-    operatorJa:    '齒琉能電鉄',
+    operatorJa:    '齒琉能電鐵',
     type:          'private',
     region:        'Ibaruno',
     circular:      false,
-    totalKm:       28.1,
-    totalStations: 23,
+    totalKm:       51.59,
+    totalStations: 34,
     headwayPeak:    10,
     headwayOffPeak: 10,
     stations: [
@@ -60,7 +65,7 @@ const IBC_LINES = {
       { code: 'IBC02', name: 'Ōdabara',                 kanji: '大津',     km:  0.7   },  /* node 452184785 */
       { code: 'IBC03', name: 'Jufurai',                 kanji: '朱布来',   km:  1.48  },  /* node 135876986 */
       { code: 'IBC04', name: 'Shin-Higikura',           kanji: '新矢九田', km:  2.8   },  /* node 219979573 */
-      { code: 'IBC05', name: 'Ibaches Makurigawa',      kanji: '齒鉄炭畝', km:  4.03  },  /* node 219979572 */
+      { code: 'IBC05', name: 'Ibaches Makurigawa',      kanji: '齒鐵炭畝', km:  4.03  },  /* node 219979572 */
       { code: 'IBC06', name: 'Karajitsa',               kanji: '次矯',     km:  4.97  },  /* node 219979571 */
       { code: 'IBC07', name: 'Oizato',                  kanji: '粕穫',     km:  6.39  },  /* node 124064341 */
       { code: 'IBC08', name: 'Dendokuri',               kanji: '殿土巻',   km:  7.55  },  /* node 124064340 */
@@ -74,18 +79,29 @@ const IBC_LINES = {
       { code: 'IBC16', name: 'Katanase Tea',            kanji: '泉那施下', km: 16.5   },  /* node 292488855 */
       { code: 'IBC17', name: 'Samakisamo',              kanji: '蓒山',     km: 18.2   },  /* node 409739998 */
       { code: 'IBC18', name: 'Shin-Dankau',             kanji: '新檀洪',   km: 20.46  },  /* node 250818684 */
-      { code: 'IBC19', name: 'Ibaches Dankau',          kanji: '齒鉄檀洪', km: 21.48  },  /* node 250818581 */
+      { code: 'IBC19', name: 'Ibaches Dankau',          kanji: '齒鐵檀洪', km: 21.48  },  /* node 250818581 */
       { code: 'IBC20', name: 'Seirenji',                kanji: '誠蓮寺',   km: 22.79  },  /* node 452184851 */
       { code: 'IBC21', name: 'Chidai Seimun',           kanji: '齒大正門', km: 24.25  },  /* node 232186875 */
       { code: 'IBC22', name: 'Kaibaji',                 kanji: '界馬寺',   km: 26.25  },  /* node 250818546 */
       { code: 'IBC23', name: 'Ibaruno',                 kanji: '齒琉能',   km: 28.1   },  /* node 128607532 */
+      { code: 'IBC24', name: 'Shinkeidai',              kanji: '真景台',   km: 29.97  },  /* node 292408409 */
+      { code: 'IBC25', name: 'Nōntsuma',                kanji: '濃都満',   km: 31.42  },  /* node 292408408 */
+      { code: 'IBC26', name: 'Kumasunto',               kanji: '枝向',     km: 33.14  },  /* node 452184850 */
+      { code: 'IBC27', name: 'Sōweski',                 kanji: '早月名',   km: 35.12  },  /* node 335188774 */
+      { code: 'IBC28', name: 'Tsukiniji',               kanji: '原西',     km: 36.04  },  /* node 335188773 */
+      { code: 'IBC30', name: 'Hakehidano',              kanji: '横林',     km: 39.24  },  /* node 256636687 */
+      { code: 'IBC29', name: 'Sorokauri',               kanji: '緋沼',     km: 40.66  },  /* node 452266340 */
+      { code: 'IBC31', name: 'Kobase-Ibu',              kanji: '槻隻中',   km: 42.26  },  /* node 335188772 */
+      { code: 'IBC32', name: 'Kobase-Rippama',          kanji: '槻隻高島', km: 45.73  },  /* node 335188771 */
+      { code: 'IBC33', name: 'Niji-Odanuri',            kanji: '西裏窟',   km: 48.27  },  /* node 292407589 */
+      { code: 'IBC34', name: 'Hetsannui-Nari',          kanji: '渇桟枡東', km: 51.59  },  /* node 292407590 */
     ],
   },
 };
 
 const IBC_SERVICES = [
-  { id: 'IBC1',    desc: 'Local', fromCode: 'IBC01', toCode: 'IBC23', headway: 10, stops: [], firstDep: '05:00', lastDep: '23:30' },
-  { id: 'IBC1_NB', desc: 'Local', fromCode: 'IBC23', toCode: 'IBC01', headway: 10, stops: [], firstDep: '05:00', lastDep: '23:30' },
+  { id: 'IBC1',    desc: 'Local', fromCode: 'IBC01', toCode: 'IBC34', headway: 10, stops: [], firstDep: '05:00', lastDep: '23:30' },
+  { id: 'IBC1_NB', desc: 'Local', fromCode: 'IBC34', toCode: 'IBC01', headway: 10, stops: [], firstDep: '05:00', lastDep: '23:30' },
 ];
 
 /* MERGE in SUBURBAN_LINES e SUBURBAN_INTERCHANGE (bidirezionale).
