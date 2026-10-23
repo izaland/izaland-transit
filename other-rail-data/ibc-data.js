@@ -9,8 +9,8 @@
    Lunghezza : 28.10 km · 23 stazioni
 
    Interscambi:
-     IBC01 (Anagusa Mukai)       ↔ KD30 (+ M817, stesso nome: da confermare)
-     IBC03 (Jufurai)             ↔ M818, M1410, M1809
+     IBC01 (Anagusa Mukai)       ↔ M817 (5 min), KD30
+     IBC03 (Jufurai)             ↔ M818 (2 min), M1410, M1809
      IBC07 (Oizato)              ↔ M823, SK20, CK26
      IBC11 (Shakihori)           ↔ M1001, SK19, CK27, KS11
      IBC18 (Shin-Dankau)         ↔ SK13
@@ -26,14 +26,14 @@
      — M8 e IBC NON condividono i binari. Da M818 la M8 si sbina e
        entra in servizio diretto su IBC (dettagli da definire).
      — Servizio provvisorio: frequenze e orari da definire.
-     — Tempi di trasferimento (transferMin) non specificati: default router.
+     — Tempi di trasferimento: solo dove indicati; altrimenti default router.
      — km: progressiva da IBC01 (=0).
 ================================================================ */
 'use strict';
 
 const IBC_INTERCHANGE = {
-  IBC01: ['KD30', 'M817'],
-  IBC03: ['M818', 'M1410', 'M1809'],
+  IBC01: ['KD30', { code: 'M817', transferMin: 5 }],
+  IBC03: [{ code: 'M818', transferMin: 2 }, 'M1410', 'M1809'],
   IBC07: ['M823', 'SK20', 'CK26'],
   IBC11: ['M1001', 'SK19', 'CK27', 'KS11'],
   IBC18: ['SK13'],
@@ -89,21 +89,25 @@ const IBC_SERVICES = [
 ];
 
 /* MERGE in SUBURBAN_LINES e SUBURBAN_INTERCHANGE (bidirezionale).
+   Richiede che suburban-data.js sia caricato PRIMA di questo file.
    I codici metro (M…) sono dichiarati dal lato metro: qui il reverse
-   viene aggiunto solo per le altre linee suburbane. */
+   viene aggiunto solo per le altre linee suburbane (KD30, KD10, SK…, CK…, KS11). */
 if (typeof SUBURBAN_LINES !== 'undefined') {
   Object.assign(SUBURBAN_LINES, IBC_LINES);
 }
 if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
   const codeOf = (e) => (typeof e === 'string' ? e : e.code);
-  const addTo = (key, code) => {
+  const addTo = (key, entry) => {
     const list = SUBURBAN_INTERCHANGE[key] || (SUBURBAN_INTERCHANGE[key] = []);
-    if (!list.some((e) => codeOf(e) === code)) list.push(code);
+    if (!list.some((e) => codeOf(e) === codeOf(entry))) list.push(entry);
   };
   Object.keys(IBC_INTERCHANGE).forEach((st) => {
-    IBC_INTERCHANGE[st].forEach((code) => {
-      addTo(st, code);
-      if (!/^M\d/.test(code)) addTo(code, st);
+    IBC_INTERCHANGE[st].forEach((entry) => {
+      const code = codeOf(entry);
+      addTo(st, entry);
+      if (!/^M\d/.test(code)) {
+        addTo(code, typeof entry === 'string' ? st : { code: st, transferMin: entry.transferMin });
+      }
     });
   });
 }
