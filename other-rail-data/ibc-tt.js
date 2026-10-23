@@ -2,9 +2,9 @@
    IBC-TT.JS — Ibaches Main Line · Timetable
    齒琉能電鐵
    ================================================================
-   Dipende da: ibc-data.js
+   Dipende da: ibc-data.js, suburban-router.js
 
-   Servizi:
+   Servizi (tutti con explicitDir: true, definiti in entrambe le direzioni):
      IBC1  Local  IBC01 ↔ IBC34  tutte le fermate  headway 10 min (6 tph)
           - da IBC01 (Anagusa Mukai Ibaches): 05:00 – 23:30
           - da IBC34 (Hetsannui-Nari):        05:00 – 23:30
@@ -15,16 +15,23 @@
           - fermate: IBC01, 03, 05, 07, 11, 15, 18, 19, 21, 23,
                      28, 30, 33, 34
 
+   Profilo cinematico (FIX 14 del router), uguale per Local e Rapid:
+     vMaxKmh 140 · accel 3.3 km/h/s · decel 4.0 km/h/s (tipo Odakyu)
+     sosta 30 s a ogni fermata intermedia.
+
+   Interscambio Local ↔ Rapid (stessa banchina, 0 min a piedi):
+     gestito dal router nelle fasi 1b (Rapid→Local) e 1c (Local→Rapid)
+     nelle stazioni in cui fermano entrambi i servizi:
+     IBC01, 03, 05, 07, 11, 15, 18, 19, 21, 23, 28, 30, 33, 34.
+     Il Rapid ha stops[] non vuoto; il Local ha stops [] (= tutte).
+
    NOTE:
      — Servizio provvisorio e uniforme tutto il giorno (TODO).
      — Ordine fisico: IBC30 precede IBC29 (vedi ibc-data.js).
      — Orari Rapid da IBC34: ogni treno arriva a IBC01 7 min prima
        della ripartenza (折り返し). Tempo di percorrenza
-       IBC34→IBC01 ≈ 36.5 min, calcolato da km tra le stazioni con:
-       accel 3.3 km/h/s, decel 4.0 km/h/s (tipo Odakyu), vmax 140 km/h,
-       sosta 30 s a ogni fermata intermedia, profilo trapezoidale
-       (triangolare nei tratti corti). Passaggi nelle stazioni saltate
-       a velocità di linea. Valori arrotondati al minuto.
+       IBC34→IBC01 ≈ 36.5 min con il profilo qui sopra. Valori
+       arrotondati al minuto.
      — Le prime corse NB partono prima delle 09:30 e le ultime prima
        delle 17:25 per poter fare il 折り返し a IBC01.
 ================================================================ */
@@ -44,6 +51,15 @@ const _IBC_RAPID_SB = [
 ];
 const _IBC_RAPID_NB = [..._IBC_RAPID_SB].reverse();
 
+/* profilo cinematico comune (metropolitano, tipo Odakyu) */
+const _IBC_PROFILE = {
+  vMaxKmh:        140,
+  accelKmhPerSec: 3.3,
+  decelKmhPerSec: 4.0,
+  dwellSec:       30,
+  explicitDir:    true,
+};
+
 const IBC_TT_SERVICES = [
   {
     id:       'IBC1',
@@ -53,7 +69,8 @@ const IBC_TT_SERVICES = [
     firstDep: '05:00',
     lastDep:  '23:30',
     headway:  10,
-    stops:    _IBC_STOPS_SB,
+    stops:    [],
+    ..._IBC_PROFILE,
   },
   {
     id:       'IBC1_NB',
@@ -63,7 +80,8 @@ const IBC_TT_SERVICES = [
     firstDep: '05:00',
     lastDep:  '23:30',
     headway:  10,
-    stops:    _IBC_STOPS_NB,
+    stops:    [],
+    ..._IBC_PROFILE,
   },
   {
     id:       'IBC2',
@@ -74,6 +92,7 @@ const IBC_TT_SERVICES = [
     lastDep:  '17:25',
     headway:  20,
     stops:    _IBC_RAPID_SB,
+    ..._IBC_PROFILE,
   },
   {
     id:       'IBC2_NB',
@@ -84,6 +103,7 @@ const IBC_TT_SERVICES = [
     lastDep:  '16:42',
     headway:  20,
     stops:    _IBC_RAPID_NB,
+    ..._IBC_PROFILE,
   },
 ];
 
