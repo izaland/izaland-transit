@@ -119,6 +119,7 @@
     { codes: ['M801', 'KW00'], stopSec: 90 },   // M8 <-> KW, Kishagoi-Exhibitown
     { codes: ['M1027', 'SSK01'], stopSec: 90 },   // M10 <-> SSK, Kanui Airport T1
     { codes: ['M415', 'SBO07'], stopSec: 90 },   // M4 <-> SBO, Kawaei
+    { codes: ['M818', 'IBC04'], stopSec: 90 },   // M8 <-> IBC, Jufurai (Local thru Enikezya)
   ];
 
   function registerThruService(def) {
