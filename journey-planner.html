@@ -370,15 +370,22 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
     jpTo.value   = 'SN08';
   }
 
-  function kwSvcPillHTML(svcDesc) {
+function svcPillHTML(svcDesc) {
   if (!svcDesc) return '';
   const d = svcDesc.toLowerCase();
+  const pill = (cls, abbr, full) =>
+    `<span class="svc-pill ${cls}" title="${full}" aria-label="${full}">${abbr}</span>`;
+
   if (d.includes('commuter rapid'))
-    return '<span class="kw-svc-pill commuter-rapid">Commuter Rapid</span>';
-  if (d.includes('rapid'))
-    return '<span class="kw-svc-pill rapid">Rapid</span>';
+    return pill('commuter-rapid', 'CRP', 'Commuter Rapid');
   if (d.includes('semi-rapid') || d.includes('semi rapid'))
-    return '<span class="kw-svc-pill semi-rapid">Semi-Rapid</span>';
+    return pill('semi-rapid', 'SRP', 'Semi-Rapid');
+  if (d.includes('limited express') || d.includes('lim. exp'))
+    return pill('limited-express', 'LEX', 'Limited Express');
+  if (d.includes('express'))
+    return pill('express', 'EXP', 'Express');
+  if (d.includes('rapid'))
+    return pill('rapid', 'RPD', 'Rapid');
   return '';
 }
   function svcBadgeHTML(lineId, svcLogical, color, network) {
@@ -465,7 +472,7 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
       let legsHTML = '<div class="journey-legs">';
       j.legs.forEach((leg, li) => {
         const badge = svcBadgeHTML(leg.lineId, leg.svcLogical, leg.color, leg.network);
-        const kwPill = /^(KW|KS|SK|TS)$/.test(leg.lineId) ? kwSvcPillHTML(leg.svcDesc) : '';
+        const svcPill = /^(KW|KS|SK|TS|IBC|SHX)$/.test(leg.lineId) ? svcPillHTML(leg.svcDesc) : '';
         const intStops = leg.intermediateStops ?? [];
         const intId = `int-${idx}-${li}`;
         const expandBtn = intStops.length
@@ -481,7 +488,7 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
 
         legsHTML += `
           <div class="leg-row">
-            <div class="leg-svc">${badge}${kwPill} <span class="svc-name">${leg.svcName}</span></div>
+            <div class="leg-svc">${badge}${svcPill} <span class="svc-name">${leg.svcName}</span></div>
             <div class="leg-times">${leg.boardDep} \u2192 ${leg.alightArr}</div>
             <div class="leg-stations">${leg.boardName} \u2192 ${leg.alightName} ${expandBtn}</div>
             <div class="leg-meta">
