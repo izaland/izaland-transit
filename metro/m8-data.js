@@ -366,11 +366,15 @@ const M8_INTERCHANGE = {
       note: 'Kidai Line — uscita condivisa' },
     { code: 'IB001', network: 'ibaches',  transferMin: 0,
       note: 'Ibaches Railway IB001 — through Svc B/C: nessun cambio treno' },
+    { code: 'IBC01', network: 'suburban', transferMin: 0,
+      note: 'Ibaches Main Line — Anagusa Mukai (Ibaches); = IB001, stazione condivisa (da confermare)' },
   ],
 
   M818: [
     { code: 'IB002', network: 'ibaches',  transferMin: 0,
       note: 'Ibaches Railway IB002 — branching point Svc B/C' },
+    { code: 'IBC03', network: 'suburban', transferMin: 0,
+      note: 'Ibaches Main Line — Jufurai; = IB002, punto di biforcazione (da confermare)' },
   ],
 
   M820: [
@@ -381,6 +385,8 @@ const M8_INTERCHANGE = {
   M823: [
     { code: 'SK20', network: 'suburban', transferMin: 3,
       note: 'Seishaku Line — Oizato 粕穫' },
+    { code: 'IBC07', network: 'suburban', transferMin: 3,
+      note: 'Ibaches Main Line — Oizato 粕穫' },
   ],
 
   M824: [
