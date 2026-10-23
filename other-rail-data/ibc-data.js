@@ -1,8 +1,8 @@
 /* ================================================================
    IBC-DATA.JS — Ibaches Main Line
-   齒琉能電鉄 (Ibaruno Dyenches) — Linea privata suburbana
+   齒琉能電鐵 (Ibaruno Dyenches) — Linea privata suburbana
 
-   Operatore : Ibaruno Dyenches (齒琉能電鉄)
+   Operatore : Ibaruno Dyenches (齒琉能電鐵)
    Tipo      : Privata suburbana (rete estesa, stile Tobu/Kintetsu;
                altre linee verranno aggiunte gradualmente)
    Capolinea : IBC01 Anagusa Mukai (Ibaches) ↔ IBC34 Hetsannui-Nari
@@ -22,6 +22,7 @@
      IBC1  Local  IBC01 ↔ IBC34  tutte le fermate  6 tph (ogni 10 min)
                     Prima corsa: 05:00 da entrambi i capolinea
                     Ultima corsa: 23:30 da entrambi i capolinea
+     IBC2  Rapid  IBC01 ↔ IBC34  (definito in ibc-tt.js)
 
    Note:
      — M8 e IBC NON condividono i binari. Da M818 la M8 si sbina e
@@ -48,10 +49,10 @@ const IBC_LINES = {
   IBC: {
     id:            'IBC',
     name:          'Ibaches Main Line',
-    nameJa:        '齒琉能電鉄',
+    nameJa:        '齒琉能電鐵',
     color:         '#FF9999',
     operator:      'Ibaruno Dyenches',
-    operatorJa:    '齒琉能電鉄',
+    operatorJa:    '齒琉能電鐵',
     type:          'private',
     region:        'Ibaruno',
     circular:      false,
@@ -64,7 +65,7 @@ const IBC_LINES = {
       { code: 'IBC02', name: 'Ōdabara',                 kanji: '大津',     km:  0.7   },  /* node 452184785 */
       { code: 'IBC03', name: 'Jufurai',                 kanji: '朱布来',   km:  1.48  },  /* node 135876986 */
       { code: 'IBC04', name: 'Shin-Higikura',           kanji: '新矢九田', km:  2.8   },  /* node 219979573 */
-      { code: 'IBC05', name: 'Ibaches Makurigawa',      kanji: '齒鉄炭畝', km:  4.03  },  /* node 219979572 */
+      { code: 'IBC05', name: 'Ibaches Makurigawa',      kanji: '齒鐵炭畝', km:  4.03  },  /* node 219979572 */
       { code: 'IBC06', name: 'Karajitsa',               kanji: '次矯',     km:  4.97  },  /* node 219979571 */
       { code: 'IBC07', name: 'Oizato',                  kanji: '粕穫',     km:  6.39  },  /* node 124064341 */
       { code: 'IBC08', name: 'Dendokuri',               kanji: '殿土巻',   km:  7.55  },  /* node 124064340 */
@@ -78,7 +79,7 @@ const IBC_LINES = {
       { code: 'IBC16', name: 'Katanase Tea',            kanji: '泉那施下', km: 16.5   },  /* node 292488855 */
       { code: 'IBC17', name: 'Samakisamo',              kanji: '蓒山',     km: 18.2   },  /* node 409739998 */
       { code: 'IBC18', name: 'Shin-Dankau',             kanji: '新檀洪',   km: 20.46  },  /* node 250818684 */
-      { code: 'IBC19', name: 'Ibaches Dankau',          kanji: '齒鉄檀洪', km: 21.48  },  /* node 250818581 */
+      { code: 'IBC19', name: 'Ibaches Dankau',          kanji: '齒鐵檀洪', km: 21.48  },  /* node 250818581 */
       { code: 'IBC20', name: 'Seirenji',                kanji: '誠蓮寺',   km: 22.79  },  /* node 452184851 */
       { code: 'IBC21', name: 'Chidai Seimun',           kanji: '齒大正門', km: 24.25  },  /* node 232186875 */
       { code: 'IBC22', name: 'Kaibaji',                 kanji: '界馬寺',   km: 26.25  },  /* node 250818546 */
