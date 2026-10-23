@@ -21,6 +21,10 @@
      M817  — IB001 (Anagusa Mukai): first Ibaches station, shared with M8
      M818  — IB002 (Jufurai): branching point; through trains diverge to Ibaches here
 
+   Interscambi con Ibaches Main Line (IBC), binari separati:
+     M817 ↔ IBC01  5 min
+     M818 ↔ IBC03  2 min
+
    Headway / Timetable:
      A  05:32–24:05  every  7 min  (~160 trips/direction)
      B  05:38–23:58  every 10 min  (~111 trips/direction)
@@ -366,15 +370,15 @@ const M8_INTERCHANGE = {
       note: 'Kidai Line — uscita condivisa' },
     { code: 'IB001', network: 'ibaches',  transferMin: 0,
       note: 'Ibaches Railway IB001 — through Svc B/C: nessun cambio treno' },
-    { code: 'IBC01', network: 'suburban', transferMin: 0,
-      note: 'Ibaches Main Line — Anagusa Mukai (Ibaches); = IB001, stazione condivisa (da confermare)' },
+    { code: 'IBC01', network: 'suburban', transferMin: 5,
+      note: 'Ibaches Main Line — Anagusa Mukai (Ibaches), binari separati' },
   ],
 
   M818: [
     { code: 'IB002', network: 'ibaches',  transferMin: 0,
       note: 'Ibaches Railway IB002 — branching point Svc B/C' },
-    { code: 'IBC03', network: 'suburban', transferMin: 0,
-      note: 'Ibaches Main Line — Jufurai; = IB002, punto di biforcazione (da confermare)' },
+    { code: 'IBC03', network: 'suburban', transferMin: 2,
+      note: 'Ibaches Main Line — Jufurai, binari separati' },
   ],
 
   M820: [
