@@ -11,6 +11,9 @@
    Diramazioni (IBC_BRANCHES, stessi colore e prefisso codici):
      IBCO  Ibaches Odanuri Shinai-Line (齒鐵裏窟市内線)
            da IBC34 · IBC101–IBC104 · 4 stazioni · 4.23 km
+     IBCE  Ibaches Enikezya Line (齒鐵盛箞線)
+           da IBC23 · IBC105–IBC107 · 3 stazioni · 6.82 km
+           (usata dal thru service di M8 — vedi M8)
      Per aggiungerne una nuova basta aggiungere un oggetto a
      IBC_BRANCHES: le stazioni vengono accodate automaticamente a
      IBC_LINES.IBC.stations (dopo la Main Line), cosi' i servizi
@@ -23,9 +26,10 @@
      IBC11 (Shakihori)           ↔ M1001, SK19, CK27, KS11
      IBC18 (Shin-Dankau)         ↔ SK13
      IBC23 (Ibaruno)             ↔ KD10
+     IBC107 (Ibaches Enikezya)   ↔ SK07, M142
      IBC19 (Ibaches Dankau)      — nessun interscambio (centinaia di metri da KD14/SK12)
      IBC24–IBC34                 — nessun interscambio definito (da completare)
-     IBC101–IBC104               — nessun interscambio definito
+     IBC101–IBC106               — nessun interscambio definito
 
    Servizi (IBC_SERVICES):
      IBC1  Local  IBC01 ↔ IBC34  tutte le fermate  6 tph (ogni 10 min)
@@ -54,6 +58,7 @@ const IBC_INTERCHANGE = {
   IBC11: ['M1001', 'SK19', 'CK27', 'KS11'],
   IBC18: ['SK13'],
   IBC23: ['KD10'],
+  IBC107: ['SK07', 'M142'],
 };
 
 const IBC_LINES = {
@@ -125,6 +130,17 @@ const IBC_BRANCHES = [
       { code: 'IBC102', name: 'Kotazhuju',           kanji: '細宿',     km: 53.77 },  /* node 335741747 · +2.18 */
       { code: 'IBC103', name: 'Odanuri Shikiniswae', kanji: '裏窟北口', km: 54.50 },  /* node 335741746 · +2.91 */
       { code: 'IBC104', name: 'Odanuri',             kanji: '裏窟',     km: 55.82 },  /* node 222589195 · +4.23 */
+    ],
+  },
+  {
+    id:       'IBCE',
+    name:     'Ibaches Enikezya Line',
+    nameJa:   '齒鐵盛狩線',
+    junction: 'IBC23',
+    stations: [
+      { code: 'IBC105', name: 'Tattamoto',           kanji: '蚫対',     km: 29.51 },  /* node 135204248 · +1.41 da IBC23 */
+      { code: 'IBC106', name: 'Kanlisāri',           kanji: '船川',     km: 33.86 },  /* node 335741468 · +5.76 */
+      { code: 'IBC107', name: 'Ibaches Enikezya',    kanji: '齒鐵盛狩', km: 34.92 },  /* node 335741589 · +6.82 */
     ],
   },
 ];
