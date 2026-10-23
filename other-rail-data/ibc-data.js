@@ -6,7 +6,15 @@
    Tipo      : Privata suburbana (rete estesa, stile Tobu/Kintetsu;
                altre linee verranno aggiunte gradualmente)
    Capolinea : IBC01 Anagusa Mukai (Ibaches) ↔ IBC34 Hetsannui-Nari
-   Lunghezza : 51.59 km · 34 stazioni
+   Lunghezza : 51.59 km · 34 stazioni (Main Line)
+
+   Diramazioni (IBC_BRANCHES, stessi colore e prefisso codici):
+     IBCO  Ibaches Odanuri Shinai-Line (齒鐵裏窟市内線)
+           da IBC34 · IBC101–IBC104 · 4 stazioni · 4.23 km
+     Per aggiungerne una nuova basta aggiungere un oggetto a
+     IBC_BRANCHES: le stazioni vengono accodate automaticamente a
+     IBC_LINES.IBC.stations (dopo la Main Line), cosi' i servizi
+     passanti usano la stessa linea del router.
 
    Interscambi:
      IBC01 (Anagusa Mukai)       ↔ M817 (5 min), KD30
@@ -17,12 +25,14 @@
      IBC23 (Ibaruno)             ↔ KD10
      IBC19 (Ibaches Dankau)      — nessun interscambio (centinaia di metri da KD14/SK12)
      IBC24–IBC34                 — nessun interscambio definito (da completare)
+     IBC101–IBC104               — nessun interscambio definito
 
    Servizi (IBC_SERVICES):
      IBC1  Local  IBC01 ↔ IBC34  tutte le fermate  6 tph (ogni 10 min)
                     Prima corsa: 05:00 da entrambi i capolinea
                     Ultima corsa: 23:30 da entrambi i capolinea
      IBC2  Rapid  IBC01 ↔ IBC34  (definito in ibc-tt.js)
+     (orari reali di tutti i servizi: ibc-tt.js)
 
    Note:
      — M8 e IBC NON condividono i binari. Da M818 la M8 si sbina e
@@ -30,7 +40,8 @@
      — Servizio provvisorio: frequenze e orari da definire.
      — Tempi di trasferimento: solo dove indicati; altrimenti default router.
      — km: progressiva da IBC01 (=0). Per IBC24–IBC34 le distanze sono state
-       rilevate da IBC23 e sommate a 28.1 km.
+       rilevate da IBC23 e sommate a 28.1 km. Per le diramazioni: km della
+       stazione di innesto + distanza da essa.
      — Ordine fisico: IBC30 (km 39.24) precede IBC29 (km 40.66); l'array
        stations segue l'ordine fisico, non quello numerico dei codici.
 ================================================================ */
@@ -98,6 +109,35 @@ const IBC_LINES = {
     ],
   },
 };
+
+/* ----------------------------------------------------------------
+   DIRAMAZIONI — stazioni accodate a IBC_LINES.IBC.stations.
+   km = progressiva da IBC01 (km della stazione di innesto + distanza).
+   ---------------------------------------------------------------- */
+const IBC_BRANCHES = [
+  {
+    id:       'IBCO',
+    name:     'Ibaches Odanuri Shinai-Line',
+    nameJa:   '齒鐵裏窟市内線',
+    junction: 'IBC34',
+    stations: [
+      { code: 'IBC101', name: 'Zhinchuku',           kanji: '秦竹',     km: 52.86 },  /* node 335741748 · +1.27 da IBC34 */
+      { code: 'IBC102', name: 'Kotazhuju',           kanji: '細宿',     km: 53.77 },  /* node 335741747 · +2.18 */
+      { code: 'IBC103', name: 'Odanuri Shikiniswae', kanji: '裏窟北口', km: 54.50 },  /* node 335741746 · +2.91 */
+      { code: 'IBC104', name: 'Odanuri',             kanji: '裏窟',     km: 55.82 },  /* node 222589195 · +4.23 */
+    ],
+  },
+];
+
+IBC_LINES.IBC.branches = IBC_BRANCHES.map((b) => ({
+  id: b.id, name: b.name, nameJa: b.nameJa, junction: b.junction,
+  stations: b.stations.map((s) => s.code),
+}));
+IBC_BRANCHES.forEach((b) => {
+  b.stations.forEach((s) => {
+    if (!IBC_LINES.IBC.stations.some((x) => x.code === s.code)) IBC_LINES.IBC.stations.push(s);
+  });
+});
 
 const IBC_SERVICES = [
   { id: 'IBC1',    desc: 'Local', fromCode: 'IBC01', toCode: 'IBC34', headway: 10, stops: [], firstDep: '05:00', lastDep: '23:30' },
