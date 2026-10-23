@@ -44,7 +44,7 @@ const _M8_A_S2_HW = [{ from: '05:46', to: '24:05', headwayMin: 21 }];
 const _M8_A_N1_HW = [{ from: '05:34', to: '24:05', headwayMin: 21 }];
 const _M8_A_N2_HW = [{ from: '05:41', to: '24:05', headwayMin: 21 }];
 const _M8_AT_S_HW = [{ from: '05:32', to: '23:23', headwayMin: 21 }];
-const _M8_AT_N_HW = [{ from: '05:39', to: '23:51', headwayMin: 21 }];
+const _M8_AT_N_HW = [{ from: '05:41', to: '23:53', headwayMin: 21 }];
 const _M8_B_HW = [
   { from: '05:38', to: '23:58', headwayMin: 10 },
 ];
