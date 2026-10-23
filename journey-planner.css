@@ -251,6 +251,6 @@
   .jp-time-chip { grid-column: 1 / -1; grid-row: 1; padding-bottom: var(--space-1); }
   .jp-nav-btn { justify-content: center; min-height: 44px; font-size: .8rem; }
 
-  .kw-svc-pill { font-size: .7rem; }
+  .svc-pill { font-size: .7rem; }
   .journey-dur .transfer-badge { font-size: .75rem; }
 }
