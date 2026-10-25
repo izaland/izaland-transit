@@ -335,7 +335,119 @@ if (typeof SuburbanRouter !== 'undefined') {
   });
 }
 
-/* FIX 19 (IBC patch): anti-backtrack filter for IZXUnifiedRouter.search.
+/* FIX 20 (IBC patch): compose branch↔main connections at Daihanjishi.
+   SuburbanRouter does not currently combine an IBCM Local with a Main Line
+   service at IBC41, so Maeðaki↔Īmate only produced the Ibaruno detour.
+   This wrapper appends up to three composed connections when the search
+   crosses Daihanjishi between the branch and the southern main line and
+   no existing result already transfers at IBC41.
+
+   SB (branch → south): IBC7/IBC7S to IBC41, then IBC3 or IBC6.
+   NB (south → branch): IBC3_NB/IBC6_NB to IBC41, then IBC7/IBC7S.
+   Minimum connection time is 5 minutes. Peak-window services are not
+   used for composition. */
+const _ibcStationByCode = new Map(IBC_LINES.IBC.stations.map((s) => [s.code, s]));
+const _ibcBranchCodes = new Set(_ibcMaedaki ? _ibcMaedaki.stations : []);
+const _ibcServedSeq = (svc) => {
+  const sts = IBC_LINES.IBC.stations;
+  const iF = sts.findIndex((s) => s.code === svc.fromCode);
+  const iT = sts.findIndex((s) => s.code === svc.toCode);
+  if (iF < 0 || iT < 0) return [];
+  const step = iF <= iT ? 1 : -1;
+  const seq = [];
+  for (let i = iF; i !== iT + step; i += step) seq.push(sts[i].code);
+  return (svc.stops && svc.stops.length) ? seq.filter((c) => svc.stops.includes(c)) : seq;
+};
+const _ibcSegMin = (svc, seq, a, b) => {
+  const ia = seq.indexOf(a), ib = seq.indexOf(b);
+  if (ia < 0 || ib < 0 || ia === ib) return 0;
+  const slice = ia < ib ? seq.slice(ia, ib + 1) : seq.slice(ib, ia + 1).reverse();
+  return _ibcPathDurationSec(slice, svc) / 60;
+};
+const _ibcDepMin = (svc, seq, boardCode, earliestMin) => {
+  const off = _ibcSegMin(svc, seq, seq[0], boardCode);
+  const base = _ibcMin(svc.firstDep) + off;
+  const k = Math.max(0, Math.ceil((earliestMin - base) / svc.headway));
+  return base + k * svc.headway;
+};
+const _ibcMakeLeg = (svc, seq, boardCode, alightCode, depMin) => {
+  const arrMin = depMin + _ibcSegMin(svc, seq, boardCode, alightCode);
+  const bs = _ibcStationByCode.get(boardCode);
+  const as = _ibcStationByCode.get(alightCode);
+  return {
+    lineId: 'IBC', network: 'suburban', color: '#FF9999',
+    svcId: svc.id, svcName: svc.desc, svcDesc: svc.desc, svcLogical: 'IBC',
+    boardCode, alightCode, boardName: bs.name, alightName: as.name,
+    boardDep: _ibcHM(depMin), alightArr: _ibcHM(arrMin),
+    km: Math.abs(as.km - bs.km), intermediateStops: [],
+  };
+};
+const _ibcComposeBranchConnection = (fromCode, toCode, depTime) => {
+  const out = [];
+  const depMin = _ibcMin(depTime);
+  const fromBranch = _ibcBranchCodes.has(fromCode);
+  const toBranch = _ibcBranchCodes.has(toCode);
+  if (fromBranch === toBranch) return out;
+  if (fromCode === 'IBC41' || toCode === 'IBC41') return out;
+  const feeders = fromBranch ? ['IBC7', 'IBC7S'] : ['IBC3_NB', 'IBC6_NB'];
+  const mains = fromBranch ? ['IBC3', 'IBC6'] : ['IBC7', 'IBC7S'];
+  for (const fid of feeders) {
+    const f = IBC_TT_SERVICES.find((s) => s.id === fid);
+    if (!f) continue;
+    const fseq = _ibcServedSeq(f);
+    if (!fseq.includes(fromCode) || !fseq.includes('IBC41')) continue;
+    if (fseq.indexOf('IBC41') < fseq.indexOf(fromCode)) continue;
+    const dep1 = _ibcDepMin(f, fseq, fromCode, depMin);
+    const arr1 = dep1 + _ibcSegMin(f, fseq, fromCode, 'IBC41');
+    for (const mid of mains) {
+      const m = IBC_TT_SERVICES.find((s) => s.id === mid);
+      if (!m) continue;
+      const mseq = _ibcServedSeq(m);
+      if (!mseq.includes('IBC41') || !mseq.includes(toCode)) continue;
+      if (mseq.indexOf(toCode) < mseq.indexOf('IBC41')) continue;
+      const dep2 = _ibcDepMin(m, mseq, 'IBC41', arr1 + 5);
+      const arr2 = dep2 + _ibcSegMin(m, mseq, 'IBC41', toCode);
+      const l1 = _ibcMakeLeg(f, fseq, fromCode, 'IBC41', dep1);
+      const l2 = _ibcMakeLeg(m, mseq, 'IBC41', toCode, dep2);
+      out.push({
+        legs: [l1, l2],
+        departureTime: l1.boardDep,
+        arrivalTime: l2.alightArr,
+        totalMinutes: Math.round(((_ibcMin(l2.alightArr) - _ibcMin(l1.boardDep) + 1440) % 1440)),
+        totalKm: l1.km + l2.km,
+        transfers: 1,
+        transferNodes: ['IBC41'],
+        transferThru: [false],
+        transferWalkMin: [0],
+        transferWaitMin: [Math.max(0, Math.round((_ibcMin(l2.boardDep) - _ibcMin(l1.alightArr))))],
+      });
+    }
+  }
+  return out.sort((a, b) => _ibcMin(a.departureTime) - _ibcMin(b.departureTime)).slice(0, 3);
+};
+if (typeof SuburbanRouter !== 'undefined' && typeof SuburbanRouter.search === 'function' && !SuburbanRouter.__ibcBranchPatched) {
+  const _origSub = SuburbanRouter.search.bind(SuburbanRouter);
+  SuburbanRouter.search = function (from, to, depTime, opts) {
+    const results = _origSub(from, to, depTime, opts);
+    const codes = [from, to].flatMap((x) => Array.isArray(x) ? x : String(x || '').split(','))
+      .map((s) => String(s).trim()).filter(Boolean);
+    if (codes.length === 2
+      && codes.every((c) => _ibcStationByCode.has(c))
+      && _ibcBranchCodes.has(codes[0]) !== _ibcBranchCodes.has(codes[1])
+      && codes[0] !== 'IBC41' && codes[1] !== 'IBC41'
+      && !(opts && opts.directOnly)) {
+      const list = Array.isArray(results) ? results : [];
+      const hasIbc41Transfer = list.some((j) => (j.transferNodes || []).includes('IBC41'));
+      if (!hasIbc41Transfer) {
+        return [...list, ..._ibcComposeBranchConnection(codes[0], codes[1], depTime)];
+      }
+    }
+    return results;
+  };
+  SuburbanRouter.__ibcBranchPatched = true;
+}
+
+/* FIX 21 (IBC patch): anti-backtrack filter for IZXUnifiedRouter.search.
    The branch detour is assembled by the unified router from separate
    direct searches, so filtering SuburbanRouter.search results cannot see
    the full multi-leg journey. This wrapper is applied after the page
@@ -349,12 +461,15 @@ if (typeof SuburbanRouter !== 'undefined') {
    destination comes from the `to` argument (comma-separated codes are
    supported), with a name-to-code fallback.
 
-   For two consecutive legs on the SAME line, if alighting moves farther
-   from the final destination than boarding, the journey is removed.
-   Unlike the previous patch, a single-result search is filtered too;
-   when the destination can be resolved, an empty filtered list is
-   returned rather than restoring a backtracking itinerary. If the
-   destination cannot be resolved, the original list is returned. */
+   Two removal rules apply to consecutive legs on the SAME line:
+   1. Backtrack: alighting is farther from the final destination than
+      boarding (e.g. Daihanjishi → Ibaruno → back south).
+   2. Passed-through break: the first service already served the second
+      leg's boarding station before its own alighting station, so the
+      passenger could have stayed on board (e.g. Īmate → Ibaruno →
+      Daihanjishi on IBC3_NB, which passes Daihanjishi first).
+   When the destination can be resolved, an empty filtered list is
+   returned rather than restoring an artificial detour. */
 const _ibcWrapUnifiedRouter = () => {
   const R = (typeof window !== 'undefined') ? window.IZXUnifiedRouter : null;
   if (!R || typeof R.search !== 'function' || R.__ibcBacktrackPatched) return;
@@ -366,7 +481,7 @@ const _ibcWrapUnifiedRouter = () => {
     }
   }
   const _toCodes = (x) => (Array.isArray(x) ? x : String(x || '').split(','))
-    .map(s => String(s).trim()).filter(Boolean);
+    .map((s) => String(s).trim()).filter(Boolean);
   const _aliasesOf = (code) => {
     const out = new Set([code]);
     const ix = (typeof SUBURBAN_INTERCHANGE !== 'undefined') ? SUBURBAN_INTERCHANGE : {};
@@ -375,7 +490,7 @@ const _ibcWrapUnifiedRouter = () => {
       out.add(c);
       for (const p of ix[c] || []) {
         const pc = (typeof p === 'object' && p !== null) ? p.code : p;
-        if (pc && !out.has(pc)) { out.add(pc); }
+        if (pc && !out.has(pc)) out.add(pc);
       }
     };
     add(code);
@@ -403,7 +518,7 @@ const _ibcWrapUnifiedRouter = () => {
       const nodes = journey.transferNodes || [];
       let destCode = null;
       for (const candidate of destCandidates) {
-        if (legs.some(leg => {
+        if (legs.some((leg) => {
           const line = (typeof SUBURBAN_LINES !== 'undefined') ? SUBURBAN_LINES[leg.lineId] : null;
           return line && Array.isArray(line.stations) && _idxOf(line, candidate) >= 0;
         })) { destCode = candidate; break; }
@@ -426,6 +541,13 @@ const _ibcWrapUnifiedRouter = () => {
         const iDest = _idxOf(line, destCode);
         if (iBoard < 0 || iAlight < 0 || iDest < 0) continue;
         if (Math.abs(iAlight - iDest) > Math.abs(iBoard - iDest)) return false;
+        const svc1 = IBC_TT_SERVICES.find((s) => s.id === prev.svcId);
+        if (svc1) {
+          const seq1 = _ibcServedSeq(svc1);
+          const pA = seq1.indexOf(alightCode);
+          const pN = seq1.findIndex((c) => _aliasesOf(boardCode).has(c));
+          if (pA >= 0 && pN >= 0 && pN < pA) return false;
+        }
       }
       return true;
     });
