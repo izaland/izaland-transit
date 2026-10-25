@@ -335,6 +335,40 @@ if (typeof SuburbanRouter !== 'undefined') {
   });
 }
 
+/* FIX 16 (IBC patch): anti-backtrack post-filter for SuburbanRouter.search.
+   Removes journeys where a later leg on the SAME line moves away from the
+   journey destination compared with its boarding station. This prevents
+   branch-to-main-line itineraries such as IBC7_NB → IBC41, then IBC3_NB
+   backwards to IBC23, then IBC3 forward to IBC55, when the forward IBC3
+   also serves IBC41. If every result would be removed, the original list
+   is returned unchanged. */
+if (typeof SuburbanRouter !== 'undefined' && typeof SuburbanRouter.search === 'function') {
+  const _ibcOrigSearch = SuburbanRouter.search;
+  SuburbanRouter.search = function (from, to, depTime, opts) {
+    const results = _ibcOrigSearch.call(this, from, to, depTime, opts);
+    if (!Array.isArray(results) || results.length <= 1) return results;
+    const filtered = results.filter((journey) => {
+      const legs = journey.legs || [];
+      const destCode = legs.at(-1)?.alightCode;
+      if (!destCode) return true;
+      for (let i = 1; i < legs.length; i++) {
+        const prev = legs[i - 1], cur = legs[i];
+        if (!prev || !cur || prev.lineId !== cur.lineId) continue;
+        const line = (typeof SUBURBAN_LINES !== 'undefined') ? SUBURBAN_LINES[cur.lineId] : null;
+        if (!line || !Array.isArray(line.stations)) continue;
+        const idx = (code) => line.stations.findIndex((s) => s.code === code);
+        const iBoard = idx(cur.boardCode);
+        const iAlight = idx(cur.alightCode);
+        const iDest = idx(destCode);
+        if (iBoard < 0 || iAlight < 0 || iDest < 0) continue;
+        if (Math.abs(iAlight - iDest) > Math.abs(iBoard - iDest)) return false;
+      }
+      return true;
+    });
+    return filtered.length ? filtered : results;
+  };
+}
+
 if (typeof module !== 'undefined') {
   module.exports = { IBC_TT_SERVICES };
 }
