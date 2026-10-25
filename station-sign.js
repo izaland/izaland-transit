@@ -10,17 +10,20 @@
   let contextLine = '';
   const style = document.createElement('style');
   style.textContent = `
-    .station-sign { background:#f4f3ed; color:#202020; border-radius:6px; overflow:hidden; margin-bottom:24px; }
+    @font-face { font-family:'Station Latin'; src:url('./assets/ANEKGUJARATI_CONDENSED-MEDIUM.TTF') format('truetype'); font-weight:500; font-style:normal; font-display:swap; }
+    @font-face { font-family:'Station Kanji'; src:url('./assets/HGMARUGOTHICMPRO_X0213(04).TTF') format('truetype'); font-weight:400; font-style:normal; font-display:swap; }
+    .station-sign { background:#f4f3ed; color:#202020; border-radius:6px; overflow:hidden; width:min(100%,480px); aspect-ratio:4 / 3; height:auto; margin:0 auto 24px; display:flex; flex-direction:column; font-family:'Station Latin','Station Kanji',sans-serif; font-weight:500; font-synthesis:none; }
     .station-sign-heading { padding:12px 16px; text-align:center; font:inherit; }
     .station-sign-heading select { max-width:100%; padding:8px; font:inherit; }
-    .station-sign-centre { text-align:center; padding:20px 16px; }
-    .station-sign-kanji { font-family:'Noto Sans JP',sans-serif; font-size:clamp(24px,4vw,40px); overflow-wrap:anywhere; }
+    .station-sign-centre { text-align:center; padding:20px 16px; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .station-sign-kanji, .station-sign-neighbour-kanji { font-family:'Station Kanji',sans-serif; font-weight:400; }
+    .station-sign-kanji { font-size:clamp(24px,4vw,40px); overflow-wrap:anywhere; }
     .station-sign-name { font-size:clamp(20px,3vw,30px); margin:8px 0; overflow-wrap:anywhere; }
     .station-sign-code { display:inline-block; padding:6px 12px; border:2px solid currentColor; border-radius:6px; font-size:16px; }
     .station-sign-neighbours { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; padding:16px; border-top:8px solid var(--sign-color); }
     .station-sign-side { display:flex; flex-direction:column; gap:8px; min-width:0; }
     .station-sign-side:last-child { text-align:right; }
-    .station-sign-link { display:block; width:100%; min-height:44px; text-align:inherit; color:inherit; background:transparent; border:1px solid #ccc; padding:10px; }
+    .station-sign-link { display:block; width:100%; min-height:44px; text-align:inherit; color:inherit; background:transparent; border:1px solid #ccc; padding:10px; font:inherit; }
     .station-sign-link:hover { background:#e4e3dc; }
     .station-sign-link:focus-visible { outline:3px solid var(--sign-color); outline-offset:2px; }
     .station-sign-link span { display:block; overflow-wrap:anywhere; }
@@ -154,7 +157,7 @@
         const button = addText(side,'button','','station-sign-link');
         button.type = 'button';
         addText(button,'span',arrow === '←' ? arrow + ' ' + s.name : s.name + ' ' + arrow);
-        if (s.kanji && s.kanji !== '—') addText(button,'small',s.kanji);
+        if (s.kanji && s.kanji !== '—') addText(button,'small',s.kanji,'station-sign-neighbour-kanji');
         addText(button,'small',s.code);
         button.addEventListener('click',() => { contextLine = graph.line.id; qEl.value = code; inspect(); });
       }
