@@ -390,4 +390,71 @@
     decorateLineInterchanges(lineId);
   };
   if (lineSelect.value) decorateLineInterchanges(lineSelect.value);
+
+  /* Inspector-only navbar; deliberately does not import global nav styles. */
+  if (!document.getElementById('inspector-nav')) {
+    const navFont = document.createElement('link');
+    navFont.rel = 'stylesheet';
+    navFont.href = 'https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap';
+    document.head.appendChild(navFont);
+    const navStyle = document.createElement('style');
+    navStyle.textContent = `
+      #inspector-nav { position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between; gap:16px; margin:-24px -24px 24px; padding:16px 32px; background:#0f1117; color:#e2e8f0; border-bottom:1px solid #2a3147; font:500 14px/1.5 'Satoshi',sans-serif; }
+      #inspector-nav .ins-logo { display:flex; align-items:center; min-height:44px; flex-shrink:0; }
+      #inspector-nav .ins-logo img { display:block; width:200px; height:40px; object-fit:contain; }
+      #inspector-nav .ins-links { display:flex; align-items:center; gap:24px; }
+      #inspector-nav a { color:#94a3b8; text-decoration:none; }
+      #inspector-nav a:hover, #inspector-nav summary:hover { color:#e2e8f0; }
+      #inspector-nav .ins-home { display:flex; align-items:center; min-height:44px; }
+      #inspector-nav details { position:relative; }
+      #inspector-nav summary { display:flex; align-items:center; gap:6px; min-height:44px; list-style:none; color:#94a3b8; cursor:pointer; }
+      #inspector-nav summary::-webkit-details-marker { display:none; }
+      #inspector-nav summary::before { content:''; width:6px; height:6px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg); margin-right:4px; }
+      #inspector-nav details[open] summary::before { transform:rotate(225deg); }
+      #inspector-nav .ins-active > summary, #inspector-nav a[aria-current='page'] { color:#3b82f6; }
+      #inspector-nav .ins-dropdown { position:absolute; top:100%; right:0; min-width:220px; max-height:min(70vh,600px); overflow-y:auto; padding:8px; background:#161b27; border:1px solid #2a3147; border-radius:12px; box-shadow:0 8px 24px #0005; }
+      #inspector-nav .ins-dropdown a { display:flex; align-items:center; min-height:44px; padding:8px 12px; border-radius:6px; white-space:nowrap; }
+      #inspector-nav .ins-dropdown a:hover { background:#1c2235; }
+      #inspector-nav .ins-divider { border-top:1px solid #2a3147; margin:4px 8px; }
+      #inspector-nav .ins-label { display:block; padding:8px 12px 4px; color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
+      #inspector-nav a:focus-visible, #inspector-nav summary:focus-visible { outline:2px solid #3b82f6; outline-offset:3px; border-radius:4px; }
+      @media (max-width:640px) {
+        #inspector-nav { flex-wrap:wrap; padding:12px 16px; gap:8px; }
+        #inspector-nav .ins-links { width:100%; justify-content:space-between; gap:12px; }
+        #inspector-nav .ins-dropdown { min-width:200px; }
+        #inspector-nav .ins-active .ins-dropdown { left:0; right:auto; }
+      }
+    `;
+    document.head.appendChild(navStyle);
+    const nav = document.createElement('nav');
+    nav.id = 'inspector-nav';
+    nav.setAttribute('aria-label','Main navigation');
+    nav.innerHTML = `
+      <a href="index.html" class="ins-logo" aria-label="Izarail home"><img src="frontend/Izarail Urban Networks dark.svg" alt="Izarail" width="200" height="40"></a>
+      <div class="ins-links">
+        <a href="index.html" class="ins-home">Home</a>
+        <details class="ins-active"><summary>Railways</summary><div class="ins-dropdown">
+          <a href="izarail.html">Izarail</a><a href="metro.html">Metro</a><a href="izx.html">IZX (High Speed)</a><a href="commuter.html">Commuter Rail</a><a href="other-rail.html">Other Rail</a><a href="map.html">Map</a>
+          <div class="ins-divider"></div><span class="ins-label">IZX Keishin</span>
+          <a href="keishin-timetable.html">Timetable</a><a href="marcia.html">Train graph</a><a href="izx-ticket.html">Tickets &amp; Fares</a>
+          <div class="ins-divider"></div><span class="ins-label">Network tools</span>
+          <a href="journey-planner.html">Journey Planner</a><a href="station-inspector.html" aria-current="page">Station / Line inspector</a>
+        </div></details>
+        <details><summary>Aviation</summary><div class="ins-dropdown"><a href="airports.html">Airports</a><a href="airlines.html">Airlines</a></div></details>
+        <details><summary>Other</summary><div class="ins-dropdown"><span class="ins-label">Coming soon</span></div></details>
+      </div>
+    `;
+    document.body.prepend(nav);
+    const menus = [...nav.querySelectorAll('details')];
+    menus.forEach(menu => menu.addEventListener('toggle',() => {
+      if (menu.open) menus.forEach(other => { if (other !== menu) other.open = false; });
+    }));
+    document.addEventListener('click',e => { if (!nav.contains(e.target)) menus.forEach(menu => { menu.open = false; }); });
+    nav.addEventListener('keydown',e => {
+      if (e.key !== 'Escape') return;
+      const menu = e.target.closest('details');
+      menus.forEach(item => { item.open = false; });
+      if (menu) menu.querySelector('summary').focus();
+    });
+  }
 })();
