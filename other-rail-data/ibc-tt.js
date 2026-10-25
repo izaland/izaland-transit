@@ -335,20 +335,26 @@ if (typeof SuburbanRouter !== 'undefined') {
   });
 }
 
-/* FIX 18 (IBC patch): anti-backtrack filter for IZXUnifiedRouter.search.
+/* FIX 19 (IBC patch): anti-backtrack filter for IZXUnifiedRouter.search.
    The branch detour is assembled by the unified router from separate
    direct searches, so filtering SuburbanRouter.search results cannot see
    the full multi-leg journey. This wrapper is applied after the page
    loads, once IZXUnifiedRouter exists.
 
-   Station codes are taken from journey.transferNodes, which already
-   contains real station codes: transferNodes[i-1] is the boarding code
-   of leg i and transferNodes[i] is its alighting code. The journey
-   destination is taken from the `to` argument (comma-separated codes
-   are supported), with a name-to-code fallback. For two consecutive
-   legs on the SAME line, if alighting moves farther from the final
-   destination than boarding, the journey is removed. If every result
-   would be removed, the original list is returned unchanged. */
+   Station codes come from journey.transferNodes: transferNodes[i-1] is
+   the boarding code of leg i and transferNodes[i] is its alighting code.
+   Transfer nodes may use an interchange alias (e.g. Ibaruno = KD10 on
+   Kidai, IBC23 on IBC), so each code is also resolved through
+   SUBURBAN_INTERCHANGE partners in both directions. The journey
+   destination comes from the `to` argument (comma-separated codes are
+   supported), with a name-to-code fallback.
+
+   For two consecutive legs on the SAME line, if alighting moves farther
+   from the final destination than boarding, the journey is removed.
+   Unlike the previous patch, a single-result search is filtered too;
+   when the destination can be resolved, an empty filtered list is
+   returned rather than restoring a backtracking itinerary. If the
+   destination cannot be resolved, the original list is returned. */
 const _ibcWrapUnifiedRouter = () => {
   const R = (typeof window !== 'undefined') ? window.IZXUnifiedRouter : null;
   if (!R || typeof R.search !== 'function' || R.__ibcBacktrackPatched) return;
@@ -361,18 +367,47 @@ const _ibcWrapUnifiedRouter = () => {
   }
   const _toCodes = (x) => (Array.isArray(x) ? x : String(x || '').split(','))
     .map(s => String(s).trim()).filter(Boolean);
+  const _aliasesOf = (code) => {
+    const out = new Set([code]);
+    const ix = (typeof SUBURBAN_INTERCHANGE !== 'undefined') ? SUBURBAN_INTERCHANGE : {};
+    const add = (c) => {
+      if (!c || out.has(c)) return;
+      out.add(c);
+      for (const p of ix[c] || []) {
+        const pc = (typeof p === 'object' && p !== null) ? p.code : p;
+        if (pc && !out.has(pc)) { out.add(pc); }
+      }
+    };
+    add(code);
+    for (const [key, partners] of Object.entries(ix)) {
+      for (const p of partners) {
+        const pc = (typeof p === 'object' && p !== null) ? p.code : p;
+        if (pc === code) add(key);
+      }
+    }
+    return out;
+  };
+  const _idxOf = (line, code) => {
+    for (const c of _aliasesOf(code)) {
+      const i = line.stations.findIndex((s) => s.code === c);
+      if (i >= 0) return i;
+    }
+    return -1;
+  };
   R.search = function (from, to, depTime, opts) {
     const results = _orig(from, to, depTime, opts);
-    if (!Array.isArray(results) || results.length <= 1) return results;
+    if (!Array.isArray(results) || !results.length) return results;
     const destCandidates = _toCodes(to);
     const filtered = results.filter((journey) => {
       const legs = journey.legs || [];
       const nodes = journey.transferNodes || [];
-      let destCode = destCandidates.find(code =>
-        legs.some(leg => {
+      let destCode = null;
+      for (const candidate of destCandidates) {
+        if (legs.some(leg => {
           const line = (typeof SUBURBAN_LINES !== 'undefined') ? SUBURBAN_LINES[leg.lineId] : null;
-          return line && Array.isArray(line.stations) && line.stations.some(s => s.code === code);
-        }));
+          return line && Array.isArray(line.stations) && _idxOf(line, candidate) >= 0;
+        })) { destCode = candidate; break; }
+      }
       if (!destCode) {
         const lastLeg = legs.at(-1) || {};
         destCode = _nameToCode.get(lastLeg.alightName);
@@ -386,16 +421,15 @@ const _ibcWrapUnifiedRouter = () => {
         const boardCode = nodes[i - 1];
         const alightCode = nodes[i];
         if (!boardCode || !alightCode) continue;
-        const idx = (code) => line.stations.findIndex((s) => s.code === code);
-        const iBoard = idx(boardCode);
-        const iAlight = idx(alightCode);
-        const iDest = idx(destCode);
+        const iBoard = _idxOf(line, boardCode);
+        const iAlight = _idxOf(line, alightCode);
+        const iDest = _idxOf(line, destCode);
         if (iBoard < 0 || iAlight < 0 || iDest < 0) continue;
         if (Math.abs(iAlight - iDest) > Math.abs(iBoard - iDest)) return false;
       }
       return true;
     });
-    return filtered.length ? filtered : results;
+    return filtered;
   };
   R.__ibcBacktrackPatched = true;
 };
