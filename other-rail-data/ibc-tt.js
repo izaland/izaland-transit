@@ -13,16 +13,16 @@
           (1 treno su 3 va sulla diramazione; NB speculare, vedi sotto)
           IBC1_NB parte da IBC41 ogni 30 min, 05:10–23:10 provvisori;
           nessun servizio nuovo assegnato a IBC42–IBC55.
-     IBC2  Rapid  IBC01 ↔ IBC34  14 fermate  headway 20 min (3 tph)
+     IBC2  Rapid  IBC01 ↔ IBC41  16 fermate  headway 20 min (3 tph)
           - fascia centrale (esclusi i picchi)
           - da IBC01: 09:45 – 17:25 (minuti :05, :25, :45)
-          - da IBC34: 09:02 – 16:42 (calcolato a ritroso, vedi note)
+          - da IBC41: 09:02 – 16:42 (orari NB conservati, provvisori)
           - fermate: IBC01, 03, 05, 07, 11, 15, 18, 19, 21, 23,
-                     28, 30, 33, 34
-     IBC3  Limited Express  IBC01 ↔ IBC33  5 fermate  headway 60 min (1 tph)
+                     28, 30, 33, 34, 37, 41
+     IBC3  Limited Express  IBC01 ↔ IBC41  6 fermate  headway 60 min (1 tph)
           - da IBC01: 07:09 – 21:09 (minuto :09)
-          - da IBC33: 06:38 – 20:38 (minuto :38)
-          - fermate: IBC01, 03, 11, 23, 33
+          - da IBC41: 06:38 – 20:38 (orari NB conservati, provvisori)
+          - fermate: IBC01, 03, 11, 23, 33, 41
 
    Odanuri Shinai-Line (齒鐵裏窟市内線) IBC34 ↔ IBC104, 4 fermate:
      - passanti da/per IBC01 (IBC1X, IBC1X_NB): 2 tph tutto il giorno
@@ -52,19 +52,17 @@
    Interscambio Local ↔ Rapid (stessa banchina, 0 min a piedi):
      gestito dal router nelle fasi 1b (Rapid→Local) e 1c (Local→Rapid)
      nelle stazioni in cui fermano entrambi i servizi:
-     IBC01, 03, 05, 07, 11, 15, 18, 19, 21, 23, 28, 30, 33, 34.
+     IBC01, 03, 05, 07, 11, 15, 18, 19, 21, 23, 28, 30, 33, 34, 37, 41.
      I percorsi Local prolungati e di diramazione usano stops[] espliciti
      per non includere stazioni appartenenti a un altro ramo.
 
    NOTE:
      — Servizio provvisorio e uniforme tutto il giorno (TODO).
      — Ordine fisico: IBC30 precede IBC29 (vedi ibc-data.js).
-     — Orari Rapid da IBC34: ogni treno arriva a IBC01 7 min prima
-       della ripartenza (折り返し). Tempo di percorrenza
-       IBC34→IBC01 ≈ 36.5 min con il profilo qui sopra. Valori
-       arrotondati al minuto.
-     — Le prime corse NB partono prima delle 09:30 e le ultime prima
-       delle 17:25 per poter fare il 折り返し a IBC01.
+     — Rapid e Limited Express prolungati a IBC41: frequenze e finestre
+       di partenza sono conservate. Le finestre NB ora si riferiscono
+       a IBC41 e non piu' a IBC34/IBC33; tempi di inversione e
+       corrispondenza con le corse SB restano da ricalibrare.
 ================================================================ */
 'use strict';
 
@@ -78,11 +76,11 @@ const _IBC_STOPS_NB = [..._IBC_STOPS_SB].reverse();
 
 const _IBC_RAPID_SB = [
   'IBC01','IBC03','IBC05','IBC07','IBC11','IBC15','IBC18','IBC19','IBC21','IBC23',
-  'IBC28','IBC30','IBC33','IBC34',
+  'IBC28','IBC30','IBC33','IBC34','IBC37','IBC41',
 ];
 const _IBC_RAPID_NB = [..._IBC_RAPID_SB].reverse();
 
-const _IBC_LEX_SB = ['IBC01','IBC03','IBC11','IBC23','IBC33'];
+const _IBC_LEX_SB = ['IBC01','IBC03','IBC11','IBC23','IBC33','IBC41'];
 const _IBC_LEX_NB = [..._IBC_LEX_SB].reverse();
 
 /* thru M8: IBC04 → IBC23 (tutte) → Enikezya Line. IBC03 saltata (= M818). */
@@ -131,9 +129,9 @@ const IBC_TT_SERVICES = [
   _ibcSvc('IBC1B_NB', 'Local NB — Hetsannui-Nari → Anagusa Mukai (Ibaches)', 'IBC34', 'IBC01', '05:20', '23:20', 30, []),
   {
     id:       'IBC2',
-    desc:     'Rapid — Anagusa Mukai (Ibaches) → Hetsannui-Nari',
+    desc:     'Rapid — Anagusa Mukai (Ibaches) → Daihanjishi',
     fromCode: 'IBC01',
-    toCode:   'IBC34',
+    toCode:   'IBC41',
     firstDep: '09:45',
     lastDep:  '17:25',
     headway:  20,
@@ -142,8 +140,8 @@ const IBC_TT_SERVICES = [
   },
   {
     id:       'IBC2_NB',
-    desc:     'Rapid NB — Hetsannui-Nari → Anagusa Mukai (Ibaches)',
-    fromCode: 'IBC34',
+    desc:     'Rapid NB — Daihanjishi → Anagusa Mukai (Ibaches)',
+    fromCode: 'IBC41',
     toCode:   'IBC01',
     firstDep: '09:02',
     lastDep:  '16:42',
@@ -153,9 +151,9 @@ const IBC_TT_SERVICES = [
   },
   {
     id:       'IBC3',
-    desc:     'Limited Express — Anagusa Mukai (Ibaches) → IBC33',
+    desc:     'Limited Express — Anagusa Mukai (Ibaches) → Daihanjishi',
     fromCode: 'IBC01',
-    toCode:   'IBC33',
+    toCode:   'IBC41',
     firstDep: '07:09',
     lastDep:  '21:09',
     headway:  60,
@@ -164,8 +162,8 @@ const IBC_TT_SERVICES = [
   },
   {
     id:       'IBC3_NB',
-    desc:     'Limited Express NB — IBC33 → Anagusa Mukai (Ibaches)',
-    fromCode: 'IBC33',
+    desc:     'Limited Express NB — Daihanjishi → Anagusa Mukai (Ibaches)',
+    fromCode: 'IBC41',
     toCode:   'IBC01',
     firstDep: '06:38',
     lastDep:  '20:38',
