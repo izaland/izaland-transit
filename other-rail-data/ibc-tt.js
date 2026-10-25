@@ -337,28 +337,37 @@ if (typeof SuburbanRouter !== 'undefined') {
 
 /* FIX 16 (IBC patch): anti-backtrack post-filter for SuburbanRouter.search.
    Removes journeys where a later leg on the SAME line moves away from the
-   journey destination compared with its boarding station. This prevents
+   journey destination compared with its boarding station. Station codes are
+   resolved from leg codes when available, otherwise from the leg display
+   names via a name-to-code map built from SUBURBAN_LINES. This prevents
    branch-to-main-line itineraries such as IBC7_NB → IBC41, then IBC3_NB
    backwards to IBC23, then IBC3 forward to IBC55, when the forward IBC3
    also serves IBC41. If every result would be removed, the original list
    is returned unchanged. */
 if (typeof SuburbanRouter !== 'undefined' && typeof SuburbanRouter.search === 'function') {
   const _ibcOrigSearch = SuburbanRouter.search;
+  const _ibcNameToCode = new Map();
+  for (const line of Object.values(typeof SUBURBAN_LINES !== 'undefined' ? SUBURBAN_LINES : {})) {
+    for (const st of line.stations || []) {
+      if (st.code && st.name && !_ibcNameToCode.has(st.name)) _ibcNameToCode.set(st.name, st.code);
+    }
+  }
+  const _ibcLegCode = (leg, codeKey, nameKey) => leg[codeKey] || _ibcNameToCode.get(leg[nameKey]);
   SuburbanRouter.search = function (from, to, depTime, opts) {
     const results = _ibcOrigSearch.call(this, from, to, depTime, opts);
     if (!Array.isArray(results) || results.length <= 1) return results;
     const filtered = results.filter((journey) => {
       const legs = journey.legs || [];
-      const destCode = legs.at(-1)?.alightCode;
+      const destCode = _ibcLegCode(legs.at(-1) || {}, 'alightCode', 'alightName');
       if (!destCode) return true;
       for (let i = 1; i < legs.length; i++) {
         const prev = legs[i - 1], cur = legs[i];
         if (!prev || !cur || prev.lineId !== cur.lineId) continue;
-        const line = (typeof SUBURBAN_LINES !== 'undefined') ? SUBURBAN_LINES[cur.lineId] : null;
+        const line = SUBURBAN_LINES[cur.lineId];
         if (!line || !Array.isArray(line.stations)) continue;
         const idx = (code) => line.stations.findIndex((s) => s.code === code);
-        const iBoard = idx(cur.boardCode);
-        const iAlight = idx(cur.alightCode);
+        const iBoard = idx(_ibcLegCode(cur, 'boardCode', 'boardName'));
+        const iAlight = idx(_ibcLegCode(cur, 'alightCode', 'alightName'));
         const iDest = idx(destCode);
         if (iBoard < 0 || iAlight < 0 || iDest < 0) continue;
         if (Math.abs(iAlight - iDest) > Math.abs(iBoard - iDest)) return false;
