@@ -28,11 +28,12 @@
      Ore iniziali/finali parziali non riempite con corse aggiuntive.
      Gli orari di servizio possono superare 24:00 per l'ultima coincidenza.
 
-   IBC7 Local IBC41 ↔ IBC121 Maeðaki: 1 tph, tutte le fermate.
-     IBC7S: corse corte IBC41 ↔ IBC114 Ninokawa, 1 tph 06–22.
-     IBC7P1/P2: altri 2 tph solo sul tronco interno, punte 07–10/17–20.
-     Totale interno: 1 tph 05–06 e 22–24; 2 tph nel resto; 4 tph in punta.
-     Oltre IBC114: sempre 1 tph. Nessun diretto da IBC01, cambio a IBC41.
+   IBC7 Local IBC41 ↔ IBC121 Maeðaki: 2 tph, tutte le fermate,
+     05:00–24:00. IBC7S: corse corte IBC41 ↔ IBC114 Ninokawa,
+     2 tph 06–22, sfasate di 15 min. IBC7P1/P2: altri 2 tph solo
+     sul tronco interno, punte 07–10/17–20.
+     Totale interno: 2 tph 05–06 e 22–24; 4 tph nel resto; 6 tph in punta.
+     Oltre IBC114: sempre 2 tph. Nessun diretto da IBC01, cambio a IBC41.
      Finestre riferite alla partenza dal capolinea di ciascun servizio;
      alle altre stazioni si spostano con il tempo di percorrenza.
      Coincidenze dove il feeder opera; primi/ultimi treni e rinforzi
@@ -272,8 +273,9 @@ if (_ibcPeakNb.length) IBC_TT_SERVICES.push({
 });
 
 /* IBC7 / IBCM: explicit branch-only paths; no direct service from IBC01.
-   Long Local: hourly 05:00–24:00. Short Local: hourly 06:00–22:00.
-   Together: 2 tph on IBC41–IBC114, 1 tph beyond IBC114.
+   Long Local: every 30 min 05:00–24:00. Short Local: every 30 min
+   06:00–22:00, offset by 15 min from the long service.
+   Together: 4 tph on IBC41–IBC114, 2 tph beyond IBC114.
    Two extra short trains/hour in peaks 07:00–10:00 / 17:00–20:00.
    Departure windows refer to each service's origin. At downstream stops
    the service period is shifted by running time. Early/late connections
@@ -291,15 +293,15 @@ if (_ibcMaedaki) {
   const fullNB = [...fullSB].reverse(), shortNB = [...shortSB].reverse();
   const mod60 = value => ((value%60)+60)%60;
   const sbPhase = mod60(_ibcMin(_ibcLocalFeed.firstDep)+_ibcLocalOffset);
-  const shortPhase = mod60(sbPhase+30);
+  const shortPhase = mod60(sbPhase+15);
   const longNbPhase = mod60(_ibcMin(_ibcLocalReturn.firstDep)-5-Math.ceil(_ibcPathDurationSec(fullNB,_IBC_PROFILE)/60));
   const shortNbPhase = mod60(_ibcMin(_ibcLocalReturn.firstDep)+30-5-Math.ceil(_ibcPathDurationSec(shortNB,_IBC_PROFILE)/60));
   const at = (hour,phase) => _ibcServiceHM(hour*60+phase);
   IBC_TT_SERVICES.push(
-    _ibcSvc('IBC7','Local — Daihanjishi → Maeðaki','IBC41','IBC121',at(5,sbPhase),at(23,sbPhase),60,fullSB),
-    _ibcSvc('IBC7_NB','Local NB — Maeðaki → Daihanjishi','IBC121','IBC41',at(5,longNbPhase),at(23,longNbPhase),60,fullNB),
-    _ibcSvc('IBC7S','Local short — Daihanjishi → Ninokawa','IBC41','IBC114',at(6,shortPhase),at(21,shortPhase),60,shortSB),
-    _ibcSvc('IBC7S_NB','Local short NB — Ninokawa → Daihanjishi','IBC114','IBC41',at(6,shortNbPhase),at(21,shortNbPhase),60,shortNB)
+    _ibcSvc('IBC7','Local — Daihanjishi → Maeðaki','IBC41','IBC121',at(5,sbPhase),at(23,sbPhase),30,fullSB),
+    _ibcSvc('IBC7_NB','Local NB — Maeðaki → Daihanjishi','IBC121','IBC41',at(5,longNbPhase),at(23,longNbPhase),30,fullNB),
+    _ibcSvc('IBC7S','Local short — Daihanjishi → Ninokawa','IBC41','IBC114',at(6,shortPhase),at(21,shortPhase),30,shortSB),
+    _ibcSvc('IBC7S_NB','Local short NB — Ninokawa → Daihanjishi','IBC114','IBC41',at(6,shortNbPhase),at(21,shortNbPhase),30,shortNB)
   );
   function peak(id,desc,phase,stops) {
     const windows = _ibcPeakWindows(phase,5*60,24*60-1)
