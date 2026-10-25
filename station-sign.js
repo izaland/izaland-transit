@@ -178,4 +178,79 @@
     if (e.target.closest('.ld-stop')) contextLine = lineSelect.value;
   },true);
   qEl.addEventListener('input',() => { contextLine = ''; });
+
+  /* Interchange badges in the vertical line diagram. */
+  const badgeStations = new Map();
+  const badgeEdges = new Map();
+  function badgeMember(code, line) {
+    if (!code || !line.id) return;
+    if (!badgeStations.has(code)) badgeStations.set(code,new Map());
+    badgeStations.get(code).set(line.network + '|' + line.id,line);
+  }
+  for (const s of ALL_STATIONS) badgeMember(s.code,{id:s.lineId,name:s.lineName,color:s.lineColor,network:s.network});
+  for (const l of LINE_INDEX) for (const s of l.stations) badgeMember(s.code,l);
+  function badgeEdge(a,b) {
+    if (!a || !b || a === b) return;
+    if (!badgeEdges.has(a)) badgeEdges.set(a,new Set());
+    if (!badgeEdges.has(b)) badgeEdges.set(b,new Set());
+    badgeEdges.get(a).add(b); badgeEdges.get(b).add(a);
+  }
+  for (const map of Object.values(METRO_INTERCHANGE_MAP)) {
+    for (const [from,entries] of Object.entries(map)) {
+      for (const e of (Array.isArray(entries) ? entries : [entries])) badgeEdge(from,typeof e === 'string' ? e : e?.code);
+    }
+  }
+  for (const ix of FLAT_IX) badgeEdge(ix.from,ix.to);
+  function badgesFor(code, current) {
+    const found = new Map();
+    for (const c of [code,...(badgeEdges.get(code) || [])]) {
+      for (const [key,line] of badgeStations.get(c) || []) {
+        if (line.id !== current.id || line.network !== current.network) found.set(key,line);
+      }
+    }
+    const category = n => n === 'metro' ? 'metro' : n === 'suburban' ? 'suburban' : 'other';
+    const order = current.network === 'metro' ? ['metro','suburban','other'] : ['suburban','other','metro'];
+    return [...found.values()].sort((a,b) => order.indexOf(category(a.network)) - order.indexOf(category(b.network)) || String(a.id).localeCompare(String(b.id),'en',{numeric:true}));
+  }
+  const badgeStyle = document.createElement('style');
+  badgeStyle.textContent = `
+    #line-diagram .ld-info { flex:1; }
+    .ld-interchanges { display:inline-flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:6px; margin-left:auto; max-width:100%; }
+    .ld-interchange-badge { display:inline-flex; align-items:center; justify-content:center; min-width:32px; min-height:28px; padding:4px 8px; border-radius:4px; font:600 12px/1.2 sans-serif; }
+    .ld-interchange-badge-metro { width:32px; height:32px; padding:0; border-radius:50%; }
+  `;
+  document.head.appendChild(badgeStyle);
+  function decorateLineInterchanges(lineId) {
+    const current = LINE_INDEX.find(l => l.id === lineId);
+    if (!current) return;
+    document.querySelectorAll('#line-diagram .ld-stop').forEach(row => {
+      row.querySelector('.ld-interchanges')?.remove();
+      const lines = badgesFor(row.dataset.code,current);
+      const info = row.querySelector('.ld-info');
+      if (!info || !lines.length) return;
+      const group = document.createElement('span');
+      group.className = 'ld-interchanges';
+      group.setAttribute('role','group');
+      group.setAttribute('aria-label','Interchange lines');
+      for (const line of lines) {
+        const badge = document.createElement('span');
+        badge.className = 'ld-interchange-badge' + (line.network === 'metro' ? ' ld-interchange-badge-metro' : '');
+        badge.textContent = line.id;
+        badge.title = line.id + ' — ' + (line.name || line.id);
+        badge.setAttribute('role','img');
+        badge.setAttribute('aria-label',badge.title);
+        const color = line.color || '#888';
+        badge.style.backgroundColor = color;
+        badge.style.color = contrastColor(color);
+        group.appendChild(badge);
+      }
+      info.appendChild(group);
+    });
+  }
+  const originalRenderLineDiagram = window.renderLineDiagram;
+  window.renderLineDiagram = function (lineId) {
+    originalRenderLineDiagram.apply(this,arguments);
+    decorateLineInterchanges(lineId);
+  };
+  if (lineSelect.value) decorateLineInterchanges(lineSelect.value);
 })();
