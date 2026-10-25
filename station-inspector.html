@@ -143,6 +143,16 @@
   min-width: 0;
   max-width: 100%;
 }
+
+    /* Interchange: larger ring, same centre as ordinary stops */
+.ld-dot.ld-dot-interchange {
+  top: 5px;
+  width: 16px;
+  height: 16px;
+  border: 3px solid var(--station-line-color, #888);
+  background: #fff !important;
+}
+    
   </style>
 </head>
 <body>
@@ -375,6 +385,41 @@
     lineSelect.addEventListener('change', () => renderLineDiagram(lineSelect.value));
   })();
 
+    function hasLineInterchange(code, currentLineId) {
+  function isOtherLine(otherCode) {
+    if (!otherCode || otherCode === code) return false;
+
+    const matches = ALL_STATIONS.filter(s => s.code === otherCode);
+
+    // Preserve declared links even when the partner data is not loaded.
+    return matches.length === 0 ||
+      matches.some(s => s.lineId !== currentLineId);
+  }
+
+  // The same station code may belong to several lines.
+  if (ALL_STATIONS.some(s =>
+    s.code === code && s.lineId !== currentLineId
+  )) return true;
+
+  // Metro interchange declarations, in either direction.
+  for (const map of Object.values(METRO_INTERCHANGE_MAP)) {
+    for (const [from, entries] of Object.entries(map)) {
+      for (const entry of (Array.isArray(entries) ? entries : [entries])) {
+        const to = typeof entry === 'string' ? entry : entry?.code;
+
+        if (from === code && isOtherLine(to)) return true;
+        if (to === code && isOtherLine(from)) return true;
+      }
+    }
+  }
+
+  // Non-metro interchange declarations, in either direction.
+  return FLAT_IX.some(ix =>
+    (ix.from === code && isOtherLine(ix.to)) ||
+    (ix.to === code && isOtherLine(ix.from))
+  );
+}
+
   function renderLineDiagram(lineId) {
     const el = document.getElementById('line-diagram');
     const L = LINE_INDEX.find(l => l.id === lineId);
@@ -387,7 +432,13 @@
       L.stations.map((s, i) => `
         <div class="ld-stop" data-code="${s.code}">
           <div class="ld-rail">
-            <span class="ld-dot" style="background:${col}"></span>
+            <span
+  class="ld-dot${hasLineInterchange(s.code, L.id) ? ' ld-dot-interchange' : ''}"
+  style="background:${col};--station-line-color:${col}"
+  title="${hasLineInterchange(s.code, L.id)
+    ? 'Interchange with other lines'
+    : 'Station'}"
+></span>
             ${i < L.stations.length - 1 ? `<span class="ld-line" style="background:${col}"></span>` : ''}
           </div>
           <div class="ld-info">
