@@ -262,11 +262,100 @@
   }
   const badgeStyle = document.createElement('style');
   badgeStyle.textContent = `
-    #line-diagram .ld-info { flex:1; }
-    .ld-interchanges { display:inline-flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:6px; margin-left:auto; max-width:100%; }
-    .ld-interchange-badge { display:inline-flex; align-items:center; justify-content:center; min-width:32px; min-height:28px; padding:4px 8px; border-radius:4px; font:600 12px/1.2 sans-serif; }
-    .ld-interchange-badge-metro { width:32px; height:32px; padding:0; border-radius:50%; }
-  `;
+  #line-diagram .ld-info {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    grid-template-columns:
+      max-content
+      minmax(0, max-content)
+      minmax(0, max-content);
+    justify-content: start;
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 3px;
+    font-family: 'Station Latin', 'Station Kanji', sans-serif;
+    font-weight: 500;
+    font-synthesis: none;
+  }
+
+  #line-diagram .ld-code {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: start;
+    font-family: 'Station Latin', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  #line-diagram .ld-name {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    font-family: 'Station Latin', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  #line-diagram .ld-info > .irow-kanji {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+    font-family: 'Station Kanji', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.3;
+    color: #aaa;
+    overflow-wrap: anywhere;
+  }
+
+  #line-diagram .ld-interchanges {
+    grid-column: 3;
+    grid-row: 1;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  #line-diagram .ld-interchange-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    min-height: 28px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: 'Station Latin', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  #line-diagram .ld-interchange-badge-metro {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  @media (max-width: 600px) {
+    #line-diagram .ld-info {
+      grid-template-columns: max-content minmax(0, 1fr);
+    }
+
+    #line-diagram .ld-interchanges {
+      grid-column: 2;
+      grid-row: 3;
+    }
+  }
+`;
   document.head.appendChild(badgeStyle);
   function decorateLineInterchanges(lineId) {
     const current = LINE_INDEX.find(l => l.id === lineId);
