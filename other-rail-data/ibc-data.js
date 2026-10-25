@@ -14,6 +14,11 @@
      IBCE  Ibaches Enikezya Line (齒鐵盛箞線)
            da IBC23 · IBC105–IBC107 · 3 stazioni · 6.82 km
            (usata dal thru service di M8 — vedi M8)
+     IBCM  Daihanjishi–Maeðaki branch (ID tecnico, nome descrittivo)
+           da IBC41 verso sud · IBC108–IBC121 · 14 stazioni · 37.14 km
+           Nessun diretto dalla direzione IBC01; servizi da definire.
+           direction/directFromIBC01 sono metadati descrittivi,
+           non introducono da soli vincoli o servizi nel router.
      Per aggiungerne una nuova basta aggiungere un oggetto a
      IBC_BRANCHES: le stazioni vengono accodate automaticamente a
      IBC_LINES.IBC.stations (dopo la Main Line), cosi' i servizi
@@ -30,6 +35,7 @@
      IBC19 (Ibaches Dankau)      — nessun interscambio (centinaia di metri da KD14/SK12)
      IBC24–IBC55                 — nessun interscambio definito (da completare)
      IBC101–IBC106               — nessun interscambio definito
+     IBC108–IBC121               — nessun interscambio fornito
 
    Servizi effettivi: ibc-tt.js.
      Local da IBC01: :00/:30 per Odanuri; :10/:40 per IBC41 Daihanjishi;
@@ -47,6 +53,7 @@
        stazione di innesto + distanza da essa.
      — IBC35–IBC42: 51.59 + progressiva locale da IBC34.
        IBC43–IBC55: 51.59 + 19.42 + progressiva locale da IBC42.
+     — IBC108–IBC121: 69.72 (IBC41) + distanza locale da IBC41.
      — Ordine fisico: IBC30 (km 39.24) precede IBC29 (km 40.66); l'array
        stations segue l'ordine fisico, non quello numerico dei codici.
 ================================================================ */
@@ -87,7 +94,7 @@ const IBC_LINES = {
       { code: 'IBC07', name: 'Oizato',                  kanji: '粕穫',     km:  6.39  },  /* node 124064341 */
       { code: 'IBC08', name: 'Dendokuri',               kanji: '殿土巻',   km:  7.55  },  /* node 124064340 */
       { code: 'IBC09', name: 'Amitoya',                 kanji: '安砂',     km:  8.51  },  /* node 124064339 */
-      { code: 'IBC10', name: 'Otsumi-Shakihori',        kanji: '南石登',   km:  9.63  },  /* node 124064338 */
+      { code: 'IBC10', name: 'Otsumi-Shakihori',        kanji: '南石登',   km:  9.63  },  /* node 219979339 */
       { code: 'IBC11', name: 'Shakihori',               kanji: '石登',     km: 10.26  },  /* node 122813475 */
       { code: 'IBC12', name: 'Nari-Tonomuri',           kanji: '東殿弖',   km: 11.87  },  /* node 378136780 */
       { code: 'IBC13', name: 'Saikametotsu',            kanji: '斎肩橋',   km: 12.46  },  /* node 225874016 */
@@ -170,10 +177,39 @@ const IBC_BRANCHES = [
       { code: 'IBC107', name: 'Ibaches Enikezya',    kanji: '齒鐵盛狩', km: 34.92 },  /* node 335741589 · +6.82 */
     ],
   },
+  {
+    id:       'IBCM',
+    name:     'Daihanjishi–Maeðaki branch',
+    nameJa:   '',
+    junction: 'IBC41',
+    direction: 'south',
+    directFromIBC01: false,
+    lengthKm: 37.14,
+    /* No services defined yet. No direct trains from the IBC01 direction. */
+    stations: [
+      { code: 'IBC108', name: 'Getol', kanji: '窪狻', km: 70.92 }, /* node 452490281 · +1.20 da IBC41 */
+      { code: 'IBC109', name: 'Daihanji', kanji: '大繁寺', km: 72.01 }, /* node 135206158 · +2.29 */
+      { code: 'IBC110', name: 'Kobase-Leurei', kanji: '槻隻榊伊', km: 74.96 }, /* node 335188770 · +5.24 */
+      { code: 'IBC111', name: 'Maintsuke', kanji: '麻衣', km: 77.69 }, /* node 335188769 · +7.97 */
+      { code: 'IBC112', name: 'Muzatoi', kanji: '狽匊', km: 81.34 }, /* node 335188768 · +11.62 */
+      { code: 'IBC113', name: 'Nari-Muzatoi', kanji: '東狽匊', km: 83.78 }, /* node 335188767 · +14.06 */
+      { code: 'IBC114', name: 'Ninokawa', kanji: '', km: 88.65 }, /* node 284017617 · +18.93 */
+      { code: 'IBC115', name: 'Samochino', kanji: '山雉', km: 92.71 }, /* node 452490274 · +22.99 */
+      { code: 'IBC116', name: 'Pumashue', kanji: '', km: 95.64 }, /* node 335188766 · +25.92 */
+      { code: 'IBC117', name: 'Sutte-Nyūngu', kanji: '', km: 97.99 }, /* node 335188698 · +28.27 */
+      { code: 'IBC118', name: 'Ārako', kanji: '', km: 99.92 }, /* node 335188765 · +30.20 */
+      { code: 'IBC119', name: 'Ārako Daishi-adae', kanji: '', km: 101.71 }, /* node 335188699 · +31.99 */
+      { code: 'IBC120', name: 'Niji-Maeðaki', kanji: '西苺邦', km: 103.69 }, /* node 452490279 · +33.97 */
+      { code: 'IBC121', name: 'Maeðaki', kanji: '苺邦', km: 106.86 }, /* node 452490280 · +37.14 */
+    ],
+  },
 ];
 
 IBC_LINES.IBC.branches = IBC_BRANCHES.map((b) => ({
   id: b.id, name: b.name, nameJa: b.nameJa, junction: b.junction,
+  ...(b.direction ? { direction: b.direction } : {}),
+  ...(b.directFromIBC01 !== undefined ? { directFromIBC01: b.directFromIBC01 } : {}),
+  ...(b.lengthKm != null ? { lengthKm: b.lengthKm } : {}),
   stations: b.stations.map((s) => s.code),
 }));
 IBC_BRANCHES.forEach((b) => {
