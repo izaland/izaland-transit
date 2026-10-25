@@ -12,23 +12,37 @@
   style.textContent = `
     @font-face { font-family:'Station Latin'; src:url('./assets/ANEKGUJARATI_CONDENSED-MEDIUM.TTF') format('truetype'); font-weight:500; font-style:normal; font-display:swap; }
     @font-face { font-family:'Station Kanji'; src:url('./assets/HGMARUGOTHICMPRO_X0213(04).TTF') format('truetype'); font-weight:400; font-style:normal; font-display:swap; }
-    .station-sign { background:#f4f3ed; color:#202020; border-radius:6px; overflow:hidden; width:min(100%,480px); aspect-ratio:4 / 3; height:auto; margin:0 auto 24px; display:flex; flex-direction:column; font-family:'Station Latin','Station Kanji',sans-serif; font-weight:500; font-synthesis:none; }
-    .station-sign-heading { padding:12px 16px; text-align:center; font:inherit; }
-    .station-sign-heading select { max-width:100%; padding:8px; font:inherit; }
-    .station-sign-centre { text-align:center; padding:20px 16px; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .station-sign-panel { width:min(100%,960px); margin:0 auto 24px; font-family:'Station Latin','Station Kanji',sans-serif; font-weight:500; font-synthesis:none; }
+    .station-sign-heading { text-align:center; padding:0 0 12px; font:inherit; }
+    .station-sign-heading select { max-width:100%; padding:8px; font:inherit; background:#222; color:#eee; border:1px solid #555; }
+    .station-sign { position:relative; container-type:inline-size; width:100%; aspect-ratio:2 / 1; background:#fff; color:#000; border:1px solid #555; border-radius:0; isolation:isolate; }
+    .station-sign-band { position:absolute; inset:70% 0 14%; background:var(--sign-color); z-index:0; }
+    .station-sign-centre { position:absolute; top:25%; left:23%; width:54%; height:37%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
     .station-sign-kanji, .station-sign-neighbour-kanji { font-family:'Station Kanji',sans-serif; font-weight:400; }
-    .station-sign-kanji { font-size:clamp(24px,4vw,40px); overflow-wrap:anywhere; }
-    .station-sign-name { font-size:clamp(20px,3vw,30px); margin:8px 0; overflow-wrap:anywhere; }
-    .station-sign-code { display:inline-block; padding:6px 12px; border:2px solid currentColor; border-radius:6px; font-size:16px; }
-    .station-sign-neighbours { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; padding:16px; border-top:8px solid var(--sign-color); }
-    .station-sign-side { display:flex; flex-direction:column; gap:8px; min-width:0; }
-    .station-sign-side:last-child { text-align:right; }
-    .station-sign-link { display:block; width:100%; min-height:44px; text-align:inherit; color:inherit; background:transparent; border:1px solid #ccc; padding:10px; font:inherit; }
-    .station-sign-link:hover { background:#e4e3dc; }
-    .station-sign-link:focus-visible { outline:3px solid var(--sign-color); outline-offset:2px; }
-    .station-sign-link span { display:block; overflow-wrap:anywhere; }
-    .station-sign-link small { display:block; font-size:12px; margin-top:4px; }
-    .station-sign-note { padding:0 16px 12px; font-size:12px; color:#555; }
+    .station-sign-kanji { font-size:clamp(20px,7.5cqw,72px); line-height:1.15; max-width:100%; overflow-wrap:anywhere; }
+    .station-sign-name { font-size:clamp(18px,5cqw,48px); line-height:1.05; max-width:100%; overflow-wrap:anywhere; margin-top:4px; }
+    .station-sign-code { position:absolute; left:50%; top:78%; transform:translate(-50%,-50%); display:flex; align-items:center; justify-content:center; min-width:12%; max-width:28%; height:26%; padding:0 4px; border:clamp(3px,0.8cqw,8px) solid var(--sign-color); border-radius:clamp(12px,2.8cqw,28px); background:#fff; color:#000; font-size:clamp(20px,5.8cqw,56px); line-height:1; z-index:3; }
+    .station-sign-side { position:absolute; top:0; bottom:0; width:22%; display:grid; grid-template-columns:repeat(var(--branch-count,1),minmax(0,1fr)); gap:4px; z-index:2; }
+    .station-sign-side-prev { left:2%; color:#999; }
+    .station-sign-side-next { right:2%; color:#000; }
+    .station-sign-link { position:relative; display:block; width:100%; height:100%; min-width:0; padding:0; border:0; border-radius:0; background:transparent; color:inherit; font:inherit; cursor:pointer; text-align:center; }
+    .station-sign-link:hover { background:transparent; }
+    .station-sign-link:hover .station-sign-neighbour-name { text-decoration:underline; }
+    .station-sign-link:focus-visible { outline:3px solid var(--sign-color); outline-offset:-3px; }
+    .station-sign-label { position:absolute; bottom:32%; left:0; right:0; max-height:43%; display:flex; flex-direction:column; justify-content:flex-end; text-align:center; }
+    .station-sign-neighbour-kanji { font-size:clamp(12px,3cqw,29px); line-height:1.15; overflow-wrap:anywhere; }
+    .station-sign-neighbour-name { font-size:clamp(12px,3.3cqw,32px); line-height:1.05; overflow-wrap:anywhere; }
+    .station-sign-node { position:absolute; left:50%; top:78%; transform:translate(-50%,-50%); width:clamp(12px,5.5cqw,54px); aspect-ratio:1; background:#fff; border-radius:50%; }
+    .station-sign-neighbour-code { position:absolute; top:88%; left:0; right:0; color:#000; font-size:clamp(12px,4cqw,38px); line-height:1; }
+    .station-sign-side-multiple .station-sign-neighbour-kanji { font-size:clamp(12px,1.8cqw,18px); }
+    .station-sign-side-multiple .station-sign-neighbour-name { font-size:clamp(12px,2cqw,20px); }
+    .station-sign-side-multiple .station-sign-neighbour-code { font-size:clamp(12px,2.5cqw,24px); }
+    .station-sign-side-multiple .station-sign-node { width:clamp(12px,3cqw,30px); }
+    .station-sign-chevron { position:absolute; left:71%; top:78%; width:8%; height:25%; transform:translate(-50%,-50%); z-index:1; pointer-events:none; }
+    .station-sign-chevron::before, .station-sign-chevron::after { content:''; position:absolute; top:15%; width:65%; height:70%; border-top:clamp(3px,0.9cqw,9px) solid #fff; border-right:clamp(3px,0.9cqw,9px) solid #fff; transform:rotate(45deg); }
+    .station-sign-chevron::before { left:0; }
+    .station-sign-chevron::after { left:30%; }
+    .station-sign-note { padding-top:8px; font-size:12px; color:#aaa; }
   `;
   document.head.appendChild(style);
   function addText(parent, tag, text, cls) {
@@ -127,11 +141,10 @@
     contextLine = selected.id;
     const graph = graphFor(selected.id);
     const current = graph.lookup.get(selected.code);
-    const sign = document.createElement('section');
-    sign.className = 'station-sign';
-    sign.setAttribute('aria-label','Station sign');
-    sign.style.setProperty('--sign-color',graph.line.color || '#888');
-    const heading = addText(sign,'div','','station-sign-heading');
+    const panel = document.createElement('section');
+    panel.className = 'station-sign-panel station-header';
+    panel.style.setProperty('--sign-color',graph.line.color || '#888');
+    const heading = addText(panel,'div','','station-sign-heading');
     if (choices.length > 1) {
       const label = addText(heading,'label','Line ');
       const select = document.createElement('select');
@@ -144,27 +157,61 @@
       select.addEventListener('change',() => { contextLine = select.value; draw(station); });
       label.appendChild(select);
     } else heading.textContent = graph.line.id + ' — ' + graph.line.name;
+    const sign = addText(panel,'div','','station-sign');
+    sign.setAttribute('role','group');
+    sign.setAttribute('aria-label',current.name + ' — ' + current.code);
+    const band = addText(sign,'div','','station-sign-band');
+    band.setAttribute('aria-hidden','true');
     const centre = addText(sign,'div','','station-sign-centre');
     if (current.kanji && current.kanji !== '—') addText(centre,'div',current.kanji,'station-sign-kanji');
     addText(centre,'div',current.name,'station-sign-name');
-    addText(centre,'div',current.code,'station-sign-code');
-    const neighbours = addText(sign,'nav','','station-sign-neighbours');
-    neighbours.setAttribute('aria-label','Adjacent stations');
-    for (const [map,arrow] of [[graph.prev,'←'],[graph.next,'→']]) {
-      const side = addText(neighbours,'div','','station-sign-side');
-      for (const code of map.get(current.code) || []) {
+    addText(sign,'div',current.code,'station-sign-code');
+    for (const [map,direction] of [[graph.prev,'prev'],[graph.next,'next']]) {
+      const codes = [...(map.get(current.code) || [])];
+      const side = addText(sign,'nav','','station-sign-side station-sign-side-' + direction + (codes.length > 1 ? ' station-sign-side-multiple' : ''));
+      side.setAttribute('aria-label',direction === 'prev' ? 'Previous stations' : 'Next stations');
+      side.style.setProperty('--branch-count',Math.max(1,codes.length));
+      for (const code of codes) {
         const s = graph.lookup.get(code);
         const button = addText(side,'button','','station-sign-link');
         button.type = 'button';
-        addText(button,'span',arrow === '←' ? arrow + ' ' + s.name : s.name + ' ' + arrow);
-        if (s.kanji && s.kanji !== '—') addText(button,'small',s.kanji,'station-sign-neighbour-kanji');
-        addText(button,'small',s.code);
+        button.setAttribute('aria-label',s.name + ' — ' + s.code);
+        const label = addText(button,'span','','station-sign-label');
+        if (s.kanji && s.kanji !== '—') addText(label,'span',s.kanji,'station-sign-neighbour-kanji');
+        addText(label,'span',s.name,'station-sign-neighbour-name');
+        const node = addText(button,'span','','station-sign-node');
+        node.setAttribute('aria-hidden','true');
+        addText(button,'span',s.code,'station-sign-neighbour-code');
         button.addEventListener('click',() => { contextLine = graph.line.id; qEl.value = code; inspect(); });
       }
     }
-    if (graph.incomplete) addText(sign,'div','Branch topology is incomplete; only verified connections are shown.','station-sign-note');
-    header.replaceWith(sign);
-    sign.classList.add('station-header');
+    if ((graph.next.get(current.code)?.size || 0) > 0) {
+      const chevron = addText(sign,'div','','station-sign-chevron');
+      chevron.setAttribute('aria-hidden','true');
+    }
+    if (graph.incomplete) addText(panel,'div','Branch topology is incomplete; only verified connections are shown.','station-sign-note');
+    header.replaceWith(panel);
+    const fit = () => {
+      if (!panel.isConnected) return;
+      for (const box of panel.querySelectorAll('.station-sign-centre, .station-sign-label')) {
+        for (const child of box.children) child.style.fontSize = '';
+        for (let i=0;i<50 && (box.scrollHeight > box.clientHeight + 1 || box.scrollWidth > box.clientWidth + 1);i++) {
+          let changed = false;
+          for (const child of box.children) {
+            const size = parseFloat(getComputedStyle(child).fontSize);
+            if (size > 12) { child.style.fontSize = Math.max(12,size - 1) + 'px'; changed = true; }
+          }
+          if (!changed) break;
+        }
+      }
+    };
+    requestAnimationFrame(fit);
+    if (document.fonts) document.fonts.ready.then(() => { if (panel.isConnected) fit(); });
+    if (typeof ResizeObserver !== 'undefined') {
+      if (draw.resizeObserver) draw.resizeObserver.disconnect();
+      draw.resizeObserver = new ResizeObserver(fit);
+      draw.resizeObserver.observe(sign);
+    }
   }
   const originalInspect = window.inspect;
   window.inspect = function () {
