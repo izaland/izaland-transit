@@ -335,16 +335,20 @@ if (typeof SuburbanRouter !== 'undefined') {
   });
 }
 
-/* FIX 17 (IBC patch): anti-backtrack filter for IZXUnifiedRouter.search.
+/* FIX 18 (IBC patch): anti-backtrack filter for IZXUnifiedRouter.search.
    The branch detour is assembled by the unified router from separate
    direct searches, so filtering SuburbanRouter.search results cannot see
    the full multi-leg journey. This wrapper is applied after the page
-   loads, once IZXUnifiedRouter exists. For each journey, if a later leg
-   on the SAME line moves away from the journey destination compared with
-   its boarding station, the journey is removed. Station codes are taken
-   from leg codes when available, otherwise resolved from leg display
-   names via a name-to-code map built from SUBURBAN_LINES. If every
-   result would be removed, the original list is returned unchanged. */
+   loads, once IZXUnifiedRouter exists.
+
+   Station codes are taken from journey.transferNodes, which already
+   contains real station codes: transferNodes[i-1] is the boarding code
+   of leg i and transferNodes[i] is its alighting code. The journey
+   destination is taken from the `to` argument (comma-separated codes
+   are supported), with a name-to-code fallback. For two consecutive
+   legs on the SAME line, if alighting moves farther from the final
+   destination than boarding, the journey is removed. If every result
+   would be removed, the original list is returned unchanged. */
 const _ibcWrapUnifiedRouter = () => {
   const R = (typeof window !== 'undefined') ? window.IZXUnifiedRouter : null;
   if (!R || typeof R.search !== 'function' || R.__ibcBacktrackPatched) return;
@@ -355,22 +359,36 @@ const _ibcWrapUnifiedRouter = () => {
       if (st.code && st.name && !_nameToCode.has(st.name)) _nameToCode.set(st.name, st.code);
     }
   }
-  const _legCode = (leg, codeKey, nameKey) => leg[codeKey] || _nameToCode.get(leg[nameKey]);
+  const _toCodes = (x) => (Array.isArray(x) ? x : String(x || '').split(','))
+    .map(s => String(s).trim()).filter(Boolean);
   R.search = function (from, to, depTime, opts) {
     const results = _orig(from, to, depTime, opts);
     if (!Array.isArray(results) || results.length <= 1) return results;
+    const destCandidates = _toCodes(to);
     const filtered = results.filter((journey) => {
       const legs = journey.legs || [];
-      const destCode = _legCode(legs.at(-1) || {}, 'alightCode', 'alightName');
+      const nodes = journey.transferNodes || [];
+      let destCode = destCandidates.find(code =>
+        legs.some(leg => {
+          const line = (typeof SUBURBAN_LINES !== 'undefined') ? SUBURBAN_LINES[leg.lineId] : null;
+          return line && Array.isArray(line.stations) && line.stations.some(s => s.code === code);
+        }));
+      if (!destCode) {
+        const lastLeg = legs.at(-1) || {};
+        destCode = _nameToCode.get(lastLeg.alightName);
+      }
       if (!destCode) return true;
       for (let i = 1; i < legs.length; i++) {
         const prev = legs[i - 1], cur = legs[i];
         if (!prev || !cur || prev.lineId !== cur.lineId) continue;
         const line = (typeof SUBURBAN_LINES !== 'undefined') ? SUBURBAN_LINES[cur.lineId] : null;
         if (!line || !Array.isArray(line.stations)) continue;
+        const boardCode = nodes[i - 1];
+        const alightCode = nodes[i];
+        if (!boardCode || !alightCode) continue;
         const idx = (code) => line.stations.findIndex((s) => s.code === code);
-        const iBoard = idx(_legCode(cur, 'boardCode', 'boardName'));
-        const iAlight = idx(_legCode(cur, 'alightCode', 'alightName'));
+        const iBoard = idx(boardCode);
+        const iAlight = idx(alightCode);
         const iDest = idx(destCode);
         if (iBoard < 0 || iAlight < 0 || iDest < 0) continue;
         if (Math.abs(iAlight - iDest) > Math.abs(iBoard - iDest)) return false;
