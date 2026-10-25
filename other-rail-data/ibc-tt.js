@@ -8,9 +8,11 @@
      Local  IBC01 ↔ IBC34  tutte le fermate  6 tph (ogni 10 min), 05:00–23:30
           Tre serie con passo 30 min, sfasate di 10 min:
           - IBC1X  :00/:30  prosegue sulla Odanuri Shinai-Line (IBC01 ↔ IBC104)
-          - IBC1   :10/:40  termina a IBC34
+          - IBC1   :10/:40  prosegue fino a IBC41 Daihanjishi
           - IBC1B  :20/:50  termina a IBC34
           (1 treno su 3 va sulla diramazione; NB speculare, vedi sotto)
+          IBC1_NB parte da IBC41 ogni 30 min, 05:10–23:10 provvisori;
+          nessun servizio nuovo assegnato a IBC42–IBC55.
      IBC2  Rapid  IBC01 ↔ IBC34  14 fermate  headway 20 min (3 tph)
           - fascia centrale (esclusi i picchi)
           - da IBC01: 09:45 – 17:25 (minuti :05, :25, :45)
@@ -51,7 +53,8 @@
      gestito dal router nelle fasi 1b (Rapid→Local) e 1c (Local→Rapid)
      nelle stazioni in cui fermano entrambi i servizi:
      IBC01, 03, 05, 07, 11, 15, 18, 19, 21, 23, 28, 30, 33, 34.
-     Il Rapid ha stops[] non vuoto; il Local ha stops [] (= tutte).
+     I percorsi Local prolungati e di diramazione usano stops[] espliciti
+     per non includere stazioni appartenenti a un altro ramo.
 
    NOTE:
      — Servizio provvisorio e uniforme tutto il giorno (TODO).
@@ -200,6 +203,24 @@ if (_IBC_HAS_ENI) {
     _ibcSvc('IBC5',    'Local thru M8 — Jufurai (M818) → Ibaches Enikezya', 'IBC04', 'IBC107', '06:00', '23:51', 21, _IBC_ENI_SB),
     _ibcSvc('IBC5_NB', 'Local thru M8 NB — Ibaches Enikezya → Jufurai (M818)', 'IBC107', 'IBC04', '05:04', '23:16', 21, _IBC_ENI_NB)
   );
+}
+
+/* Explicit paths keep the new Main Line extension out of Odanuri trains. */
+const _IBC_DAIHANJISHI_SB = [..._IBC_STOPS_SB, 'IBC35','IBC36','IBC37','IBC38','IBC39','IBC40','IBC41'];
+const _IBC_ODANURI_SB = _IBC_HAS_BRANCH ? [..._IBC_STOPS_SB,'IBC101','IBC102','IBC103','IBC104'] : _IBC_STOPS_SB;
+const _IBC_ODANURI_BRANCH_SB = ['IBC34','IBC101','IBC102','IBC103','IBC104'];
+for (const svc of IBC_TT_SERVICES) {
+  if (svc.id === 'IBC1' || svc.id === 'IBC1_NB') {
+    const nb = svc.id === 'IBC1_NB';
+    svc.fromCode = nb ? 'IBC41' : 'IBC01';
+    svc.toCode = nb ? 'IBC01' : 'IBC41';
+    svc.desc = nb ? 'Local NB — Daihanjishi → Anagusa Mukai (Ibaches)' : 'Local — Anagusa Mukai (Ibaches) → Daihanjishi';
+    svc.stops = nb ? [..._IBC_DAIHANJISHI_SB].reverse() : _IBC_DAIHANJISHI_SB;
+  } else if (svc.id === 'IBC1X' || svc.id === 'IBC1X_NB') {
+    svc.stops = svc.id.endsWith('_NB') ? [..._IBC_ODANURI_SB].reverse() : _IBC_ODANURI_SB;
+  } else if (svc.id.startsWith('IBC4_')) {
+    svc.stops = svc.id.endsWith('_NB') ? [..._IBC_ODANURI_BRANCH_SB].reverse() : _IBC_ODANURI_BRANCH_SB;
+  }
 }
 
 if (typeof SuburbanRouter !== 'undefined') {

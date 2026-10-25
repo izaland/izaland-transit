@@ -5,8 +5,8 @@
    Operatore : Ibaruno Dyenches (齒琉能電鐵)
    Tipo      : Privata suburbana (rete estesa, stile Tobu/Kintetsu;
                altre linee verranno aggiunte gradualmente)
-   Capolinea : IBC01 Anagusa Mukai (Ibaches) ↔ IBC34 Hetsannui-Nari
-   Lunghezza : 51.59 km · 34 stazioni (Main Line)
+   Capolinea : IBC01 Anagusa Mukai (Ibaches) ↔ IBC55 Īmate
+   Lunghezza : 115.46 km · 55 stazioni (Main Line)
 
    Diramazioni (IBC_BRANCHES, stessi colore e prefisso codici):
      IBCO  Ibaches Odanuri Shinai-Line (齒鐵裏窟市内線)
@@ -28,15 +28,14 @@
      IBC23 (Ibaruno)             ↔ KD10
      IBC107 (Ibaches Enikezya)   ↔ SK07, M142
      IBC19 (Ibaches Dankau)      — nessun interscambio (centinaia di metri da KD14/SK12)
-     IBC24–IBC34                 — nessun interscambio definito (da completare)
+     IBC24–IBC55                 — nessun interscambio definito (da completare)
      IBC101–IBC106               — nessun interscambio definito
 
-   Servizi (IBC_SERVICES):
-     IBC1  Local  IBC01 ↔ IBC34  tutte le fermate  6 tph (ogni 10 min)
-                    Prima corsa: 05:00 da entrambi i capolinea
-                    Ultima corsa: 23:30 da entrambi i capolinea
-     IBC2  Rapid  IBC01 ↔ IBC34  (definito in ibc-tt.js)
-     (orari reali di tutti i servizi: ibc-tt.js)
+   Servizi effettivi: ibc-tt.js.
+     Local da IBC01: :00/:30 per Odanuri; :10/:40 per IBC41 Daihanjishi;
+     :20/:50 per IBC34 Hetsannui-Nari. IBC42–IBC55: solo dati stazioni.
+     IBC_SERVICES sotto conserva il fallback storico IBC01 ↔ IBC34;
+     il timetable registrato in ibc-tt.js definisce i servizi completi.
 
    Note:
      — M8 e IBC NON condividono i binari. Da M818 la M8 si sbina e
@@ -46,6 +45,8 @@
      — km: progressiva da IBC01 (=0). Per IBC24–IBC34 le distanze sono state
        rilevate da IBC23 e sommate a 28.1 km. Per le diramazioni: km della
        stazione di innesto + distanza da essa.
+     — IBC35–IBC42: 51.59 + progressiva locale da IBC34.
+       IBC43–IBC55: 51.59 + 19.42 + progressiva locale da IBC42.
      — Ordine fisico: IBC30 (km 39.24) precede IBC29 (km 40.66); l'array
        stations segue l'ordine fisico, non quello numerico dei codici.
 ================================================================ */
@@ -72,8 +73,8 @@ const IBC_LINES = {
     type:          'private',
     region:        'Ibaruno',
     circular:      false,
-    totalKm:       51.59,
-    totalStations: 34,
+    totalKm:       115.46,
+    totalStations: 55,
     headwayPeak:    10,
     headwayOffPeak: 10,
     stations: [
@@ -114,6 +115,32 @@ const IBC_LINES = {
     ],
   },
 };
+
+/* Main Line extension; all km are cumulative from IBC01. */
+const IBC_MAIN_EXTENSION = [
+  { code: 'IBC35', name: 'Illakiro', kanji: '', km: 55.21 }, /* node 292407588 */
+  { code: 'IBC36', name: 'Kuskawagi', kanji: '杉畔名', km: 58.00 }, /* node 452184835 */
+  { code: 'IBC37', name: 'Niji-Hakenaki', kanji: '西横畑', km: 61.72 }, /* node 256636403 */
+  { code: 'IBC38', name: 'Daihanji Numasate', kanji: '', km: 64.68 }, /* node 292407587 */
+  { code: 'IBC39', name: 'Shigaya', kanji: '藻屋', km: 66.03 }, /* node 452184836 */
+  { code: 'IBC40', name: 'Daihanji Pokamotu', kanji: '大繁寺吉口', km: 68.57 }, /* node 339602557 */
+  { code: 'IBC41', name: 'Daihanjishi', kanji: '大繁寺市', km: 69.72 }, /* node 292407586 */
+  { code: 'IBC42', name: 'Sannyehai', kanji: '山嵜半', km: 71.01 }, /* node 452184842 */
+  { code: 'IBC43', name: 'Aribashiko', kanji: '', km: 73.74 }, /* node 256636399 */
+  { code: 'IBC44', name: 'Kusudoshi', kanji: '杉汎', km: 76.58 }, /* node 452184849 */
+  { code: 'IBC45', name: 'Tsawaibu', kanji: '森中', km: 78.92 }, /* node 292407584 */
+  { code: 'IBC46', name: 'Cheratson', kanji: '', km: 84.90 }, /* node 292407583 */
+  { code: 'IBC47', name: 'Kasadu', kanji: '家佐頭', km: 89.08 }, /* node 292407582 */
+  { code: 'IBC48', name: 'Tolomauri', kanji: '', km: 94.43 }, /* node 452184847 */
+  { code: 'IBC49', name: 'Chastayunte', kanji: '椋灝', km: 99.11 }, /* node 452432882 */
+  { code: 'IBC50', name: 'Hibareki', kanji: '夏浦', km: 101.34 }, /* node 452432881 */
+  { code: 'IBC51', name: 'Tsigawinji', kanji: '', km: 106.97 }, /* node 452184846 */
+  { code: 'IBC52', name: 'Niji-Īmate', kanji: '西江方', km: 111.49 }, /* node 452184845 */
+  { code: 'IBC53', name: 'Haryesoudori', kanji: '榎壇市', km: 113.06 }, /* node 452432079 */
+  { code: 'IBC54', name: 'Sōgantais', kanji: '松岩塔', km: 114.23 }, /* node 452432077 */
+  { code: 'IBC55', name: 'Īmate', kanji: '江方', km: 115.46 }, /* node 452184844 */
+];
+IBC_LINES.IBC.stations.push(...IBC_MAIN_EXTENSION);
 
 /* ----------------------------------------------------------------
    DIRAMAZIONI — stazioni accodate a IBC_LINES.IBC.stations.
