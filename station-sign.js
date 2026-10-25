@@ -393,71 +393,97 @@
     decorateLineInterchanges(lineId);
   };
   if (lineSelect.value) decorateLineInterchanges(lineSelect.value);
-
-  /* Inspector-only navbar; deliberately does not import global nav styles. */
-  if (!document.getElementById('inspector-nav')) {
-    const navFont = document.createElement('link');
-    navFont.rel = 'stylesheet';
-    navFont.href = 'https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap';
-    document.head.appendChild(navFont);
-    const navStyle = document.createElement('style');
-    navStyle.textContent = `
-      #inspector-nav { position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between; gap:16px; margin:-24px -24px 24px; padding:16px 32px; background:#0f1117; color:#e2e8f0; border-bottom:1px solid #2a3147; font:500 14px/1.5 'Satoshi',sans-serif; }
-      #inspector-nav .ins-logo { display:flex; align-items:center; min-height:44px; flex-shrink:0; }
-      #inspector-nav .ins-logo img { display:block; width:200px; height:40px; object-fit:contain; }
-      #inspector-nav .ins-links { display:flex; align-items:center; gap:24px; }
-      #inspector-nav a { color:#94a3b8; text-decoration:none; }
-      #inspector-nav a:hover, #inspector-nav summary:hover { color:#e2e8f0; }
-      #inspector-nav .ins-home { display:flex; align-items:center; min-height:44px; }
-      #inspector-nav details { position:relative; }
-      #inspector-nav summary { display:flex; align-items:center; gap:6px; min-height:44px; list-style:none; color:#94a3b8; cursor:pointer; }
-      #inspector-nav summary::-webkit-details-marker { display:none; }
-      #inspector-nav summary::before { content:''; width:6px; height:6px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg); margin-right:4px; }
-      #inspector-nav details[open] summary::before { transform:rotate(225deg); }
-      #inspector-nav .ins-active > summary, #inspector-nav a[aria-current='page'] { color:#3b82f6; }
-      #inspector-nav .ins-dropdown { position:absolute; top:100%; right:0; min-width:220px; max-height:min(70vh,600px); overflow-y:auto; padding:8px; background:#161b27; border:1px solid #2a3147; border-radius:12px; box-shadow:0 8px 24px #0005; }
-      #inspector-nav .ins-dropdown a { display:flex; align-items:center; min-height:44px; padding:8px 12px; border-radius:6px; white-space:nowrap; }
-      #inspector-nav .ins-dropdown a:hover { background:#1c2235; }
-      #inspector-nav .ins-divider { border-top:1px solid #2a3147; margin:4px 8px; }
-      #inspector-nav .ins-label { display:block; padding:8px 12px 4px; color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
-      #inspector-nav a:focus-visible, #inspector-nav summary:focus-visible { outline:2px solid #3b82f6; outline-offset:3px; border-radius:4px; }
-      @media (max-width:640px) {
-        #inspector-nav { flex-wrap:wrap; padding:12px 16px; gap:8px; }
-        #inspector-nav .ins-links { width:100%; justify-content:space-between; gap:12px; }
-        #inspector-nav .ins-dropdown { min-width:200px; }
-        #inspector-nav .ins-active .ins-dropdown { left:0; right:auto; }
+  /* Reuse the home navbar inside a style-isolated shadow root. */
+  if (!document.getElementById('inspector-home-nav')) {
+    const font = document.createElement('link');
+    font.rel = 'stylesheet';
+    font.href = 'https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap';
+    document.head.appendChild(font);
+    const host = document.createElement('header');
+    host.id = 'inspector-home-nav';
+    host.setAttribute('data-theme','dark');
+    const shadow = host.attachShadow({mode:'open'});
+    const base = document.createElement('style');
+    base.textContent = `
+      :host { display:block; position:sticky; top:0; z-index:100; margin:-24px -24px 24px; font-family:'Satoshi',sans-serif; }
+      nav { position:relative !important; top:auto !important; }
+      .nav-links { flex-wrap:wrap; }
+      .nav-links > .nav-item:last-of-type .dropdown--sub { left:auto; right:calc(100% + 6px); }
+      @media (max-width:768px) {
+        nav { flex-wrap:wrap; gap:12px; }
+        .nav-links { width:100%; justify-content:flex-start; }
+        .dropdown { left:0; transform:translateY(-4px); }
+        .nav-item.open .dropdown { transform:translateY(0); }
+        .dropdown--sub { position:static; display:none; transform:none; opacity:1; pointer-events:auto; box-shadow:none; margin-top:4px; }
+        .nav-item--sub.open .dropdown--sub { display:block; }
       }
     `;
-    document.head.appendChild(navStyle);
-    const nav = document.createElement('nav');
-    nav.id = 'inspector-nav';
-    nav.setAttribute('aria-label','Main navigation');
-    nav.innerHTML = `
-      <a href="index.html" class="ins-logo" aria-label="Izarail home"><img src="frontend/Izarail Urban Networks dark.svg" alt="Izarail" width="200" height="40"></a>
-      <div class="ins-links">
-        <a href="index.html" class="ins-home">Home</a>
-        <details class="ins-active"><summary>Railways</summary><div class="ins-dropdown">
-          <a href="izarail.html">Izarail</a><a href="metro.html">Metro</a><a href="izx.html">IZX (High Speed)</a><a href="commuter.html">Commuter Rail</a><a href="other-rail.html">Other Rail</a><a href="map.html">Map</a>
-          <div class="ins-divider"></div><span class="ins-label">IZX Keishin</span>
-          <a href="keishin-timetable.html">Timetable</a><a href="marcia.html">Train graph</a><a href="izx-ticket.html">Tickets &amp; Fares</a>
-          <div class="ins-divider"></div><span class="ins-label">Network tools</span>
-          <a href="journey-planner.html">Journey Planner</a><a href="station-inspector.html" aria-current="page">Station / Line inspector</a>
-        </div></details>
-        <details><summary>Aviation</summary><div class="ins-dropdown"><a href="airports.html">Airports</a><a href="airlines.html">Airlines</a></div></details>
-        <details><summary>Other</summary><div class="ins-dropdown"><span class="ins-label">Coming soon</span></div></details>
-      </div>
-    `;
-    document.body.prepend(nav);
-    const menus = [...nav.querySelectorAll('details')];
-    menus.forEach(menu => menu.addEventListener('toggle',() => {
-      if (menu.open) menus.forEach(other => { if (other !== menu) other.open = false; });
-    }));
-    document.addEventListener('click',e => { if (!nav.contains(e.target)) menus.forEach(menu => { menu.open = false; }); });
-    nav.addEventListener('keydown',e => {
-      if (e.key !== 'Escape') return;
-      const menu = e.target.closest('details');
-      menus.forEach(item => { item.open = false; });
-      if (menu) menu.querySelector('summary').focus();
-    });
+    const fallback = document.createElement('nav');
+    fallback.setAttribute('aria-label','Main navigation');
+    fallback.innerHTML = '<a href="index.html">Home</a> · <a href="journey-planner.html">Toryo</a> · <a href="station-inspector.html" aria-current="page">Station / Line inspector</a>';
+    shadow.append(base,fallback);
+    document.body.prepend(host);
+    fetch('index.html').then(response => {
+      if (!response.ok) throw new Error('Home navbar HTTP ' + response.status);
+      return response.text();
+    }).then(html => {
+      const home = new DOMParser().parseFromString(html,'text/html');
+      const source = home.querySelector('body > nav');
+      if (!source) throw new Error('Home navbar not found');
+      const css = [...home.querySelectorAll('head > style')].map(s => s.textContent).join('\n')
+        .replace(/:root\b/g,':host')
+        .replace(/\[data-theme=(["'])(dark|light)\1\]/g,':host([data-theme="$2"])');
+      const sharedStyle = document.createElement('style');
+      sharedStyle.textContent = css;
+      shadow.insertBefore(sharedStyle,base);
+      const nav = source.cloneNode(true);
+      nav.setAttribute('aria-label','Main navigation');
+      nav.querySelector('[data-theme-toggle]')?.remove();
+      nav.querySelectorAll('a.active').forEach(a => a.classList.remove('active'));
+      const active = [...nav.querySelectorAll('a')].find(a => a.getAttribute('href') === 'station-inspector.html');
+      if (active) {
+        active.textContent = 'Station / Line inspector';
+        active.classList.add('active');
+        active.setAttribute('aria-current','page');
+        active.closest('.nav-item')?.classList.add('active');
+      }
+      let sequence = 0;
+      const items = [...nav.querySelectorAll('.nav-item, .nav-item--sub')];
+      function setOpen(item,open) {
+        item.classList.toggle('open',open);
+        item.querySelector(':scope > button')?.setAttribute('aria-expanded',String(open));
+        const menu = item.querySelector(':scope > .dropdown, :scope > .dropdown--sub');
+        if (menu) menu.hidden = !open;
+      }
+      function close(item) {
+        item.querySelectorAll('.nav-item--sub').forEach(sub => setOpen(sub,false));
+        setOpen(item,false);
+      }
+      for (const item of items) {
+        const button = item.querySelector(':scope > button');
+        const menu = item.querySelector(':scope > .dropdown, :scope > .dropdown--sub');
+        if (!button || !menu) continue;
+        button.type = 'button';
+        menu.id = 'inspector-home-menu-' + (++sequence);
+        button.setAttribute('aria-controls',menu.id);
+        setOpen(item,false);
+        button.addEventListener('click',e => {
+          e.stopPropagation();
+          const open = !item.classList.contains('open');
+          const siblings = item.classList.contains('nav-item--sub')
+            ? [...item.parentElement.children].filter(el => el.classList.contains('nav-item--sub'))
+            : items.filter(el => el.classList.contains('nav-item'));
+          siblings.forEach(close);
+          setOpen(item,open);
+        });
+      }
+      document.addEventListener('click',e => { if (!e.composedPath().includes(host)) items.forEach(close); });
+      nav.addEventListener('keydown',e => {
+        if (e.key !== 'Escape') return;
+        const item = e.target.closest('.nav-item--sub, .nav-item');
+        if (item) { close(item); item.querySelector(':scope > button')?.focus(); }
+      });
+      fallback.replaceWith(nav);
+    }).catch(error => { console.warn('Inspector navbar: using fallback navigation.',error); });
   }
 })();
