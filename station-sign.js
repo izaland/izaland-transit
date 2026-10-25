@@ -12,6 +12,7 @@
   style.textContent = `
     @font-face { font-family:'Station Latin'; src:url('./assets/ANEKGUJARATI_CONDENSED-MEDIUM.TTF') format('truetype'); font-weight:500; font-style:normal; font-display:swap; }
     @font-face { font-family:'Station Kanji'; src:url('./assets/HGMARUGOTHICMPRO_X0213(04).TTF') format('truetype'); font-weight:400; font-style:normal; font-display:swap; }
+    @font-face { font-family:'Station Gujarati'; src:url('./assets/AKHANDGUJARATI-SEMIBOLD.OTF') format('opentype'); font-weight:600; font-style:normal; font-display:swap; unicode-range:U+0A80-0AFF; }
     .station-sign-panel { width:min(100%,960px); margin:0 auto 24px; font-family:'Station Latin','Station Kanji',sans-serif; font-weight:500; font-synthesis:none; }
     .station-sign-heading { text-align:center; padding:0 0 12px; font:inherit; }
     .station-sign-heading select { max-width:100%; padding:8px; font:inherit; background:#222; color:#eee; border:1px solid #555; }
@@ -44,6 +45,8 @@
     .station-sign-chevron::before { left:0; }
     .station-sign-chevron::after { left:30%; }
     .station-sign-note { padding-top:8px; font-size:12px; color:#aaa; }
+    .station-sign { font-family:'Station Gujarati','Station Latin','Station Kanji',sans-serif; }
+    .station-sign .station-sign-kanji, .station-sign .station-sign-neighbour-kanji { font-family:'Station Gujarati','Station Kanji',sans-serif; }
   `;
   document.head.appendChild(style);
   function addText(parent, tag, text, cls) {
