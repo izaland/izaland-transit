@@ -99,6 +99,12 @@
     <button onclick="inspect()">Inspect</button>
     <button onclick="coverage()">Coverage</button>
   </div>
+  <div id="line-bar">
+    <select id="line-select">
+      <option value="">— Select a line —</option>
+    </select>
+  </div>
+  <div id="line-diagram"></div>
   <div id="suggestions"></div>
   <div id="no-result">No station found.</div>
   <div id="results"></div>
@@ -283,6 +289,68 @@
     return k ? ` <span class="${cls}">${k}</span>` : '';
   }
 
+  /* ── Line index + diagram ─────────────────────────────────────────── */
+  const LINE_INDEX = [];
+  (function buildLineIndex() {
+    const seen = new Set();
+    for (const s of ALL_STATIONS) {
+      if (!seen.has(s.lineId)) {
+        seen.add(s.lineId);
+        LINE_INDEX.push({ id: s.lineId, name: s.lineName || s.lineId,
+          color: s.lineColor || '#888', network: s.network, stations: [] });
+      }
+      const L = LINE_INDEX.find(l => l.id === s.lineId);
+      if (!L.stations.some(x => x.code === s.code))
+        L.stations.push({ code: s.code, name: s.name, kanji: s.kanji });
+    }
+  })();
+
+  const lineSelect = document.getElementById('line-select');
+  (function populateLineSelect() {
+    const order = { metro: 0, suburban: 1, izx: 2, ax: 3, other: 4 };
+    LINE_INDEX.sort((a, b) =>
+      (order[a.network] ?? 9) - (order[b.network] ?? 9) ||
+      a.id.localeCompare(b.id));
+    LINE_INDEX.forEach(l => {
+      const opt = document.createElement('option');
+      opt.value = l.id;
+      opt.textContent = `${l.id} — ${l.name} (${l.stations.length} st.)`;
+      lineSelect.appendChild(opt);
+    });
+    lineSelect.addEventListener('change', () => renderLineDiagram(lineSelect.value));
+  })();
+
+  function renderLineDiagram(lineId) {
+    const el = document.getElementById('line-diagram');
+    const L = LINE_INDEX.find(l => l.id === lineId);
+    if (!L) { el.style.display = 'none'; return; }
+    const col = L.color, txt = contrastColor(col);
+    el.innerHTML = `
+      <div class="section">
+        <div class="section-title">${L.id} · ${L.name} — ${L.stations.length} stations</div>
+        <div class="line-diagram">` +
+      L.stations.map((s, i) => `
+        <div class="ld-stop" data-code="${s.code}">
+          <div class="ld-rail">
+            <span class="ld-dot" style="background:${col}"></span>
+            ${i < L.stations.length - 1 ? `<span class="ld-line" style="background:${col}"></span>` : ''}
+          </div>
+          <div class="ld-info">
+            <span class="ld-code" style="background:${col};color:${txt}">${s.code}</span>
+            <span class="ld-name">${s.name}</span>
+            ${s.kanji ? `<span class="irow-kanji">${s.kanji}</span>` : ''}
+          </div>
+        </div>`).join('') +
+      `</div></div>`;
+    el.querySelectorAll('.ld-stop').forEach(node => {
+      node.addEventListener('click', () => {
+        qEl.value = node.dataset.code;
+        inspect();
+      });
+    });
+    el.style.display = 'block';
+  }
+
   /* ── Badge con colore testo automatico ──────────────────────────── */
   function lineBadge(lineId, lineColor, lineName, network) {
     const col = lineColor || '#888';
@@ -405,6 +473,7 @@
   }
   function coverage() {
     sugEl.style.display = 'none';
+    document.getElementById('line-diagram').style.display = 'none';
     document.getElementById('no-result').style.display = 'none';
     const refs = {};   /* code → Set(sorgenti) */
     function ref(code, from) { (refs[code] = refs[code] || new Set()).add(from); }
@@ -448,6 +517,7 @@
   /* ── Core inspect() ────────────────────────────────────────────────── */
   function inspect() {
     sugEl.style.display = 'none';
+    document.getElementById('line-diagram').style.display = 'none';
     const raw = qEl.value.trim();
     const q   = raw.toLowerCase();
     const resultsEl = document.getElementById('results');
