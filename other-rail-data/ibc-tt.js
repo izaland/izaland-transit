@@ -28,6 +28,16 @@
      Ore iniziali/finali parziali non riempite con corse aggiuntive.
      Gli orari di servizio possono superare 24:00 per l'ultima coincidenza.
 
+   IBC7 Local IBC41 ↔ IBC121 Maeðaki: 1 tph, tutte le fermate.
+     IBC7S: corse corte IBC41 ↔ IBC114 Ninokawa, 1 tph 06–22.
+     IBC7P1/P2: altri 2 tph solo sul tronco interno, punte 07–10/17–20.
+     Totale interno: 1 tph 05–06 e 22–24; 2 tph nel resto; 4 tph in punta.
+     Oltre IBC114: sempre 1 tph. Nessun diretto da IBC01, cambio a IBC41.
+     Finestre riferite alla partenza dal capolinea di ciascun servizio;
+     alle altre stazioni si spostano con il tempo di percorrenza.
+     Coincidenze dove il feeder opera; primi/ultimi treni e rinforzi
+     indipendenti non hanno una coincidenza garantita.
+
    Odanuri Shinai-Line IBC34 ↔ IBC104: passanti IBC1X 2 tph;
      IBC4 completa 6 tph in punta e 4 tph fuori punta. Invariati.
    Enikezya Line: IBC5/IBC5_NB thru M8 ogni 21 min, invariati.
@@ -260,6 +270,53 @@ if (_ibcPeakNb.length) IBC_TT_SERVICES.push({
   ..._ibcSvc('IBC6P_NB','Local NB peak reinforcement — Īmate → Daihanjishi','IBC55','IBC41',_ibcPeakNb[0].from,_ibcPeakNb.at(-1).to,60,[]),
   peakWindows:_ibcPeakNb,
 });
+
+/* IBC7 / IBCM: explicit branch-only paths; no direct service from IBC01.
+   Long Local: hourly 05:00–24:00. Short Local: hourly 06:00–22:00.
+   Together: 2 tph on IBC41–IBC114, 1 tph beyond IBC114.
+   Two extra short trains/hour in peaks 07:00–10:00 / 17:00–20:00.
+   Departure windows refer to each service's origin. At downstream stops
+   the service period is shifted by running time. Early/late connections
+   only exist when the main-line feeder is operating; no guaranteed hold.
+   SB base follows the IBC1 arrival phase (+5 min minimum). One peak
+   train follows IBC3; the other is an independent local reinforcement.
+   NB phases aim for IBC1_NB connections at IBC41; late trains may arrive
+   after the last main-line departure. Rolling-stock turns not assigned. */
+const _ibcMaedaki = IBC_LINES.IBC.branches?.find(b => b.id === 'IBCM');
+if (_ibcMaedaki) {
+  const fullSB = ['IBC41',..._ibcMaedaki.stations];
+  const cut = fullSB.indexOf('IBC114');
+  if (cut < 1 || fullSB.at(-1) !== 'IBC121') throw new Error('IBCM: invalid branch path');
+  const shortSB = fullSB.slice(0,cut+1);
+  const fullNB = [...fullSB].reverse(), shortNB = [...shortSB].reverse();
+  const mod60 = value => ((value%60)+60)%60;
+  const sbPhase = mod60(_ibcMin(_ibcLocalFeed.firstDep)+_ibcLocalOffset);
+  const shortPhase = mod60(sbPhase+30);
+  const longNbPhase = mod60(_ibcMin(_ibcLocalReturn.firstDep)-5-Math.ceil(_ibcPathDurationSec(fullNB,_IBC_PROFILE)/60));
+  const shortNbPhase = mod60(_ibcMin(_ibcLocalReturn.firstDep)+30-5-Math.ceil(_ibcPathDurationSec(shortNB,_IBC_PROFILE)/60));
+  const at = (hour,phase) => _ibcServiceHM(hour*60+phase);
+  IBC_TT_SERVICES.push(
+    _ibcSvc('IBC7','Local — Daihanjishi → Maeðaki','IBC41','IBC121',at(5,sbPhase),at(23,sbPhase),60,fullSB),
+    _ibcSvc('IBC7_NB','Local NB — Maeðaki → Daihanjishi','IBC121','IBC41',at(5,longNbPhase),at(23,longNbPhase),60,fullNB),
+    _ibcSvc('IBC7S','Local short — Daihanjishi → Ninokawa','IBC41','IBC114',at(6,shortPhase),at(21,shortPhase),60,shortSB),
+    _ibcSvc('IBC7S_NB','Local short NB — Ninokawa → Daihanjishi','IBC114','IBC41',at(6,shortNbPhase),at(21,shortNbPhase),60,shortNB)
+  );
+  function peak(id,desc,phase,stops) {
+    const windows = _ibcPeakWindows(phase,5*60,24*60-1)
+      .map(w => ({from:w.from,to:_ibcServiceHM(Math.min(_ibcMin(w.to),(_ibcMin(w.from)<10*60?10:20)*60-1))}))
+      .filter(w => _ibcMin(w.from)<=_ibcMin(w.to));
+    if (!windows.length) return;
+    IBC_TT_SERVICES.push({
+      ..._ibcSvc(id,desc,stops[0],stops.at(-1),windows[0].from,windows.at(-1).to,60,stops),
+      peakWindows:windows,
+    });
+  }
+  peak('IBC7P1','Local peak short — Daihanjishi → Ninokawa',mod60(sbPhase-15),shortSB);
+  peak('IBC7P2','Local peak short — Daihanjishi → Ninokawa',_ibcPeakPhase,shortSB);
+  const shortRunMin = Math.ceil(_ibcPathDurationSec(shortNB,_IBC_PROFILE)/60);
+  peak('IBC7P1_NB','Local peak short NB — Ninokawa → Daihanjishi',mod60(_ibcMin(_ibcLocalReturn.firstDep)+10-shortRunMin),shortNB);
+  peak('IBC7P2_NB','Local peak short NB — Ninokawa → Daihanjishi',mod60(_ibcMin(_ibcLocalReturn.firstDep)+40-shortRunMin),shortNB);
+}
 
 if (typeof SuburbanRouter !== 'undefined') {
   SuburbanRouter.register({
