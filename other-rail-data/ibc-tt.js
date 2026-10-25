@@ -4,65 +4,37 @@
    ================================================================
    Dipende da: ibc-data.js, suburban-router.js
 
-   Servizi (tutti con explicitDir: true, definiti in entrambe le direzioni):
-     Local  IBC01 ↔ IBC34  tutte le fermate  6 tph (ogni 10 min), 05:00–23:30
-          Tre serie con passo 30 min, sfasate di 10 min:
-          - IBC1X  :00/:30  prosegue sulla Odanuri Shinai-Line (IBC01 ↔ IBC104)
-          - IBC1   :10/:40  prosegue fino a IBC41 Daihanjishi
-          - IBC1B  :20/:50  termina a IBC34
-          (1 treno su 3 va sulla diramazione; NB speculare, vedi sotto)
-          IBC1_NB parte da IBC41 ogni 30 min, 05:10–23:10 provvisori;
-          nessun servizio nuovo assegnato a IBC42–IBC55.
-     IBC2  Rapid  IBC01 ↔ IBC41  16 fermate  headway 20 min (3 tph)
-          - fascia centrale (esclusi i picchi)
-          - da IBC01: 09:45 – 17:25 (minuti :05, :25, :45)
-          - da IBC41: 09:02 – 16:42 (orari NB conservati, provvisori)
-          - fermate: IBC01, 03, 05, 07, 11, 15, 18, 19, 21, 23,
-                     28, 30, 33, 34, 37, 41
-     IBC3  Limited Express  IBC01 ↔ IBC41  6 fermate  headway 60 min (1 tph)
-          - da IBC01: 07:09 – 21:09 (minuto :09)
-          - da IBC41: 06:38 – 20:38 (orari NB conservati, provvisori)
-          - fermate: IBC01, 03, 11, 23, 33, 41
+   Local da IBC01: tre serie ogni 30 min, sfasate di 10 min.
+     IBC1X :00/:30 per IBC104 Odanuri; IBC1 :10/:40 per IBC41;
+     IBC1B :20/:50 per IBC34. IBC1_NB: IBC41 → IBC01,
+     05:10–23:10 provvisori. A IBC41 il Local termina: per proseguire
+     verso IBC55 si cambia su una navetta IBC6, NON e' un thru.
 
-   Odanuri Shinai-Line (齒鐵裏窟市内線) IBC34 ↔ IBC104, 4 fermate:
-     - passanti da/per IBC01 (IBC1X, IBC1X_NB): 2 tph tutto il giorno
-     - IBC4_n: treni che nascono/finiscono a IBC34 per completare la
-       frequenza: 10 min in punta (07:00–10:00 e 17:00–20:00),
-       15 min nel resto della giornata. Totale diramazione: 6 tph in
-       punta, 4 tph fuori punta.
-     - ASSUNZIONI (da calibrare): fasce di punta; tempo IBC34→IBC104
-       ≈ 6 min; i passanti arrivano a IBC34 ai minuti :00/:30.
+   IBC2 Rapid IBC01 ↔ IBC41: 16 fermate, ogni 20 min.
+     SB 09:45–17:25; NB da IBC41 09:02–16:42 provvisori.
+     IBC01,03,05,07,11,15,18,19,21,23,28,30,33,34,37,41.
 
-   Enikezya Line (齒鐵盛狩線) IBC23 ↔ IBC107, fermate IBC105, 106, 107:
-     - IBC5 / IBC5_NB: thru service dei Local M8 (1 su 3, ogni 21 min).
-       SB: M801 → M818 (metro, vedi m8-tt.js) → IBC04 → tutte le fermate
-       fino a IBC23 → IBC105 → IBC106 → IBC107 (IBC03 saltata: coincide
-       con M818). NB: IBC107 → … → IBC04 → M818 → M801.
-     - Il router tratta i due tratti come servizi separati (cambio a
-       M818 ↔ IBC03 2 min): il thru reale e' modellato con orari
-       sincronizzati. SB: IBC04 ai minuti :00 (+21k) da 06:00 a 23:51;
-       NB: IBC107 ai minuti :04 (+21k) da 05:04 a 23:16.
-     - ASSUNZIONI (da calibrare): M818→IBC04 ≈ 2 min; IBC04→IBC107
-       ≈ 35 min.
+   IBC3 Limited Express IBC01 ↔ IBC55: diretto senza cambio,
+     8 fermate, ogni 60 min. SB 07:09–21:09; NB da IBC55
+     06:38–20:38 provvisori. IBC01,03,11,23,33,41,50,55.
 
-   Profilo cinematico (FIX 14 del router), uguale per tutti i servizi:
-     vMaxKmh 140 · accel 3.3 km/h/s · decel 4.0 km/h/s (tipo Odakyu)
-     sosta 30 s a ogni fermata intermedia.
+   IBC6 Local IBC41 ↔ IBC55: tutte le 15 stazioni, 2 tph di base.
+     Punte 07:00–10:00 e 17:00–20:00: un rinforzo/ora (3 tph),
+     non necessariamente equidistante. I tempi delle navette vengono
+     calcolati sotto dal profilo corrente: attesa MINIMA 5 min,
+     partenza arrotondata al minuto successivo. Nessun thru flag.
+     Base SB dopo gli arrivi IBC1 da IBC01; rinforzo SB dopo IBC3.
+     Base NB prima delle partenze IBC1_NB; rinforzi NB provvisori.
+     Ore iniziali/finali parziali non riempite con corse aggiuntive.
+     Gli orari di servizio possono superare 24:00 per l'ultima coincidenza.
 
-   Interscambio Local ↔ Rapid (stessa banchina, 0 min a piedi):
-     gestito dal router nelle fasi 1b (Rapid→Local) e 1c (Local→Rapid)
-     nelle stazioni in cui fermano entrambi i servizi:
-     IBC01, 03, 05, 07, 11, 15, 18, 19, 21, 23, 28, 30, 33, 34, 37, 41.
-     I percorsi Local prolungati e di diramazione usano stops[] espliciti
-     per non includere stazioni appartenenti a un altro ramo.
-
-   NOTE:
-     — Servizio provvisorio e uniforme tutto il giorno (TODO).
-     — Ordine fisico: IBC30 precede IBC29 (vedi ibc-data.js).
-     — Rapid e Limited Express prolungati a IBC41: frequenze e finestre
-       di partenza sono conservate. Le finestre NB ora si riferiscono
-       a IBC41 e non piu' a IBC34/IBC33; tempi di inversione e
-       corrispondenza con le corse SB restano da ricalibrare.
+   Odanuri Shinai-Line IBC34 ↔ IBC104: passanti IBC1X 2 tph;
+     IBC4 completa 6 tph in punta e 4 tph fuori punta. Invariati.
+   Enikezya Line: IBC5/IBC5_NB thru M8 ogni 21 min, invariati.
+   Profilo comune: 140 km/h, accel 3.3, decel 4.0 km/h/s; soste 30 s.
+   Ordine fisico: IBC30 precede IBC29.
+   Finestre degli express conservate: inversioni e rotazioni da calibrare.
+   La costruzione del cambio nel Journey Planner richiede verifica completa.
 ================================================================ */
 'use strict';
 
@@ -80,7 +52,7 @@ const _IBC_RAPID_SB = [
 ];
 const _IBC_RAPID_NB = [..._IBC_RAPID_SB].reverse();
 
-const _IBC_LEX_SB = ['IBC01','IBC03','IBC11','IBC23','IBC33','IBC41'];
+const _IBC_LEX_SB = ['IBC01','IBC03','IBC11','IBC23','IBC33','IBC41','IBC50','IBC55'];
 const _IBC_LEX_NB = [..._IBC_LEX_SB].reverse();
 
 /* thru M8: IBC04 → IBC23 (tutte) → Enikezya Line. IBC03 saltata (= M818). */
@@ -151,9 +123,9 @@ const IBC_TT_SERVICES = [
   },
   {
     id:       'IBC3',
-    desc:     'Limited Express — Anagusa Mukai (Ibaches) → Daihanjishi',
+    desc:     'Limited Express — Anagusa Mukai (Ibaches) → Īmate (direct)',
     fromCode: 'IBC01',
-    toCode:   'IBC41',
+    toCode:   'IBC55',
     firstDep: '07:09',
     lastDep:  '21:09',
     headway:  60,
@@ -162,8 +134,8 @@ const IBC_TT_SERVICES = [
   },
   {
     id:       'IBC3_NB',
-    desc:     'Limited Express NB — Daihanjishi → Anagusa Mukai (Ibaches)',
-    fromCode: 'IBC41',
+    desc:     'Limited Express NB — Īmate → Anagusa Mukai (Ibaches) (direct)',
+    fromCode: 'IBC55',
     toCode:   'IBC01',
     firstDep: '06:38',
     lastDep:  '20:38',
@@ -220,6 +192,74 @@ for (const svc of IBC_TT_SERVICES) {
     svc.stops = svc.id.endsWith('_NB') ? [..._IBC_ODANURI_BRANCH_SB].reverse() : _IBC_ODANURI_BRANCH_SB;
   }
 }
+
+/* IBC6: separate all-stop shuttle. No thru flag: passengers change at IBC41.
+   Five minutes MINIMUM; round departures up to a whole minute.
+   The duration calculation mirrors the current SuburbanRouter profile.
+   Base SB connects with IBC1. Peak SB reinforcement connects with IBC3.
+   NB base connects into IBC1_NB; NB peak reinforcement is provisional.
+   Complete hours: 2 Local tph off-peak, 3 tph 07:00–10:00 / 17:00–20:00.
+   First/last partial operating hours are not padded with unconnected runs. */
+const _IBC_SHUTTLE_SB = Array.from({length:15}, (_,i) => 'IBC' + (41+i));
+function _ibcPathDurationSec(stops, svc) {
+  const stations = IBC_LINES.IBC.stations;
+  const byCode = new Map(stations.map((s,i) => [s.code,{s,i}]));
+  let run = 0, dwell = 0;
+  for (let n=1;n<stops.length;n++) {
+    const from = byCode.get(stops[n-1]), to = byCode.get(stops[n]);
+    if (!from || !to) throw new Error('IBC connection: missing station');
+    const len = Math.abs(to.s.km-from.s.km)*1000;
+    let cap = svc.vMaxKmh;
+    for (let k=Math.min(from.i,to.i);k<Math.max(from.i,to.i);k++)
+      cap = Math.min(cap,stations[k].vLimitKmh ?? cap);
+    const a = (svc.accelKmhPerSec ?? 2.5)/3.6;
+    const b = (svc.decelKmhPerSec ?? 3.0)/3.6;
+    const v = Math.min(cap/3.6,Math.sqrt(2*len*a*b/(a+b)));
+    if (len>0) run += v/a+v/b+Math.max(0,len-v*v/(2*a)-v*v/(2*b))/v;
+    if (n<stops.length-1) dwell += to.s.dwellSec ?? svc.dwellSec ?? 20;
+  }
+  return Math.round(run)+dwell;
+}
+const _ibcServiceHM = minutes => String(Math.floor(minutes/60)).padStart(2,'0') + ':' + String(minutes%60).padStart(2,'0');
+const _ibcLocalFeed = IBC_TT_SERVICES.find(s => s.id === 'IBC1');
+const _ibcLocalReturn = IBC_TT_SERVICES.find(s => s.id === 'IBC1_NB');
+const _ibcLexFeed = IBC_TT_SERVICES.find(s => s.id === 'IBC3');
+const _ibcLocalOffset = Math.ceil(_ibcPathDurationSec(_IBC_DAIHANJISHI_SB,_ibcLocalFeed)/60)+5;
+const _ibcShuttleOffset = Math.ceil(_ibcPathDurationSec(_IBC_SHUTTLE_SB,_IBC_PROFILE)/60)+5;
+const _ibcLexTo41 = _IBC_LEX_SB.slice(0,_IBC_LEX_SB.indexOf('IBC41')+1);
+const _ibcPeakPhase = (_ibcMin(_ibcLexFeed.firstDep)+Math.ceil(_ibcPathDurationSec(_ibcLexTo41,_ibcLexFeed)/60)+5)%60;
+const _ibcNbPhase = ((_ibcMin(_ibcLocalReturn.firstDep)-_ibcShuttleOffset+15)%60+60)%60;
+function _ibcPeakWindows(phase, first, last) {
+  const windows = [];
+  for (const [start,end] of [[7*60,10*60],[17*60,20*60]]) {
+    const lower = Math.max(start,first), upper = Math.min(end-1,last);
+    const f = lower+((phase-lower%60+60)%60);
+    if (f<=upper) windows.push({from:_ibcServiceHM(f),to:_ibcServiceHM(f+Math.floor((upper-f)/60)*60)});
+  }
+  return windows;
+}
+const _ibcShuttleFirst = _ibcMin(_ibcLocalFeed.firstDep)+_ibcLocalOffset;
+const _ibcShuttleLast = _ibcMin(_ibcLocalFeed.lastDep)+_ibcLocalOffset;
+const _ibcShuttleNbFirst = _ibcMin(_ibcLocalReturn.firstDep)-_ibcShuttleOffset;
+const _ibcShuttleNbLast = _ibcMin(_ibcLocalReturn.lastDep)-_ibcShuttleOffset;
+IBC_TT_SERVICES.push(
+  _ibcSvc('IBC6','Local — Daihanjishi → Īmate (change at IBC41)','IBC41','IBC55',
+    _ibcServiceHM(_ibcShuttleFirst),_ibcServiceHM(_ibcShuttleLast),30,[]),
+  _ibcSvc('IBC6_NB','Local NB — Īmate → Daihanjishi (change at IBC41)','IBC55','IBC41',
+    _ibcServiceHM(_ibcShuttleNbFirst),_ibcServiceHM(_ibcShuttleNbLast),30,[])
+);
+const _ibcLexFirstAt41 = _ibcMin(_ibcLexFeed.firstDep)+Math.ceil(_ibcPathDurationSec(_ibcLexTo41,_ibcLexFeed)/60)+5;
+const _ibcLexLastAt41 = _ibcMin(_ibcLexFeed.lastDep)+Math.ceil(_ibcPathDurationSec(_ibcLexTo41,_ibcLexFeed)/60)+5;
+const _ibcPeakSb = _ibcPeakWindows(_ibcPeakPhase,Math.max(_ibcShuttleFirst,_ibcLexFirstAt41),Math.min(_ibcShuttleLast,_ibcLexLastAt41));
+const _ibcPeakNb = _ibcPeakWindows(_ibcNbPhase,_ibcShuttleNbFirst,_ibcShuttleNbLast);
+if (_ibcPeakSb.length) IBC_TT_SERVICES.push({
+  ..._ibcSvc('IBC6P','Local peak reinforcement — Daihanjishi → Īmate','IBC41','IBC55',_ibcPeakSb[0].from,_ibcPeakSb.at(-1).to,60,[]),
+  peakWindows:_ibcPeakSb,
+});
+if (_ibcPeakNb.length) IBC_TT_SERVICES.push({
+  ..._ibcSvc('IBC6P_NB','Local NB peak reinforcement — Īmate → Daihanjishi','IBC55','IBC41',_ibcPeakNb[0].from,_ibcPeakNb.at(-1).to,60,[]),
+  peakWindows:_ibcPeakNb,
+});
 
 if (typeof SuburbanRouter !== 'undefined') {
   SuburbanRouter.register({
