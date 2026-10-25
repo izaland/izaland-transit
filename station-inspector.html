@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Station Inspector — Izarail Debug</title>
+  <title>Station / Line inspector — Izarail Debug</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #111; color: #eee; font-family: monospace; padding: 24px; }
@@ -75,10 +75,24 @@
     .dot-warn { background: #ff9800; }
     .dot-err  { background: #f44336; }
     #no-result { color: #666; font-size: 0.9rem; display: none; }
+    #line-bar { margin-bottom: 20px; }
+#line-select { background: #222; border: 1px solid #444; color: #eee;
+               padding: 10px 14px; font-family: monospace; font-size: 0.95rem;
+               border-radius: 4px; min-width: 320px; }
+#line-diagram { display: none; margin-bottom: 24px; }
+.line-diagram { display: flex; flex-direction: column; }
+.ld-stop { display: flex; gap: 12px; cursor: pointer; padding: 2px 0; }
+.ld-stop:hover .ld-name { color: #fff; }
+.ld-rail { display: flex; flex-direction: column; align-items: center; width: 14px; }
+.ld-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.ld-line { width: 3px; flex: 1; min-height: 14px; }
+.ld-info { display: flex; align-items: baseline; gap: 8px; padding-bottom: 10px; }
+.ld-code { font-size: 0.7rem; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
+.ld-name { font-size: 0.9rem; color: #ccc; }
   </style>
 </head>
 <body>
-  <h1>⚙ STATION INSPECTOR</h1>
+  <h1>⚙ STATION / LINE INSPECTOR</h1>
 
   <div id="search-bar">
     <input id="query" type="text" placeholder="Search by name or code (e.g. M409, Kasakuri, LL01)…" autocomplete="off">
