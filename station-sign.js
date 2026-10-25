@@ -30,8 +30,9 @@
     .station-sign-link:hover .station-sign-neighbour-name { text-decoration:underline; }
     .station-sign-link:focus-visible { outline:3px solid var(--sign-color); outline-offset:-3px; }
     .station-sign-label { position:absolute; bottom:32%; left:0; right:0; max-height:43%; display:flex; flex-direction:column; justify-content:flex-end; text-align:center; }
-    .station-sign-neighbour-kanji { font-size:clamp(12px,3cqw,29px); line-height:1.15; overflow-wrap:anywhere; }
-    .station-sign-neighbour-name { font-size:clamp(12px,3.3cqw,32px); line-height:1.05; overflow-wrap:anywhere; }
+    .station-sign-label > span {  flex-shrink: 0;}
+    .station-sign-neighbour-kanji { font-size: clamp(18px, 3.5cqw, 34px);  line-height: 1.15; overflow-wrap: anywhere;}
+    .station-sign-neighbour-name { font-size: clamp(20px, 4cqw, 38px); line-height: 1.05; overflow-wrap: anywhere;}
     .station-sign-node { position:absolute; left:50%; top:78%; transform:translate(-50%,-50%); width:clamp(12px,5.5cqw,54px); aspect-ratio:1; background:#fff; border-radius:50%; }
     .station-sign-neighbour-code { position:absolute; top:88%; left:0; right:0; color:#000; font-size:clamp(12px,4cqw,38px); line-height:1; }
     .station-sign-side-multiple .station-sign-neighbour-kanji { font-size:clamp(12px,1.8cqw,18px); }
@@ -193,7 +194,7 @@
     header.replaceWith(panel);
     const fit = () => {
       if (!panel.isConnected) return;
-      for (const box of panel.querySelectorAll('.station-sign-centre, .station-sign-label')) {
+      for (const box of panel.querySelectorAll('.station-sign-centre')) {
         for (const child of box.children) child.style.fontSize = '';
         for (let i=0;i<50 && (box.scrollHeight > box.clientHeight + 1 || box.scrollWidth > box.clientWidth + 1);i++) {
           let changed = false;
