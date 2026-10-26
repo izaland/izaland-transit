@@ -1,8 +1,8 @@
 /* station-timetable.js — Station / Line inspector · daily timetable panel
    Adds a "Timetable" button to the inspector search bar.
-   The panel is built only when opened and reads line/service data directly:
-   SUBURBAN_LINES (+ SK/KW/TS/KS service arrays), IBC_LINES/IBC_TT_SERVICES,
-   and other lines that expose a services array. No router internals needed. */
+   Shows all departures from all serving lines in chronological order,
+   with multi-select filters to include/exclude individual relations
+   (line families such as RI, CO, AX, IBC, ...). */
 (function () {
   'use strict';
   if (window.__IZX_STATION_TIMETABLE__) return;
@@ -17,6 +17,9 @@
     const [h, m] = String(s).split(':').map(Number);
     return (h || 0) * 60 + (m || 0);
   };
+
+  /* lineId -> included? Default: every serving line is included. */
+  const lineFilter = new Map();
 
   function syntheticService(line) {
     const sts = line.stations || [];
@@ -169,6 +172,8 @@
         const dep = originDep + offset;
         out.push({
           dep,
+          lineId: entry.lineId,
+          lineColor: entry.meta?.color || '#888',
           svcId: svc.id || '(service)',
           svcDesc: svc.desc || svc.name || '',
           destCode: seq[seq.length - 1],
@@ -239,17 +244,19 @@
       return;
     }
 
-    const selected = panel.dataset.lineId &&
-      serving.some((e) => e.lineId === panel.dataset.lineId)
-      ? panel.dataset.lineId
-      : serving[0].lineId;
-
-    const entry = serving.find((e) => e.lineId === selected);
-    const rows = [];
-    for (const svc of entry.services || []) {
-      rows.push(...serviceDepartures(entry, svc, code));
+    /* New lines default to included; previous choices are preserved. */
+    for (const e of serving) {
+      if (!lineFilter.has(e.lineId)) lineFilter.set(e.lineId, true);
     }
-    rows.sort((a, b) => a.dep - b.dep);
+
+    const rows = [];
+    for (const entry of serving) {
+      if (!lineFilter.get(entry.lineId)) continue;
+      for (const svc of entry.services || []) {
+        rows.push(...serviceDepartures(entry, svc, code));
+      }
+    }
+    rows.sort((a, b) => a.dep - b.dep || a.lineId.localeCompare(b.lineId));
 
     const byHour = new Map();
     for (const r of rows) {
@@ -261,32 +268,47 @@
     const station = stationName(serving, code);
     const destName = (c) => stationName(serving, c);
 
-    const lineOptions = serving.map((e) => `
-      <option value="${e.lineId}"${e.lineId === selected ? ' selected' : ''}>
-        ${e.lineId} — ${e.meta?.name || e.lineId}
-      </option>`).join('');
+    const chips = serving.map((e) => {
+      const on = lineFilter.get(e.lineId);
+      const col = e.meta?.color || '#888';
+      return `<label style="display:inline-flex;align-items:center;gap:6px;
+        background:#1f1f1f;border:1px solid ${on ? col : '#333'};
+        border-radius:14px;padding:4px 10px;margin:3px;cursor:pointer;font-size:0.8rem">
+        <input type="checkbox" data-line="${e.lineId}" ${on ? 'checked' : ''}
+          style="accent-color:${col}">
+        <span style="color:${on ? '#fff' : '#777'}">${e.lineId}</span>
+      </label>`;
+    }).join('');
 
     let html = `
-      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px">
+      <div style="margin-bottom:10px">
         <strong style="color:#fff">${station} · ${code}</strong>
-        <select id="timetable-line" style="background:#222;border:1px solid #444;color:#eee;padding:6px 10px;border-radius:4px;font-family:monospace">
-          ${lineOptions}
-        </select>
-        <span style="color:#666;font-size:0.8rem">${rows.length} departures</span>
+        <span style="color:#666;font-size:0.8rem;margin-left:10px">${rows.length} departures</span>
+      </div>
+      <div style="margin-bottom:12px">
+        <span style="color:#888;font-size:0.75rem;letter-spacing:0.08em;margin-right:8px">RELATIONS</span>
+        <button id="tt-all" style="background:#333;color:#eee;border:1px solid #555;
+          padding:3px 10px;margin-right:6px;border-radius:4px;cursor:pointer;font-family:monospace">All</button>
+        <button id="tt-none" style="background:#333;color:#eee;border:1px solid #555;
+          padding:3px 10px;border-radius:4px;cursor:pointer;font-family:monospace">None</button>
+        <div style="margin-top:6px">${chips}</div>
       </div>`;
 
     if (!rows.length) {
-      html += '<div style="color:#ff9800">No departures found for this station and line.</div>';
+      html += '<div style="color:#ff9800">No departures match the selected relations.</div>';
     } else {
-      html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">';
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px">';
       for (const [hour, list] of [...byHour.entries()].sort((a, b) => a[0] - b[0])) {
         html += `
           <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:6px;padding:10px">
             <div style="color:#888;font-size:0.75rem;letter-spacing:0.08em;margin-bottom:8px">${pad2(hour % 24)}:00–${pad2((hour + 1) % 24)}:00</div>`;
         for (const r of list) {
+          const txt = (luminance(r.lineColor) > 0.35) ? '#000' : '#fff';
           html += `
             <div style="display:flex;gap:8px;align-items:baseline;padding:3px 0;font-size:0.85rem">
               <span style="color:#fff;min-width:44px">${hm(r.dep)}</span>
+              <span style="background:${r.lineColor};color:${txt};padding:1px 6px;
+                border-radius:3px;font-size:0.72rem;font-weight:bold">${r.lineId}</span>
               <span style="color:#4fc3f7;min-width:64px">${r.svcId}</span>
               <span style="color:#aaa">→ ${destName(r.destCode)}</span>
             </div>`;
@@ -299,13 +321,35 @@
     panel.innerHTML = html;
     panel.style.display = 'block';
 
-    const sel = panel.querySelector('#timetable-line');
-    if (sel) {
-      sel.addEventListener('change', () => {
-        panel.dataset.lineId = sel.value;
+    panel.querySelectorAll('input[data-line]').forEach((box) => {
+      box.addEventListener('change', () => {
+        lineFilter.set(box.dataset.line, box.checked);
         renderTimetable();
       });
-    }
+    });
+    const allBtn = panel.querySelector('#tt-all');
+    const noneBtn = panel.querySelector('#tt-none');
+    if (allBtn) allBtn.addEventListener('click', () => {
+      serving.forEach((e) => lineFilter.set(e.lineId, true));
+      renderTimetable();
+    });
+    if (noneBtn) noneBtn.addEventListener('click', () => {
+      serving.forEach((e) => lineFilter.set(e.lineId, false));
+      renderTimetable();
+    });
+  }
+
+  /* WCAG-style relative luminance for badge text contrast. */
+  function luminance(hex) {
+    hex = String(hex || '#888').replace(/^#/, '');
+    if (hex.length === 3) hex = hex.split('').map((x) => x + x).join('');
+    const lin = (c) => {
+      const v = parseInt(c, 16) / 255;
+      return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * lin(hex.slice(0, 2))
+      + 0.7152 * lin(hex.slice(2, 4))
+      + 0.0722 * lin(hex.slice(4, 6));
   }
 
   function init() {
