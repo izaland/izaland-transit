@@ -362,7 +362,7 @@ const _ibcSegMin = (svc, seq, a, b) => {
   const ia = seq.indexOf(a), ib = seq.indexOf(b);
   if (ia < 0 || ib < 0 || ia === ib) return 0;
   const slice = ia < ib ? seq.slice(ia, ib + 1) : seq.slice(ib, ia + 1).reverse();
-  return _ibcPathDurationSec(slice, svc) / 60;
+  return Math.ceil(_ibcPathDurationSec(slice, svc) / 60);
 };
 const _ibcDepMin = (svc, seq, boardCode, earliestMin) => {
   const off = _ibcSegMin(svc, seq, seq[0], boardCode);
