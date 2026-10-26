@@ -1,6 +1,9 @@
 /* SBM Local timetable and explicit Local-only M20 through journeys.
    Requires sbo-data.js and M20 data. Loaded by sbo-tt.js.
-   Provisional rolling-stock profile: M20_KIN.LO; border dwell 90 s.
+   SBM uses its own historic-railway operating profile, separate from M20.
+   Provisional SBM profile: 90 km/h, 45 s intermediate stops, 7% running-time
+   margin. M20 retains its own high-performance profile.
+   Border dwell at Sainðaul Central: 90 s.
    All times remain absolute service-day seconds, including 25:xx.
    M20 Express is never part of a through trip generated here.
    Independent trains: 10 min before/after the through coverage.
@@ -18,10 +21,11 @@ function init(){
 if(api.ready)return;
 if(typeof SBO_LINES==='undefined'||!SBO_LINES.SBM||typeof M20_ST==='undefined'||typeof M20_HEADWAY_LO==='undefined'||typeof M20_KIN==='undefined'){api.error='SBM needs sbo-data.js and metro/m20-data.js';console.warn(api.error);return;}
 const line=SBO_LINES.SBM,kin=M20_KIN.LO,stopSec=90;
+const SBM_KIN={vmaxKmh:90,accel:kin.accel,decel:kin.decel,dwellSec:45,runningTimeMargin:0.07};
 const sb=line.stations.map(s=>({...s,lineId:'SBM',network:'suburban',color:line.color}));
 const metro=M20_CANONICAL_ORDER.map(code=>({code,name:M20_ST[code].n,kanji:M20_ST[code].k,km:M20_ST[code].km,lineId:'M20',network:'metro',color:'#0F1F5C'}));
-function hop(a,b){const d=Math.abs(b.km-a.km)*1000,v=kin.vmaxKmh/3.6,acc=kin.accel,dec=kin.decel;if(!d)return 0;const p=Math.min(v,Math.sqrt(2*d*acc*dec/(acc+dec)));return p/acc+p/dec+Math.max(0,d-p*p/(2*acc)-p*p/(2*dec))/p;}
-function timeline(seq,start){let t=start;return seq.map((s,i)=>{if(i)t+=s.lineId!==seq[i-1].lineId?stopSec:hop(seq[i-1],s);const arr=t;if(i>0&&i<seq.length-1&&seq[i-1].lineId===s.lineId&&seq[i+1].lineId===s.lineId)t+=kin.dwellSec??30;return {...s,arr:Math.round(arr),dep:Math.round(t)};});}
+function hop(a,b,profile){const d=Math.abs(b.km-a.km)*1000,v=profile.vmaxKmh/3.6,acc=profile.accel,dec=profile.decel;if(!d)return 0;const p=Math.min(v,Math.sqrt(2*d*acc*dec/(acc+dec)));return (p/acc+p/dec+Math.max(0,d-p*p/(2*acc)-p*p/(2*dec))/p)*(profile.runningTimeMargin||0);}
+function timeline(seq,start){let t=start;return seq.map((s,i)=>{if(i)t+=s.lineId!==seq[i-1].lineId?stopSec:hop(seq[i-1],s,s.lineId==='SBM'?SBM_KIN:kin);const arr=t;if(i>0&&i<seq.length-1&&seq[i-1].lineId===s.lineId&&seq[i+1].lineId===s.lineId)t+=(s.lineId==='SBM'?SBM_KIN:kin).dwellSec??30;return {...s,arr:Math.round(arr),dep:Math.round(t)};});}
 function add(id,seq,start,through){if(start<sec('04:30'))return;const stops=timeline(seq,start);api.trips.push({id,through,stops});}
 function departures(){const set=new Set();for(const w of M20_HEADWAY_LO){const h=w.headwayMin*60;for(let t=Math.ceil(sec(w.from)/h)*h;t<sec(w.to);t+=h)set.add(t);}return [...set].sort((a,b)=>a-b);}
 const grid=departures(),south=[...metro].reverse().concat(sb),north=[...sb].reverse().concat(metro);
@@ -35,7 +39,7 @@ if(lateShort)for(let t=sec('25:15');t<=sec('25:45');t+=600)add('SBM_LO_SHORT_'+t
 }
 fill(sb,'SBM01',true);fill([...sb].reverse(),'SBM27',false);
 api.trips.sort((a,b)=>a.stops[0].dep-b.stops[0].dep);
-api.services=api.trips.map(t=>{const stops=t.stops.filter(s=>s.lineId==='SBM'),first=stops[0];return {id:t.id,desc:'Local'+(t.through?' thru M20 (Local only)':''),fromCode:first.code,toCode:stops.at(-1).code,firstDep:hm(Math.ceil(first.dep/60)*60),lastDep:hm(Math.ceil(first.dep/60)*60),headway:1,explicitDir:true,vMaxKmh:kin.vmaxKmh,accelKmhPerSec:kin.accel*3.6,decelKmhPerSec:kin.decel*3.6,dwellSec:kin.dwellSec??30,stops:stops.map(s=>s.code),thruService:t.through,tripId:t.id};});
+api.services=api.trips.map(t=>{const stops=t.stops.filter(s=>s.lineId==='SBM'),first=stops[0];return {id:t.id,desc:'Local'+(t.through?' thru M20 (Local only)':''),fromCode:first.code,toCode:stops.at(-1).code,firstDep:hm(Math.ceil(first.dep/60)*60),lastDep:hm(Math.ceil(first.dep/60)*60),headway:1,explicitDir:true,vMaxKmh:SBM_KIN.vmaxKmh,accelKmhPerSec:SBM_KIN.accel*3.6,decelKmhPerSec:SBM_KIN.decel*3.6,dwellSec:SBM_KIN.dwellSec,runningTimeMargin:SBM_KIN.runningTimeMargin,stops:stops.map(s=>s.code),thruService:t.through,tripId:t.id};});
 line.services=api.services;root.SBM_TT_SERVICES=api.services;
 if(typeof SuburbanRouter!=='undefined')SuburbanRouter.register({lineId:'SBM',meta:{name:line.name,color:line.color,cls:'suburban'},stations:line.stations,services:api.services,interchange:Object.fromEntries(Object.entries(SUBURBAN_INTERCHANGE).filter(([c])=>c.startsWith('SBM')))});
 const list=x=>(Array.isArray(x)?x:String(x||'').split(',')).map(c=>String(c).trim());
