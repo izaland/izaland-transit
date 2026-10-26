@@ -12,6 +12,10 @@
      - SBM Express: 3/hour peak, 2/hour off-peak
      - Residual M20 Express: only where slots remain
 
+   Mixed M20-to-SBM journeys may use either:
+     - a Local thru service, staying on board at Sainðaul Central; or
+     - an M20 Local to SBM01, then an SBM Rapid or Express.
+
    The last three M20-originated trips before the final train
    terminate on M20 and do not continue to SBM.
 
@@ -68,8 +72,14 @@ for(let i=1;i<stops.length;i++)if(stops[i].lineId!==stops[i-1].lineId){if(i-1>st
 if(stops.length-1>start)legs.push(leg(start,stops.length-1));
 if(!legs.length)return null;const thru=legs.length>1;
 return {legs,departureTime:legs[0].boardDep,arrivalTime:legs.at(-1).alightArr,totalMinutes:Math.round((stops.at(-1).arr-stops[0].dep)/60),totalKm:legs.reduce((sum,l)=>sum+l.km,0),transfers:0,transferNodes:thru?['SBM01']:[],transferThru:thru?[true]:[],transferWalkMin:thru?[0]:[],transferWaitMin:thru?[0]:[],thruService:thru,thruNode:thru?'SBM01':undefined};}
+function connection(fromTrip,a,toTrip,b){const arrive=fromTrip.stops[a].arr,depart=toTrip.stops[b].dep;if(depart<arrive||depart-arrive>3600)return null;const first=make(fromTrip,a,a),second=make(toTrip,b,b);if(!first||!second)return null;const wait=Math.round((depart-arrive)/60);return {legs:[first.legs[0],second.legs[0]],departureTime:first.legs[0].boardDep,arrivalTime:second.legs[0].alightArr,totalMinutes:Math.round((toTrip.stops[b].arr-fromTrip.stops[a].dep)/60),totalKm:first.legs[0].km+second.legs[0].km,transfers:1,transferNodes:['SBM01'],transferThru:[false],transferWalkMin:[0],transferWaitMin:[wait],thruService:false};}
 function search(from,to,time,opts={}){let earliest=sec(time);if(earliest<sec('04:30'))earliest+=86400;const result=[],froms=list(from),tos=list(to);
 for(const t of api.trips){for(const f of froms)for(const dest of tos){const a=t.stops.findIndex(s=>s.code===f),b=t.stops.findIndex(s=>s.code===dest);if(a<0||b<=a)continue;if(t.stops[a].dep<earliest||t.stops[a].dep>earliest+10800)continue;const j=make(t,a,b);if(j)result.push(j);}}
+const m20From=froms.filter(c=>/^M20\d+$/.test(c)),sbmTo=tos.filter(c=>/^SBM\d+$/.test(c));
+if(m20From.length&&sbmTo.length){
+for(const f of m20From)for(const dest of sbmTo){
+for(const inbound of api.trips.filter(t=>t.kind==='LO'&&t.stops.some(s=>s.code===f))){const a=inbound.stops.findIndex(s=>s.code===f),x=inbound.stops.findIndex(s=>s.code==='SBM01');if(a<0||x<=a)continue;if(inbound.stops[a].dep<earliest||inbound.stops[a].dep>earliest+10800)continue;
+for(const outbound of api.trips.filter(t=>(t.kind==='RAPID'||t.kind==='EX')&&t.stops.some(s=>s.code===dest))){const y=outbound.stops.findIndex(s=>s.code==='SBM01'),b=outbound.stops.findIndex(s=>s.code===dest);if(y<0||b<=y)continue;const j=connection(inbound,a,outbound,b);if(j)result.push(j);}}}}
 const seen=new Set();return result.filter(j=>{const k=j.legs.map(l=>l.tripId+':'+l.boardCode+':'+l.alightCode).join('|');if(seen.has(k))return false;seen.add(k);return true;}).sort((a,b)=>a.legs.at(-1).alightArrSec-b.legs.at(-1).alightArrSec).slice(0,opts.maxResults??8);}
 api.search=search;
 if(typeof SuburbanRouter!=='undefined'&&!SuburbanRouter.__sbmLocalPatched){const original=SuburbanRouter.search.bind(SuburbanRouter);SuburbanRouter.search=function(from,to,time,opts){const usesSBM=list(from).some(c=>/^SBM\d+$/.test(c))||list(to).some(c=>/^SBM\d+$/.test(c));return usesSBM?search(from,to,time,opts):original(from,to,time,opts);};SuburbanRouter.__sbmLocalPatched=true;}
