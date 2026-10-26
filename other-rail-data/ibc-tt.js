@@ -389,7 +389,7 @@ const _ibcComposeBranchConnection = (fromCode, toCode, depTime) => {
   const toBranch = _ibcBranchCodes.has(toCode);
   if (fromBranch === toBranch) return out;
   if (fromCode === 'IBC41' || toCode === 'IBC41') return out;
-  const feeders = fromBranch ? ['IBC7', 'IBC7S'] : ['IBC3_NB', 'IBC6_NB'];
+  const feeders = fromBranch ? ['IBC7_NB', 'IBC7S_NB'] : ['IBC3_NB', 'IBC6_NB'];
   const mains = fromBranch ? ['IBC3', 'IBC6'] : ['IBC7', 'IBC7S'];
   for (const fid of feeders) {
     const f = IBC_TT_SERVICES.find((s) => s.id === fid);
