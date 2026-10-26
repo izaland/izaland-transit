@@ -37,7 +37,7 @@ const RAPID_STOPS=new Set(['SBM01','SBM04','SBM07','SBM10','SBM12','SBM13','SBM1
 const EXPRESS_STOPS=new Set(['SBM01','SBM04','SBM07','SBM10','SBM13','SBM15','SBM19','SBM23','SBM27']);
 const sb=line.stations.map(s=>({...s,lineId:'SBM',network:'suburban',color:line.color}));
 const metro=M20_CANONICAL_ORDER.map(code=>({code,name:M20_ST[code].n,kanji:M20_ST[code].k,km:M20_ST[code].km,lineId:'M20',network:'metro',color:'#0F1F5C'}));
-function hop(a,b,p){const d=Math.abs(b.km-a.km)*1000,v=p.vmaxKmh/3.6,acc=p.accel,dec=p.decel;if(!d)return 0;const peak=Math.min(v,Math.sqrt(2*d*acc*dec/(acc+dec)));return (peak/acc+peak/dec+Math.max(0,d-peak*peak/(2*acc)-peak*peak/(2*dec))/peak)*(p.runningTimeMargin||0);}
+function hop(a,b,p){const d=Math.abs(b.km-a.km)*1000,v=p.vmaxKmh/3.6,acc=p.accel,dec=p.decel;if(!d)return 0;const peak=Math.min(v,Math.sqrt(2*d*acc*dec/(acc+dec)));return (peak/acc+peak/dec+Math.max(0,d-peak*peak/(2*acc)-peak*peak/(2*dec))/peak)*(1+(p.runningTimeMargin||0));}
 function timeline(seq,start,kind){let t=start;const out=[];for(let i=0;i<seq.length;i++){const s=seq[i];if(i){const prev=seq[i-1];const profile=s.lineId==='SBM'?SBM_KIN:(kind==='EX'?exKin:kin);t+=s.lineId!==prev.lineId?stopSec:hop(prev,s,profile);}const arr=t;if(i&&i<seq.length-1&&seq[i-1].lineId===s.lineId&&seq[i+1].lineId===s.lineId){const profile=s.lineId==='SBM'?SBM_KIN:(kind==='EX'?exKin:kin);t+=profile.dwellSec??30;}out.push({...s,arr:Math.round(arr),dep:Math.round(t)});}
 return out;}
 function add(id,seq,start,kind){if(start<sec('04:30'))return;api.trips.push({id,kind,stops:timeline(seq,start,kind)});}
