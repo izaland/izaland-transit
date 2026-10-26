@@ -18,8 +18,6 @@
     return (h || 0) * 60 + (m || 0);
   };
 
-  /* Find registered SuburbanRouter line entries without assuming a
-     particular internal property name. */
   function registryEntries() {
     const R = window.SuburbanRouter;
     if (!R || typeof R !== 'object') return [];
@@ -78,8 +76,8 @@
       ? entry.stations.slice(lo, hi + 1)
       : entry.stations.slice(lo, hi + 1).reverse();
 
-    const acc = ((entry.accelKmhPerSec ?? 2.5)) / 3.6;
-    const dec = ((entry.decelKmhPerSec ?? 3.0)) / 3.6;
+    const acc = (entry.accelKmhPerSec ?? 2.5) / 3.6;
+    const dec = (entry.decelKmhPerSec ?? 3.0) / 3.6;
     let run = 0, dwell = 0;
 
     for (let n = 1; n < slice.length; n++) {
@@ -189,8 +187,7 @@
       e.stations.some((s) => s.code === code));
 
     if (!serving.length) {
-      panel.innerHTML = '<div style="color:#ff9800">No SuburbanRouter timetable data for ' +
-        code + '.</div>';
+      panel.innerHTML = `<div style="color:#ff9800">No SuburbanRouter timetable data for ${code}.</div>`;
       panel.style.display = 'block';
       return;
     }
@@ -217,35 +214,35 @@
     const station = stationName(serving, code);
     const destName = (c) => stationName(serving, c);
 
-    let html = '
+    const lineOptions = serving.map((e) => `
+      <option value="${e.lineId}"${e.lineId === selected ? ' selected' : ''}>
+        ${e.lineId} — ${e.meta?.name || e.lineId}
+      </option>`).join('');
+
+    let html = `
       <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px">
-        <strong style="color:#fff">' + station + ' · ' + code + '</strong>
-        <select id="timetable-line" style="background:#222;border:1px solid #444;color:#eee;
-          padding:6px 10px;border-radius:4px;font-family:monospace">
-          ' + serving.map((e) => '
-            <option value="' + e.lineId + '"' + (e.lineId === selected ? ' selected' : '') + '>
-              ' + e.lineId + ' — ' + (e.meta?.name || e.lineId) + '
-            </option>').join('') + '
+        <strong style="color:#fff">${station} · ${code}</strong>
+        <select id="timetable-line" style="background:#222;border:1px solid #444;color:#eee;padding:6px 10px;border-radius:4px;font-family:monospace">
+          ${lineOptions}
         </select>
-        <span style="color:#666;font-size:0.8rem">' + rows.length + ' departures</span>
-      </div>';
+        <span style="color:#666;font-size:0.8rem">${rows.length} departures</span>
+      </div>`;
 
     if (!rows.length) {
       html += '<div style="color:#ff9800">No departures found for this station and line.</div>';
     } else {
       html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">';
       for (const [hour, list] of [...byHour.entries()].sort((a, b) => a[0] - b[0])) {
-        html += '
+        html += `
           <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:6px;padding:10px">
-            <div style="color:#888;font-size:0.75rem;letter-spacing:0.08em;margin-bottom:8px">' +
-              pad2(hour % 24) + ':00–' + pad2((hour + 1) % 24) + ':00</div>';
+            <div style="color:#888;font-size:0.75rem;letter-spacing:0.08em;margin-bottom:8px">${pad2(hour % 24)}:00–${pad2((hour + 1) % 24)}:00</div>`;
         for (const r of list) {
-          html += '
+          html += `
             <div style="display:flex;gap:8px;align-items:baseline;padding:3px 0;font-size:0.85rem">
-              <span style="color:#fff;min-width:44px">' + hm(r.dep) + '</span>
-              <span style="color:#4fc3f7;min-width:64px">' + r.svcId + '</span>
-              <span style="color:#aaa">→ ' + destName(r.destCode) + '</span>
-            </div>';
+              <span style="color:#fff;min-width:44px">${hm(r.dep)}</span>
+              <span style="color:#4fc3f7;min-width:64px">${r.svcId}</span>
+              <span style="color:#aaa">→ ${destName(r.destCode)}</span>
+            </div>`;
         }
         html += '</div>';
       }
