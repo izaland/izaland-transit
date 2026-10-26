@@ -1,8 +1,10 @@
 /* station-timetable.js — Station / Line inspector · daily timetable panel
    Adds a "Timetable" button to the inspector search bar.
-   Shows all departures from all serving lines in chronological order,
-   with multi-select filters to include/exclude individual relations
-   (line families such as RI, CO, AX, IBC, ...). */
+   Shows all departures from all interchange-connected lines in
+   chronological order, with multi-select relation filters.
+   Station codes are expanded through SUBURBAN_INTERCHANGE and
+   METRO_INTERCHANGE_MAP, so one physical station can aggregate
+   codes such as CO01 · KD32 · LL01. */
 (function () {
   'use strict';
   if (window.__IZX_STATION_TIMETABLE__) return;
@@ -18,7 +20,6 @@
     return (h || 0) * 60 + (m || 0);
   };
 
-  /* lineId -> included? Default: every serving line is included. */
   const lineFilter = new Map();
 
   function syntheticService(line) {
@@ -91,6 +92,42 @@
     }
 
     return [...out.values()];
+  }
+
+  /* Expand a station code to every interchange-connected code,
+   * in both directions, using the same link data as the router. */
+  function equivalentCodes(code) {
+    const out = new Set([code]);
+    const add = (c) => { if (c && typeof c === 'string') out.add(c); };
+
+    if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
+      const partners = SUBURBAN_INTERCHANGE[code];
+      if (Array.isArray(partners)) {
+        for (const p of partners) add((p && typeof p === 'object') ? p.code : p);
+      }
+      for (const [key, list] of Object.entries(SUBURBAN_INTERCHANGE)) {
+        if (!Array.isArray(list)) continue;
+        for (const p of list) {
+          const c = (p && typeof p === 'object') ? p.code : p;
+          if (c === code) add(key);
+        }
+      }
+    }
+
+    if (typeof METRO_INTERCHANGE_MAP !== 'undefined') {
+      for (const map of Object.values(METRO_INTERCHANGE_MAP)) {
+        for (const [from, entries] of Object.entries(map)) {
+          const list = Array.isArray(entries) ? entries : [entries];
+          for (const e of list) {
+            const to = (e && typeof e === 'object') ? e.code : e;
+            if (from === code) add(to);
+            if (to === code) add(from);
+          }
+        }
+      }
+    }
+
+    return out;
   }
 
   function stationIndex(entry) {
@@ -227,24 +264,24 @@
   function renderTimetable() {
     const panel = ensurePanel();
     const entries = buildEntries();
-    const code = currentStationCode();
+    const baseCode = currentStationCode();
 
-    if (!code) {
+    if (!baseCode) {
       panel.innerHTML = '<div style="color:#f44336">Inspect a station first.</div>';
       panel.style.display = 'block';
       return;
     }
 
+    const codes = equivalentCodes(baseCode);
     const serving = entries.filter((e) =>
-      e.stations.some((s) => s.code === code));
+      e.stations.some((s) => codes.has(s.code)));
 
     if (!serving.length) {
-      panel.innerHTML = `<div style="color:#ff9800">No timetable data available for ${code}.</div>`;
+      panel.innerHTML = `<div style="color:#ff9800">No timetable data available for ${baseCode}.</div>`;
       panel.style.display = 'block';
       return;
     }
 
-    /* New lines default to included; previous choices are preserved. */
     for (const e of serving) {
       if (!lineFilter.has(e.lineId)) lineFilter.set(e.lineId, true);
     }
@@ -252,8 +289,10 @@
     const rows = [];
     for (const entry of serving) {
       if (!lineFilter.get(entry.lineId)) continue;
+      const matched = entry.stations.find((s) => codes.has(s.code));
+      if (!matched) continue;
       for (const svc of entry.services || []) {
-        rows.push(...serviceDepartures(entry, svc, code));
+        rows.push(...serviceDepartures(entry, svc, matched.code));
       }
     }
     rows.sort((a, b) => a.dep - b.dep || a.lineId.localeCompare(b.lineId));
@@ -265,8 +304,9 @@
       byHour.get(hour).push(r);
     }
 
-    const station = stationName(serving, code);
+    const station = stationName(serving, baseCode);
     const destName = (c) => stationName(serving, c);
+    const codeList = [...codes].sort().join(' · ');
 
     const chips = serving.map((e) => {
       const on = lineFilter.get(e.lineId);
@@ -282,7 +322,8 @@
 
     let html = `
       <div style="margin-bottom:10px">
-        <strong style="color:#fff">${station} · ${code}</strong>
+        <strong style="color:#fff">${station}</strong>
+        <span style="color:#888;font-size:0.85rem;margin-left:8px">${codeList}</span>
         <span style="color:#666;font-size:0.8rem;margin-left:10px">${rows.length} departures</span>
       </div>
       <div style="margin-bottom:12px">
@@ -339,7 +380,6 @@
     });
   }
 
-  /* WCAG-style relative luminance for badge text contrast. */
   function luminance(hex) {
     hex = String(hex || '#888').replace(/^#/, '');
     if (hex.length === 3) hex = hex.split('').map((x) => x + x).join('');
