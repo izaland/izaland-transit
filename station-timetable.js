@@ -5,7 +5,7 @@
   window.__IZX_STATION_TIMETABLE__=true;
   const filters=new Map();
   const base=new URL('.',document.currentScript?.src||document.baseURI);
-  let enginePromise,revision=0;
+  let enginePromise,revision=0,boardPromise,mode='debug';
   const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const min=x=>{const [h,m]=String(x).split(':').map(Number);return h*60+m;};
   const clock=t=>{const v=((Math.floor(t)%1440)+1440)%1440;return String(Math.floor(v/60)).padStart(2,'0')+':'+String(v%60).padStart(2,'0')+(t>=1440?' +'+Math.floor(t/1440)+'d':'');};
@@ -88,6 +88,31 @@
     }return rows;
   }
   function panel(){let p=document.getElementById('timetable-panel');if(!p){p=document.createElement('section');p.id='timetable-panel';p.style.cssText='margin:24px 0;padding:16px;background:#161616;border:1px solid #333;border-radius:6px';document.getElementById('results')?.after(p);if(!p.isConnected)document.body.append(p);}return p;}
+  function boardModule(){
+    if(boardPromise)return boardPromise;
+    const css=document.createElement('link');css.rel='stylesheet';css.href=new URL('station-departure-board.css',base).href;
+    const js=document.createElement('script');js.src=new URL('station-departure-board.js',base).href;
+    boardPromise=Promise.all([new Promise((yes,no)=>{css.onload=yes;css.onerror=()=>no(new Error('LCD stylesheet unavailable'));document.head.append(css);}),new Promise((yes,no)=>{js.onload=()=>window.IZXDepartureBoard?yes():no(new Error('LCD module unavailable'));js.onerror=()=>no(new Error('LCD module unavailable'));document.head.append(js);})]).catch(e=>{css.remove();js.remove();boardPromise=null;throw e;});
+    return boardPromise;
+  }
+  function installModes(p,rows,name,codes){
+    const debug=p.querySelector('#tt-trips'),toolbar=document.createElement('div'),sim=document.createElement('div');
+    toolbar.style.cssText='display:flex;gap:8px;margin:14px 0';
+    toolbar.innerHTML='<button type="button" data-mode="debug">Debug</button><button type="button" data-mode="simulation">Simulation</button>';
+    debug.before(toolbar);debug.after(sim);
+    let version=0;
+    async function show(next){
+      const current=++version;mode=next;
+      toolbar.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));
+      debug.hidden=mode!=='debug';sim.hidden=mode==='debug';
+      if(mode==='debug')return;
+      sim.textContent='Loading LCD board…';
+      try{await boardModule();if(current!==version||!p.contains(toolbar))return;window.IZXDepartureBoard.mount(sim,{rows,name,stationKey:[...codes].sort().join('|')});}
+      catch(e){if(current===version&&p.contains(toolbar)){sim.textContent=e.message+' — select Debug or retry Simulation.';}}
+    }
+    toolbar.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.mode)));
+    show(mode);
+  }
   async function render(){
     const token=++revision,p=panel(),code=resolve(),codes=aliases(code),lines=entries().filter(l=>l.stations.some(s=>codes.has(s.code)));p.style.display='block';
     if(!lines.length){p.textContent='No timetable data available for '+code;return;}
@@ -108,6 +133,7 @@
     }
     if(!rows.length)target.textContent='No departures match the selected relations.';
     p.querySelectorAll('input[data-line]').forEach(b=>b.addEventListener('change',()=>{filters.set(b.dataset.line,b.checked);render();}));p.querySelectorAll('button[data-all]').forEach(b=>b.addEventListener('click',()=>{lines.forEach(l=>filters.set(l.id,b.dataset.all==='true'));render();}));
+    installModes(p,rows,name,codes);
   }
   function init(){const bar=document.getElementById('search-bar');if(!bar||document.getElementById('timetable-button'))return;const b=document.createElement('button');b.type='button';b.id='timetable-button';b.textContent='Timetable';b.addEventListener('click',render);bar.append(b);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
