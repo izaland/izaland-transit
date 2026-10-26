@@ -1,8 +1,8 @@
 /* station-timetable.js — Station / Line inspector · daily timetable panel
    Adds a "Timetable" button to the inspector search bar.
-   The panel is built only when opened; it reads services registered in
-   SuburbanRouter and computes station departure times from each line's
-   kinematic profile. No existing timetable data is modified. */
+   The panel is built only when opened and reads line/service data directly:
+   SUBURBAN_LINES (+ SK/KW/TS/KS service arrays), IBC_LINES/IBC_TT_SERVICES,
+   and other lines that expose a services array. No router internals needed. */
 (function () {
   'use strict';
   if (window.__IZX_STATION_TIMETABLE__) return;
@@ -18,33 +18,75 @@
     return (h || 0) * 60 + (m || 0);
   };
 
-  function registryEntries() {
-    const R = window.SuburbanRouter;
-    if (!R || typeof R !== 'object') return [];
-    const out = new Map();
-    const seen = new Set();
-    const add = (e) => {
-      if (e && e.lineId && Array.isArray(e.services) && Array.isArray(e.stations)) {
-        out.set(e.lineId, e);
-      }
+  function syntheticService(line) {
+    const sts = line.stations || [];
+    if (sts.length < 2) return null;
+    return {
+      id: line.id,
+      desc: line.name || line.id,
+      fromCode: sts[0].code,
+      toCode: sts[sts.length - 1].code,
+      firstDep: '05:00',
+      lastDep: '23:00',
+      headway: line.headwayOffPeak || 30,
+      stops: [],
     };
-    const scan = (v, depth) => {
-      if (!v || typeof v !== 'object' || depth > 3 || seen.has(v)) return;
-      seen.add(v);
-      if (Array.isArray(v)) {
-        v.forEach((x) => scan(x, depth + 1));
-        return;
-      }
-      if (Array.isArray(v.services) && Array.isArray(v.stations)) {
-        add(v);
-        return;
-      }
-      for (const x of Object.values(v)) scan(x, depth + 1);
+  }
+
+  function serviceArrayFor(lineId) {
+    const map = {
+      SK: 'SK_SERVICES',
+      KW: 'KW_SERVICES',
+      TS: 'TS_SERVICES',
+      KS: 'KS_SERVICES',
     };
-    for (const key of ['lines', 'registry', 'registered', '_lines', '_registry']) {
-      scan(R[key], 0);
+    const name = map[lineId];
+    if (!name) return null;
+    try {
+      const v = eval(name);
+      return Array.isArray(v) ? v : null;
+    } catch (e) {
+      return null;
     }
-    scan(R, 0);
+  }
+
+  function buildEntries() {
+    const out = new Map();
+    const add = (lineId, meta, stations, services) => {
+      if (!lineId || !Array.isArray(stations) || !Array.isArray(services) || !services.length) return;
+      out.set(lineId, { lineId, meta, stations, services });
+    };
+
+    if (typeof SUBURBAN_LINES !== 'undefined') {
+      for (const line of Object.values(SUBURBAN_LINES)) {
+        const services = serviceArrayFor(line.id)
+          || (Array.isArray(line.services) && line.services.length ? line.services : null)
+          || [syntheticService(line)].filter(Boolean);
+        add(line.id, { name: line.name, color: line.color }, line.stations, services);
+      }
+    }
+
+    if (typeof IBC_LINES !== 'undefined' && IBC_LINES.IBC
+      && typeof IBC_TT_SERVICES !== 'undefined') {
+      add('IBC', { name: 'Ibaches Main Line', color: '#FF9999' },
+        IBC_LINES.IBC.stations, IBC_TT_SERVICES);
+    }
+
+    const otherSources = [
+      ['HD_LINES', 'HD'], ['WI_LINES', 'WI'],
+      ['SHX_LINES', 'SHX'], ['SSK_LINES', 'SSK'],
+    ];
+    for (const [name, fallbackId] of otherSources) {
+      const lines = (typeof window !== 'undefined' && window[name])
+        || (typeof eval !== 'undefined' && (() => { try { return eval(name); } catch (e) { return null; } })());
+      if (!lines) continue;
+      for (const line of Object.values(lines)) {
+        if (!Array.isArray(line.services) || !line.services.length) continue;
+        add(line.id || fallbackId, { name: line.name, color: line.color },
+          line.stations, line.services);
+      }
+    }
+
     return [...out.values()];
   }
 
@@ -101,33 +143,38 @@
     return Math.ceil((Math.round(run) + dwell) / 60);
   }
 
+  function serviceWindows(svc) {
+    if (Array.isArray(svc.peakWindows) && svc.peakWindows.length) {
+      return svc.peakWindows;
+    }
+    if (svc.firstDep && svc.lastDep) {
+      return [{ from: svc.firstDep, to: svc.lastDep }];
+    }
+    return [];
+  }
+
   function serviceDepartures(entry, svc, stationCode) {
     const seq = servedSeq(entry, svc);
     const pos = seq.indexOf(stationCode);
-    if (pos < 0 || !svc.firstDep || !svc.lastDep) return [];
+    if (pos < 0) return [];
 
     const offset = segMinutes(entry, seq, seq[0], stationCode);
-    const firstAtStation = toMin(svc.firstDep) + offset;
-    const lastAtStation = toMin(svc.lastDep) + offset;
     const headway = svc.headway || 30;
     const out = [];
 
-    const originInWindow = (originDep) => {
-      if (!Array.isArray(svc.peakWindows) || !svc.peakWindows.length) return true;
-      return svc.peakWindows.some((w) =>
-        originDep >= toMin(w.from) && originDep <= toMin(w.to));
-    };
-
-    for (let t = firstAtStation; t <= lastAtStation; t += headway) {
-      const originDep = t - offset;
-      if (!originInWindow(originDep)) continue;
-      out.push({
-        dep: t,
-        svcId: svc.id || '(service)',
-        svcDesc: svc.desc || svc.name || '',
-        destCode: seq[seq.length - 1],
-        dir: pos === 0 ? 'SB' : (pos === seq.length - 1 ? 'NB' : ''),
-      });
+    for (const win of serviceWindows(svc)) {
+      const start = toMin(win.from);
+      const end = toMin(win.to);
+      for (let originDep = start; originDep <= end; originDep += headway) {
+        const dep = originDep + offset;
+        out.push({
+          dep,
+          svcId: svc.id || '(service)',
+          svcDesc: svc.desc || svc.name || '',
+          destCode: seq[seq.length - 1],
+          dir: pos === 0 ? 'SB' : (pos === seq.length - 1 ? 'NB' : ''),
+        });
+      }
     }
     return out;
   }
@@ -174,7 +221,7 @@
 
   function renderTimetable() {
     const panel = ensurePanel();
-    const entries = registryEntries();
+    const entries = buildEntries();
     const code = currentStationCode();
 
     if (!code) {
@@ -187,7 +234,7 @@
       e.stations.some((s) => s.code === code));
 
     if (!serving.length) {
-      panel.innerHTML = `<div style="color:#ff9800">No SuburbanRouter timetable data for ${code}.</div>`;
+      panel.innerHTML = `<div style="color:#ff9800">No timetable data available for ${code}.</div>`;
       panel.style.display = 'block';
       return;
     }
