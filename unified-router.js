@@ -1,15 +1,12 @@
 /* ================================================================
    UNIFIED-ROUTER.JS — Izaland Cross-Network Journey Planner
    ================================================================
-   Aggrega IZXRouter, LERouter, SuburbanRouter e MetroRouter in
-   un'unica interfaccia di ricerca. Gestisce i trasferimenti
-   cross-network tra IZX, LE (Lake Eira), Suburban e Metro.
-
    FIX 19 (thru solo per lo stesso treno fisico):
      Un cambio cross-network e' marcato come thru solo quando l'ultima
      gamba di j1 e la prima gamba di j2 condividono lo stesso tripId.
-     Questo evita che due corse diverse, anche temporalmente vicine,
-     vengano presentate come 'stay on board'.
+   HOTFIX:
+     - Ripristinato p.networkId nella ricerca a tre cambi.
+     - Ripristinata l'assegnazione di wait in _xferArrays().
 ================================================================ */
 
 (function (root, factory) {
@@ -24,8 +21,6 @@
 
   const _routers = {};
 
-  /* PERFORMANCE: cache (dati statici). Svuotate quando cambiano router,
-     interscambi, alias o thru. */
   const SEARCH_BUDGET_MS = 2500;
   let _lastEnd = 0, _batchDeadline = 0;
   let _netCache      = new Map();
@@ -210,7 +205,7 @@
     else walk = fill(null);
     let wait;
     if (Array.isArray(j.transferWaitMin) && j.transferWaitMin.length === n) wait = j.transferWaitMin.slice();
-    else if (typeof j.transferWaitMin === 'number') walk = fill(null).map((_, i) => i === 0 ? j.transferWaitMin : null);
+    else if (typeof j.transferWaitMin === 'number') wait = fill(null).map((_, i) => i === 0 ? j.transferWaitMin : null);
     else wait = fill(null);
     return { thru, walk, wait };
   }
@@ -235,7 +230,7 @@
     const thruIdx = transferThru.indexOf(true);
     const isThru = !!thru && _samePhysicalTrain(j1, j2);
 
-    if (thruIdx !== -1 || (j1.thruService || j2.thruService) && isThru) {
+    if (thruIdx !== -1 || ((j1.thruService || j2.thruService) && isThru)) {
       const nodes = [...(j1.transferNodes || []), midCode, ...(j2.transferNodes || [])];
       thruFields.thruService = true;
       thruFields.thruNode    = thruIdx !== -1 ? nodes[thruIdx] : (j1.thruNode ?? j2.thruNode);
@@ -519,7 +514,7 @@
             if (_timeUp()) break;
             const partners2 = _partnersOf(midSt2.code).filter(p => {
               if (netFilter && !netFilter.has(p.networkId)) return false;
-              return tNodes.some(t => t.networkId === p2?.networkId);
+              return tNodes.some(t => t.networkId === p.networkId);
             });
             if (!partners2.length) continue;
 
