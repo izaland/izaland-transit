@@ -17,14 +17,18 @@ const sec = x => { const [h,m] = x.split(':').map(Number); return h*3600 + m*60;
 
 function install(){
   const api  = window.SBMLocalTimetable;
-  const line = (typeof SBO_LINES !== 'undefined') ? SBO_LINES.SBM : null;
-  if (!api || !api.ready || !line) { setTimeout(install, 50); return; }
+  const sbm  = (typeof SBO_LINES !== 'undefined') ? SBO_LINES.SBM : null;
+  const sbo  = (typeof SBO_LINES !== 'undefined') ? SBO_LINES.SBO : null;
+  if (!api || !api.ready || !sbm || !sbo) { setTimeout(install, 50); return; }
   if (api.__sbmSboDirectInstalled) return;
   api.__sbmSboDirectInstalled = true;
 
   const byCode = {};
-  line.stations.forEach(s => {
-    byCode[s.code] = { ...s, lineId:'SBM', network:'suburban', color:line.color };
+  sbm.stations.forEach(s => {
+    byCode[s.code] = { ...s, lineId:'SBM', network:'suburban', color:sbm.color };
+  });
+  sbo.stations.forEach(s => {
+    byCode[s.code] = { ...s, lineId:'SBO', network:'suburban', color:sbo.color };
   });
 
   function timeline(seq, start){
