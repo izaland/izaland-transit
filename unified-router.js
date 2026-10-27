@@ -5,54 +5,11 @@
    un'unica interfaccia di ricerca. Gestisce i trasferimenti
    cross-network tra IZX, LE (Lake Eira), Suburban e Metro.
 
-   FIX 14 (stazioni identiche con codici su reti diverse):
-     Alcune stazioni hanno un codice per ogni rete pur essendo la
-     STESSA stazione (es. Binno = LL02 / SK25 / TS12 / M452;
-     Anagusa Mukai = KD30 / JD03 / M405). Prima la fase 1 (diretto)
-     cercava solo nella rete di from/to, quindi Binno → Anagusa Mukai
-     sulla Metro M4 (M452 → M405) non veniva mai trovato e il cambio
-     veniva trattato come interscambio da 10 min.
-     Ora:
-       - SAME_STATION_GROUPS elenca i codici equivalenti;
-         registerSameStation(codes) permette di aggiungerne altri.
-       - _partnersOf() restituisce transferMin = 0 tra codici dello
-         stesso gruppo appartenenti a reti diverse.
-       - La fase 1 espande from/to agli alias a 0 min e prova il
-         diretto su ogni coppia di codici della stessa rete.
-
-   FIX 15 (treni duplicati):
-       - _journeyKey() non include piu' i codici stazione dei leg:
-         lo stesso treno raggiunto tramite alias diversi (es.
-         LL10 / KD26 / JD05 / SHX06 = Hayatogaru) ora ha la stessa
-         chiave ed e' deduplicato.
-       - search() accetta from/to come array o stringa separata da
-         virgole ('LL10,KD26,JD05,SHX06'): prova tutte le coppie e
-         applica UN SOLO dedup finale.
-
-   FIX 16 (treni passanti / 相互直通運転):
-     Su alcune stazioni di confine i treni di due reti proseguono
-     l'uno sull'altro (es. M8 <-> KW a Kishagoi-Exhibitown,
-     M801 = KW00): i passeggeri restano a bordo e c'e' solo una
-     sosta breve (cambio macchinista, ~90 s). Non e' un interscambio.
-       - THRU_SERVICES elenca le coppie di codici + durata sosta (s);
-         registerThruService({ codes:[..], stopSec }) ne aggiunge altre.
-       - _partnersOf() marca i partner con thru:true e thruSec.
-       - Fasi 2/3: solo LA PRIMA partenza disponibile dopo arrivo +
-         stopSec puo' essere un thru. Se parte entro THRU_TOLERANCE_MIN
-         dall'arrivo e' un vero thru; ogni corsa successiva resta un
-         cambio normale, anche se temporalmente vicina.
-       - Il journey ha transferThru[] (uno per cambio, allineato a
-         transferNodes[]), transfers NON conta i thru, e
-         thruService/thruNode sono impostati per la UI.
-
-   FIX 18 (array per-cambio allineati a transferNodes[]):
-     _buildJourney2/3 sovrascrivevano transferThru / transferWalkMin /
-     transferWaitMin con un solo elemento, scartando i cambi interni
-     dei leg gia' composti (es. KS -> KW dentro SuburbanRouter + thru
-     KW -> M8): l'indice 0 (Kawayatsu) riceveva il valore del cambio
-     successivo. Ora gli array dei sotto-journey vengono concatenati
-     (_xferArrays) e restano lunghi quanto transferNodes[]. La UI deve
-     usare transferThru[li] e non il flag globale thruService.
+   FIX 19 (thru solo per lo stesso treno fisico):
+     Un cambio cross-network e' marcato come thru solo quando l'ultima
+     gamba di j1 e la prima gamba di j2 condividono lo stesso tripId.
+     Questo evita che due corse diverse, anche temporalmente vicine,
+     vengano presentate come 'stay on board'.
 ================================================================ */
 
 (function (root, factory) {
@@ -69,13 +26,13 @@
 
   /* PERFORMANCE: cache (dati statici). Svuotate quando cambiano router,
      interscambi, alias o thru. */
-  const SEARCH_BUDGET_MS = 2500;       // tempo massimo per una richiesta (anche se la UI chiama search() piu' volte di fila)
+  const SEARCH_BUDGET_MS = 2500;
   let _lastEnd = 0, _batchDeadline = 0;
-  let _netCache      = new Map();      // codice -> networkId
-  let _stationsCache = new Map();      // networkId -> allStations()
-  let _partnersCache = new Map();      // codice -> partner[]
-  let _bridgeCache   = new Map();      // networkId -> stazioni con partner
-  let _memo          = new Map();      // risultati dei sotto-ricerca
+  let _netCache      = new Map();
+  let _stationsCache = new Map();
+  let _partnersCache = new Map();
+  let _bridgeCache   = new Map();
+  let _memo          = new Map();
   let _deadline      = Infinity;
   let _truncated     = false;
 
@@ -96,8 +53,6 @@
     }
     return v;
   }
-  /* Solo le stazioni che hanno almeno un interscambio possono essere
-     nodi intermedi: evita di scandire centinaia di stazioni inutili. */
   function _bridgesOf(networkId) {
     let v = _bridgeCache.get(networkId);
     if (!v) {
@@ -107,19 +62,17 @@
     return v;
   }
 
-  /* Gruppi di codici che indicano la stessa stazione fisica su reti diverse. */
   const SAME_STATION_GROUPS = [
-    ['LL02', 'SK25', 'TS12', 'M452'],   // Binno
-    ['KD30', 'JD03', 'M405'],           // Anagusa Mukai
+    ['LL02', 'SK25', 'TS12', 'M452'],
+    ['KD30', 'JD03', 'M405'],
   ];
 
-  /* Thru services: i treni proseguono da una rete all'altra (stay on board). */
-  const THRU_TOLERANCE_MIN = 3;   // gap max (min) tra arrivo e partenza per considerarlo thru
+  const THRU_TOLERANCE_MIN = 3;
   const THRU_SERVICES = [
-    { codes: ['M801', 'KW00'], stopSec: 90 },   // M8 <-> KW, Kishagoi-Exhibitown
-    { codes: ['M1027', 'SSK01'], stopSec: 90 },   // M10 <-> SSK, Kanui Airport T1
-    { codes: ['M415', 'SBO07'], stopSec: 90 },   // M4 <-> SBO, Kawaei
-    { codes: ['M818', 'IBC04'], stopSec: 90 },   // M8 <-> IBC, Jufurai (Local thru Enikezya)
+    { codes: ['M801', 'KW00'], stopSec: 90 },
+    { codes: ['M1027', 'SSK01'], stopSec: 90 },
+    { codes: ['M415', 'SBO07'], stopSec: 90 },
+    { codes: ['M818', 'IBC04'], stopSec: 90 },
   ];
 
   function registerThruService(def) {
@@ -165,9 +118,6 @@
 
   const _ixIndex = {};
 
-  /* Default dei cambi senza override: suburbana↔suburbana → regola per numero
-     di linee (SuburbanRouter.transferMin); suburbana↔altra rete → 5 min;
-     altre combinazioni → CROSS_TRANSFER_MIN. */
   const SUB_CROSS_TRANSFER_MIN = 5;
   function _defaultTransferMin(codeA, codeB) {
     const na = _netOfCode(codeA), nb = _netOfCode(codeB);
@@ -224,7 +174,6 @@
       });
     }
 
-    /* Le coppie thru valgono anche se mancano da INTERCHANGE. */
     THRU_SERVICES.forEach(t => {
       if (!t.codes.includes(code)) return;
       t.codes.filter(c => c !== code).forEach(c => {
@@ -247,13 +196,9 @@
     const s = ((sec % 86400) + 86400) % 86400;
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
-    return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+    return String(h).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
   }
 
-  /* FIX 18: array per-cambio di un sotto-journey, lunghi quanto
-     transferNodes[]. Se il sotto-journey non li espone (es. leg
-     interno di SuburbanRouter), thru ricade sul flag globale e
-     walk/wait restano null (la UI usa i propri default con ??). */
   function _xferArrays(j) {
     const n = (j.transferNodes || []).length;
     const fill = v => Array.from({ length: n }, () => v);
@@ -265,9 +210,15 @@
     else walk = fill(null);
     let wait;
     if (Array.isArray(j.transferWaitMin) && j.transferWaitMin.length === n) wait = j.transferWaitMin.slice();
-    else if (typeof j.transferWaitMin === 'number') wait = fill(null).map((_, i) => i === 0 ? j.transferWaitMin : null);
+    else if (typeof j.transferWaitMin === 'number') walk = fill(null).map((_, i) => i === 0 ? j.transferWaitMin : null);
     else wait = fill(null);
     return { thru, walk, wait };
+  }
+
+  function _samePhysicalTrain(j1, j2) {
+    const lastLeg = j1.legs?.at(-1);
+    const nextLeg = j2.legs?.[0];
+    return !!(lastLeg?.tripId && nextLeg?.tripId && lastLeg.tripId === nextLeg.tripId);
   }
 
   function _buildJourney2(j1, j2, midCode, walkMin, thru) {
@@ -282,22 +233,25 @@
     const transferThru = [...a.thru, !!thru, ...b.thru];
     const thruFields = {};
     const thruIdx = transferThru.indexOf(true);
-    if (thruIdx !== -1 || j1.thruService || j2.thruService) {
+    const isThru = !!thru && _samePhysicalTrain(j1, j2);
+
+    if (thruIdx !== -1 || (j1.thruService || j2.thruService) && isThru) {
       const nodes = [...(j1.transferNodes || []), midCode, ...(j2.transferNodes || [])];
       thruFields.thruService = true;
       thruFields.thruNode    = thruIdx !== -1 ? nodes[thruIdx] : (j1.thruNode ?? j2.thruNode);
     }
+
     return {
       legs:              [...j1.legs, ...j2.legs],
       departureTime:     j1.departureTime,
       arrivalTime:       j2.arrivalTime,
       totalMinutes:      Math.round((_hmToSec(j2.arrivalTime) - _hmToSec(j1.departureTime)) / 60),
       totalKm,
-      transfers:         (j1.transfers + j2.transfers) + (thru ? 0 : 1),
+      transfers:         (j1.transfers + j2.transfers) + (isThru ? 0 : 1),
       transferNodes:     [...(j1.transferNodes || []), midCode, ...(j2.transferNodes || [])],
       transferThru,
-      transferWalkMin:   [...a.walk, thru ? 0 : wkMin, ...b.walk],
-      transferWaitMin:   [...a.wait, thru ? 0 : wtMin, ...b.wait],
+      transferWalkMin:   [...a.walk, isThru ? 0 : wkMin, ...b.walk],
+      transferWaitMin:   [...a.wait, isThru ? 0 : wtMin, ...b.wait],
       ...thruFields,
     };
   }
@@ -310,27 +264,29 @@
     const gap1 = Math.round((_hmToSec(j2.departureTime) - _hmToSec(j1.arrivalTime)) / 60);
     const gap2 = Math.round((_hmToSec(j3.departureTime) - _hmToSec(j2.arrivalTime)) / 60);
     const a = _xferArrays(j1), b = _xferArrays(j2), c = _xferArrays(j3);
-    const transferThru = [...a.thru, !!thru1, ...b.thru, !!thru2, ...c.thru];
+    const isThru1 = !!thru1 && _samePhysicalTrain(j1, j2);
+    const isThru2 = !!thru2 && _samePhysicalTrain(j2, j3);
+    const transferThru = [...a.thru, isThru1, ...b.thru, isThru2, ...c.thru];
     const transferNodes = [
       ...(j1.transferNodes || []), midCode1,
       ...(j2.transferNodes || []), midCode2,
       ...(j3.transferNodes || []),
     ];
     const thruIdx = transferThru.indexOf(true);
-    const thruAny = thruIdx !== -1 || !!(j1.thruService || j2.thruService || j3.thruService);
+    const thruAny = thruIdx !== -1;
     return {
       legs:              [...j1.legs, ...j2.legs, ...j3.legs],
       departureTime:     j1.departureTime,
       arrivalTime:       j3.arrivalTime,
       totalMinutes:      Math.round((_hmToSec(j3.arrivalTime) - _hmToSec(j1.departureTime)) / 60),
       totalKm,
-      transfers:         (j1.transfers + j2.transfers + j3.transfers) + 2 - (thru1 ? 1 : 0) - (thru2 ? 1 : 0),
+      transfers:         (j1.transfers + j2.transfers + j3.transfers) + 2 - (isThru1 ? 1 : 0) - (isThru2 ? 1 : 0),
       thruService:       thruAny || undefined,
-      thruNode:          thruAny ? (thruIdx !== -1 ? transferNodes[thruIdx] : (j1.thruNode ?? j2.thruNode ?? j3.thruNode)) : undefined,
+      thruNode:          thruAny ? transferNodes[thruIdx] : undefined,
       transferThru,
       transferNodes,
-      transferWalkMin:   [...a.walk, thru1 ? 0 : wk1, ...b.walk, thru2 ? 0 : wk2, ...c.walk],
-      transferWaitMin:   [...a.wait, thru1 ? 0 : Math.max(0, gap1 - wk1), ...b.wait, thru2 ? 0 : Math.max(0, gap2 - wk2), ...c.wait],
+      transferWalkMin:   [...a.walk, isThru1 ? 0 : wk1, ...b.walk, isThru2 ? 0 : wk2, ...c.walk],
+      transferWaitMin:   [...a.wait, isThru1 ? 0 : Math.max(0, gap1 - wk1), ...b.wait, isThru2 ? 0 : Math.max(0, gap2 - wk2), ...c.wait],
     };
   }
 
@@ -356,10 +312,6 @@
     return out;
   }
 
-  /* Cerca i leg successivi dopo j1 su un partner. Se il partner e' un
-     thru, prova solo la prima partenza disponibile dopo arrivo + stopSec.
-     Se quella corsa parte entro THRU_TOLERANCE_MIN e' un vero thru;
-     ogni corsa successiva, anche entro la tolleranza, e' un cambio normale. */
   function _nextLegs(router, partner, toCode, j1, opts) {
     const arr = _hmToSec(j1.arrivalTime);
     if (partner.thru) {
@@ -399,7 +351,6 @@
     return out;
   }
 
-  /* Nodi di `code` + alias a 0 min (stessa stazione, altra rete). */
   function _aliasNodes(code, netFilter) {
     const out = _resolveNodes(code, netFilter);
     for (const p of _partnersOf(code)) {
@@ -416,9 +367,6 @@
     });
   }
 
-  /* FIX 15: la chiave NON contiene i codici stazione, che cambiano
-     in base all'alias con cui e' stata fatta la ricerca. Identifica
-     il treno da linea/servizio + orari di salita e discesa. */
   function _journeyKey(j) {
     const legKey = j.legs.map(l => [
       l.lineId  || l.line  || '',
@@ -475,8 +423,6 @@
     return kept;
   }
 
-  /* Ricerca per una singola coppia di codici; restituisce i journey
-     grezzi (senza dedup finale). */
   function _searchRaw(from, to, depTime, opts) {
     const directOnly = !!opts.directOnly;
     const netFilter  = _networkFilter(opts);
@@ -487,7 +433,6 @@
 
     const journeys = [];
 
-    /* ---- 1. DIRECT (con alias stessa-stazione a 0 min) ---- */
     const fAlias = _aliasNodes(from, netFilter);
     const tAlias = _aliasNodes(to,   netFilter);
     for (const fNode of fAlias) {
@@ -510,7 +455,6 @@
 
     if (directOnly) return journeys;
 
-    /* ---- 2. 2-LEG ---- */
     for (const fNode of fNodes) {
       if (netFilter && !netFilter.has(fNode.networkId)) continue;
       const router1 = _routerFor(fNode.networkId);
@@ -545,10 +489,6 @@
       }
     }
 
-    /* ---- 3. 3-LEG ----
-       PERFORMANCE: e' la fase piu' costosa (migliaia di sotto-ricerche).
-       Se diretto + 1 cambio hanno gia' dato abbastanza alternative,
-       non serve cercare le soluzioni a 2 cambi. */
     const enough = opts.minBeforeThreeLeg ?? 3;
     if (_dedup(journeys.slice()).length >= enough) return journeys;
     for (const fNode of fNodes) {
@@ -579,7 +519,7 @@
             if (_timeUp()) break;
             const partners2 = _partnersOf(midSt2.code).filter(p => {
               if (netFilter && !netFilter.has(p.networkId)) return false;
-              return tNodes.some(t => t.networkId === p.networkId);
+              return tNodes.some(t => t.networkId === p2?.networkId);
             });
             if (!partners2.length) continue;
 
@@ -618,10 +558,6 @@
     return String(x || '').split(',').map(s => s.trim()).filter(Boolean);
   }
 
-  /* FIX 15: from/to possono essere array o stringhe 'A,B,C'.
-     Tutte le coppie vengono provate e il dedup e' applicato UNA volta.
-     FIX 17 (performance): budget di tempo per richiesta; se scade, si
-     restituiscono i risultati parziali (api.lastSearchTruncated = true). */
   function search(from, to, depTime, opts = {}) {
     const maxResults = opts.maxResults ?? MAX_JOURNEYS;
     const froms = _toCodeList(from);
@@ -629,7 +565,7 @@
 
     _truncated = false;
     const _now = Date.now();
-    if (_now - _lastEnd < 50 && _batchDeadline > _now) _deadline = _batchDeadline;   // stessa richiesta UI
+    if (_now - _lastEnd < 50 && _batchDeadline > _now) _deadline = _batchDeadline;
     else _deadline = _batchDeadline = _now + (opts.timeBudgetMs ?? SEARCH_BUDGET_MS);
     const all = [];
     try {
