@@ -17,7 +17,7 @@ const sec = x => { const [h,m] = x.split(':').map(Number); return h*3600 + m*60;
 
 function install(){
   const api  = window.SBMLocalTimetable;
-  const line = window.SBO_LINES && window.SBO_LINES.SBM;
+  const line = (typeof SBO_LINES !== 'undefined') ? SBO_LINES.SBM : null;
   if (!api || !api.ready || !line) { setTimeout(install, 50); return; }
   if (api.__sbmSboDirectInstalled) return;
   api.__sbmSboDirectInstalled = true;
