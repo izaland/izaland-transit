@@ -1,34 +1,33 @@
 /* ================================================================
    SBM-SBO-DIRECT-TT.JS
    Direct SB service: SBM01 ↔ SBO01, every 10 minutes.
-   Southbound: SBM01 → SBM11 → SBO10 → SBO01.
-   Northbound: SBO01 → SBO10 → SBM11 → SBM01.
-   Trips reuse the full station metadata from SBO_LINES so the
-   Journey Planner can render and search them correctly.
+   Southbound: SBM01 → SBM12 (Kanui Airport T1) → SBO09 → SBO01.
+   Northbound: SBO01 → SBO09 → SBM12 (Kanui Airport T1) → SBM01.
+   All stops use the unified SB line identity.
 ================================================================ */
 'use strict';
 (function(){
 const SOUTH = [
-  'SBM01','SBM02','SBM03','SBM04','SBM05','SBM06','SBM07','SBM08','SBM09','SBM10','SBM11',
-  'SBO10','SBO09','SBO08','SBO07','SBO06','SBO05','SBO04','SBO03','SBO02','SBO01'
+  'SBM01','SBM02','SBM03','SBM04','SBM05','SBM06','SBM07','SBM08','SBM09','SBM10','SBM11','SBM12',
+  'SBO09','SBO08','SBO07','SBO06','SBO05','SBO04','SBO03','SBO02','SBO01'
 ];
 const NORTH = [...SOUTH].reverse();
 const sec = x => { const [h,m] = x.split(':').map(Number); return h*3600 + m*60; };
 
 function install(){
-  const api  = window.SBMLocalTimetable;
-  const sbm  = (typeof SBO_LINES !== 'undefined') ? SBO_LINES.SBM : null;
-  const sbo  = (typeof SBO_LINES !== 'undefined') ? SBO_LINES.SBO : null;
+  const api = window.SBMLocalTimetable;
+  const sbm = (typeof SBO_LINES !== 'undefined') ? SBO_LINES.SBM : null;
+  const sbo = (typeof SBO_LINES !== 'undefined') ? SBO_LINES.SBO : null;
   if (!api || !api.ready || !sbm || !sbo) { setTimeout(install, 50); return; }
   if (api.__sbmSboDirectInstalled) return;
   api.__sbmSboDirectInstalled = true;
 
   const byCode = {};
   sbm.stations.forEach(s => {
-    byCode[s.code] = { ...s, lineId:'SBM', network:'suburban', color:sbm.color };
+    byCode[s.code] = { ...s, lineId:'SB', network:'suburban', color:sbm.color };
   });
   sbo.stations.forEach(s => {
-    byCode[s.code] = { ...s, lineId:'SBO', network:'suburban', color:sbo.color };
+    byCode[s.code] = { ...s, lineId:'SB', network:'suburban', color:sbo.color };
   });
 
   function timeline(seq, start){
