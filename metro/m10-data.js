@@ -52,7 +52,7 @@ const M10_ST = {
   M1024: { n: 'Shiki-Kōmeitsān',                 k: '北公明倉',                nodeId: 126666462, km: 28.26 },
   M1025: { n: 'Torihashi',                       k: '',                    nodeId: 126666463, km: 29.12 },
   M1026: { n: 'Kanui 2-sa',                      k: '',                    nodeId: 126666464, km: 29.76 },
-  M1027: { n: 'Kanui Airport T1',                k: '',                    nodeId: 126497710, km: 30.72 },
+  M1027: { n: 'Kanui Airport T1',                k: '嘉枡空港T1',           nodeId: 126497710, km: 30.72 },
   M1028: { n: 'Osenude',                         k: '防斉',                  nodeId: 126497709, km: 31.28 },
   M1029: { n: 'Osenude-Kyatoba',                 k: '',                    nodeId: 229655862, km: 31.77 },
   M1030: { n: 'Uhāra-Motu',                      k: '',                    nodeId: 229655863, km: 32.55 },
@@ -100,11 +100,13 @@ const M10_INTERCHANGE = {
   M1011: [_m10('M1717')],
   M1013: [_s10('CK20'), _s10('CO20')],
   M1014: [_m10('M911')],
+  M1015: [_m10('M2001', 7, 'collegamento sotterraneo — Sainðaul Central')],
+  M1016: [_s10('SBM02', 2)],
   M1017: [_m10('M326'), _m10('M1414')],
   M1018: [_m10('M914'), _ic10('SHX02', 'other')],
   M1019: [_m10('M1812', 3, 'collegamento sotterraneo (nodo e nome diversi) — Gwannowin-Adae, M18')],
   M1021: [_s10('LL13'), _s10('CO11')],
-  M1027: [_ic10('SSK01', 'other')],
+  M1027: [_ic10('SSK01', 'other', 5, 'Kanui Airport T1'), _s10('SBM12', 5, 'SBO10'),],
   M1028: [_ic10('AX08', 'ax', 5, 'Airport Express — Osenude')],
 };
 
