@@ -42,16 +42,20 @@ const lastThree=localGrid.slice(-3);
 for(const t of localGrid){
 const isSbo=(Math.round((t-sec('05:30'))/60)%10===0);
 const sbmKind=isSbo?'LO':(t%1800===300?'RAPID':'LO');
+const southSeq=sbmKind==='RAPID'?southRapid:south;
+const northSeq=sbmKind==='RAPID'?northRapid:north;
 if(!lastThree.includes(t)){
-add('M20_SBM_S_'+t,south,t,'LO',sbmKind);add('M20_SBM_N_'+t,north,t-northOffset,'LO',sbmKind);}
+add('M20_SBM_S_'+t,southSeq,t,'LO',sbmKind);add('M20_SBM_N_'+t,northSeq,t-northOffset,'LO',sbmKind);}
 else{add('M20_TERMINATING_S_'+t,[...metro].reverse(),t,'LO','LO');add('M20_TERMINATING_N_'+t,metro,t-northOffset,'LO','LO');}
 }
 for(const t of expressGrid){
 const sbmKind=(t%1800===300)?'EX':'RAPID';
-add('M20_SBM_S_'+t,south,t,'EX',sbmKind);add('M20_SBM_N_'+t,north,t,'EX',sbmKind);
+const southSeq=sbmKind==='EX'?southExpress:southRapid;
+const northSeq=sbmKind==='EX'?northExpress:northRapid;
+add('M20_SBM_S_'+t,southSeq,t,'EX',sbmKind);add('M20_SBM_N_'+t,northSeq,t,'EX',sbmKind);
 }
 const rapidOnly=[];for(const w of M20_HEADWAY_LO){const h=900,s=sec(w.from),e=sec(w.to);for(let t=s;t<e;t+=h)rapidOnly.push(t);}
-for(const t of rapidOnly){if(!localGrid.includes(t)){add('M20_SBM_RAPID_S_'+t,south,t,'LO','RAPID');add('M20_SBM_RAPID_N_'+t,north,t-northOffset,'LO','RAPID');}}
+for(const t of rapidOnly){if(!localGrid.includes(t)){add('M20_SBM_RAPID_S_'+t,southRapid,t,'LO','RAPID');add('M20_SBM_RAPID_N_'+t,northRapid,t-northOffset,'LO','RAPID');}}
 api.trips.sort((a,b)=>a.stops[0].dep-b.stops[0].dep);
 function serviceMeta(t){const stops=t.stops,first=stops[0],last=stops.at(-1);const m20Name=t.m20Kind==='EX'?'Express — Metro Line 20':'Local — Metro Line 20';const sbmName=t.sbmKind==='EX'?'Express — Shinsabu Main Line':(t.sbmKind==='RAPID'?'Rapid — Shinsabu Main Line':'Local — Shinsabu Main Line');return {id:t.id,desc:m20Name+' → '+sbmName,fromCode:first.code,toCode:last.code,firstDep:hm(first.dep),lastDep:hm(first.dep),headway:1,explicitDir:true,vMaxKmh:t.sbmKind==='EX'?exKin.vmaxKmh:SBM_KIN.vmaxKmh,dwellSec:t.sbmKind==='EX'?exKin.dwellSec:SBM_KIN.dwellSec,stops:stops.map(s=>s.code),m20Kind:t.m20Kind,sbmKind:t.sbmKind,thruService:true,tripId:t.id};}
 api.services=api.trips.map(serviceMeta);line.services=api.services;root.SBM_TT_SERVICES=api.services;
