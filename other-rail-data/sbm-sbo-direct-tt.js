@@ -21,7 +21,7 @@ const stopsSBOtoSBM=[...stopsSBMtoSBO].reverse();
 function makeService(id,southbound,firstDep,lastDep){
 return {
  id,
- desc:'Local · '+(southbound?'SBM01 → SBO01':'SBO01 → SBM01'),
+ desc:'Local · '+(southbound?'SB → SB':'SB → SB'),
  fromCode:southbound?'SBM01':'SBO01',
  toCode:southbound?'SBO01':'SBM01',
  firstDep,lastDep,headway:10,
