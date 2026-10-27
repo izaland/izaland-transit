@@ -3,8 +3,8 @@
    Direct SB service: SBM01 ↔ SBO01, every 10 minutes.
    Southbound: SBM01 → SBM11 → SBO10 → SBO01.
    Northbound: SBO01 → SBO10 → SBM11 → SBM01.
-   These trips are injected into the SBM local timetable so the
-   Journey Planner can find them.
+   Trips reuse the full station metadata from SBO_LINES so the
+   Journey Planner can render and search them correctly.
 ================================================================ */
 'use strict';
 (function(){
@@ -22,31 +22,38 @@ function install(){
   if (api.__sbmSboDirectInstalled) return;
   api.__sbmSboDirectInstalled = true;
 
-  const km = {};
-  line.stations.forEach(s => { km[s.code] = s.km; });
+  const byCode = {};
+  line.stations.forEach(s => {
+    byCode[s.code] = { ...s, lineId:'SBM', network:'suburban', color:line.color };
+  });
 
   function timeline(seq, start){
     let t = start;
     const out = [];
     seq.forEach((code, i) => {
+      const st = byCode[code];
+      if (!st) return;
       if (i) {
-        const d = Math.abs(km[code] - km[seq[i-1]]);
+        const prev = byCode[seq[i-1]];
+        const d = Math.abs(st.km - prev.km);
         t += (d / 90) * 3600 * 1.07 + 45;
       }
       const arr = t;
       if (i && i < seq.length - 1) t += 45;
-      out.push({ code, arr: Math.round(arr), dep: Math.round(t) });
+      out.push({ ...st, arr: Math.round(arr), dep: Math.round(t) });
     });
     return out;
   }
 
   function addDirection(prefix, seq, first, last){
     for (let t = sec(first); t <= sec(last); t += 600) {
+      const stops = timeline(seq, t);
+      if (stops.length !== seq.length) continue;
       api.trips.push({
         id: prefix + t,
         m20Kind: 'LO',
         sbmKind: 'LO',
-        stops: timeline(seq, t)
+        stops
       });
     }
   }
