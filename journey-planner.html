@@ -31,25 +31,25 @@
         <span class="dropdown-label">IZX Keishin</span>
         <a href="keishin-timetable.html">📅 Timetable</a>
         <a href="marcia.html">📊 Train graph</a>
-        <a href="izx-ticket.html">🎫 Tickets & Fares</a>
+        <a href="izx-ticket.html">🎫 Tickets &amp; Fares</a>
         <a href="journey-planner.html" class="active">🧭 Journey Planner</a>
       </div>
     </div>
     <div class="nav-item">
-      <button><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 8 8 0 0 0 21 12.79z"/></svg> Aviation</button>
+      <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Aviation</button>
       <div class="dropdown">
         <a href="airports.html">Airports</a>
         <a href="airlines.html">Airlines</a>
       </div>
     </div>
     <div class="nav-item">
-      <button><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 8 8 0 0 0 21 12.79z"/></svg> Other</button>
+      <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg> Other</button>
       <div class="dropdown">
         <span class="dropdown-label">Coming soon</span>
       </div>
     </div>
     <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 8 8 0 0 0 21 12.79z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
   </div>
 </nav>
@@ -174,6 +174,7 @@
 <script src="other-rail-data/ssk-tt.js"></script>
 <script src="other-rail-data/sbo-data.js"></script>
 <script src="other-rail-data/sbo-tt.js"></script>
+<script src="other-rail-data/sbm-sbo-direct-tt.js"></script>
 <script src="izx-data.js"></script>
 <script src="ax-data.js"></script>
 <script src="fare-engine.js"></script>
@@ -508,16 +509,16 @@ function svcPillHTML(svcDesc) {
      - In quel caso si confronta il nodo del cambio con thruNode. */
   const nTransfers = j.legs.length - 1;
   const prevLeg = j.legs[li];
-  const nextLeg = j.legs[li + 1];
-  const sameTrip =
-    prevLeg?.tripId && nextLeg?.tripId &&
-    prevLeg.tripId === nextLeg.tripId;
+const nextLeg = j.legs[li + 1];
+const sameTrip =
+  prevLeg?.tripId && nextLeg?.tripId &&
+  prevLeg.tripId === nextLeg.tripId;
 
-  const isThru = sameTrip && (
-    (Array.isArray(j.transferThru) && j.transferThru.length === nTransfers)
-      ? !!j.transferThru[li]
-      : (!!j.thruService && (j.thruNode == null || j.transferNodes[li] === j.thruNode))
-  );
+const isThru = sameTrip && (
+  (Array.isArray(j.transferThru) && j.transferThru.length === nTransfers)
+    ? !!j.transferThru[li]
+    : (!!j.thruService && (j.thruNode == null || j.transferNodes[li] === j.thruNode))
+);
 
   if (isThru) {
     // Thru-service: cambio operatore, i passeggeri restano a bordo
@@ -662,4 +663,78 @@ const journeys = _runSearch(from, to, depTime, lineF, directOnly, excludeIzx);
     if (!_jpState.from) return;
     const anchor = _nextAfter(_jpState.all);
     if (!anchor) return;
-    const jo...[truncated]
+    const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly, _jpState.excludeIzx);
+    if (!journeys.length) {
+      const btn = document.getElementById('jp-later');
+      const orig = btn.innerHTML;
+      btn.textContent = 'No later trains'; btn.disabled = true;
+      setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+      return;
+    }
+    renderJourneys(journeys, _jpState.fromName, _jpState.toName, 'append');
+  });
+
+})();
+</script>
+<script src="station-picker.js"></script>
+<script>
+/* ================================================================
+   JOURNEY PLANNER — DATABASE COUNTERS (lines + stations)
+================================================================ */
+(function(){
+  const panel = document.getElementById('tab-planner');
+  if(!panel) return;
+
+  const st = document.createElement('style');
+  st.textContent = `
+    .db-stats{display:flex;gap:var(--space-6);flex-wrap:wrap;margin-bottom:var(--space-6);padding:var(--space-3) var(--space-4);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-lg);}
+    .db-stat{display:flex;align-items:baseline;gap:var(--space-2);}
+    .db-stat-num{font-family:var(--font-display);font-size:var(--text-lg);font-weight:800;font-variant-numeric:tabular-nums;color:var(--text);}
+    .db-stat-lbl{font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700;}
+  `;
+  document.head.appendChild(st);
+
+  function safe(fn, fallback){ try { return fn(); } catch(e){ return fallback; } }
+
+  /* ── Stazioni ── */
+  const stationsByCode = new Map();   // codice -> nome
+  const lineIds = new Set();          // relazioni (linee) distinte
+
+  const add = (list, tag) => (list || []).forEach(s => {
+    if(!s || !s.code) return;
+    stationsByCode.set(s.code, (s.name || '').trim());
+    if(s.lineId) lineIds.add(tag + ':' + s.lineId);
+  });
+
+  if(typeof TTEngine !== 'undefined')
+    add(safe(() => TTEngine.allStations(), []), 'IZX');
+
+  if(typeof SuburbanRouter !== 'undefined')
+    add(safe(() => SuburbanRouter.allStations(), []), 'SUB');
+
+  if(typeof MetroRouter !== 'undefined'){
+    add(safe(() => MetroRouter.allStations(), []), 'MET');
+    safe(() => MetroRouter.allLines(), []).forEach(l => lineIds.add('MET:' + l.id));
+  }
+
+  /* Linee suburbane: arrivano da SUBURBAN_LINES (chiavi = id linea) */
+  if(typeof SUBURBAN_LINES !== 'undefined')
+    Object.keys(SUBURBAN_LINES).forEach(k => lineIds.add('SUB:' + k));
+
+  const nLines    = lineIds.size;
+  const nCodes    = stationsByCode.size;
+  const nStations = new Set(Array.from(stationsByCode.values()).map(n => n.toLowerCase())).size;
+
+  const fmt = n => n.toLocaleString('en-US');
+  const box = document.createElement('div');
+  box.className = 'db-stats';
+  box.setAttribute('aria-label', 'Database statistics');
+  box.innerHTML =
+    '<div class="db-stat"><span class="db-stat-num">' + fmt(nLines) + '</span><span class="db-stat-lbl">Lines</span></div>' +
+    '<div class="db-stat"><span class="db-stat-num">' + fmt(nStations) + '</span><span class="db-stat-lbl">Stations</span></div>' +
+    '<div class="db-stat"><span class="db-stat-num">' + fmt(nCodes) + '</span><span class="db-stat-lbl">Station codes</span></div>';
+  panel.insertBefore(box, panel.firstChild);
+})();
+</script>
+</body>
+</html>
