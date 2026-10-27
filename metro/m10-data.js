@@ -13,11 +13,13 @@
      M1011  M1717                       (Chiyakuda)
      M1013  CK20, CO20                  (Tobeskauri)
      M1014  M911                        (Kanbata)
+     M1015  HUB_SAINDAUL_CENTRAL        (Sainðaul Central)
+     M1016  SBM02                       (Tikkamoto)
      M1017  M326, M1414                 (Kansāri)
      M1018  M914, SHX02                 (Eigan-ji)
      M1019  M1812                       (sotterraneo, 3 min — Gwannowin-Adae, M18)
      M1021  LL13, CO11                  (Oritoku)
-     M1027  SSK01                       (Kanui Airport T1)
+     M1027  SSK01, SBM12                (Kanui Airport T1)
      M1028  AX08                        (Osenude)
 
    TODO: nomi/tipologia servizi, headway, ore di servizio,
@@ -68,11 +70,10 @@ const M10_META = {
   color:       '#db8b3a',
   stations:    30,
   totalKm:     32.55,
-  avgSpeedKmh: null,   // da definire
-  dwellSec:    null,   // da definire
+  avgSpeedKmh: null,
+  dwellSec:    null,
 };
 
-/* Placeholder: headway da definire con le prossime istruzioni */
 const M10_HEADWAY = [];
 
 const M10_SVC = {
@@ -88,6 +89,7 @@ const M10_SVC = {
 const _ic10 = (code, network, transferMin = 3, note = '') => ({ code, network, transferMin, note });
 const _m10  = (c, min, note) => _ic10(c, 'metro', min, note);
 const _s10  = (c, min, note) => _ic10(c, 'suburban', min, note);
+const _hub10 = (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
 
 const M10_INTERCHANGE = {
   M1001: [_m10('M3150', 3, 'Shakihori — M3100 branch terminus'), _s10('SK19'), _s10('CK27'), _s10('KS11')],
@@ -100,13 +102,16 @@ const M10_INTERCHANGE = {
   M1011: [_m10('M1717')],
   M1013: [_s10('CK20'), _s10('CO20')],
   M1014: [_m10('M911')],
-  M1015: [_m10('M2001', 7, 'collegamento sotterraneo — Sainðaul Central')],
+  M1015: [_hub10('HUB_SAINDAUL_CENTRAL')],
   M1016: [_s10('SBM02', 2)],
   M1017: [_m10('M326'), _m10('M1414')],
   M1018: [_m10('M914'), _ic10('SHX02', 'other')],
   M1019: [_m10('M1812', 3, 'collegamento sotterraneo (nodo e nome diversi) — Gwannowin-Adae, M18')],
   M1021: [_s10('LL13'), _s10('CO11')],
-  M1027: [_ic10('SSK01', 'other', 5, 'Kanui Airport T1'), _s10('SBM12', 5, 'SBO10'),],
+  M1027: [
+    _ic10('SSK01', 'other', 5, 'Kanui Airport T1'),
+    _s10('SBM12', 5, 'SBO10'),
+  ],
   M1028: [_ic10('AX08', 'ax', 5, 'Airport Express — Osenude')],
 };
 
