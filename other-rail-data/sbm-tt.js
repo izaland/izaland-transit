@@ -5,19 +5,9 @@
    M20 is the shared high-performance trunk; SBM uses its own
    historic-railway operating profile.
 
-   Service structure (per direction):
-     - M20-SBM-SBO Local thru: 6/hour (every 10 minutes)
-     - M20-SBM Local: remaining M20 Local capacity, to Hidano Maeburi
-     - SBM Rapid: 4/hour, all day
-     - SBM Express: 3/hour peak, 2/hour off-peak
-     - Residual M20 Express: only where slots remain
-
    Mixed M20-to-SBM journeys may use either:
      - a Local thru service, staying on board at Sainðaul Central; or
      - an M20 Local to SBM01, then an SBM Rapid or Express.
-
-   The last three M20-originated trips before the final train
-   terminate on M20 and do not continue to SBM.
 
    SBM profile: 90 km/h, 45 s intermediate dwell, 7% running margin.
    M20 retains its own high-performance profile.
@@ -78,13 +68,15 @@ for(const t of api.trips){for(const f of froms)for(const dest of tos){const a=t.
 const m20From=froms.filter(c=>/^M20\d+$/.test(c)),sbmTo=tos.filter(c=>/^SBM\d+$/.test(c));
 if(m20From.length&&sbmTo.length){
 for(const f of m20From)for(const dest of sbmTo){
-for(const inbound of api.trips.filter(t=>t.kind==='LO'&&t.stops.some(s=>s.code===f))){const a=inbound.stops.findIndex(s=>s.code===f),x=inbound.stops.findIndex(s=>s.code==='SBM01');if(a<0||x<=a)continue;if(inbound.stops[a].dep<earliest||inbound.stops[a].dep>earliest+10800)continue;
-for(const outbound of api.trips.filter(t=>(t.kind==='RAPID'||t.kind==='EX')&&t.stops.some(s=>s.code===dest))){const y=outbound.stops.findIndex(s=>s.code==='SBM01'),b=outbound.stops.findIndex(s=>s.code===dest);if(y<0||b<=y)continue;const j=connection(inbound,a,outbound,b);if(j)result.push(j);}}}}
+const inbounds=api.trips.filter(t=>t.kind==='LO'&&t.stops.some(s=>s.code===f)&&t.stops.some(s=>s.code==='SBM01'));
+const outbounds=api.trips.filter(t=>(t.kind==='RAPID'||t.kind==='EX')&&t.stops.some(s=>s.code==='SBM01')&&t.stops.some(s=>s.code===dest));
+for(const inbound of inbounds){const a=inbound.stops.findIndex(s=>s.code===f),x=inbound.stops.findIndex(s=>s.code==='SBM01');if(a<0||x<=a)continue;if(inbound.stops[a].dep<earliest||inbound.stops[a].dep>earliest+10800)continue;
+for(const outbound of outbounds){const y=outbound.stops.findIndex(s=>s.code==='SBM01'),b=outbound.stops.findIndex(s=>s.code===dest);if(y<0||b<=y)continue;const j=connection(inbound,a,outbound,b);if(j)result.push(j);}}}}
 const seen=new Set();return result.filter(j=>{const k=j.legs.map(l=>l.tripId+':'+l.boardCode+':'+l.alightCode).join('|');if(seen.has(k))return false;seen.add(k);return true;}).sort((a,b)=>a.legs.at(-1).alightArrSec-b.legs.at(-1).alightArrSec).slice(0,opts.maxResults??8);}
 api.search=search;
 if(typeof SuburbanRouter!=='undefined'&&!SuburbanRouter.__sbmLocalPatched){const original=SuburbanRouter.search.bind(SuburbanRouter);SuburbanRouter.search=function(from,to,time,opts){const usesSBM=list(from).some(c=>/^SBM\d+$/.test(c))||list(to).some(c=>/^SBM\d+$/.test(c));return usesSBM?search(from,to,time,opts):original(from,to,time,opts);};SuburbanRouter.__sbmLocalPatched=true;}
 const R=root.IZXUnifiedRouter;
-if(R&&!R.__sbmLocalPatched){const original=R.search.bind(R);R.search=function(from,to,time,opts={}){const existing=original(from,to,time,opts)||[],extra=search(from,to,time,opts);const merged=typeof R.dedup==='function'?R.dedup([...existing,...extra]):[...existing,...extra];return merged.slice(0,opts.maxResults??5);};R.__sbmLocalPatched=true;}
+if(R&&!R.__sbmLocalPatched){const original=R.search.bind(R);R.search=function(from,to,time,opts={}){const mixed=(list(from).some(c=>/^M20\d+$/.test(c))&&list(to).some(c=>/^SBM\d+$/.test(c)))||(list(from).some(c=>/^SBM\d+$/.test(c))&&list(to).some(c=>/^M20\d+$/.test(c)));const extra=search(from,to,time,opts);if(mixed)return extra.slice(0,opts.maxResults??5);const existing=original(from,to,time,opts)||[];const merged=typeof R.dedup==='function'?R.dedup([...existing,...extra]):[...existing,...extra];return merged.slice(0,opts.maxResults??5);};R.__sbmLocalPatched=true;}
 api.ready=true;api.error=null;
 }
 api.init=init;
