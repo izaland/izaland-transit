@@ -500,7 +500,8 @@ function svcPillHTML(svcDesc) {
           ${intStops.length ? `<div class="leg-intermediates" id="${intId}">${intHTML}</div>` : ''}`;
 
                 if (li < j.legs.length - 1) {
-  const node = _stName(j.transferNodes[li]);
+  const node = _stName(  j.transferNodes?.[li] ??  j.legs[li + 1]?.boardCode ??  ''
+);
 
   /* La riga thru va mostrata solo nel cambio che e' davvero un thru.
      - transferThru[] e' affidabile solo se ha un elemento per cambio
@@ -613,8 +614,19 @@ const isThru = sameTrip && (
       }
     }
     const merged = directOnly ? all : IZXUnifiedRouter.dedup(all);
-    merged.sort((a, b) => _parseMins(a.departureTime) - _parseMins(b.departureTime));
-    return merged.slice(0, 8);
+
+merged.sort((a, b) =>
+  (a.transfers ?? 0) - (b.transfers ?? 0) ||
+  _parseMins(a.departureTime) - _parseMins(b.departureTime)
+);
+
+const hasDirect = merged.some(j => (j.transfers ?? 0) === 0);
+
+const filtered = hasDirect
+  ? merged.filter(j => (j.transfers ?? 0) === 0)
+  : merged;
+
+return filtered.slice(0, 8);
   }
 
   buildPlannerSelects();
