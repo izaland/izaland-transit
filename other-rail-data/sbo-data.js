@@ -38,7 +38,7 @@ const SBO_INTERCHANGE = {
 
 const SBO_LINES = {
   SBM: {
-    id: 'SBM', label: 'SBM', name: 'Shinsabu Main Line',
+    id: 'SBM', label: 'SB', name: 'Shinsabu Main Line',
     nameLocal: '', color: '#00CCCC', operator: '', operatorJa: '',
     type: 'private', region: '', circular: false,
     role: 'mainline', totalKm: 34.36, totalStations: 27,
@@ -74,7 +74,7 @@ const SBO_LINES = {
     ],
   },
   SBO: {
-    id: 'SBO', label: 'SBO', name: 'Shinsabu Oitsura Line',
+    id: 'SBO', label: 'SB', name: 'Shinsabu Oitsura Line',
     nameLocal: 'યાપ્‌ટરૃે粕鵲線', color: '#00CCCC',
     operator: '', operatorJa: '', type: 'private', region: '', circular: false,
     role: 'branch', parentLine: 'SBM', totalKm: 11.28, totalStations: 10,
