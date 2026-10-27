@@ -507,9 +507,17 @@ function svcPillHTML(svcDesc) {
        (journey composti da leg che hanno gia' cambi interni).
      - In quel caso si confronta il nodo del cambio con thruNode. */
   const nTransfers = j.legs.length - 1;
-  const isThru = (Array.isArray(j.transferThru) && j.transferThru.length === nTransfers)
+  const prevLeg = j.legs[li];
+const nextLeg = j.legs[li + 1];
+const sameTrip =
+  prevLeg?.tripId && nextLeg?.tripId &&
+  prevLeg.tripId === nextLeg.tripId;
+
+const isThru = sameTrip && (
+  (Array.isArray(j.transferThru) && j.transferThru.length === nTransfers)
     ? !!j.transferThru[li]
-    : (!!j.thruService && (j.thruNode == null || j.transferNodes[li] === j.thruNode));
+    : (!!j.thruService && (j.thruNode == null || j.transferNodes[li] === j.thruNode))
+);
 
   if (isThru) {
     // Thru-service: cambio operatore, i passeggeri restano a bordo
