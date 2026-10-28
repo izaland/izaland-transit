@@ -197,6 +197,8 @@ const CO_STATIONS = [
   { code: 'CO58', name: 'Tsukuwa',     kanji: '黄凪',          nodeId: 126754769, km:  143.48 },
 ];
 
+const _hub = (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
+
 const CO_INTERCHANGE = {
   CO73: ['JD16'],
   CO72: ['JD12'],
@@ -218,7 +220,7 @@ const CO_INTERCHANGE = {
   CO15: ['M327', 'M1212', 'LL17', 'SHX01', 'AX07'],
   CO16: ['M1211', 'M1415', 'LL18'],
   CO17: ['M1210', 'LL19', 'SK27'],
-  CO18: ['M117', 'M814', 'M1712', 'LL01', 'SK26', 'TS13', 'JD01', 'AX06', 'K01', 'R01', 'E01'],
+  CO18: [_hub('HUB_SAINDAUL_CENTRAL')],
   CO19: ['M452', 'M1713', 'LL02', 'SK25', 'TS12'],
   CO20: ['M1013', 'CK20'],
   CO21: ['M805', 'CK19'],
