@@ -147,7 +147,16 @@
   function buildInterchangeIndex(interchangeData) {
   _clearCaches();
   if (Array.isArray(interchangeData)) {
-    interchangeData.forEach(ix => _add(ix.codeA, ix.codeB, ix.transferMin));
+    interchangeData.forEach(ix => {
+      if (ix.codeB && typeof ix.codeB === 'object' && ix.codeB.hubId) {
+        const members = HUBS[ix.codeB.hubId] || [];
+        members.forEach(m => {
+          if (m !== ix.codeA) _add(ix.codeA, m, ix.codeB.transferMin);
+        });
+        return;
+      }
+      _add(ix.codeA, ix.codeB, ix.transferMin);
+    });
     return;
   }
   Object.entries(interchangeData).forEach(([stCode, partners]) => {
