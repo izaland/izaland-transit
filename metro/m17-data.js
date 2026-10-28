@@ -154,13 +154,14 @@ const M17_SVC = {
 const _ic = (code, network) => ({ code, network, transferMin: 3, note: '' });
 const _m = (c) => _ic(c, 'metro');
 const _s = (c) => _ic(c, 'suburban');
+const _hub = (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
 
 const M17_INTERCHANGE = {
   M1701: [_m('M1219')],
   M1708: [_m('M1416')],
   M1709: [_m('M812'), _s('SK28')],
   M1711: [_m('M813'), _m('M1209')],
-  M1712: [_m('M117'), _m('M814'), _s('LL01'), _s('SK26'), _s('TS13'), _s('JD01')],
+  M1712: [_hub('HUB_SAINDAUL_CENTRAL')],
   M1713: [_m('M452'), _s('LL02'), _s('SK25'), _s('TS12')],
   M1714: [_s('CK21')],
   M1717: [_m('M1011')],
