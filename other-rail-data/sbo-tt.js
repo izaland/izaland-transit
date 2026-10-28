@@ -1,5 +1,5 @@
 /* SBO timetable. Existing SBO01–SBO07 and M4 services preserved.
-   Direct SBM01↔SBO01 services are defined in sbm-sbo-direct-tt.js. */
+Direct SBM01↔SBO01 services are defined in sbm-sbo-direct-tt.js. */
 'use strict';
 const _SBO_ORDER_SB=['SBO01','SBO02','SBO03','SBO04','SBO05','SBO06','SBO07'];
 const _SBO_ORDER_RAPID_SB=['SBO01','SBO05','SBO07'];
@@ -20,5 +20,5 @@ if(typeof SUBURBAN_LINES!=='undefined'&&SUBURBAN_LINES.SBO){
 SUBURBAN_LINES.SBO.services=SBO_TT_SERVICES;
 if(typeof SuburbanRouter!=='undefined')SuburbanRouter.register({lineId:'SBO',meta:{name:'Shinsabu Oitsura Line',label:'SBO',kanji:'粕鵲線',color:'#00CCCC',cls:'suburban'},stations:SUBURBAN_LINES.SBO.stations,services:SBO_TT_SERVICES,interchange:Object.fromEntries(Object.entries(SUBURBAN_INTERCHANGE).filter(([k])=>k.startsWith('SBO')))});
 }
-if(typeof document!=='undefined'&&!document.querySelector('script[data-sbm-timetable]')){const script=document.createElement('script');script.dataset.sbmTimetable='true';script.src=new URL('../sbm-tt.js',document.currentScript.src).href;script.onerror=()=>console.error('SBM timetable failed to load');document.head.append(script);}
+if(typeof document!=='undefined'&&!document.querySelector('script[data-sbm-timetable]')){const script=document.createElement('script');script.dataset.sbmTimetable='true';script.src=new URL('../sbm-tt.js?v=2',document.currentScript.src).href;script.onerror=()=>console.error('SBM timetable failed to load');document.head.append(script);}
 if(typeof module!=='undefined')module.exports={SBO_TT_SERVICES};
