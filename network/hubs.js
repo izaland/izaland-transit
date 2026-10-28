@@ -8,8 +8,7 @@
    Transfer times are in minutes and may be asymmetric:
    transferTimes[from][to].
 
-   The first hub is Sainðaul Central. It includes lines already
-   registered and lines still to be registered.
+   Hubs: Sainðaul Central, Sakamuso.
 ================================================================ */
 'use strict';
 
@@ -51,11 +50,38 @@ const HUB_SAINDAUL_CENTRAL_TRANSFER_TIMES = {
   MTX101: { M117: 5, M814: 9, M1712: 7, M2001: 5, SBM01: 5, LL01: 7, SK26: 8, TS13: 6, CO18: 6, JD01: 6, KD32: 6, AX06: 7, K01: 10, R01: 12, E01: 12 },
 };
 
+const HUB_SAKAMUSO_STATIONS = [
+  'M721',
+  'M1525',
+  'M2007',
+  'KD36',
+  'SK38',
+  'K101',
+  'RKY01',
+];
+
+/* Matrice provvisoria: 3 min tra tutti i membri;
+   M2007 ↔ RKY01 = 0 (thru service M20 ↔ RKY). */
+const HUB_SAKAMUSO_TRANSFER_TIMES = {
+  M721:  { M1525: 3, M2007: 3, KD36: 3, SK38: 3, K101: 3, RKY01: 3 },
+  M1525: { M721: 3, M2007: 3, KD36: 3, SK38: 3, K101: 3, RKY01: 3 },
+  M2007: { M721: 3, M1525: 3, KD36: 3, SK38: 3, K101: 3, RKY01: 0 },
+  KD36:  { M721: 3, M1525: 3, M2007: 3, SK38: 3, K101: 3, RKY01: 3 },
+  SK38:  { M721: 3, M1525: 3, M2007: 3, KD36: 3, K101: 3, RKY01: 3 },
+  K101:  { M721: 3, M1525: 3, M2007: 3, KD36: 3, SK38: 3, RKY01: 3 },
+  RKY01: { M721: 3, M1525: 3, M2007: 0, KD36: 3, SK38: 3, K101: 3 },
+};
+
 const NETWORK_HUBS = {
   HUB_SAINDAUL_CENTRAL: {
     name: 'Sainðaul Central',
     stations: HUB_SAINDAUL_CENTRAL_STATIONS,
     transferTimes: HUB_SAINDAUL_CENTRAL_TRANSFER_TIMES,
+  },
+  HUB_SAKAMUSO: {
+    name: 'Sakamuso',
+    stations: HUB_SAKAMUSO_STATIONS,
+    transferTimes: HUB_SAKAMUSO_TRANSFER_TIMES,
   },
 };
 
