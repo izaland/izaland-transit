@@ -327,24 +327,35 @@
     return out;
   }
 
-  function _nextLegs(router, partner, toCode, j1, opts) {
-    const arr = _hmToSec(j1.arrivalTime);
-    if (partner.thru) {
-      const readyHM = _secToHM(arr + partner.thruSec);
-      const list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
-        { ...opts, maxResults: 2, directOnly: true });
-      const first = list[0];
-      if (first) {
-        const gap = ((_hmToSec(first.departureTime) - arr + 86400) % 86400) / 60;
-        if (gap <= THRU_TOLERANCE_MIN) return [{ j2: first, thru: true }];
-      }
+ function _nextLegs(router, partner, toCode, j1, opts) {
+  const arr = _hmToSec(j1.arrivalTime);
+
+  if (partner.thru) {
+    const readyHM = _secToHM(arr + partner.thruSec);
+    const list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
+      { ...opts, maxResults: 2, directOnly: true });
+    const first = list[0];
+    if (first) {
+      const gap = ((_hmToSec(first.departureTime) - arr + 86400) % 86400) / 60;
+      if (gap <= THRU_TOLERANCE_MIN) return [{ j2: first, thru: true }];
     }
-    const tSec = (partner.transferMin ?? CROSS_TRANSFER_MIN) * 60;
-    const readyHM = _secToHM(arr + tSec);
-    return _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
-      { ...opts, maxResults: 2, directOnly: true }).map(j2 => ({ j2, thru: false }));
   }
 
+  const tSec = (partner.transferMin ?? CROSS_TRANSFER_MIN) * 60;
+  const readyHM = _secToHM(arr + tSec);
+
+  // 1° tentativo: solo corse dirette
+  let list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
+    { ...opts, maxResults: 2, directOnly: true });
+
+  // 2° tentativo (fallback): ammette cambi interni sulla stessa rete
+  if (!list.length) {
+    list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
+      { ...opts, maxResults: 2 });
+  }
+
+  return list.map(j2 => ({ j2, thru: false }));
+}
   function _networkFilter(opts) {
     const raw = opts.networks;
     if (!raw) return null;
