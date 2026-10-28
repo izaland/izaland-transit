@@ -94,6 +94,10 @@ const SBO_LINES = {
   },
 };
 
+var _hub = (typeof _hub !== 'undefined')
+  ? _hub
+  : (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
+
 if (typeof SUBURBAN_LINES !== 'undefined') Object.assign(SUBURBAN_LINES, SBO_LINES);
 if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
   const codeOf = entry => typeof entry === 'string' ? entry : entry.code;
