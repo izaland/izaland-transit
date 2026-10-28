@@ -29,6 +29,10 @@
 ================================================================ */
 'use strict';
 
+var _hub = (typeof _hub !== 'undefined')
+  ? _hub
+  : (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
+
 const M1_ST = {
   M110: { n: 'Alkuitsa',               k: '潮屺',           km:  0.00 },
   M111: { n: 'Shimamera',              k: '渠瀬田',          km:  1.26 },
@@ -132,10 +136,7 @@ const M1_SVC = {
 /* ----------------------------------------------------------------
    Interscambi Metro Line 1 ↔ altre reti
    Regola: aggiungere i nuovi collegamenti senza rimuovere i vecchi.
-   transferMin: valori esistenti; quelli delle voci nuove sono provvisori.
 ---------------------------------------------------------------- */
-const _hub = (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
-
 const M1_INTERCHANGE = {
   M110: [
     { code: 'M202', network: 'metro', transferMin: 3,
