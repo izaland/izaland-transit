@@ -546,7 +546,11 @@ const IZX_LINES = {
     TT:KE_TT, FREQ:KE_FREQ, PEAK:KE_PEAK_WINDOWS,
     /* Sainðaul Central (K01) è in interscambio con RY (R01) ed EI (E01) */
     /* Asunahama Int'l Airport (K03) è in interscambio con AX (AX01)     */
-    INTERCHANGE: { K01: "R01", K03: "AX01" },
+    INTERCHANGE: {
+  K01: [{ hubId: 'HUB_SAINDAUL_CENTRAL' }],
+  K03: "AX01",
+  K101: [{ hubId: 'HUB_SAKAMUSO' }],
+},
     TERMINUS_SPLIT:{
       A:[{terminus:"K17",weight:2},{terminus:"N4",weight:1}],
       B:[{terminus:"K17",weight:2},{terminus:"N4",weight:1}],
