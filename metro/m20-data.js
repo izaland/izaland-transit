@@ -34,16 +34,8 @@
      - Express M20 residui solo se avanzano slot
 
    Interscambi:
-     M2001  M117, M814, M1712 (metro)
-            LL01, SK26, TS13, JD01 (suburban)
-            AX06 (Airport Express)
-            K01, E01, R01 (IZX)
-     M2002  M911, M1014
-     M2003  M416, M609
-     M2004  M111, M417, M610 (metro) · SK33, TS14 (suburban) · AX05 (AX)
-     M2005  M906, M1203
-     M2006  nessun interscambio
-     M2007  M721, M1525 (metro) · SK38 (suburban) · K101 (IZX)
+     M2001  HUB_SAINDAUL_CENTRAL (da applicare)
+     M2007  HUB_SAKAMUSO
 ================================================================ */
 'use strict';
 
@@ -124,6 +116,8 @@ const M20_SVC = {
   },
 };
 
+const _hub = (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
+
 const M20_INTERCHANGE = {
   M2001: [
     { code: 'M117',  network: 'metro',    transferMin: 3, note: 'Metro Line 1 — Sainðaul Central' },
@@ -159,12 +153,7 @@ const M20_INTERCHANGE = {
     { code: 'M1203', network: 'metro', transferMin: 3, note: 'Metro Line 12 — Hadantoyo' },
   ],
   M2006: [],
-  M2007: [
-    { code: 'M721',  network: 'metro',    transferMin: 3, note: 'Metro Line 7 — Sakamuso' },
-    { code: 'M1525', network: 'metro',    transferMin: 3, note: 'Metro Line 15 — Sakamuso' },
-    { code: 'SK38',  network: 'suburban', transferMin: 4, note: 'SK38 Sakamuso' },
-    { code: 'K101',  network: 'izx',      transferMin: 5, note: 'IZX K101 Sakamuso' },
-  ],
+  M2007: [_hub('HUB_SAKAMUSO')],
 };
 
 if (typeof module !== 'undefined') {
