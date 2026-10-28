@@ -34,7 +34,7 @@
      - Express M20 residui solo se avanzano slot
 
    Interscambi:
-     M2001  HUB_SAINDAUL_CENTRAL (da applicare)
+     M2001  HUB_SAINDAUL_CENTRAL 
      M2007  HUB_SAKAMUSO
 ================================================================ */
 'use strict';
@@ -121,19 +121,7 @@ var _hub = (typeof _hub !== 'undefined')
   : (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
 
 const M20_INTERCHANGE = {
-  M2001: [
-    { code: 'M117',  network: 'metro',    transferMin: 3, note: 'Metro Line 1 — Sainðaul Central' },
-    { code: 'M814',  network: 'metro',    transferMin: 3, note: 'Metro Line 8 — Sainðaul Central' },
-    { code: 'M1712', network: 'metro',    transferMin: 3, note: 'Metro Line 17 — Sainðaul Central' },
-    { code: 'LL01',  network: 'suburban', transferMin: 4, note: 'LL01 Sainðaul Central' },
-    { code: 'SK26',  network: 'suburban', transferMin: 4, note: 'SK26 Sainðaul Central' },
-    { code: 'TS13',  network: 'suburban', transferMin: 4, note: 'TS13 Sainðaul Central' },
-    { code: 'JD01',  network: 'suburban', transferMin: 4, note: 'JD01 Sainðaul Central' },
-    { code: 'AX06',  network: 'ax',       transferMin: 5, note: 'Airport Express — Sainðaul Central' },
-    { code: 'K01',   network: 'izx',      transferMin: 5, note: 'IZX K01 Sainðaul Central' },
-    { code: 'E01',   network: 'izx',      transferMin: 5, note: 'IZX E01 Sainðaul Central' },
-    { code: 'R01',   network: 'izx',      transferMin: 5, note: 'IZX R01 Sainðaul Central' },
-  ],
+    M2001: [_hub('HUB_SAINDAUL_CENTRAL')],
   M2002: [
     { code: 'M911',  network: 'metro', transferMin: 3, note: 'Metro Line 9 — Kanbata' },
     { code: 'M1014', network: 'metro', transferMin: 3, note: 'Metro Line 10 — Kanbata' },
