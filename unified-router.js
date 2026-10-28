@@ -114,7 +114,7 @@
   const HUBS = {
   HUB_SAINDAUL_CENTRAL: [
     // stazioni delle linee che passano dall'HUB
-    'M117', 'M814', 'M1015', 'M1712', 'CO18',
+    'M117', 'M814', 'M1015', 'M1712', 'CO18', 'SBM01',
     // collegamenti alle altre reti
     'R01', 'E01', 'K01', 'AX06',
     'LL01', 'KD32', 'SK26', 'TS13', 'JD01',
