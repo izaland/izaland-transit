@@ -159,6 +159,8 @@
 ================================================================ */
 'use strict';
 
+const _hub = (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
+
 /* ================================================================
    SUBURBAN_INTERCHANGE
 ================================================================ */
@@ -188,7 +190,7 @@ const SUBURBAN_INTERCHANGE = {
   KD33: ['LL19'],
   KD34: [],
   KD35: ['AX04', 'M419'],
-  KD36: ['K101'],
+  KD36: [_hub('HUB_SAKAMUSO')],
   KD37: ['K102', 'AX21', 'RI15'],
   KD46: ['K31'],
   KD54: ['K32'],
@@ -202,7 +204,7 @@ const SUBURBAN_INTERCHANGE = {
   SK28: ['KD34'],
   SK34: ['CO23'],
   SK35: ['KD35', 'CO24'],
-  SK38: ['KD36'],
+  SK38: [_hub('HUB_SAKAMUSO')],
   SK43: ['KD37', 'RI15'],
   SK44: ['RI16'],
   SK45: ['RI17'],
