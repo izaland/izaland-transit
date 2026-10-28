@@ -50,30 +50,28 @@ const HD_TT_SERVICES = [
     stops:    _HD_HD1_STOPS_NB,
   },
 
-  /*
   // HD2 — Rapid (placeholder)
   // Decommentare quando il servizio viene istituito.
-  {
-    id:       'HD2',
-    desc:     'Rapid SB — Warohan Daiches → Kuryen-ji',
-    fromCode: 'HD01',
-    toCode:   'HD30',
-    firstDep: 'HH:MM',
-    lastDep:  'HH:MM',
-    headway:  15,
-    stops:    ['HD01', /* fermate selezionate */ 'HD30'],
-  },
-  {
-    id:       'HD2_NB',
-    desc:     'Rapid NB — Kuryen-ji → Warohan Daiches',
-    fromCode: 'HD30',
-    toCode:   'HD01',
-    firstDep: 'HH:MM',
-    lastDep:  'HH:MM',
-    headway:  15,
-    stops:    ['HD30', /* fermate selezionate */ 'HD01'],
-  },
-  */
+  // {
+  //   id:       'HD2',
+  //   desc:     'Rapid SB — Warohan Daiches → Kuryen-ji',
+  //   fromCode: 'HD01',
+  //   toCode:   'HD30',
+  //   firstDep: 'HH:MM',
+  //   lastDep:  'HH:MM',
+  //   headway:  15,
+  //   stops:    ['HD01', 'HD30'],
+  // },
+  // {
+  //   id:       'HD2_NB',
+  //   desc:     'Rapid NB — Kuryen-ji → Warohan Daiches',
+  //   fromCode: 'HD30',
+  //   toCode:   'HD01',
+  //   firstDep: 'HH:MM',
+  //   lastDep:  'HH:MM',
+  //   headway:  15,
+  //   stops:    ['HD30', 'HD01'],
+  // },
 ];
 
 /* ================================================================
