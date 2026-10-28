@@ -21,7 +21,7 @@
 
   const _routers = {};
 
-  const SEARCH_BUDGET_MS = 2500;
+  const SEARCH_BUDGET_MS = 6000;
   let _lastEnd = 0, _batchDeadline = 0;
   let _netCache      = new Map();
   let _stationsCache = new Map();
