@@ -197,7 +197,9 @@ const CO_STATIONS = [
   { code: 'CO58', name: 'Tsukuwa',     kanji: '黄凪',          nodeId: 126754769, km:  143.48 },
 ];
 
-const _hub = (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
+var _hub = (typeof _hub !== 'undefined')
+  ? _hub
+  : (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
 
 const CO_INTERCHANGE = {
   CO73: ['JD16'],
