@@ -17,7 +17,7 @@
      M1519 Eonogi Kōwen                      ↔ M510
      M1521 Urenosomi-Tsuruna                 ↔ M1320
      M1523 Bajikoe Canal Kōwen               ↔ M1115
-     M1525 Sakamuso                          ↔ M721, SK38
+     M1525 Sakamuso                          ↔ HUB_SAKAMUSO
 ================================================================ */
 'use strict';
 
@@ -93,6 +93,8 @@ const M15_SVC = {
 
 /* TODO: transferMin provvisorio 3 min per tutti i nodi — da rivedere.
    TODO: network di STW04 da verificare. */
+const _hub = (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
+
 const M15_INTERCHANGE = {
   M1501: [
     { code: 'M1301', network: 'metro', transferMin: 3, note: 'M1301 SAIA Cargo Center' }
@@ -132,10 +134,7 @@ const M15_INTERCHANGE = {
   M1523: [
     { code: 'M1115', network: 'metro', transferMin: 3, note: 'M1115 Bajikoe Canal Kōwen' }
   ],
-  M1525: [
-    { code: 'M721', network: 'metro', transferMin: 3, note: 'M721 Sakamuso' },
-    { code: 'SK38', network: 'suburban', transferMin: 3, note: 'SK38 Sakamuso' }
-  ],
+  M1525: [_hub('HUB_SAKAMUSO')],
 };
 
 if (typeof module !== 'undefined') {

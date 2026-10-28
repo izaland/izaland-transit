@@ -15,7 +15,7 @@
      M717  AX20, TS19 (Airport Express; TS line — Eigandan Senpyan)
      M718  M1113 (Metro Line 11 — Ushiuruma)
      M719  M503, M1619 (Metro Line 5; Metro Line 16 — Konegisa Eigandan)
-     M721  M1525, SK38 (Metro Line 15; Seishaku Line — Sakamuso)
+     M721  HUB_SAKAMUSO
      M722  SK39  (Seishaku Line — Kashiwaka)
      M723  SK40  (Seishaku Line — Togamiro)
      M725  M1116, M1614, TS20 (Metro Line 11; Metro Line 16; TS line — Shutazai)
@@ -84,6 +84,8 @@ const M7_SVC = {
   },
 };
 
+const _hub = (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
+
 const M7_INTERCHANGE = {
   M705: [
     { code: 'CK08', network: 'suburban', transferMin: 4,
@@ -127,12 +129,7 @@ const M7_INTERCHANGE = {
     { code: 'M1619', network: 'metro', transferMin: 3,
       note: 'Metro Line 16 — Konegisa Eigandan' },
   ],
-  M721: [
-    { code: 'M1525', network: 'metro', transferMin: 3,
-      note: 'Metro Line 15 — Sakamuso' },
-    { code: 'SK38', network: 'suburban', transferMin: 4,
-      note: 'Sakamuso — Seishaku Line' },
-  ],
+  M721: [_hub('HUB_SAKAMUSO')],
   M722: [
     { code: 'SK39', network: 'suburban', transferMin: 4,
       note: 'Kashiwaka — Seishaku Line' },
