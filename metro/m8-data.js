@@ -14,7 +14,7 @@
    Services:
      A  All-stop  — covers all 24 metro stations M801→M824
      B  Ibaches Through — M801→M817 then diverges onto Ibaches Railway via M818 (IB002)
-     C  Rapido — IR through → M8 selected stops → Ibaches Railway via M818
+     C  Rapido — IR through → M8 selected stops → Ibaches Railway via M818 (IB002)
 
    Operator boundaries:
      M801  — IR Izarail boundary (north); IR trains enter metro tracks here
@@ -322,6 +322,8 @@ const M8_META = {
 /* ================================================================
    INTERSCAMBI
 ================================================================ */
+const _hub = (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
+
 const M8_INTERCHANGE = {
 
   M803: [
@@ -353,15 +355,7 @@ const M8_INTERCHANGE = {
       note: 'Kidai Line — Nashikoma' },
   ],
 
-  M814: [
-    { code: 'LL01', network: 'suburban', transferMin: 3,  note: 'Loop Line — Sainðaul Central' },
-    { code: 'KD32', network: 'suburban', transferMin: 3,  note: 'Kidai Line — Sainðaul Central' },
-    { code: 'SK26', network: 'suburban', transferMin: 3,  note: 'Seishaku Line — Sainðaul Central' },
-    { code: 'K01',  network: 'izx',      transferMin: 5,  note: 'IZX Keishin — Sainðaul Central' },
-    { code: 'R01',  network: 'izx',      transferMin: 5,  note: 'IZX Ryānkai — Sainðaul Central' },
-    { code: 'E01',  network: 'izx',      transferMin: 5,  note: 'IZX Eira — Sainðaul Central' },
-    { code: 'AX06', network: 'ax',       transferMin: 5,  note: 'Airport Express — Sainðaul Central' },
-  ],
+  M814: [_hub('HUB_SAINDAUL_CENTRAL')],
 
   M817: [
     { code: 'M405',  network: 'metro',    transferMin: 3,
