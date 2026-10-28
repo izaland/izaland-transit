@@ -9,7 +9,7 @@
    REGOLA: i nuovi interscambi si AGGIUNGONO, quelli esistenti non si rimuovono.
 
    Interscambi principali:
-     M117 Sainðaul Central — R01, E01, K01, AX06, M814, LL01, KD32, SK26, TS13, JD01
+     M117 Sainðaul Central — HUB_SAINDAUL_CENTRAL
      M118 Masuda Agarai    — M209, M325, M913, M1413
      M111 Shimamera        — AX05, TS14, M417, M610, SK33
      M110 Alkuitsa         — M202, CK18
@@ -134,6 +134,8 @@ const M1_SVC = {
    Regola: aggiungere i nuovi collegamenti senza rimuovere i vecchi.
    transferMin: valori esistenti; quelli delle voci nuove sono provvisori.
 ---------------------------------------------------------------- */
+const _hub = (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
+
 const M1_INTERCHANGE = {
   M110: [
     { code: 'M202', network: 'metro', transferMin: 3,
@@ -163,28 +165,7 @@ const M1_INTERCHANGE = {
     { code: 'M808', network: 'metro', transferMin: 3,
       note: 'M8 Nimunoðai — banchine separate' },
   ],
-  M117: [
-    { code: 'R01', network: 'izx', transferMin: 5,
-      note: 'IZX Ryānkai — Sainðaul Central' },
-    { code: 'E01', network: 'izx', transferMin: 5,
-      note: 'IZX Eira — Sainðaul Central' },
-    { code: 'K01', network: 'izx', transferMin: 5,
-      note: 'IZX Keishin — Sainðaul Central' },
-    { code: 'AX06', network: 'ax', transferMin: 3,
-      note: 'Airport Express — Sainðaul Central AX' },
-    { code: 'M814', network: 'metro', transferMin: 2,
-      note: 'M8 Sainðaul Central — banchine separate' },
-    { code: 'LL01', network: 'suburban', transferMin: 3,
-      note: 'Loop Line — Sainðaul Central' },
-    { code: 'KD32', network: 'suburban', transferMin: 4,
-      note: 'Kidai Line — Sainðaul Central' },
-    { code: 'SK26', network: 'suburban', transferMin: 4,
-      note: 'Seishaku Line — Sainðaul Central' },
-    { code: 'TS13', network: 'suburban', transferMin: 4,
-      note: 'Tandan-Senpyan — Sainðaul Central TS' },
-    { code: 'JD01', network: 'suburban', transferMin: 4,
-      note: 'Jōdai Line — Sainðaul Central JD' },
-  ],
+  M117: [_hub('HUB_SAINDAUL_CENTRAL')],
   M118: [
     { code: 'M209', network: 'metro', transferMin: 9,
       note: 'M2 Masuda Hibaru — corridoio sotterraneo' },
