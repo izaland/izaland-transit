@@ -8,7 +8,7 @@
    Lunghezza : 16.70 km · 14 stazioni
 
    Interscambi:
-     RKY01 (Sakamuso)        ↔ M721, M1525, SK38, K101, M2007 (thru)
+     RKY01 (Sakamuso)        ↔ HUB_SAKAMUSO
      RKY03 (Shiittaru Kone)  ↔ M1618
      RKY04 (Ikasurun-Owonideki) ↔ M1113, M718 (6 min a piedi)
      RKY05 (Bawangitan)      ↔ M716
@@ -20,16 +20,13 @@
 
    Thru Service:
      RKY01 ↔ M2007 (Metro Line 20) a Sakamuso.
-     Implementazione thru integrata prevista in fase successiva.
-
-   Servizi:
-     RKY1  Local  RKY01 ↔ RKY14  tutte le fermate
-           10 min nelle fasce diurne; 20 min early/late (provvisorio)
 ================================================================ */
 'use strict';
 
+const _hub = (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
+
 const RKY_INTERCHANGE = {
-  RKY01: ['M721', 'M1525', 'SK38', 'K101', 'M2007'],
+  RKY01: [_hub('HUB_SAKAMUSO')],
   RKY03: ['M1618'],
   RKY04: [{ code: 'M1113', transferMin: 6 }, { code: 'M718', transferMin: 6 }],
   RKY05: ['M716'],
@@ -54,7 +51,7 @@ const RKY_LINES = {
     totalKm:       16.70,
     totalStations: 14,
     headwayPeak:    10,
-    headwayOffPeak: 10,   // fasce early/late a 20 min, vedi RKY_TT_SERVICES
+    headwayOffPeak: 10,
     stations: [
       { code: 'RKY01', name: 'Sakamuso',              kanji: '沛坤',       km:  0.00 },  /* node 176874425 */
       { code: 'RKY02', name: 'Himatoshi Tohtomai',    kanji: '妃満夫昧',   km:  1.20 },  /* node 452748385 */
