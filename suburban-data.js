@@ -159,7 +159,9 @@
 ================================================================ */
 'use strict';
 
-const _hub = (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
+var _hub = (typeof _hub !== 'undefined')
+  ? _hub
+  : (hubId, min = null, note = '') => ({ hubId, transferMin: min, note });
 
 /* ================================================================
    SUBURBAN_INTERCHANGE
