@@ -98,7 +98,10 @@ const j1=make(t,a,x),j2=make(best.c.t,best.c.i,best.b2);
 if(!j1||!j2)continue;
 if(best.c.t.stops[best.b2].arr>=bestDirect)continue;
 const wait=Math.max(0,Math.round((best.dep-arrX)/60));
-result.push({legs:[...j1.legs,...j2.legs],departureTime:j1.departureTime,arrivalTime:j2.arrivalTime,totalMinutes:Math.round((best.c.t.stops[best.b2].arr-t.stops[a].dep)/60),totalKm:(j1.totalKm??0)+(j2.totalKm??0),transfers:1,transferNodes:[X.code],transferThru:[false],transferWalkMin:[0],transferWaitMin:[wait],thruService:false});
+const thruIdx=t.stops.findIndex((s,i)=>i>0&&s.lineId==='SBM'&&t.stops[i-1].lineId==='M20');
+const hasThru=thruIdx>0&&thruIdx<x;
+const thruNode=hasThru?t.stops[thruIdx].code:X.code;
+result.push({legs:[...j1.legs,...j2.legs],departureTime:j1.departureTime,arrivalTime:j2.arrivalTime,totalMinutes:Math.round((best.c.t.stops[best.b2].arr-t.stops[a].dep)/60),totalKm:(j1.totalKm??0)+(j2.totalKm??0),transfers:1,transferNodes:hasThru?[thruNode,X.code]:[X.code],transferThru:hasThru?[true,false]:[false],transferWalkMin:hasThru?[0,0]:[0],transferWaitMin:hasThru?[0,wait]:[wait],thruService:hasThru?true:false});
 }
 }
 }
