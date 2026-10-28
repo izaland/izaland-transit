@@ -71,6 +71,38 @@ if(!legs.length)return null;
 return {legs,departureTime:legs[0].boardDep,arrivalTime:legs.at(-1).alightArr,totalMinutes:Math.round((stops.at(-1).arr-stops[0].dep)/60),totalKm:legs.reduce((sum,l)=>sum+l.km,0),transfers:0,transferNodes:[],transferThru:[],transferWalkMin:[],transferWaitMin:[],thruService:true};}
 function search(from,to,time,opts={}){let earliest=sec(time);if(earliest<sec('04:30'))earliest+=86400;const result=[],froms=list(from),tos=list(to);
 for(const t of api.trips){for(const f of froms)for(const dest of tos){const a=t.stops.findIndex(s=>s.code===f),b=t.stops.findIndex(s=>s.code===dest);if(a<0||b<=a)continue;if(t.stops[a].dep<earliest||t.stops[a].dep>earliest+10800)continue;const j=make(t,a,b);if(j)result.push(j);}}
+let bestDirect=Infinity;for(const j of result){const arr=j.legs.at(-1).alightArrSec;if(arr<bestDirect)bestDirect=arr;}
+const byStop={};
+for(const t of api.trips)t.stops.forEach((s,i)=>{(byStop[s.code]??=[]).push({t,i});});
+for(const t of api.trips){
+for(const f of froms){
+const a=t.stops.findIndex(s=>s.code===f);if(a<0)continue;
+if(t.stops[a].dep<earliest||t.stops[a].dep>earliest+10800)continue;
+for(const dest of tos){
+const bEnd=t.stops.findIndex(s=>s.code===dest);
+const lastX=(bEnd<0?t.stops.length:bEnd);
+for(let x=a+1;x<lastX;x++){
+const X=t.stops[x];if(X.code===dest)continue;
+const arrX=t.stops[x].arr;
+let best=null;
+for(const c of byStop[X.code]||[]){
+if(c.t===t)continue;
+const dep=c.t.stops[c.i].dep;
+if(dep<arrX+60)continue;
+const b2=c.t.stops.findIndex(s=>s.code===dest);
+if(b2<0||b2<=c.i)continue;
+if(!best||dep<best.dep)best={c,b2,dep};
+}
+if(!best)continue;
+const j1=make(t,a,x),j2=make(best.c.t,best.c.i,best.b2);
+if(!j1||!j2)continue;
+if(best.c.t.stops[best.b2].arr>=bestDirect)continue;
+const wait=Math.max(0,Math.round((best.dep-arrX)/60));
+result.push({legs:[...j1.legs,...j2.legs],departureTime:j1.departureTime,arrivalTime:j2.arrivalTime,totalMinutes:Math.round((best.c.t.stops[best.b2].arr-t.stops[a].dep)/60),totalKm:(j1.totalKm??0)+(j2.totalKm??0),transfers:1,transferNodes:[X.code],transferThru:[false],transferWalkMin:[0],transferWaitMin:[wait],thruService:false});
+}
+}
+}
+}
 const seen=new Set();return result.filter(j=>{const k=j.legs.map(l=>l.tripId+':'+l.boardCode+':'+l.alightCode).join('|');if(seen.has(k))return false;seen.add(k);return true;}).sort((a,b)=>a.legs.at(-1).alightArrSec-b.legs.at(-1).alightArrSec).slice(0,opts.maxResults??8);}
 api.search=search;
 if(typeof SuburbanRouter!=='undefined'&&!SuburbanRouter.__sbmLocalPatched){const original=SuburbanRouter.search.bind(SuburbanRouter);SuburbanRouter.search=function(from,to,time,opts){const usesSBM=list(from).some(c=>/^SBM\d+$/.test(c))||list(to).some(c=>/^SBM\d+$/.test(c));return usesSBM?search(from,to,time,opts):original(from,to,time,opts);};SuburbanRouter.__sbmLocalPatched=true;}
