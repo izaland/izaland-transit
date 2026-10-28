@@ -28,12 +28,14 @@
   let _partnersCache = new Map();
   let _bridgeCache   = new Map();
   let _memo          = new Map();
+  let _bridgePartnersCache = new Map();
   let _deadline      = Infinity;
   let _truncated     = false;
 
   function _clearCaches() {
     _netCache.clear(); _stationsCache.clear(); _partnersCache.clear();
     _bridgeCache.clear(); _memo.clear();
+    _bridgePartnersCache.clear(); 
   }
   function _timeUp() {
     if (Date.now() > _deadline) { _truncated = true; return true; }
@@ -488,11 +490,18 @@
 
       for (const midSt of _bridgesOf(fNode.networkId)) {
         if (_timeUp()) break;
-        const partners = _partnersOf(midSt.code).filter(p => {
-          if (netFilter && !netFilter.has(p.networkId)) return false;
-          return tNodes.some(t => t.networkId === p.networkId);
-        });
-        if (!partners.length) continue;
+        const tNetSet = new Set(tNodes.map(t => t.networkId));
+const cacheKey = midSt.code + '|' + [...tNetSet].join(',');
+
+let partners = _bridgePartnersCache.get(cacheKey);
+if (!partners) {
+  partners = _partnersOf(midSt.code).filter(p => {
+    if (netFilter && !netFilter.has(p.networkId)) return false;
+    return tNetSet.has(p.networkId);
+  });
+  _bridgePartnersCache.set(cacheKey, partners);
+}
+if (!partners.length) continue;
 
         const j1list = _safeSearch(
           router1, fNode.networkId,
