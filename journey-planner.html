@@ -645,13 +645,35 @@ return filtered.slice(0, 8);
     const lineF      = document.getElementById('jp-line').value;
         const directOnly = document.getElementById('jp-direct-only').checked;
     const excludeIzx = document.getElementById('jp-exclude-izx').checked;
-    if (from[0] === to[0] && from.length === 1 && to.length === 1) { alert('Please select two different stations.'); return; }
-    _jpState.from = from; _jpState.to = to; _jpState.lineF = lineF; _jpState.directOnly = directOnly; _jpState.excludeIzx = excludeIzx; _jpState.all = [];
+    if (from[0] === to[0] && from.length === 1 && to.length === 1) {
+  alert('Please select two different stations.');
+  return;
+}
+
+const btn = document.getElementById('jp-search');
+const listEl = document.getElementById('journey-list');
+
+btn.disabled = true;
+btn.textContent = 'Searching…';
+listEl.innerHTML = '<p class="jp-no-result">⏳ Searching journeys…</br>経由檢索中...</p>';
+
+setTimeout(() => {
+  try {
+    _jpState.from = from; _jpState.to = to;
+    _jpState.lineF = lineF; _jpState.directOnly = directOnly;
+    _jpState.excludeIzx = excludeIzx; _jpState.all = [];
+
     const fromName = fromSel.selectedOptions[0]?.textContent.split('  [')[0].trim() || _stName(from[0]);
-const toName   = toSel.selectedOptions[0]?.textContent.split('  [')[0].trim()   || _stName(to[0]);
-_jpState.fromName = fromName; _jpState.toName = toName;
-const journeys = _runSearch(from, to, depTime, lineF, directOnly, excludeIzx);
+    const toName   = toSel.selectedOptions[0]?.textContent.split('  [')[0].trim()   || _stName(to[0]);
+    _jpState.fromName = fromName; _jpState.toName = toName;
+
+    const journeys = _runSearch(from, to, depTime, lineF, directOnly, excludeIzx);
     renderJourneys(journeys, fromName, toName, 'replace');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Find journeys';
+  }
+}, 30);
   });
 
   document.getElementById('jp-earlier').addEventListener('click', () => {
