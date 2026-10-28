@@ -24,7 +24,7 @@ const SBO_INTERCHANGE = {
   SBO07: ['M230', 'M415'],
   SBO09: ['SBM13'],
   SBO10: ['SBM12', 'M1027', { code: 'SSK01', transferMin: 5 }, 'M1028', 'AX08', { code: 'AK02', transferMin: 10 }],
-  SBM01: ['M117', 'M2001', 'LL01', 'CO18', 'JD01', 'R01', 'E01', 'K01', 'AX06', 'M814', 'KD32', 'SK26', 'TS13', 'M1712', 'M1015', 'M208', 'M912', { code: 'M815', transferMin: 12 }],
+  SBM01: [_hub('HUB_SAINDAUL_CENTRAL')],
   SBM02: ['M1016'],
   SBM04: ['M327', 'M1212', 'LL17', 'CO15', 'SHX01', 'AX07'],
   SBM05: ['LL16', { code: 'CO14', transferMin: 5 }, 'M915', { code: 'M1813', transferMin: 8 }],
