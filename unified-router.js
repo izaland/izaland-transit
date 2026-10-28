@@ -111,6 +111,16 @@
     return found;
   }
 
+  const HUBS = {
+  HUB_SAINDAUL_CENTRAL: [
+    // stazioni delle linee che passano dall'HUB
+    'M117', 'M814', 'M1015', 'M1712', 'CO18',
+    // collegamenti alle altre reti
+    'R01', 'E01', 'K01', 'AX06',
+    'LL01', 'KD32', 'SK26', 'TS13', 'JD01',
+  ],
+};
+
   const _ixIndex = {};
 
   const SUB_CROSS_TRANSFER_MIN = 5;
@@ -133,16 +143,26 @@
   }
 
   function buildInterchangeIndex(interchangeData) {
-    _clearCaches();
-    if (Array.isArray(interchangeData)) {
-      interchangeData.forEach(ix => _add(ix.codeA, ix.codeB, ix.transferMin));
-      return;
-    }
-    Object.entries(interchangeData).forEach(([stCode, partners]) => {
-      const pArr = Array.isArray(partners) ? partners : [partners];
-      for (const b of pArr) _add(stCode, b.code ?? b, b.transferMin);
-    });
+  _clearCaches();
+  if (Array.isArray(interchangeData)) {
+    interchangeData.forEach(ix => _add(ix.codeA, ix.codeB, ix.transferMin));
+    return;
   }
+  Object.entries(interchangeData).forEach(([stCode, partners]) => {
+    const pArr = Array.isArray(partners) ? partners : [partners];
+    for (const b of pArr) {
+      // HUB: espandi il hubId nei suoi membri
+      if (b && typeof b === 'object' && b.hubId) {
+        const members = HUBS[b.hubId] || [];
+        members.forEach(m => {
+          if (m !== stCode) _add(stCode, m, b.transferMin);
+        });
+        continue;
+      }
+      _add(stCode, b.code ?? b, b.transferMin);
+    }
+  });
+}
 
   function _partnersOf(code) {
     let c = _partnersCache.get(code);
