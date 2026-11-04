@@ -334,7 +334,7 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
   return L > 0.179 ? '#000' : '#fff';
 }
 
- function buildPlannerSelects(){
+  function buildPlannerSelects(){
     const jpFrom = document.getElementById('jp-from');
     const jpTo   = document.getElementById('jp-to');
 
@@ -351,6 +351,36 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
     if (typeof MetroRouter !== 'undefined') {
       MetroRouter.allStations().forEach(st => addSt(st.code, st.name, st.kanji));
     }
+
+    // CityLiner (CL)
+    if (typeof CL_ST !== 'undefined') {
+      Object.entries(CL_ST).forEach(([code, s]) => addSt(code, s.n, s.k));
+    }
+
+    // Ordine alfabetico per nome
+    const sorted = Object.values(byName).sort((a, b) => a.name.localeCompare(b.name));
+
+    sorted.forEach(entry => {
+      const primaryCode = entry.codes[0];
+      const debugCodes = entry.codes.length > 1
+        ? '  [' + entry.codes.join(', ') + ']'
+        : '';
+      const label = entry.name
+        + (entry.kanji ? ' · ' + entry.kanji : '')
+        + debugCodes;
+
+      [jpFrom, jpTo].forEach(sel => {
+        const opt = document.createElement('option');
+        opt.value = primaryCode;
+        opt.dataset.codes = entry.codes.join(',');
+        opt.textContent = label;
+        sel.appendChild(opt);
+      });
+    });
+
+    jpFrom.value = 'R13';
+    jpTo.value   = 'SN08';
+  }
 
     // Ordine alfabetico per nome
     const sorted = Object.values(byName).sort((a, b) => a.name.localeCompare(b.name));
@@ -758,6 +788,13 @@ setTimeout(() => {
   if(typeof MetroRouter !== 'undefined'){
     add(safe(() => MetroRouter.allStations(), []), 'MET');
     safe(() => MetroRouter.allLines(), []).forEach(l => lineIds.add('MET:' + l.id));
+  }
+    /* CityLiner (CL) */
+  if (typeof CL_ST !== 'undefined') {
+    Object.entries(CL_ST).forEach(([code, s]) => {
+      stationsByCode.set(code, (s.n || '').trim());
+    });
+    lineIds.add('CL:CL');
   }
 
   /* Linee suburbane: arrivano da SUBURBAN_LINES (chiavi = id linea) */
