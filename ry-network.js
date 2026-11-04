@@ -1,1 +1,44 @@
-/* RY-NETWORK.JS — with per-segment km */
+/* RY-NETWORK.JS — Ryānkai physical model with per-segment km. */
+'use strict';
+const RY_SEGMENTS = [
+  { from: 'R01', to: 'R02', km: 15.30, vLimit: 180 },
+  { from: 'R02', to: 'R03', km: 19.89, vLimit: 250 },
+  { from: 'R03', to: 'R04', km: 20.34, vLimit: 320 },
+  { from: 'R04', to: 'R05', km: 34.84, vLimit: 320 },
+  { from: 'R05', to: 'R06', km: 39.52, vLimit: 320 },
+  { from: 'R06', to: 'R61', km: 27.35, vLimit: 320 },
+  { from: 'R61', to: 'R07', km: 14.44, vLimit: 320 },
+  { from: 'R07', to: 'R08', km: 21.04, vLimit: 320 },
+  { from: 'R08', to: 'R81', km: 11.82, vLimit: 320 },
+  { from: 'R81', to: 'R09', km: 37.48, vLimit: 320 },
+  { from: 'R09', to: 'R10', km: 33.50, vLimit: 320 },
+  { from: 'R10', to: 'R11', km: 22.34, vLimit: 320 },
+  { from: 'R11', to: 'R12', km: 20.61, vLimit: 320 },
+  { from: 'R12', to: 'R13', km: 50.72, vLimit: 320 },
+  { from: 'R13', to: 'R14', km: 46.51, vLimit: 350 },
+  { from: 'R14', to: 'R15', km: 24.93, vLimit: 350 },
+  { from: 'R15', to: 'R16', km: 30.50, vLimit: 350 },
+  { from: 'R16', to: 'R17', km: 30.97, vLimit: 350 },
+  { from: 'R17', to: 'R18', km: 31.86, vLimit: 350 },
+  { from: 'R18', to: 'R19', km: 34.64, vLimit: 350 },
+  { from: 'R19', to: 'R20', km: 17.54, vLimit: 350 },
+  { from: 'R20', to: 'R21', km: 42.61, vLimit: 350 },
+  { from: 'R13', to: 'SA01', km: 38.87, vLimit: 350 },
+  { from: 'SA01', to: 'SA02', km: 30.72, vLimit: 350 },
+  { from: 'SA02', to: 'SA03', km: 27.62, vLimit: 350 },
+  { from: 'SA03', to: 'SA04', km: 42.79, vLimit: 350 },
+  { from: 'SA04', to: 'SA05', km: 32.60, vLimit: 350 },
+  { from: 'SA05', to: 'SA06', km: 23.07, vLimit: 350 },
+  { from: 'SA06', to: 'SA07', km: 21.73, vLimit: 350 },
+  { from: 'SA07', to: 'SA08', km: 37.71, vLimit: 350 },
+  { from: 'SA08', to: 'SA09', km: 31.17, vLimit: 350 },
+  { from: 'SA04', to: 'SK02', km: 68.06, vLimit: 200 },
+  { from: 'SK02', to: 'SK03', km: 51.69, vLimit: 200 },
+  { from: 'SK03', to: 'SK04', km: 20.35, vLimit: 200 },
+  { from: 'SK04', to: 'SK05', km: 38.54, vLimit: 200 },
+  { from: 'SK05', to: 'SK06', km: 16.80, vLimit: 200 },
+  { from: 'SK02', to: 'SK02-1', km: 12.36, vLimit: 120 }
+];
+const RY_DWELL = { default: 60, overrides: { R01: 90, R06: 90, R13: 90, R15: 90, SA04: 90 } };
+const RY_TRAIN_PROFILE = { name: 'CR400BF-like', vMaxKmh: 350, accelMps2: 0.6, decelMps2: 0.7 };
+if (typeof module !== 'undefined') module.exports = { RY_SEGMENTS, RY_DWELL, RY_TRAIN_PROFILE };
