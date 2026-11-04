@@ -375,35 +375,7 @@ if (typeof M4_INTERCHANGE !== 'undefined') {
         opt.dataset.codes = entry.codes.join(',');
         opt.textContent = label;
         sel.appendChild(opt);
-      });
-    });
-
-    jpFrom.value = 'R13';
-    jpTo.value   = 'SN08';
-  }
-
-    // Ordine alfabetico per nome
-    const sorted = Object.values(byName).sort((a, b) => a.name.localeCompare(b.name));
-
-    sorted.forEach(entry => {
-      // Il value è il primo codice (usato per la ricerca);
-      // se la stazione è su più linee, tutti i codici vengono
-      // memorizzati in data-codes per _runSearch
-      const primaryCode = entry.codes[0];
-      const debugCodes = entry.codes.length > 1
-        ? '  [' + entry.codes.join(', ') + ']'
-        : '';
-      const label = entry.name
-        + (entry.kanji ? ' · ' + entry.kanji : '')
-        + debugCodes;
-
-      [jpFrom, jpTo].forEach(sel => {
-        const opt = document.createElement('option');
-        opt.value = primaryCode;
-        opt.dataset.codes = entry.codes.join(',');
-        opt.textContent = label;
-        sel.appendChild(opt);
-      });
+            });
     });
 
     jpFrom.value = 'R13';
