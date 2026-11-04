@@ -303,7 +303,14 @@ function _clSearch(from, to, depTime) {
 IZXUnifiedRouter.registerRouter('CL', {
   allStations: () => Object.entries(CL_ST).map(([code, s]) => ({ code, name: s.n })),
   hasStation: (code) => !!CL_ST[code],
-  search: (from, to, depTime, opts) => _clSearch(from, to, depTime),
+    search: (from, to, depTime, opts) => {
+    try {
+      return _clSearch(from, to, depTime);
+    } catch (e) {
+      console.error('CL search error:', e);
+      return [];
+    }
+  },
 });
 
 // 2. Costruisci l'interchange index cross-network
