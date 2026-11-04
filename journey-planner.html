@@ -239,6 +239,11 @@ if (typeof SuburbanRouter !== 'undefined')
   IZXUnifiedRouter.registerRouter('SUB', SuburbanRouter);
 if (typeof MetroRouter !== 'undefined')
   IZXUnifiedRouter.registerRouter('METRO', MetroRouter);
+IZXUnifiedRouter.registerRouter('CL', {
+  allStations: () => Object.entries(CL_ST).map(([code, s]) => ({ code, name: s.n })),
+  hasStation: (code) => !!CL_ST[code],
+  search: (from, to, depTime, opts) => /* ricerca su CL32_TIMETABLE */,
+});
 
 // 2. Costruisci l'interchange index cross-network
 (function _buildIx() {
