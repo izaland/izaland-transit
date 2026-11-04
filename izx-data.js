@@ -15,7 +15,7 @@ const KE_ST = {
   K33:  {n:"Keishunneul",                 k:"",                              b:"cprime"},
   K04:  {n:"Hashimakori-Juwon",           k:"\u793a\u4e07\u98ef\u4e2d\u592e",  b:"main",   km:84.85},
   K05:  {n:"Wodoriha IR",                 k:"\u6f91\u9ad8 IR",               b:"main",   km:101.75},
-  K06:  {n:"Shin-Eriraul",                k:"\u65b0\u7e70\u7f85\u5d0e",      b:"main",   km:122.97},
+  K06:  {n:"Shin-Eriraul",                k:"\u65b0\u7e70\u9ad8\u6d0e",      b:"main",   km:122.97},
   K07:  {n:"Nappawa",                     k:"\u90a3\u854e\u8f2a",            b:"main",   km:144.68},
   K08:  {n:"Otsumi-Komishinan",           k:"\u5357\u53e4\u8fba\u5357",      b:"main",   km:185.39},
   K09:  {n:"Kamahoraya",                  k:"\u5bfa\u7a32\u91ce",            b:"main",   km:198.04},
@@ -23,14 +23,14 @@ const KE_ST = {
   K102: {n:"Showanul",                    k:"\u66f8\u74e6\u5d0e",            b:"saka"},
   K120: {n:"Panatsawa",                   k:"",                              b:"saka"},
   K103: {n:"Katayoshi Juwon",             k:"\u6cc9\u5cf0\u4e2d\u592e",      b:"saka"},
-  K104: {n:"Illashiya",                   k:"\u72d0\u68b2",                  b:"saka"},
+  K104: {n:"Illashiya",                   k:"\u72d0\u6822",                  b:"saka"},
   K105: {n:"Ch\u014dpatsu",               k:"",                              b:"saka"},
   K106: {n:"Kohtos\u014dre",              k:"",                              b:"saka"},
   K160: {n:"Ikahoro K\u014dwen",          k:"",                              b:"saka"},
   K10:  {n:"Shin-Kichatsura Teba",        k:"\u65b0\u4e80\u8336\u5915\u99ac", b:"main",  km:252.52},
-  K11:  {n:"Shin-Kashioka",               k:"\u65b0\u7b20\u4ed8",            b:"main",   km:296.64},
+  K11:  {n:"Shin-Kashioka",               k:"\u65b0\u7b20\u4f8f",            b:"main",   km:296.64},
   K12:  {n:"Panaireki",                   k:"\u82e5\u6d66",                  b:"main",   km:345.01},
-  K13:  {n:"Hy\u014dmonan Resort",         k:"\u88cf\u8302\u5357\u904a\u5712", b:"main",  km:386.29},
+  K13:  {n:"Hy\u014dmonan Resort",         k:"\u88cf\u8302\u5357\u904a\u5722", b:"main",  km:386.29},
   K14:  {n:"Shin-Imihatsorul",            k:"\u65b0\u7acb\u9bad\u57fc",      b:"main",   km:427.14},
   K144: {n:"Tsirina Wents\u0101n",         k:"\u969c\u5185\u9280\u5c1a",      b:"main",   km:451.74},
   K15:  {n:"Naeba",                       k:"\u5185\u6ce2",                  b:"main",   km:465.21},
@@ -111,7 +111,7 @@ const RY_ST = {
   R15:  {n:"Shin-Makkenoke",          k:"\u65b0\u5e73\u5742",             b:"main", km:440.63},
   R16:  {n:"Soritsun K\u014dwen",     k:"",                               b:"main", km:471.13},
   R17:  {n:"Hentsari-Donan",          k:"",                               b:"main", km:502.10},
-  R18:  {n:"Rekefura-K\u014dwen",     k:"\u9577\u798f\u7530\u516c\u5712", b:"main", km:533.96},
+  R18:  {n:"Rekefura-K\u014dwen",     k:"\u9577\u798f\u7530\u516c\u5722", b:"main", km:533.96},
   R19:  {n:"Chunnitai",               k:"\u79cb\u68ee",                   b:"main", km:568.60},
   R20:  {n:"Shin-Pekonai",            k:"\u65b0\u725b\u6ca2",             b:"main", km:586.14},
   R21:  {n:"Sannupuri",               k:"\u4e7e\u5c71",                   b:"main", km:628.75},
@@ -120,14 +120,18 @@ const RY_ST = {
 const RY_CANONICAL_ORDER = [
   "R01","R02","R03","R04","R05","R06","R61","R07","R08","R81",
   "R09","R10","R11","R12","R13","R14","R15","R16","R17","R18",
-  "R19","R20","R21"
+  "R19","R20","R21",
+  "SA00","SA01","SA02","SA03","SA04",
+  "SA05","SA06","SA07","SA08","SA09"
 ];
 
 const RY_SVC = {
   L: {coeff:0.92, name:"All Stop",     cls:"svc-L", color:"#6b7280",
       stops:["R01","R02","R03","R04","R05","R06","R61","R07","R08","R81","R09","R10","R11","R12","R13"]},
   K: {coeff:1.08, name:"North West",   cls:"svc-K", color:"#EA7501", pair:"J",
-      stops:["R01","R02","R06","R10","R13"],
+      stops:["R01","R02","R06","R10","R13",
+             "SA00","SA01","SA02","SA03","SA04",
+             "SA05","SA06","SA07","SA08","SA09"],
       conditionalStops:{
         R03:{rule:"peak"}
       }},
@@ -183,31 +187,23 @@ const RY_SVC = {
       stops:["R01","R02","R06","R10","R14","R15","R16","R17","R18","R19","R20","R21"]},
 };
 
-/* ---- SEIBU NAERYUKU BRANCH (SA / SK / BL) — legacy names retained ---- */
+/* ---- SEIBU NAERYUKU BRANCH (SA) — nuova numerazione ---- */
 const SA_ST = {
-  SA01:  {n:"Chun\u00f0ouni-Naoza",  k:"\u9baa\u7a2e - \u6912\u6f5f", b:"sa"},
-  SA02:  {n:"Poridake",               k:"\u767b\u9928",                   b:"sa"},
-  SA101: {n:"Hakosakki",              k:"\u5143\u7aef",                   b:"sa_j"},
-  SA03:  {n:"Pakkutanma",             k:"\u8d64\u8c37",                   b:"sa_j"},
-  SA04:  {n:"Yamagata",               k:"\u5009\u6cc9",                   b:"sa_j"},
-  SA05:  {n:"Tentosamo",              k:"\u72ac\u5c71",                   b:"sa_j"},
-  SA06:  {n:"Fudoasamo",              k:"\u76bf\u5c71",                   b:"sa_j"},
-  SK01:  {n:"Sum\u0101ra",            k:"",                               b:"sk"},
-  SK02:  {n:"Tohpatogu",              k:"",                               b:"sk"},
-  SK03:  {n:"Soranaka",               k:"",                               b:"sk"},
-  SK04:  {n:"Tsobunetoka",            k:"",                               b:"sk"},
-  SK05:  {n:"Kiikori",                k:"",                               b:"sk"},
-  BL01:  {n:"Gunporainen",            k:"",                               b:"bl"},
-  BL02:  {n:"Yamatsuka / Banzilluun", k:"",                               b:"bl"},
-  BL03:  {n:"Behringstein",           k:"",                               b:"bl"},
-  BL04:  {n:"Pyhritz-Keltenberg",     k:"",                               b:"bl"},
-  BL05:  {n:"Burgenau HBF",           k:"",                               b:"bl"},
+  SA00: { n:"Riyatoma",              k:"追庥",       b:"sa", km:0      },
+  SA01: { n:"Sayaize",               k:"餝拭",       b:"sa", km:38.87  },
+  SA02: { n:"Haðohano-Chunðouuni",   k:"鮪種・椒潟", b:"sa", km:69.59  },
+  SA03: { n:"Mirayama-Hattsuma",     k:"水良倉発維", b:"sa", km:97.21  },
+  SA04: { n:"Poridake",              k:"登館",       b:"sa", km:140.00 },
+  SA05: { n:"Hakosakki",             k:"元端",       b:"sa", km:172.60 },
+  SA06: { n:"Pakkutanma",            k:"赤谷",       b:"sa", km:195.67 },
+  SA07: { n:"Yamagata",              k:"倉泉",       b:"sa", km:217.40 },
+  SA08: { n:"Tentosamo",             k:"犬山",       b:"sa", km:255.11 },
+  SA09: { n:"Shin-Fudoasamo",        k:"新皿山",     b:"sa", km:286.28 },
 };
+
 const SA_CANONICAL_ORDER = [
-  "SA01","SA02",
-  "SA101","SA03","SA04","SA05","SA06",
-  "SK01","SK02","SK03","SK04","SK05",
-  "BL01","BL02","BL03","BL04","BL05"
+  "SA00","SA01","SA02","SA03","SA04",
+  "SA05","SA06","SA07","SA08","SA09"
 ];
 
 /* ---- DŌNPUKU BRANCH (DP / DN) — retained for reference ---- */
@@ -259,56 +255,9 @@ const RY_INT_ST = {
   SZ3:{n:"Eulerhafen C.",  k:"",                   b:"sz"},
 };
 
-const RY_TT = {
-  L:{R01:0,R02:366,R03:772,R04:1136,R05:1855,R06:2689,R61:3277,R07:3570,R08:3983,R81:4245,R09:5214,R10:6176,R11:6864,R12:7232,R13:8380},
-  K:{R01:0,R02:366,R03:712,R06:1909,R08:2723,R10:3776,R13:4960,R14:5579,SA01:5800,SA02:6220,SK01:6520,SK02:6880,SK03:7240,SK04:7600,SK05:7960,BL01:8500,BL02:8980,BL03:9460,BL04:9940,BL05:10480},
-  J:{R01:0,R02:366,R03:712,R06:1909,R08:2723,R10:3776,R13:4960,R14:5579,SA01:5800,SA02:6220,SA101:6460,SA03:6700,SA04:7000,SA05:7300,SA06:7600},
-  G:{R01:0,R02:306,R06:1789,R08:2603,R81:2805,R10:3716,R13:4900,R14:5519,R15:5899,R16:6273,R17:6651,R18:7039,R19:7455,R20:7696,R21:8194,R22:8734,R23:9394,SZ1:10054,SZ2:10594,SZ3:11134},
-  I:{
-    R01:0, R02:306, R06:1789, R13:4780, R14:5399, R15:5719,
-    DI1:  6332,
-    DI3:  7862,
-    DI8:  9627,
-    DI9: 10195,
-    DI12:11723,
-    DI13:12033,
-    DI14:13333,
-    DI131:12279,
-  },
-  IS:{
-    R01:0, R02:306, R06:1789, R13:4780, R14:5399, R15:5719,
-    DI1:  6332,
-    DI2:  7239,
-    DI3:  7979,
-    DI5:  8895,
-    DI6:  9628,
-    DI8: 10350,
-    DI9: 10878,
-    DI12:12406,
-    DI13:12716,
-    DI14:14016,
-    DI131:12962,
-  },
-  IL:{
-    R01:0, R02:306, R06:1789, R13:4780, R14:5399, R15:5719,
-    DI1:  6332,
-    DI2:  7239,
-    DI3:  7979,
-    DI4:  8597,
-    DI5:  9005,
-    DI6:  9738,
-    DI7: 10099,
-    DI8: 10667,
-    DI9: 11195,
-    DI10:12538,
-    DI11:13672,
-    DI12:13956,
-    DI13:14266,
-    DI14:15566,
-    DI131:14512,
-  },
-  H:{R01:0,R02:306,R06:1789,R10:3596,R14:5339,R15:5719,R16:6093,R17:6471,R18:6859,R19:7275,R20:7516,R21:8014},
-};
+/* RY_TT non è più usato per la RY: i tempi sono calcolati da
+   run-time-engine.js + ry-network.js (segmenti, km, dwell). */
+const RY_TT = {};
 
 const RY_FREQ = {
   L: {offpeak:1,  peak:2},
@@ -404,7 +353,7 @@ const KE_TT = {
   Cp: {K01:0,K02:360,K03:960,K31:1560,K32:2040,K33:2700,K08:3360,K09:3660,K10:4500,K11:4560,K12:5340},
   D:  {K101:0,K104:1175,K10:3659,K11:4420,K12:5247,K13:5963,K14:6671,K144:7121,K15:7395,K16:7992,K116:8485,K17:8842,N1:9355,N2:9812,N3:10500,N4:10884},
   E:  {K101:0,K104:1155,K160:2314,K10:3655,K12:5156,K17:8333,N1:8838,N2:9287,N3:9964,N4:10343},
-  F:  {K101:0,K102:190,K120:538,K103:1072,K104:1549,K105:2123,K106:2486,K160:3043,K10:4635,K11:5517,K12:6478,K13:7307,K14:8129,K144:8647,K15:8958,K16:9648,K116:10216,K17:10625,N1:11216,N2:11742,N3:12539,N4:12981},
+  F:  {K101:0,K102:190,K120:538,K103:1072,K104:1549,K105:2123,K106:2486,K160:3043,K10:4635,K11:5517,K12:6478,K13:7307,K14:8129,K144:8647,K15:8958,K16:9480,K116:10020,K17:10440,N1:11216,N2:11742,N3:12539,N4:12981},
 };
 
 const KE_FREQ = {
@@ -423,18 +372,6 @@ const KE_PEAK_WINDOWS = [
 
 /* ================================================================
    SEIBU NAERYUKU LINE (SN)
-   Branch da Riyatoma (R13) verso Yamagata — futura prosecuzione a Sanain
-   Servizi: K (via sub-branch SK) e G (schema alternato rapido/locale)
-   Cinematica: N700S a=0.72 m/s², dwell 60s, vmax 160 km/h
-   ----------------------------------------------------------------
-   Distanze e tempi cinematici:
-     SN01→SN02  34870 m  →  846s + 60s dwell = 906s  (15 min)
-     SN02→SN03  35720 m  →  865s + 60s dwell = 1831s (30 min)
-     SN03→SN04  26250 m  →  652s + 60s dwell = 2543s (42 min)
-     SN04→SN05  42800 m  → 1025s + 60s dwell = 3628s (60 min)
-     SN05→SN06  30900 m  →  757s + 60s dwell = 4445s (74 min)
-     SN06→SN07  24760 m  →  619s + 60s dwell = 5124s (85 min)
-     SN07→SN08  22940 m  →  578s             = 5762s (96 min)
 ================================================================ */
 const SN_ST = {
   SN01: {n:"Riyatoma",                    k:"\u8ffd\u5ea5",                       b:"main", km:0},
@@ -451,20 +388,10 @@ const SN_CANONICAL_ORDER = [
   "SN01","SN02","SN03","SN04","SN05","SN06","SN07","SN08"
 ];
 
-/* ----------------------------------------------------------------
-   SN_TT — offset in secondi da SN01 (Riyatoma)
-
-   Servizio K: ferma SN01 + SN05(Poridake), poi esce su sub-branch SK
-   Servizio G — schema alternato (phase):
-     G_rapid (phase 0, 1 tph): SN01, SN05, SN08
-     G_local (phase 1, 1 tph): tutte le stazioni
-   → 2 tph a SN05 e SN08, 1 tph nelle stazioni minori
----------------------------------------------------------------- */
 const SN_TT = {
   K: {
     SN01:    0,
     SN05: 3628,
-    /* prosegue su SK dopo SN05 */
   },
   G_rapid: {
     SN01:    0,
@@ -544,13 +471,11 @@ const IZX_LINES = {
     inboundDir:"NB", inboundLabel:"\u2191 Inbound \u2014 Sain\u00f0aul", outboundLabel:"\u2193 Outbound \u2014 Daishin",
     ST:KE_ST, CANONICAL:KE_CANONICAL_ORDER, SVC:KE_SVC,
     TT:KE_TT, FREQ:KE_FREQ, PEAK:KE_PEAK_WINDOWS,
-    /* Sainðaul Central (K01) è in interscambio con RY (R01) ed EI (E01) */
-    /* Asunahama Int'l Airport (K03) è in interscambio con AX (AX01)     */
     INTERCHANGE: {
-  K01: [{ hubId: 'HUB_SAINDAUL_CENTRAL' }],
-  K03: "AX01",
-  K101: [{ hubId: 'HUB_SAKAMUSO' }],
-},
+      K01: [{ hubId: 'HUB_SAINDAUL_CENTRAL' }],
+      K03: "AX01",
+      K101: [{ hubId: 'HUB_SAKAMUSO' }],
+    },
     TERMINUS_SPLIT:{
       A:[{terminus:"K17",weight:2},{terminus:"N4",weight:1}],
       B:[{terminus:"K17",weight:2},{terminus:"N4",weight:1}],
@@ -573,13 +498,12 @@ const IZX_LINES = {
       {svcId:"F", dir:"SB", cutoff:"23:12", terminus:"K10"},
       {svcId:"F", dir:"NB", cutoff:"23:12", terminus:"K10"},
     ],
-    /* ── TARIFF ─────────────────────────────────────────────── */
     tariff: {
       operator:   "IZX",
       zone:       "national",
-      category:   "intercity",   // servizio base = Semi-rapido B (coeff 1.00)
-      baseFixed:  4.50,          // quota fissa in Ė
-      basePer100: 0.195,         // tariffa per 100 km (primo scaglione)
+      category:   "intercity",
+      baseFixed:  4.50,
+      basePer100: 0.195,
       classes:    ["standard","blue_seat","yurani"],
     },
   },
@@ -588,13 +512,12 @@ const IZX_LINES = {
     id:"RY", label:"IZX Ry\u0101nkai", shortLabel:"Ry\u0101nkai",
     color:"#148466", textColor:"#ffffff",
     inboundDir:"NB", inboundLabel:"\u2191 Inbound \u2014 Sain\u00f0aul", outboundLabel:"\u2193 Outbound \u2014 Tsusamo",
-    ST:Object.assign({},RY_ST,DI_ST),
-    CANONICAL:RY_CANONICAL_ORDER.concat(DI_CANONICAL_ORDER),
+    ST: Object.assign({}, RY_ST, SA_ST, DI_ST),
+    CANONICAL: RY_CANONICAL_ORDER.concat(DI_CANONICAL_ORDER),
     SVC:RY_SVC, TT:RY_TT, FREQ:RY_FREQ, PEAK:RY_PEAK_WINDOWS,
-    /* Sainðaul Central (R01) è in interscambio con KE (K01) ed EI (E01) */
-    INTERCHANGE: { R01: "K01" },
+    INTERCHANGE: { R01: "K01", SA00: "R13" },
     TERMINUS_SPLIT:{
-      K:[{terminus:"BL05",weight:1},{terminus:"R21",weight:1}],
+      K:[{terminus:"SA09",weight:1},{terminus:"R21",weight:1}],
       J:[{terminus:"SA06",weight:1}],
       G:[{terminus:"R21", weight:1}],
       I:[{terminus:"DI14",weight:1}],
@@ -622,11 +545,10 @@ const IZX_LINES = {
       {svcId:"IL", dir:"SB", cutoff:"22:54", terminus:"R15"},
       {svcId:"IL", dir:"NB", cutoff:"22:54", terminus:"R15"},
     ],
-    /* ── TARIFF ─────────────────────────────────────────────── */
     tariff: {
       operator:   "IZX",
       zone:       "national",
-      category:   "intercity",   // servizio base = L All-Stop (coeff 0.92) → override per svc G/I
+      category:   "intercity",
       baseFixed:  4.50,
       basePer100: 0.195,
       classes:    ["standard","blue_seat","yurani"],
@@ -645,7 +567,6 @@ const IZX_LINES = {
     TT:  EI_TT,
     FREQ: EI_FREQ,
     PEAK: EI_PEAK_WINDOWS,
-    /* Sainðaul Central (E01) è in interscambio con KE (K01) e RY (R01) */
     INTERCHANGE: { E01: "K01" },
     TERMINUS_SPLIT: {
       M: [{terminus: "E12", weight: 1}],
@@ -656,11 +577,10 @@ const IZX_LINES = {
       {svcId:"M", dir:"SB", cutoff:"22:36", terminus:"E08"},
       {svcId:"N", dir:"SB", cutoff:"21:57", terminus:"E08"},
     ],
-    /* ── TARIFF ─────────────────────────────────────────────── */
     tariff: {
       operator:   "IZX",
       zone:       "national",
-      category:   "intercity",   // servizio base = N Domestic (coeff 1.00)
+      category:   "intercity",
       baseFixed:  4.50,
       basePer100: 0.195,
       classes:    ["standard","blue_seat","yurani"],
@@ -679,14 +599,12 @@ const IZX_LINES = {
     TT:  SN_TT,
     FREQ: SN_FREQ,
     PEAK: SN_PEAK_WINDOWS,
-    /* SN01 (Riyatoma) = interscambio con RY R13 */
     INTERCHANGE: {SN01: "R13"},
     TERMINUS_SPLIT: {
       K:       [{terminus: "SN05", weight: 1}],
       G_rapid: [{terminus: "SN08", weight: 1}],
       G_local: [{terminus: "SN08", weight: 1}],
     },
-    /* offset calcolati a partire da R13 Riyatoma — sfasati rispetto a G su RY */
     OFFSETS: {K: 5, G_rapid: 10, G_local: 40},
     SHORT_WORKING:[
       {svcId:"G_rapid", dir:"SB", cutoff:"23:05", terminus:"SN08"},
@@ -694,11 +612,10 @@ const IZX_LINES = {
       {svcId:"G_rapid", dir:"NB", cutoff:"23:05", terminus:"SN08"},
       {svcId:"G_local", dir:"NB", cutoff:"22:35", terminus:"SN08"},
     ],
-    /* ── TARIFF ─────────────────────────────────────────────── */
     tariff: {
       operator:   "IZX",
       zone:       "national",
-      category:   "rapido",      // SN è linea a minor frequenza con servizi prevalentemente rapidi
+      category:   "rapido",
       baseFixed:  4.50,
       basePer100: 0.195,
       classes:    ["standard","blue_seat"],
