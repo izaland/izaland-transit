@@ -43,17 +43,16 @@ const TTEngine = (() => {
   }
 
   function buildRyOffsets(svc, dir) {
-    const segMap = {};
-    for (const s of RY_SEGMENTS) segMap[`${s.from}>${s.to}`] = s.vLimit;
-    const segMap = {}, segKm = {};
-for (const s of RY_SEGMENTS) {
-  segMap[`${s.from}>${s.to}`] = s.vLimit;
-  segKm[`${s.from}>${s.to}`] = s.km;
-}
+  const segMap = {};
+  const segKm = {};
+  for (const s of RY_SEGMENTS) {
+    segMap[`${s.from}>${s.to}`] = s.vLimit;
+    segKm[`${s.from}>${s.to}`] = s.km;
+  }
 
-    const stopsRaw = svc.stops.filter(code =>
-      code.startsWith('R') || code.startsWith('SA') || code.startsWith('SK')
-    );
+  const stopsRaw = svc.stops.filter(code =>
+    code.startsWith('R') || code.startsWith('SA') || code.startsWith('SK')
+  );
     const stops = dir === 'NB' ? [...stopsRaw].reverse() : stopsRaw;
 
     const offsets = {};
