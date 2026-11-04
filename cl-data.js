@@ -55,6 +55,18 @@ const CL32 = {
   },
 };
 
+/* ================================================================
+   CL_INTERCHANGE — collegamenti della CityLiner con altre reti
+   Formato: codice CL → [codici stazioni di altre reti]
+   Per un transferMin personalizzato usare:
+     { code: 'XXXX', transferMin: N }
+================================================================ */
+const CL_INTERCHANGE = {
+  CL321: ['R19', 'SN01'],   // Riyatoma
+  CL326: ['SN05'],          // Poridake
+  // CL3211: ['...'],       // Tohpatogu — futuro
+};
+
 if (typeof module !== 'undefined') {
-  module.exports = { CL_ST, CL_CANONICAL_ORDER, CL_LINE, CL32 };
+  module.exports = { CL_ST, CL_CANONICAL_ORDER, CL_LINE, CL32, CL_INTERCHANGE };
 }
