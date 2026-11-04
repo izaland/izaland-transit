@@ -256,6 +256,7 @@ function _clSearch(from, to, depTime) {
         const i = stops.findIndex(s => s.code === from);
         const j = stops.findIndex(s => s.code === to);
         if (i === -1 || j === -1 || j <= i) continue;
+        if (stops[i].arrival == null || stops[j].arrival == null) continue; 
 
         const boardMin = _clMin(stops[i].arrival);
         if (boardMin < depMin) continue;
@@ -275,12 +276,14 @@ function _clSearch(from, to, depTime) {
           alightName: CL_ST[to].n,
           alightArr: stops[j].arrival,
           km: CL_ST[to].km - CL_ST[from].km,
-          intermediateStops: stops.slice(i + 1, j).map(s => ({
-            code: s.code,
-            name: CL_ST[s.code].n,
-            arr: s.arrival,
-            dep: s.arrival,
-          })),
+          intermediateStops: stops.slice(i + 1, j)
+            .filter(s => s.arrival != null)
+            .map(s => ({
+              code: s.code,
+              name: CL_ST[s.code].n,
+              arr: s.arrival,
+              dep: s.arrival,
+            })),
         };
 
         out.push({
