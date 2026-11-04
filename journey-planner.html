@@ -319,6 +319,7 @@ IZXUnifiedRouter.registerRouter('CL', {
 // 2. Costruisci l'interchange index cross-network
 (function _buildIx() {
   const pairs = [];
+
   // IZX_LINES interchange
   for (const line of Object.values(IZX_LINES)) {
     if (line.INTERCHANGE) {
@@ -330,23 +331,34 @@ IZXUnifiedRouter.registerRouter('CL', {
         for (const b of partners) pairs.push({ codeA: a, codeB: b });
     }
   }
+
   // Suburban interchange
   if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
     for (const [a, arr] of Object.entries(SUBURBAN_INTERCHANGE))
       for (const e of arr) pairs.push({ codeA: a, codeB: e.code ?? e, transferMin: e.transferMin });
   }
+
   // Metro interchanges (M4_INTERCHANGE + MetroRouter.allInterchanges())
-if (typeof MetroRouter !== 'undefined') {
-  MetroRouter.allInterchanges().forEach(ix =>
-    pairs.push({ codeA: ix.codeA, codeB: ix.codeB, transferMin: ix.transferMin })
-  );
-}
-// M4_INTERCHANGE (cross-network: metro ↔ IZX/suburban)
-if (typeof M4_INTERCHANGE !== 'undefined') {
-  for (const [a, arr] of Object.entries(M4_INTERCHANGE))
-    for (const e of arr)
-      pairs.push({ codeA: a, codeB: e.code ?? e, transferMin: e.transferMin });
-}
+  if (typeof MetroRouter !== 'undefined') {
+    MetroRouter.allInterchanges().forEach(ix =>
+      pairs.push({ codeA: ix.codeA, codeB: ix.codeB, transferMin: ix.transferMin })
+    );
+  }
+
+  // M4_INTERCHANGE (cross-network: metro ↔ IZX/suburban)
+  if (typeof M4_INTERCHANGE !== 'undefined') {
+    for (const [a, arr] of Object.entries(M4_INTERCHANGE))
+      for (const e of arr)
+        pairs.push({ codeA: a, codeB: e.code ?? e, transferMin: e.transferMin });
+  }
+
+  // CityLiner (CL) — interscambi da cl-data.js
+  if (typeof CL_INTERCHANGE !== 'undefined') {
+    for (const [a, arr] of Object.entries(CL_INTERCHANGE))
+      for (const b of arr)
+        pairs.push({ codeA: a, codeB: b, transferMin: 5 });
+  }
+
   IZXUnifiedRouter.buildInterchangeIndex(pairs);
 })();
 
