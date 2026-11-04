@@ -30,7 +30,7 @@ const CL_LINE = {
   code: 'CL',
   name: 'CityLiner',
   nameIZ: 'ટાઠાધ૩પદ્',
-  color: '#TODO',
+  color: '#9e9e9e',
   totalKm: 262.671,
 };
 
