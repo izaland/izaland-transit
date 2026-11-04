@@ -45,6 +45,11 @@ const TTEngine = (() => {
   function buildRyOffsets(svc, dir) {
     const segMap = {};
     for (const s of RY_SEGMENTS) segMap[`${s.from}>${s.to}`] = s.vLimit;
+    const segMap = {}, segKm = {};
+for (const s of RY_SEGMENTS) {
+  segMap[`${s.from}>${s.to}`] = s.vLimit;
+  segKm[`${s.from}>${s.to}`] = s.km;
+}
 
     const stopsRaw = svc.stops.filter(code =>
       code.startsWith('R') || code.startsWith('SA') || code.startsWith('SK')
@@ -59,7 +64,7 @@ const TTEngine = (() => {
       const revKey = `${b}>${a}`;
       const vLimit = segMap[key] ?? segMap[revKey];
       if (vLimit == null) continue;
-      const km = 0; // TODO: plug real per-segment km when available
+      const km = segKm[key] ?? segKm[revKey];
       const runSec = RunTimeEngine.segmentRunSec(km, vLimit);
       const dwell = RunTimeEngine.dwellSec(b, RY_DWELL);
       offsets[b] = offsets[a] + runSec + dwell;
