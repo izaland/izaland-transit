@@ -3,6 +3,10 @@
    Generatore orari per i pattern R01 (tutte le fermate) e
    R02 (espresso). Le partenze di ritorno da Tohpatogu derivano
    dall'arrivo della corsa in discesa + 15 min di layover.
+
+   FIX: gli arrivi usano l'indice della stazione nella lista
+   completa CL_CANONICAL_ORDER, così i pattern ridotti (R02)
+   leggono il cumulativo corretto e non producono arrivi null.
 ================================================================ */
 'use strict';
 
@@ -41,15 +45,14 @@ function clMinutesToHHMM(min) {
 
 function clBuildTimetable(patternId) {
   const p = CL32_PATTERNS[patternId];
-  const lastIdx = p.stops.length - 1;
   const down = [];
   const up = [];
 
   for (const dep of p.departures) {
     const [h, m] = dep.split(':').map(Number);
     const depMin = h * 60 + m;
-    const arriveMin = depMin + p.cum[lastIdx];
-    const cum = p.cum;
+    const lastCum = p.cum[CL_CANONICAL_ORDER.indexOf(p.stops[p.stops.length - 1])];
+    const arriveMin = depMin + lastCum;
 
     down.push({
       service: 'CL32',
@@ -57,24 +60,29 @@ function clBuildTimetable(patternId) {
       from: 'CL321',
       to: 'CL3211',
       departure: dep,
-      arrivals: p.stops.map((code, i) => ({
-        code,
-        arrival: cum[i] === null ? null : clMinutesToHHMM(depMin + cum[i]),
-      })),
+      arrivals: p.stops.map(code => {
+        const idx = CL_CANONICAL_ORDER.indexOf(code);
+        return {
+          code,
+          arrival: p.cum[idx] == null ? null : clMinutesToHHMM(depMin + p.cum[idx]),
+        };
+      }),
     });
 
     const upDepMin = arriveMin + CL32_LAYOVER_MIN;
+
     up.push({
       service: 'CL32',
       pattern: patternId,
       from: 'CL3211',
       to: 'CL321',
       departure: clMinutesToHHMM(upDepMin),
-      arrivals: p.stops.slice().reverse().map((code) => {
-        const idx = p.stops.indexOf(code);
+      arrivals: p.stops.slice().reverse().map(code => {
+        const idx = CL_CANONICAL_ORDER.indexOf(code);
         return {
           code,
-          arrival: cum[idx] === null ? null : clMinutesToHHMM(upDepMin + (p.cum[lastIdx] - cum[idx])),
+          arrival: p.cum[idx] == null ? null
+            : clMinutesToHHMM(upDepMin + (lastCum - p.cum[idx])),
         };
       }),
     });
