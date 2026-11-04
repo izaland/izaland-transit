@@ -1,12 +1,12 @@
 /* ================================================================
    CL-TT.JS — CityLiner (CL) · Servizio CL32 "Nijisnore"
-   Generatore orari per i pattern R01 (tutte le fermate) e
-   R02 (espresso). Le partenze di ritorno da Tohpatogu derivano
-   dall'arrivo della corsa in discesa + 15 min di layover.
+   Orari SIMMETRICI: R01 e R02 partono da entrambi i capolinea.
+   R01 (tutte le fermate): 06:30–18:30 ogni 2h
+   R02 (espresso):         07:30–19:30 ogni 2h
+   Sovrapposizione: un treno ogni ora nelle stazioni principali.
 
-   FIX: gli arrivi usano l'indice della stazione nella lista
-   completa CL_CANONICAL_ORDER, così i pattern ridotti (R02)
-   leggono il cumulativo corretto e non producono arrivi null.
+   Gli arrivi usano l'indice della stazione nella lista completa
+   CL_CANONICAL_ORDER, così anche R02 legge i cumulativi giusti.
 ================================================================ */
 'use strict';
 
@@ -25,16 +25,18 @@ const CL32_PATTERNS = {
   R01: {
     stops: CL_CANONICAL_ORDER,
     cum: CL32_R01_CUM_MIN,
-    departures: ['06:30', '08:30', '10:30', '12:30', '14:30', '16:30', '18:30'],
+    downDepartures: ['06:30', '08:30', '10:30', '12:30', '14:30', '16:30', '18:30'],
+    upDepartures:   ['06:30', '08:30', '10:30', '12:30', '14:30', '16:30', '18:30'],
   },
   R02: {
     stops: ['CL321', 'CL323', 'CL324', 'CL325', 'CL326', 'CL329', 'CL3211'],
     cum: CL32_R02_CUM_MIN,
-    departures: ['07:30', '09:30', '11:30', '13:30', '15:30', '17:30', '19:30'],
+    downDepartures: ['07:30', '09:30', '11:30', '13:30', '15:30', '17:30', '19:30'],
+    upDepartures:   ['07:30', '09:30', '11:30', '13:30', '15:30', '17:30', '19:30'],
   },
 };
 
-const CL32_LAYOVER_MIN = 15;
+const CL32_LAYOVER_MIN = 15; // riferimento operativo, non usato per derivare le partenze
 
 function clMinutesToHHMM(min) {
   const m = ((Math.round(min) % 1440) + 1440) % 1440;
@@ -48,11 +50,9 @@ function clBuildTimetable(patternId) {
   const down = [];
   const up = [];
 
-  for (const dep of p.departures) {
+  for (const dep of p.downDepartures) {
     const [h, m] = dep.split(':').map(Number);
     const depMin = h * 60 + m;
-    const lastCum = p.cum[CL_CANONICAL_ORDER.indexOf(p.stops[p.stops.length - 1])];
-    const arriveMin = depMin + lastCum;
 
     down.push({
       service: 'CL32',
@@ -68,21 +68,25 @@ function clBuildTimetable(patternId) {
         };
       }),
     });
+  }
 
-    const upDepMin = arriveMin + CL32_LAYOVER_MIN;
+  for (const dep of p.upDepartures) {
+    const [h, m] = dep.split(':').map(Number);
+    const depMin = h * 60 + m;
+    const lastCum = p.cum[CL_CANONICAL_ORDER.indexOf(p.stops[p.stops.length - 1])];
 
     up.push({
       service: 'CL32',
       pattern: patternId,
       from: 'CL3211',
       to: 'CL321',
-      departure: clMinutesToHHMM(upDepMin),
+      departure: dep,
       arrivals: p.stops.slice().reverse().map(code => {
         const idx = CL_CANONICAL_ORDER.indexOf(code);
         return {
           code,
           arrival: p.cum[idx] == null ? null
-            : clMinutesToHHMM(upDepMin + (lastCum - p.cum[idx])),
+            : clMinutesToHHMM(depMin + (lastCum - p.cum[idx])),
         };
       }),
     });
