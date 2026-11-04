@@ -242,7 +242,7 @@ if (typeof MetroRouter !== 'undefined')
 IZXUnifiedRouter.registerRouter('CL', {
   allStations: () => Object.entries(CL_ST).map(([code, s]) => ({ code, name: s.n })),
   hasStation: (code) => !!CL_ST[code],
-  search: (from, to, depTime, opts) => /* ricerca su CL32_TIMETABLE */,
+  search: (from, to, depTime, opts) => [],
 });
 
 // 2. Costruisci l'interchange index cross-network
