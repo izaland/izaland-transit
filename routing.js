@@ -18,6 +18,13 @@
      - Percorso diretto (stesso servizio, stessa linea)
      - Percorso con un cambio (transfer in una stazione di interscambio)
    Tempo di interscambio: TRANSFER_MIN (default 5 minuti).
+
+   PERF 1:
+     - La fase diretta di search() fa UNA query TTEngine per
+       (linea, direzione) con tutti i servizi, poi raggruppa i trip
+       per svcId in memoria: N servizi per linea = N volte meno query.
+     - Cache LRU delle query TTEngine (_ttQuery, max 800) condivisa
+       da nextTrip, nextTrips e _diagnoseBuildLeg.
 ================================================================ */
 
 const IZXRouter = (() => {
@@ -28,6 +35,20 @@ const IZXRouter = (() => {
   const SEARCH_WINDOW  = 3 * 3600;
 
   const AX_SVC_VARIANTS = new Set(['EST', 'BAJ', 'SAK']);
+
+  const _ttCache = new Map();
+  const TT_CACHE_MAX = 800;
+
+  function _ttQuery(params) {
+    const key = JSON.stringify(params);
+    if (_ttCache.has(key)) return _ttCache.get(key);
+    const res = TTEngine.query(params);
+    if (_ttCache.size >= TT_CACHE_MAX) {
+      _ttCache.delete(_ttCache.keys().next().value);
+    }
+    _ttCache.set(key, res);
+    return res;
+  }
 
   function _lineFilter(opts) {
     const raw = opts.lines;
@@ -155,106 +176,125 @@ const IZXRouter = (() => {
     return iTerm < iAlight;
   }
 
+  function _tripValid(lineId, trip, boardCode, alightCode, minDepSec) {
+    const { hmToSec } = TTEngine;
+
+    if (alightCode && !trip.stops[alightCode]) {
+      const line = IZX_LINES[lineId];
+      const svc = line && line.SVC[trip.svcId];
+      const cond = svc && svc.conditionalStops && svc.conditionalStops[alightCode];
+      if (cond) return null;
+
+      const precedes = _terminusPrecedesAlight(trip, lineId, alightCode);
+      if (precedes === true) return null;
+      if (precedes === false) {
+        console.warn(
+          `[IZXRouter] Trip ${trip._uid}: terminus ${trip.terminus} is beyond` +
+          ` alightCode ${alightCode} but stop is missing from trip.stops.`
+        );
+      }
+      return null;
+    }
+
+    const boardStop  = trip.stops[boardCode];
+    if (!boardStop) return null;
+    const alightStop = alightCode ? trip.stops[alightCode] : null;
+
+    const boardSec  = hmToSec(boardStop.dep);
+    const alightSec = alightStop ? hmToSec(alightStop.arr ?? alightStop.dep) : null;
+
+    if (alightSec !== null && alightSec <= boardSec) return null;
+    if (boardSec < minDepSec) return null;
+
+    return { trip, boardStop, alightStop, boardSec, alightSec };
+  }
+
+  function _ttWindow(minDepSec) {
+    const { secToHM } = TTEngine;
+    return {
+      fromTime: secToHM(minDepSec),
+      toTime:   secToHM(Math.min(minDepSec + SEARCH_WINDOW, 88140)),
+    };
+  }
+
   function nextTrip(lineId, svcId, boardCode, minDepSec, alightCode) {
-    const { hmToSec, secToHM } = TTEngine;
-    const fromHM = secToHM(minDepSec);
-    const toHM   = secToHM(Math.min(minDepSec + SEARCH_WINDOW, 88140));
+    const win = _ttWindow(minDepSec);
     let best = null;
     for (const dir of ["SB", "NB"]) {
-      const trips = TTEngine.query({
+      const trips = _ttQuery({
         lines:     lineId,
         station:   boardCode,
         direction: dir,
-        fromTime:  fromHM,
-        toTime:    toHM,
+        fromTime:  win.fromTime,
+        toTime:    win.toTime,
         services:  [svcId],
       });
       for (const trip of trips) {
-        if (alightCode && !trip.stops[alightCode]) {
-          const line = IZX_LINES[lineId];
-          const svc = line && line.SVC[trip.svcId];
-          const cond = svc && svc.conditionalStops && svc.conditionalStops[alightCode];
-          if (cond) continue;
-
-          const precedes = _terminusPrecedesAlight(trip, lineId, alightCode);
-          if (precedes === true) {
-            continue;
-          } else if (precedes === false) {
-            console.warn(
-              `[IZXRouter] Trip ${trip._uid}: terminus ${trip.terminus} is beyond` +
-              ` alightCode ${alightCode} but stop is missing from trip.stops.` +
-              ` Possible data error in TT/${svcId}.`
-            );
-          }
-          continue;
-        }
-        const boardStop  = trip.stops[boardCode];
-        const alightStop = alightCode ? trip.stops[alightCode] : null;
-        if (!boardStop) continue;
-        const boardSec  = hmToSec(boardStop.dep);
-        const alightSec = alightStop ? hmToSec(alightStop.arr ?? alightStop.dep) : null;
-        if (alightSec !== null && alightSec <= boardSec) continue;
-        if (boardSec >= minDepSec) {
-          if (!best || boardSec < hmToSec(best.boardStop.dep)) {
-            best = { trip, boardStop, alightStop, boardSec, alightSec };
-          }
-        }
+        const found = _tripValid(lineId, trip, boardCode, alightCode, minDepSec);
+        if (!found) continue;
+        if (!best || found.boardSec < best.boardSec) best = found;
       }
     }
     return best;
   }
 
   function nextTrips(lineId, svcId, boardCode, minDepSec, alightCode, limit = 3) {
-    const { hmToSec, secToHM } = TTEngine;
-    const fromHM = secToHM(minDepSec);
-    const toHM   = secToHM(Math.min(minDepSec + SEARCH_WINDOW, 88140));
-
+    const win = _ttWindow(minDepSec);
     const found = [];
-
     for (const dir of ["SB", "NB"]) {
-      const trips = TTEngine.query({
+      const trips = _ttQuery({
         lines:     lineId,
         station:   boardCode,
         direction: dir,
-        fromTime:  fromHM,
-        toTime:    toHM,
+        fromTime:  win.fromTime,
+        toTime:    win.toTime,
         services:  [svcId],
       });
-
       for (const trip of trips) {
-        if (alightCode && !trip.stops[alightCode]) {
-          const line = IZX_LINES[lineId];
-          const svc = line && line.SVC[trip.svcId];
-          const cond = svc && svc.conditionalStops && svc.conditionalStops[alightCode];
-          if (cond) continue;
-
-          const precedes = _terminusPrecedesAlight(trip, lineId, alightCode);
-          if (precedes === true) continue;
-          if (precedes === false) {
-            console.warn(
-              `[IZXRouter] Trip ${trip._uid}: terminus ${trip.terminus} is beyond` +
-              ` alightCode ${alightCode} but stop is missing from trip.stops.`
-            );
-          }
-          continue;
-        }
-
-        const boardStop  = trip.stops[boardCode];
-        const alightStop = alightCode ? trip.stops[alightCode] : null;
-        if (!boardStop) continue;
-
-        const boardSec  = hmToSec(boardStop.dep);
-        const alightSec = alightStop ? hmToSec(alightStop.arr ?? alightStop.dep) : null;
-
-        if (alightSec !== null && alightSec <= boardSec) continue;
-        if (boardSec < minDepSec) continue;
-
-        found.push({ trip, boardStop, alightStop, boardSec, alightSec });
+        const foundTrip = _tripValid(lineId, trip, boardCode, alightCode, minDepSec);
+        if (foundTrip) found.push(foundTrip);
       }
     }
-
     found.sort((a, b) => a.boardSec - b.boardSec);
+    const out = [];
+    const seen = new Set();
+    for (const f of found) {
+      const key = f.trip._uid ?? `${f.boardSec}:${f.trip.trainNumber ?? ''}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(f);
+      if (out.length >= limit) break;
+    }
+    return out;
+  }
 
+  function _lineTripsByService(lineId, boardCode, minDepSec) {
+    const win = _ttWindow(minDepSec);
+    const bySvc = {};
+    for (const dir of ["SB", "NB"]) {
+      const trips = _ttQuery({
+        lines:     lineId,
+        station:   boardCode,
+        direction: dir,
+        fromTime:  win.fromTime,
+        toTime:    win.toTime,
+      });
+      for (const trip of trips) {
+        const svcId = trip.svcId;
+        if (!bySvc[svcId]) bySvc[svcId] = [];
+        bySvc[svcId].push(trip);
+      }
+    }
+    return bySvc;
+  }
+
+  function _pickTrips(lineId, trips, boardCode, alightCode, minDepSec, limit = 3) {
+    const found = [];
+    for (const trip of trips || []) {
+      const foundTrip = _tripValid(lineId, trip, boardCode, alightCode, minDepSec);
+      if (foundTrip) found.push(foundTrip);
+    }
+    found.sort((a, b) => a.boardSec - b.boardSec);
     const out = [];
     const seen = new Set();
     for (const f of found) {
@@ -268,20 +308,19 @@ const IZXRouter = (() => {
   }
 
   function _diagnoseBuildLeg(lineId, svcId, boardCode, alightCode, minDepSec) {
-    const { hmToSec, secToHM } = TTEngine;
-    const fromHM = secToHM(minDepSec);
-    const toHM   = secToHM(Math.min(minDepSec + SEARCH_WINDOW, 88140));
+    const { hmToSec } = TTEngine;
+    const win = _ttWindow(minDepSec);
 
     let foundAny = false;
     let shortWorkingTerminus = null;
 
     for (const dir of ["SB", "NB"]) {
-      const trips = TTEngine.query({
+      const trips = _ttQuery({
         lines:     lineId,
         station:   boardCode,
         direction: dir,
-        fromTime:  fromHM,
-        toTime:    toHM,
+        fromTime:  win.fromTime,
+        toTime:    win.toTime,
         services:  [svcId],
       });
       for (const trip of trips) {
@@ -420,10 +459,12 @@ const IZXRouter = (() => {
       const hasTo   = line.ST[to]   !== undefined;
       if (!hasFrom || !hasTo) continue;
 
+      const tripsBySvc = _lineTripsByService(lineId, from, depSec);
+
       for (const svcId of Object.keys(line.SVC)) {
         if (lineId !== 'RY' && !line.TT[svcId]) continue;
 
-        const trips = nextTrips(lineId, svcId, from, depSec, to, 3);
+        const trips = _pickTrips(lineId, tripsBySvc[svcId], from, to, depSec, 3);
 
         if (!trips.length) {
           const diag = _diagnoseBuildLeg(lineId, svcId, from, to, depSec);
@@ -535,25 +576,25 @@ const IZXRouter = (() => {
     }
     const lines = [];
     lines.push(
-      `Partenza ${j.departureTime} \u2192 Arrivo ${j.arrivalTime}` +
+      `Partenza ${j.departureTime} \\u2192 Arrivo ${j.arrivalTime}` +
       ` (${j.totalMinutes} min, ${j.transfers} cambio/i` +
       (j.totalKm != null ? `, ${j.totalKm.toFixed(1)} km` : '') + ')'
     );
     for (const [i, leg] of j.legs.entries()) {
       lines.push(
         `  Tratto ${i + 1}: [${leg.svcLogical}/${leg.svcId}] ${leg.svcName}` +
-        ` \u00b7 ${leg.boardName} ${leg.boardDep} \u2192 ${leg.alightName} ${leg.alightArr}` +
-        (leg.km != null ? ` \u00b7 ${leg.km.toFixed(1)} km` : '') +
-        ` \u00b7 Treno ${leg.trainNumber ?? "--"}`
+        ` \\u00b7 ${leg.boardName} ${leg.boardDep} \\u2192 ${leg.alightName} ${leg.alightArr}` +
+        (leg.km != null ? ` \\u00b7 ${leg.km.toFixed(1)} km` : '') +
+        ` \\u00b7 Treno ${leg.trainNumber ?? "--"}`
       );
       if (i < j.legs.length - 1) {
         lines.push(
-          `    \u2195 Cambio a ${stationName(j.transferNodes[i])}` +
-          ` \u2014 attesa ${j.transferWaitMin ?? TRANSFER_MIN} min`
+          `    \\u2195 Cambio a ${stationName(j.transferNodes[i])}` +
+          ` \\u2014 attesa ${j.transferWaitMin ?? TRANSFER_MIN} min`
         );
       }
     }
-    return lines.join("\n");
+    return lines.join("\\n");
   }
 
   return {
