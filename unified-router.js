@@ -513,10 +513,10 @@ if (!partners) {
 if (!partners.length) continue;
 
         const j1list = _safeSearch(
-          router1, fNode.networkId,
-          fNode.code, midSt.code, depTime,
-          { ...opts, maxResults: 2, directOnly: true }
-        );
+  router1, fNode.networkId,
+  fNode.code, midSt.code, depTime,
+  { ...opts, maxResults: 2, directOnly: !!opts.directOnly }
+);
         if (!j1list.length) continue;
 
         for (const partner of partners) {
@@ -546,10 +546,10 @@ if (!partners.length) continue;
         if (!partners1.length) continue;
 
         const j1list = _safeSearch(
-          router1, fNode.networkId,
-          fNode.code, midSt1.code, depTime,
-          { ...opts, maxResults: 2, directOnly: true }
-        );
+  router1, fNode.networkId,
+  fNode.code, midSt.code, depTime,
+  { ...opts, maxResults: 2, directOnly: !!opts.directOnly }
+);
         if (!j1list.length) continue;
 
         for (const p1 of partners1) {
