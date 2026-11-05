@@ -43,33 +43,49 @@ const TTEngine = (() => {
   }
 
   function buildRyOffsets(svc, dir) {
-  const segMap = {};
-  const segKm = {};
+  const adj = {};
   for (const s of RY_SEGMENTS) {
-    segMap[`${s.from}>${s.to}`] = s.vLimit;
-    segKm[`${s.from}>${s.to}`] = s.km;
+    (adj[s.from] ??= []).push(s);
+    (adj[s.to] ??= []).push({ from: s.to, to: s.from, km: s.km, vLimit: s.vLimit });
+  }
+
+  function pathSec(a, b) {
+    const prev = new Map([[a, null]]);
+    const q = [a];
+    while (q.length) {
+      const cur = q.shift();
+      if (cur === b) break;
+      for (const e of (adj[cur] || [])) {
+        if (!prev.has(e.to)) { prev.set(e.to, { node: cur, seg: e }); q.push(e.to); }
+      }
+    }
+    if (!prev.has(b)) return null;
+
+    let sec = 0, node = b;
+    while (prev.get(node)) {
+      const { node: p, seg } = prev.get(node);
+      sec += RunTimeEngine.segmentRunSec(seg.km, seg.vLimit);
+      sec += RunTimeEngine.dwellSec(p, RY_DWELL);
+      node = p;
+    }
+    return sec;
   }
 
   const stopsRaw = svc.stops.filter(code =>
     code.startsWith('R') || code.startsWith('SA') || code.startsWith('SK')
   );
-    const stops = dir === 'NB' ? [...stopsRaw].reverse() : stopsRaw;
+  const stops = dir === 'NB' ? [...stopsRaw].reverse() : stopsRaw;
 
-    const offsets = {};
-    offsets[stops[0]] = 0;
-    for (let i = 0; i < stops.length - 1; i++) {
-      const a = stops[i], b = stops[i + 1];
-      const key = `${a}>${b}`;
-      const revKey = `${b}>${a}`;
-      const vLimit = segMap[key] ?? segMap[revKey];
-      if (vLimit == null) continue;
-      const km = segKm[key] ?? segKm[revKey];
-      const runSec = RunTimeEngine.segmentRunSec(km, vLimit);
-      const dwell = RunTimeEngine.dwellSec(b, RY_DWELL);
-      offsets[b] = offsets[a] + runSec + dwell;
-    }
-    return { stops, offsets };
+  const offsets = {};
+  offsets[stops[0]] = 0;
+  for (let i = 0; i < stops.length - 1; i++) {
+    const a = stops[i], b = stops[i + 1];
+    const sec = pathSec(a, b);
+    if (sec == null) continue;
+    offsets[b] = offsets[a] + sec;
   }
+  return { stops, offsets };
+}
 
   function generateTripsForService(lineId, svcId, dir, fromSec, toSec) {
     const line = IZX_LINES[lineId];
