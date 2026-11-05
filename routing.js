@@ -18,34 +18,6 @@
      - Percorso diretto (stesso servizio, stessa linea)
      - Percorso con un cambio (transfer in una stazione di interscambio)
    Tempo di interscambio: TRANSFER_MIN (default 5 minuti).
-
-   FIX (SHORT_WORKING + nextTrip):
-     nextTrip ora usa trip.terminus (esposto da tt-engine FIX) per
-     distinguere tre casi quando alightCode è assente da trip.stops:
-       a) terminus prima di alightCode nella sequenza → skip silenzioso
-          (comportamento corretto: il treno termina prima)
-       b) terminus dopo/uguale ad alightCode ma stop mancante →
-          console.warn (anomalia dati) + skip
-       c) terminus non disponibile (dato vecchio) → skip silenzioso
-          come prima
-
-   FIX 11 (short-working no-results transparency):
-     Quando tutti i trip di un svcId terminano prima di alightCode
-     per regole SHORT_WORKING, buildLeg restituisce null e il
-     journey sparisce silenziosamente. Aggiunto _diagnoseBuildLeg()
-     che rileva questo caso e fa sì che search() emetta un journey
-     sintetico con { noService: true, noServiceReason: 'short_working',
-     noServiceTerminus, noServiceLine, noServiceSvc } invece di
-     restituire zero risultati. Il frontend usa questo flag per
-     mostrare un avviso "Ultimo servizio fino a <terminus>".
-     Inoltre nextTrip cappа toHM a '24:29' per evitare overflow
-     quando minDepSec + SEARCH_WINDOW supera SERVICE_END.
-
-   FIX 20 (RY TT generato a runtime):
-     La rete RY non ha orari statici (RY_TT = {}): i trip sono
-     generati da TTEngine tramite RY_SEGMENTS. Le guardie
-     `!line.TT[svcId]` devono quindi esentare la RY, altrimenti
-     IZXRouter.search() salta tutti i servizi Ryānkai.
 ================================================================ */
 
 const IZXRouter = (() => {
@@ -121,11 +93,11 @@ const IZXRouter = (() => {
         nameMap[key].push(code);
       }
     }
-    for (const group of Object.values(nameMap)) {
-      if (group.length < 2) continue;
-      for (let i = 0; i < group.length; i++)
-        for (let j = i + 1; j < group.length; j++)
-          add(group[i], group[j]);
+    for (const entries of Object.values(nameMap)) {
+      if (entries.length < 2) continue;
+      for (let i = 0; i < entries.length; i++)
+        for (let j = i + 1; j < entries.length; j++)
+          add(entries[i], entries[j]);
     }
     const result = {};
     for (const [k, v] of Object.entries(map)) result[k] = [...v];
@@ -198,13 +170,13 @@ const IZXRouter = (() => {
         services:  [svcId],
       });
       for (const trip of trips) {
-  if (alightCode && !trip.stops[alightCode]) {
-    const line = IZX_LINES[lineId];
-    const svc = line && line.SVC[trip.svcId];
-    const cond = svc && svc.conditionalStops && svc.conditionalStops[alightCode];
-    if (cond) continue;
+        if (alightCode && !trip.stops[alightCode]) {
+          const line = IZX_LINES[lineId];
+          const svc = line && line.SVC[trip.svcId];
+          const cond = svc && svc.conditionalStops && svc.conditionalStops[alightCode];
+          if (cond) continue;
 
-    const precedes = _terminusPrecedesAlight(trip, lineId, alightCode);
+          const precedes = _terminusPrecedesAlight(trip, lineId, alightCode);
           if (precedes === true) {
             continue;
           } else if (precedes === false) {
@@ -232,69 +204,68 @@ const IZXRouter = (() => {
     return best;
   }
 
-   function nextTrips(lineId, svcId, boardCode, minDepSec, alightCode, limit = 3) {
-  const { hmToSec, secToHM } = TTEngine;
-  const fromHM = secToHM(minDepSec);
-  const toHM   = secToHM(Math.min(minDepSec + SEARCH_WINDOW, 88140));
+  function nextTrips(lineId, svcId, boardCode, minDepSec, alightCode, limit = 3) {
+    const { hmToSec, secToHM } = TTEngine;
+    const fromHM = secToHM(minDepSec);
+    const toHM   = secToHM(Math.min(minDepSec + SEARCH_WINDOW, 88140));
 
-  const found = [];
+    const found = [];
 
-  for (const dir of ["SB", "NB"]) {
-    const trips = TTEngine.query({
-      lines:     lineId,
-      station:   boardCode,
-      direction: dir,
-      fromTime:  fromHM,
-      toTime:    toHM,
-      services:  [svcId],
-    });
+    for (const dir of ["SB", "NB"]) {
+      const trips = TTEngine.query({
+        lines:     lineId,
+        station:   boardCode,
+        direction: dir,
+        fromTime:  fromHM,
+        toTime:    toHM,
+        services:  [svcId],
+      });
 
-    for (const trip of trips) {
-      if (alightCode && !trip.stops[alightCode]) {
-        const line = IZX_LINES[lineId];
-        const svc = line && line.SVC[trip.svcId];
-        const cond = svc && svc.conditionalStops && svc.conditionalStops[alightCode];
-        if (cond) continue;
+      for (const trip of trips) {
+        if (alightCode && !trip.stops[alightCode]) {
+          const line = IZX_LINES[lineId];
+          const svc = line && line.SVC[trip.svcId];
+          const cond = svc && svc.conditionalStops && svc.conditionalStops[alightCode];
+          if (cond) continue;
 
-        const precedes = _terminusPrecedesAlight(trip, lineId, alightCode);
-        if (precedes === true) continue;
-        if (precedes === false) {
-          console.warn(
-            `[IZXRouter] Trip ${trip._uid}: terminus ${trip.terminus} is beyond` +
-            ` alightCode ${alightCode} but stop is missing from trip.stops.`
-          );
+          const precedes = _terminusPrecedesAlight(trip, lineId, alightCode);
+          if (precedes === true) continue;
+          if (precedes === false) {
+            console.warn(
+              `[IZXRouter] Trip ${trip._uid}: terminus ${trip.terminus} is beyond` +
+              ` alightCode ${alightCode} but stop is missing from trip.stops.`
+            );
+          }
+          continue;
         }
-        continue;
+
+        const boardStop  = trip.stops[boardCode];
+        const alightStop = alightCode ? trip.stops[alightCode] : null;
+        if (!boardStop) continue;
+
+        const boardSec  = hmToSec(boardStop.dep);
+        const alightSec = alightStop ? hmToSec(alightStop.arr ?? alightStop.dep) : null;
+
+        if (alightSec !== null && alightSec <= boardSec) continue;
+        if (boardSec < minDepSec) continue;
+
+        found.push({ trip, boardStop, alightStop, boardSec, alightSec });
       }
-
-      const boardStop  = trip.stops[boardCode];
-      const alightStop = alightCode ? trip.stops[alightCode] : null;
-      if (!boardStop) continue;
-
-      const boardSec  = hmToSec(boardStop.dep);
-      const alightSec = alightStop ? hmToSec(alightStop.arr ?? alightStop.dep) : null;
-
-      if (alightSec !== null && alightSec <= boardSec) continue;
-      if (boardSec < minDepSec) continue;
-
-      found.push({ trip, boardStop, alightStop, boardSec, alightSec });
     }
-  }
 
-  // Ordina per partenza e restituisce le prime `limit` corse distinte
-  found.sort((a, b) => a.boardSec - b.boardSec);
+    found.sort((a, b) => a.boardSec - b.boardSec);
 
-  const out = [];
-  const seen = new Set();
-  for (const f of found) {
-    const key = f.trip._uid;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(f);
-    if (out.length >= limit) break;
+    const out = [];
+    const seen = new Set();
+    for (const f of found) {
+      const key = f.trip._uid ?? `${f.boardSec}:${f.trip.trainNumber ?? ''}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(f);
+      if (out.length >= limit) break;
+    }
+    return out;
   }
-  return out;
-}
 
   function _diagnoseBuildLeg(lineId, svcId, boardCode, alightCode, minDepSec) {
     const { hmToSec, secToHM } = TTEngine;
@@ -338,10 +309,10 @@ const IZXRouter = (() => {
 
   function buildLeg(lineId, svcId, boardCode, alightCode, minDepSec, found = null) {
     if (!found) {
-  found = nextTrip(lineId, svcId, boardCode, minDepSec, alightCode);
-  if (!found) return null;
-}
-     const { trip, boardStop, alightStop, boardSec, alightSec } = found;
+      found = nextTrip(lineId, svcId, boardCode, minDepSec, alightCode);
+      if (!found) return null;
+    }
+    const { trip, boardStop, alightStop, boardSec, alightSec } = found;
     const svcLogical = AX_SVC_VARIANTS.has(svcId)
       ? 'AX'
       : svcId.replace(/_rapid$|_local$/, "");
@@ -443,33 +414,40 @@ const IZXRouter = (() => {
 
     const shortWorkingMisses = [];
 
-    for (const svcId of Object.keys(line.SVC)) {
-  if (lineId !== 'RY' && !line.TT[svcId]) continue;
+    for (const [lineId, line] of Object.entries(IZX_LINES)) {
+      if (lineAllowed && !lineAllowed.has(lineId)) continue;
+      const hasFrom = line.ST[from] !== undefined;
+      const hasTo   = line.ST[to]   !== undefined;
+      if (!hasFrom || !hasTo) continue;
 
-  const trips = nextTrips(lineId, svcId, from, depSec, to, 3);
+      for (const svcId of Object.keys(line.SVC)) {
+        if (lineId !== 'RY' && !line.TT[svcId]) continue;
 
-  if (!trips.length) {
-    const diag = _diagnoseBuildLeg(lineId, svcId, from, to, depSec);
-    if (diag && diag.reason === 'short_working') {
-      shortWorkingMisses.push({
-        lineId, svcId, terminus: diag.terminus,
-      });
-    }
-    continue;
-  }
+        const trips = nextTrips(lineId, svcId, from, depSec, to, 3);
 
-  for (const found of trips) {
-    const leg = buildLegFromTrip(lineId, svcId, from, to, found);
-    journeys.push({
-      legs:          [leg],
-      departureTime: leg.boardDep,
-      arrivalTime:   leg.alightArr,
-      totalMinutes:  Math.round((leg.alightArrSec - leg.boardDepSec) / 60),
-      totalKm:       leg.km,
-      transfers:     0,
-      transferNodes: [],
-    });
-  }
+        if (!trips.length) {
+          const diag = _diagnoseBuildLeg(lineId, svcId, from, to, depSec);
+          if (diag && diag.reason === 'short_working') {
+            shortWorkingMisses.push({
+              lineId, svcId, terminus: diag.terminus,
+            });
+          }
+          continue;
+        }
+
+        for (const found of trips) {
+          const leg = buildLeg(lineId, svcId, from, to, found.boardSec, found);
+          journeys.push({
+            legs:          [leg],
+            departureTime: leg.boardDep,
+            arrivalTime:   leg.alightArr,
+            totalMinutes:  Math.round((leg.alightArrSec - leg.boardDepSec) / 60),
+            totalKm:       leg.km,
+            transfers:     0,
+            transferNodes: [],
+          });
+        }
+      }
     }
 
     if (!directOnly) {
