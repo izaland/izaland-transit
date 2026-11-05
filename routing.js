@@ -232,6 +232,70 @@ const IZXRouter = (() => {
     return best;
   }
 
+   function nextTrips(lineId, svcId, boardCode, minDepSec, alightCode, limit = 3) {
+  const { hmToSec, secToHM } = TTEngine;
+  const fromHM = secToHM(minDepSec);
+  const toHM   = secToHM(Math.min(minDepSec + SEARCH_WINDOW, 88140));
+
+  const found = [];
+
+  for (const dir of ["SB", "NB"]) {
+    const trips = TTEngine.query({
+      lines:     lineId,
+      station:   boardCode,
+      direction: dir,
+      fromTime:  fromHM,
+      toTime:    toHM,
+      services:  [svcId],
+    });
+
+    for (const trip of trips) {
+      if (alightCode && !trip.stops[alightCode]) {
+        const line = IZX_LINES[lineId];
+        const svc = line && line.SVC[trip.svcId];
+        const cond = svc && svc.conditionalStops && svc.conditionalStops[alightCode];
+        if (cond) continue;
+
+        const precedes = _terminusPrecedesAlight(trip, lineId, alightCode);
+        if (precedes === true) continue;
+        if (precedes === false) {
+          console.warn(
+            `[IZXRouter] Trip ${trip._uid}: terminus ${trip.terminus} is beyond` +
+            ` alightCode ${alightCode} but stop is missing from trip.stops.`
+          );
+        }
+        continue;
+      }
+
+      const boardStop  = trip.stops[boardCode];
+      const alightStop = alightCode ? trip.stops[alightCode] : null;
+      if (!boardStop) continue;
+
+      const boardSec  = hmToSec(boardStop.dep);
+      const alightSec = alightStop ? hmToSec(alightStop.arr ?? alightStop.dep) : null;
+
+      if (alightSec !== null && alightSec <= boardSec) continue;
+      if (boardSec < minDepSec) continue;
+
+      found.push({ trip, boardStop, alightStop, boardSec, alightSec });
+    }
+  }
+
+  // Ordina per partenza e restituisce le prime `limit` corse distinte
+  found.sort((a, b) => a.boardSec - b.boardSec);
+
+  const out = [];
+  const seen = new Set();
+  for (const f of found) {
+    const key = f.trip._uid;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(f);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
   function _diagnoseBuildLeg(lineId, svcId, boardCode, alightCode, minDepSec) {
     const { hmToSec, secToHM } = TTEngine;
     const fromHM = secToHM(minDepSec);
@@ -272,10 +336,12 @@ const IZXRouter = (() => {
     return null;
   }
 
-  function buildLeg(lineId, svcId, boardCode, alightCode, minDepSec) {
-    const found = nextTrip(lineId, svcId, boardCode, minDepSec, alightCode);
-    if (!found) return null;
-    const { trip, boardStop, alightStop, boardSec, alightSec } = found;
+  function buildLeg(lineId, svcId, boardCode, alightCode, minDepSec, found = null) {
+    if (!found) {
+  found = nextTrip(lineId, svcId, boardCode, minDepSec, alightCode);
+  if (!found) return null;
+}
+     const { trip, boardStop, alightStop, boardSec, alightSec } = found;
     const svcLogical = AX_SVC_VARIANTS.has(svcId)
       ? 'AX'
       : svcId.replace(/_rapid$|_local$/, "");
@@ -377,33 +443,33 @@ const IZXRouter = (() => {
 
     const shortWorkingMisses = [];
 
-    for (const [lineId, line] of Object.entries(IZX_LINES)) {
-      if (lineAllowed && !lineAllowed.has(lineId)) continue;
-      const hasFrom = line.ST[from] !== undefined;
-      const hasTo   = line.ST[to]   !== undefined;
-      if (!hasFrom || !hasTo) continue;
-      for (const svcId of Object.keys(line.SVC)) {
-        if (lineId !== 'RY' && !line.TT[svcId]) continue;
-        const leg = buildLeg(lineId, svcId, from, to, depSec);
-        if (!leg) {
-          const diag = _diagnoseBuildLeg(lineId, svcId, from, to, depSec);
-          if (diag && diag.reason === 'short_working') {
-            shortWorkingMisses.push({
-              lineId, svcId, terminus: diag.terminus,
-            });
-          }
-          continue;
-        }
-        journeys.push({
-          legs:          [leg],
-          departureTime: leg.boardDep,
-          arrivalTime:   leg.alightArr,
-          totalMinutes:  Math.round((leg.alightArrSec - leg.boardDepSec) / 60),
-          totalKm:       leg.km,
-          transfers:     0,
-          transferNodes: [],
-        });
-      }
+    for (const svcId of Object.keys(line.SVC)) {
+  if (lineId !== 'RY' && !line.TT[svcId]) continue;
+
+  const trips = nextTrips(lineId, svcId, from, depSec, to, 3);
+
+  if (!trips.length) {
+    const diag = _diagnoseBuildLeg(lineId, svcId, from, to, depSec);
+    if (diag && diag.reason === 'short_working') {
+      shortWorkingMisses.push({
+        lineId, svcId, terminus: diag.terminus,
+      });
+    }
+    continue;
+  }
+
+  for (const found of trips) {
+    const leg = buildLegFromTrip(lineId, svcId, from, to, found);
+    journeys.push({
+      legs:          [leg],
+      departureTime: leg.boardDep,
+      arrivalTime:   leg.alightArr,
+      totalMinutes:  Math.round((leg.alightArrSec - leg.boardDepSec) / 60),
+      totalKm:       leg.km,
+      transfers:     0,
+      transferNodes: [],
+    });
+  }
     }
 
     if (!directOnly) {
