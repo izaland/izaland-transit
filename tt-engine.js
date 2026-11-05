@@ -66,7 +66,7 @@ const TTEngine = (() => {
     let node = b;
     while (prev.get(node)) {
       const { node: p, seg } = prev.get(node);
-      sec += RunTimeEngine.segmentRunSec(seg.km, seg.vLimit) * (svc.coeff ?? 1);
+      sec += RunTimeEngine.segmentRunSec(seg.km, seg.vLimit);
       nodes.push(p);
       node = p;
     }
