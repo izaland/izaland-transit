@@ -1,12 +1,12 @@
 /* ================================================================
    UNIFIED-ROUTER.JS — Izaland Cross-Network Journey Planner
    ================================================================
-   FIX 19 (thru solo per lo stesso treno fisico):
-     Un cambio cross-network e' marcato come thru solo quando l'ultima
-     gamba di j1 e la prima gamba di j2 condividono lo stesso tripId.
-   HOTFIX:
-     - Ripristinato p.networkId nella ricerca a tre cambi.
-     - Ripristinata l'assegnazione di wait in _xferArrays().
+   FIX 20:
+     - La prima gamba (j1) può usare i cambi interni alla rete di
+       partenza: necessario per percorsi come R19 → R13 → SA04.
+     - Corretto il riferimento midSt → midSt1 nella ricerca a 3 cambi.
+     - directOnly dell'utente viene rispettato; non è più forzato
+       sulle gambe iniziali.
 ================================================================ */
 
 (function (root, factory) {
@@ -23,24 +23,29 @@
 
   const SEARCH_BUDGET_MS = 6000;
   let _lastEnd = 0, _batchDeadline = 0;
-  let _netCache      = new Map();
-  let _stationsCache = new Map();
-  let _partnersCache = new Map();
-  let _bridgeCache   = new Map();
-  let _memo          = new Map();
+  let _netCache            = new Map();
+  let _stationsCache       = new Map();
+  let _partnersCache       = new Map();
+  let _bridgeCache         = new Map();
+  let _memo                = new Map();
   let _bridgePartnersCache = new Map();
-  let _deadline      = Infinity;
-  let _truncated     = false;
+  let _deadline            = Infinity;
+  let _truncated           = false;
 
   function _clearCaches() {
-    _netCache.clear(); _stationsCache.clear(); _partnersCache.clear();
-    _bridgeCache.clear(); _memo.clear();
-    _bridgePartnersCache.clear(); 
+    _netCache.clear();
+    _stationsCache.clear();
+    _partnersCache.clear();
+    _bridgeCache.clear();
+    _memo.clear();
+    _bridgePartnersCache.clear();
   }
+
   function _timeUp() {
     if (Date.now() > _deadline) { _truncated = true; return true; }
     return false;
   }
+
   function _stationsOf(networkId) {
     let v = _stationsCache.get(networkId);
     if (!v) {
@@ -50,6 +55,7 @@
     }
     return v;
   }
+
   function _bridgesOf(networkId) {
     let v = _bridgeCache.get(networkId);
     if (!v) {
@@ -66,10 +72,10 @@
 
   const THRU_TOLERANCE_MIN = 3;
   const THRU_SERVICES = [
-    { codes: ['M801', 'KW00'], stopSec: 90 },
-    { codes: ['M1027', 'SSK01'], stopSec: 90 },
-    { codes: ['M415', 'SBO07'], stopSec: 90 },
-    { codes: ['M818', 'IBC04'], stopSec: 90 },
+    { codes: ['M801', 'KW00'],    stopSec: 90 },
+    { codes: ['M1027', 'SSK01'],  stopSec: 90 },
+    { codes: ['M415', 'SBO07'],   stopSec: 90 },
+    { codes: ['M818', 'IBC04'],   stopSec: 90 },
   ];
 
   function registerThruService(def) {
@@ -114,18 +120,17 @@
   }
 
   const HUBS = {
-  HUB_SAINDAUL_CENTRAL: [
-    // stazioni delle linee che passano dall'HUB
-    'M117', 'M814', 'M1015', 'M1712', 'CO18', 'SBM01',
-    // collegamenti alle altre reti
-    'R01', 'E01', 'K01', 'AX06',
-    'LL01', 'KD32', 'SK26', 'TS13', 'JD01',
-  ],
-};
+    HUB_SAINDAUL_CENTRAL: [
+      'M117', 'M814', 'M1015', 'M1712', 'CO18', 'SBM01',
+      'R01', 'E01', 'K01', 'AX06',
+      'LL01', 'KD32', 'SK26', 'TS13', 'JD01',
+    ],
+  };
 
   const _ixIndex = {};
 
   const SUB_CROSS_TRANSFER_MIN = 5;
+
   function _defaultTransferMin(codeA, codeB) {
     const na = _netOfCode(codeA), nb = _netOfCode(codeB);
     if (na === 'SUB' && nb === 'SUB' && typeof _routers.SUB?.transferMin === 'function')
@@ -145,35 +150,36 @@
   }
 
   function buildInterchangeIndex(interchangeData) {
-  _clearCaches();
-  if (Array.isArray(interchangeData)) {
-    interchangeData.forEach(ix => {
-      if (ix.codeB && typeof ix.codeB === 'object' && ix.codeB.hubId) {
-        const members = HUBS[ix.codeB.hubId] || [];
-        members.forEach(m => {
-          if (m !== ix.codeA) _add(ix.codeA, m, ix.codeB.transferMin);
-        });
-        return;
-      }
-      _add(ix.codeA, ix.codeB, ix.transferMin);
-    });
-    return;
-  }
-  Object.entries(interchangeData).forEach(([stCode, partners]) => {
-    const pArr = Array.isArray(partners) ? partners : [partners];
-    for (const b of pArr) {
-      // HUB: espandi il hubId nei suoi membri
-      if (b && typeof b === 'object' && b.hubId) {
-        const members = HUBS[b.hubId] || [];
-        members.forEach(m => {
-          if (m !== stCode) _add(stCode, m, b.transferMin);
-        });
-        continue;
-      }
-      _add(stCode, b.code ?? b, b.transferMin);
+    _clearCaches();
+
+    if (Array.isArray(interchangeData)) {
+      interchangeData.forEach(ix => {
+        if (ix.codeB && typeof ix.codeB === 'object' && ix.codeB.hubId) {
+          const members = HUBS[ix.codeB.hubId] || [];
+          members.forEach(m => {
+            if (m !== ix.codeA) _add(ix.codeA, m, ix.codeB.transferMin);
+          });
+          return;
+        }
+        _add(ix.codeA, ix.codeB, ix.transferMin);
+      });
+      return;
     }
-  });
-}
+
+    Object.entries(interchangeData).forEach(([stCode, partners]) => {
+      const pArr = Array.isArray(partners) ? partners : [partners];
+      for (const b of pArr) {
+        if (b && typeof b === 'object' && b.hubId) {
+          const members = HUBS[b.hubId] || [];
+          members.forEach(m => {
+            if (m !== stCode) _add(stCode, m, b.transferMin);
+          });
+          continue;
+        }
+        _add(stCode, b.code ?? b, b.transferMin);
+      }
+    });
+  }
 
   function _partnersOf(code) {
     let c = _partnersCache.get(code);
@@ -210,7 +216,11 @@
     raw.forEach(entry => _push(entry.code, entry.transferMin ?? CROSS_TRANSFER_MIN));
 
     const seen = new Set();
-    return out.filter(e => { if (seen.has(e.code)) return false; seen.add(e.code); return true; });
+    return out.filter(e => {
+      if (seen.has(e.code)) return false;
+      seen.add(e.code);
+      return true;
+    });
   }
 
   function _hmToSec(hm) {
@@ -218,6 +228,7 @@
     const [h, m] = hm.split(':').map(Number);
     return h * 3600 + m * 60;
   }
+
   function _secToHM(sec) {
     const s = ((sec % 86400) + 86400) % 86400;
     const h = Math.floor(s / 3600);
@@ -228,16 +239,26 @@
   function _xferArrays(j) {
     const n = (j.transferNodes || []).length;
     const fill = v => Array.from({ length: n }, () => v);
+
     const thru = (Array.isArray(j.transferThru) && j.transferThru.length === n)
       ? j.transferThru.slice() : fill(!!j.thruService);
+
     let walk;
-    if (Array.isArray(j.transferWalkMin) && j.transferWalkMin.length === n) walk = j.transferWalkMin.slice();
-    else if (typeof j.transferWalkMin === 'number') walk = fill(j.transferWalkMin);
-    else walk = fill(null);
+    if (Array.isArray(j.transferWalkMin) && j.transferWalkMin.length === n)
+      walk = j.transferWalkMin.slice();
+    else if (typeof j.transferWalkMin === 'number')
+      walk = fill(j.transferWalkMin);
+    else
+      walk = fill(null);
+
     let wait;
-    if (Array.isArray(j.transferWaitMin) && j.transferWaitMin.length === n) wait = j.transferWaitMin.slice();
-    else if (typeof j.transferWaitMin === 'number') wait = fill(null).map((_, i) => i === 0 ? j.transferWaitMin : null);
-    else wait = fill(null);
+    if (Array.isArray(j.transferWaitMin) && j.transferWaitMin.length === n)
+      wait = j.transferWaitMin.slice();
+    else if (typeof j.transferWaitMin === 'number')
+      wait = fill(null).map((_, i) => i === 0 ? j.transferWaitMin : null);
+    else
+      wait = fill(null);
+
     return { thru, walk, wait };
   }
 
@@ -300,6 +321,7 @@
     ];
     const thruIdx = transferThru.indexOf(true);
     const thruAny = thruIdx !== -1;
+
     return {
       legs:              [...j1.legs, ...j2.legs, ...j3.legs],
       departureTime:     j1.departureTime,
@@ -323,6 +345,7 @@
       (opts.networks ? [].concat(opts.networks).join(',') : '');
     const hit = _memo.get(key);
     if (hit) return hit;
+
     let out = [];
     try {
       const fn = router.search || router.findJourneys;
@@ -333,40 +356,40 @@
     } catch (e) {
       out = [];
     }
+
     if (_memo.size > 150000) _memo.clear();
     _memo.set(key, out);
     return out;
   }
 
- function _nextLegs(router, partner, toCode, j1, opts) {
-  const arr = _hmToSec(j1.arrivalTime);
+  function _nextLegs(router, partner, toCode, j1, opts) {
+    const arr = _hmToSec(j1.arrivalTime);
 
-  if (partner.thru) {
-    const readyHM = _secToHM(arr + partner.thruSec);
-    const list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
-      { ...opts, maxResults: 2, directOnly: true });
-    const first = list[0];
-    if (first) {
-      const gap = ((_hmToSec(first.departureTime) - arr + 86400) % 86400) / 60;
-      if (gap <= THRU_TOLERANCE_MIN) return [{ j2: first, thru: true }];
+    if (partner.thru) {
+      const readyHM = _secToHM(arr + partner.thruSec);
+      const list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
+        { ...opts, maxResults: 2, directOnly: true });
+      const first = list[0];
+      if (first) {
+        const gap = ((_hmToSec(first.departureTime) - arr + 86400) % 86400) / 60;
+        if (gap <= THRU_TOLERANCE_MIN) return [{ j2: first, thru: true }];
+      }
     }
+
+    const tSec = (partner.transferMin ?? CROSS_TRANSFER_MIN) * 60;
+    const readyHM = _secToHM(arr + tSec);
+
+    let list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
+      { ...opts, maxResults: 2, directOnly: true });
+
+    if (!list.length) {
+      list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
+        { ...opts, maxResults: 2 });
+    }
+
+    return list.map(j2 => ({ j2, thru: false }));
   }
 
-  const tSec = (partner.transferMin ?? CROSS_TRANSFER_MIN) * 60;
-  const readyHM = _secToHM(arr + tSec);
-
-  // 1° tentativo: solo corse dirette
-  let list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
-    { ...opts, maxResults: 2, directOnly: true });
-
-  // 2° tentativo (fallback): ammette cambi interni sulla stessa rete
-  if (!list.length) {
-    list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
-      { ...opts, maxResults: 2 });
-  }
-
-  return list.map(j2 => ({ j2, thru: false }));
-}
   function _networkFilter(opts) {
     const raw = opts.networks;
     if (!raw) return null;
@@ -429,9 +452,9 @@
     });
 
     deduped.sort((a, b) => {
-      const da = _hmToSec(a.arrivalTime),   db = _hmToSec(b.arrivalTime);
+      const da = _hmToSec(a.arrivalTime), db = _hmToSec(b.arrivalTime);
       if (da !== db) return da - db;
-      const ta = a.transfers ?? 0,          tb = b.transfers ?? 0;
+      const ta = a.transfers ?? 0, tb = b.transfers ?? 0;
       if (ta !== tb) return ta - tb;
       return _hmToSec(b.departureTime) - _hmToSec(a.departureTime);
     });
@@ -492,6 +515,10 @@
 
     if (directOnly) return journeys;
 
+    /* ------------------------------------------------------------
+       FASE 2 — un cambio cross-network
+       La prima gamba può usare i cambi interni alla rete di partenza.
+    ------------------------------------------------------------ */
     for (const fNode of fNodes) {
       if (netFilter && !netFilter.has(fNode.networkId)) continue;
       const router1 = _routerFor(fNode.networkId);
@@ -499,24 +526,25 @@
 
       for (const midSt of _bridgesOf(fNode.networkId)) {
         if (_timeUp()) break;
-        const tNetSet = new Set(tNodes.map(t => t.networkId));
-const cacheKey = midSt.code + '|' + [...tNetSet].join(',');
 
-let partners = _bridgePartnersCache.get(cacheKey);
-if (!partners) {
-  partners = _partnersOf(midSt.code).filter(p => {
-    if (netFilter && !netFilter.has(p.networkId)) return false;
-    return tNetSet.has(p.networkId);
-  });
-  _bridgePartnersCache.set(cacheKey, partners);
-}
-if (!partners.length) continue;
+        const tNetSet = new Set(tNodes.map(t => t.networkId));
+        const cacheKey = midSt.code + '|' + [...tNetSet].join(',');
+
+        let partners = _bridgePartnersCache.get(cacheKey);
+        if (!partners) {
+          partners = _partnersOf(midSt.code).filter(p => {
+            if (netFilter && !netFilter.has(p.networkId)) return false;
+            return tNetSet.has(p.networkId);
+          });
+          _bridgePartnersCache.set(cacheKey, partners);
+        }
+        if (!partners.length) continue;
 
         const j1list = _safeSearch(
-  router1, fNode.networkId,
-  fNode.code, midSt.code, depTime,
-  { ...opts, maxResults: 2, directOnly: !!opts.directOnly }
-);
+          router1, fNode.networkId,
+          fNode.code, midSt.code, depTime,
+          { ...opts, maxResults: 2, directOnly: !!opts.directOnly }
+        );
         if (!j1list.length) continue;
 
         for (const partner of partners) {
@@ -527,14 +555,22 @@ if (!partners.length) continue;
 
           for (const j1 of j1list) {
             for (const { j2, thru } of _nextLegs(router2, partner, tNode.code, j1, opts))
-              journeys.push(_buildJourney2(j1, j2, midSt.code, partner.transferMin ?? CROSS_TRANSFER_MIN, thru));
+              journeys.push(_buildJourney2(
+                j1, j2, midSt.code,
+                partner.transferMin ?? CROSS_TRANSFER_MIN,
+                thru
+              ));
           }
         }
       }
     }
 
+    /* ------------------------------------------------------------
+       FASE 3 — due cambi cross-network
+    ------------------------------------------------------------ */
     const enough = opts.minBeforeThreeLeg ?? 3;
     if (_dedup(journeys.slice()).length >= enough) return journeys;
+
     for (const fNode of fNodes) {
       if (netFilter && !netFilter.has(fNode.networkId)) continue;
       const router1 = _routerFor(fNode.networkId);
@@ -542,14 +578,15 @@ if (!partners.length) continue;
 
       for (const midSt1 of _bridgesOf(fNode.networkId)) {
         if (_timeUp()) break;
+
         const partners1 = _partnersOf(midSt1.code);
         if (!partners1.length) continue;
 
         const j1list = _safeSearch(
-  router1, fNode.networkId,
-  fNode.code, midSt.code, depTime,
-  { ...opts, maxResults: 2, directOnly: !!opts.directOnly }
-);
+          router1, fNode.networkId,
+          fNode.code, midSt1.code, depTime,
+          { ...opts, maxResults: 2, directOnly: !!opts.directOnly }
+        );
         if (!j1list.length) continue;
 
         for (const p1 of partners1) {
@@ -561,6 +598,7 @@ if (!partners.length) continue;
 
           for (const midSt2 of _bridgesOf(p1.networkId)) {
             if (_timeUp()) break;
+
             const partners2 = _partnersOf(midSt2.code).filter(p => {
               if (netFilter && !netFilter.has(p.networkId)) return false;
               return tNodes.some(t => t.networkId === p.networkId);
@@ -611,6 +649,7 @@ if (!partners.length) continue;
     const _now = Date.now();
     if (_now - _lastEnd < 50 && _batchDeadline > _now) _deadline = _batchDeadline;
     else _deadline = _batchDeadline = _now + (opts.timeBudgetMs ?? SEARCH_BUDGET_MS);
+
     const all = [];
     try {
       for (const f of froms) {
@@ -623,6 +662,7 @@ if (!partners.length) continue;
       _deadline = Infinity;
       _lastEnd = Date.now();
     }
+
     const res = _dedup(all).slice(0, maxResults);
     api.lastSearchTruncated = _truncated;
     return res;
