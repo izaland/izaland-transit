@@ -398,16 +398,24 @@ IZXUnifiedRouter.registerRouter('CL', {
    * disponibili: IZX → Suburban → Metro.
    * ---------------------------------------------------------------- */
   function _stName(code) {
-    const izxName = IZXRouter.stationName(code);
-    if (izxName && izxName !== code) return izxName;
-    const subName = SuburbanRouter.stationName(code);
-    if (subName && subName !== code) return subName;
-    if (typeof MetroRouter !== 'undefined') {
-      const metName = MetroRouter.stationName(code);
-      if (metName && metName !== code) return metName;
-    }
-    return code;
+  // CityLiner (CL)
+  if (typeof CL_ST !== 'undefined' && CL_ST[code]) {
+    return CL_ST[code].n;
   }
+
+  const izxName = IZXRouter.stationName(code);
+  if (izxName && izxName !== code) return izxName;
+
+  const subName = SuburbanRouter.stationName(code);
+  if (subName && subName !== code) return subName;
+
+  if (typeof MetroRouter !== 'undefined') {
+    const metName = MetroRouter.stationName(code);
+    if (metName && metName !== code) return metName;
+  }
+
+  return code;
+}
 
   function _badgeTextColor(hex) {
   const c = hex.replace('#','');
