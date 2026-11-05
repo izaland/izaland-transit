@@ -1,12 +1,11 @@
 /* ================================================================
    UNIFIED-ROUTER.JS — Izaland Cross-Network Journey Planner
    ================================================================
-   FIX 21:
-     - j1list (Fasi 2 e 3) passa da maxResults 2 a 6: con piu' corse
-       per servizio, i 2 slot erano occupati da corse dello stesso
-       servizio i cui transfer erano dominati dalle dirette.
-     - _nextLegs: maxResults 2 -> 3 per la gamba successiva.
-     - MAX_JOURNEYS 5 -> 10 per non tagliare i transfer sopravvissuti.
+   FIX 22:
+     - j1list (Fasi 2 e 3) 6 -> 4 e _nextLegs 3 -> 2:
+       riduce il costo delle ricerche cross-network mantenendo
+       abbastanza opzioni perche' i transfer non dominati
+       (servizi piu' lenti/differenti) sopravvivano alla dedup.
 ================================================================ */
 
 (function (root, factory) {
@@ -368,7 +367,7 @@
     if (partner.thru) {
       const readyHM = _secToHM(arr + partner.thruSec);
       const list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
-        { ...opts, maxResults: 3, directOnly: true });
+        { ...opts, maxResults: 2, directOnly: true });
       const first = list[0];
       if (first) {
         const gap = ((_hmToSec(first.departureTime) - arr + 86400) % 86400) / 60;
@@ -380,11 +379,11 @@
     const readyHM = _secToHM(arr + tSec);
 
     let list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
-      { ...opts, maxResults: 3, directOnly: true });
+      { ...opts, maxResults: 2, directOnly: true });
 
     if (!list.length) {
       list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
-        { ...opts, maxResults: 3 });
+        { ...opts, maxResults: 2 });
     }
 
     return list.map(j2 => ({ j2, thru: false }));
@@ -543,7 +542,7 @@
         const j1list = _safeSearch(
           router1, fNode.networkId,
           fNode.code, midSt.code, depTime,
-          { ...opts, maxResults: 6, directOnly: !!opts.directOnly }
+          { ...opts, maxResults: 4, directOnly: !!opts.directOnly }
         );
         if (!j1list.length) continue;
 
@@ -585,7 +584,7 @@
         const j1list = _safeSearch(
           router1, fNode.networkId,
           fNode.code, midSt1.code, depTime,
-          { ...opts, maxResults: 6, directOnly: !!opts.directOnly }
+          { ...opts, maxResults: 4, directOnly: !!opts.directOnly }
         );
         if (!j1list.length) continue;
 
