@@ -61,14 +61,16 @@ const TTEngine = (() => {
     }
     if (!prev.has(b)) return null;
 
-    let sec = 0, node = b;
+    let sec = 0;
+    const nodes = [];
+    let node = b;
     while (prev.get(node)) {
       const { node: p, seg } = prev.get(node);
-      sec += RunTimeEngine.segmentRunSec(seg.km, seg.vLimit);
-      sec += RunTimeEngine.dwellSec(p, RY_DWELL);
+      sec += RunTimeEngine.segmentRunSec(seg.km, seg.vLimit) * (svc.coeff ?? 1);
+      nodes.push(p);
       node = p;
     }
-    return sec;
+    return { sec, nodes };
   }
 
   const stopsRaw = svc.stops.filter(code =>
@@ -80,9 +82,15 @@ const TTEngine = (() => {
   offsets[stops[0]] = 0;
   for (let i = 0; i < stops.length - 1; i++) {
     const a = stops[i], b = stops[i + 1];
-    const sec = pathSec(a, b);
-    if (sec == null) continue;
-    offsets[b] = offsets[a] + sec;
+    const res = pathSec(a, b);
+    if (!res) continue;
+    let dwell = 0;
+    for (const mid of res.nodes) {
+      if (mid !== a && mid !== b && stops.includes(mid)) {
+        dwell += RunTimeEngine.dwellSec(mid, RY_DWELL);
+      }
+    }
+    offsets[b] = offsets[a] + res.sec + dwell;
   }
   return { stops, offsets };
 }
