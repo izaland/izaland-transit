@@ -277,7 +277,7 @@ function _clSearch(from, to, depTime) {
           alightCode: to,
           alightName: CL_ST[to].n,
           alightArr: stops[j].arrival,
-          km: CL_ST[to].km - CL_ST[from].km,
+          km: Math.abs(CL_ST[to].km - CL_ST[from].km),
           intermediateStops: stops.slice(i + 1, j)
             .filter(s => s.arrival != null)
             .map(s => ({
