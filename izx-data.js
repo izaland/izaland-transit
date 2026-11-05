@@ -129,9 +129,8 @@ const RY_SVC = {
   L: {coeff:0.92, name:"All Stop",     cls:"svc-L", color:"#6b7280",
       stops:["R01","R02","R03","R04","R05","R06","R61","R07","R08","R81","R09","R10","R11","R12","R13"]},
   K: { coeff:1.08, name:"North West", cls:"svc-K", color:"#EA7501", pair:"J",
-     stops:["R01","R02","R06","R10","R13",
-            "SA01","SA02","SA03","SA04",
-            "SA05","SA06","SA07","SA08","SA09"],
+     stops:["R01","R02","R06","R10","R13","SA00","SA01","SA02","SA03","SA04",
+       "SA05","SA06","SA07","SA08","SA09"],
      conditionalStops:{ R03:{rule:"peak"}
       }},
   J: {coeff:1.08, name:"Nansai",   cls:"svc-J", color:"#C9211E", pair:"K",
