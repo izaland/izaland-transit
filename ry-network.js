@@ -15,6 +15,7 @@ const RY_SEGMENTS = [
   { from: 'R10', to: 'R11', km: 22.34, vLimit: 320 },
   { from: 'R11', to: 'R12', km: 20.61, vLimit: 320 },
   { from: 'R12', to: 'R13', km: 50.72, vLimit: 320 },
+  { from: 'R13', to: 'SA00', km: 0.1, vLimit: 80 },
   { from: 'R13', to: 'R14', km: 46.51, vLimit: 350 },
   { from: 'R14', to: 'R15', km: 24.93, vLimit: 350 },
   { from: 'R15', to: 'R16', km: 30.50, vLimit: 350 },
