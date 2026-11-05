@@ -11,7 +11,7 @@ const TTEngine = (() => {
   function secToHM(s) {
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
-    return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '00');
+    return String(h).padStart(2, '0') + ':' + String(m % 60).padStart(2, '00');
   }
   function isPeak(sec, peakWindows) {
     return peakWindows.some(w => sec >= hmToSec(w.start) && sec < hmToSec(w.end));
@@ -110,7 +110,7 @@ const TTEngine = (() => {
 
     const totalDuration = tt[stops[stops.length - 1]];
     const splits = dir === 'SB' ? (line.TERMINUS_SPLIT?.[svcId] ?? null) : null;
-    const nbTerminus = dir === 'NB' ? stops[0] : null;
+    const nbTerminus = dir === 'NB' ? stops[stops.length - 1] : null;
 
     const SERVICE_START = hmToSec('06:00');
     const SERVICE_END = hmToSec('24:30');
