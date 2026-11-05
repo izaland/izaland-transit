@@ -157,7 +157,7 @@ const TTEngine = (() => {
 
       for (const st of stops) {
         if (!stopIsActive(st, conditionalStops, tripIndex, peakNow, routeType)) continue;
-        const rawOffset = dir === 'NB' ? (totalDuration - tt[st]) : tt[st];
+        const rawOffset = tt[st];
         if (rawOffset === undefined) continue;
         const depSec = cursor + rawOffset;
         const dwell = lineId === 'RY'
