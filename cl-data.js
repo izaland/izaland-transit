@@ -63,7 +63,7 @@ const CL32 = {
 ================================================================ */
 const CL_INTERCHANGE = {
   CL321: ['R19', 'SN01'],   // Riyatoma
-  CL326: ['SN05'],          // Poridake
+  CL326: ['SN05', 'SA04'],  // Poridake
   // CL3211: ['...'],       // Tohpatogu — futuro
 };
 
