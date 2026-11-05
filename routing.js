@@ -40,6 +40,12 @@
      mostrare un avviso "Ultimo servizio fino a <terminus>".
      Inoltre nextTrip cappа toHM a '24:29' per evitare overflow
      quando minDepSec + SEARCH_WINDOW supera SERVICE_END.
+
+   FIX 20 (RY TT generato a runtime):
+     La rete RY non ha orari statici (RY_TT = {}): i trip sono
+     generati da TTEngine tramite RY_SEGMENTS. Le guardie
+     `!line.TT[svcId]` devono quindi esentare la RY, altrimenti
+     IZXRouter.search() salta tutti i servizi Ryānkai.
 ================================================================ */
 
 const IZXRouter = (() => {
@@ -163,18 +169,9 @@ const IZXRouter = (() => {
     return (st && st.km != null) ? st.km : null;
   }
 
-  /* ----------------------------------------------------------------
-   * _terminusPrecedesAlight(trip, lineId, alightCode)
-   * Restituisce true se il terminus del trip si trova PRIMA di
-   * alightCode nella sequenza SVC.stops della linea (direzione SB)
-   * oppure DOPO in direzione NB — cioè se il treno termina prima
-   * di raggiungere alightCode.
-   * Usato da nextTrip per distinguere "treno corto" (skip silenzioso)
-   * da "anomalia dati" (console.warn).
-   * ---------------------------------------------------------------- */
   function _terminusPrecedesAlight(trip, lineId, alightCode) {
     const line = IZX_LINES[lineId];
-    if (!line || !trip.terminus) return null; // sconosciuto
+    if (!line || !trip.terminus) return null;
     const svc = line.SVC[trip.svcId];
     if (!svc) return null;
     const seq = trip.direction === 'NB'
@@ -183,14 +180,13 @@ const IZXRouter = (() => {
     const iTerm   = seq.indexOf(trip.terminus);
     const iAlight = seq.indexOf(alightCode);
     if (iTerm === -1 || iAlight === -1) return null;
-    return iTerm < iAlight; // terminus viene prima di alightCode nella direzione di marcia
+    return iTerm < iAlight;
   }
 
   function nextTrip(lineId, svcId, boardCode, minDepSec, alightCode) {
     const { hmToSec, secToHM } = TTEngine;
     const fromHM = secToHM(minDepSec);
-    // FIX 11: cappа toHM a 24:29 per non superare SERVICE_END del tt-engine
-    const toHM   = secToHM(Math.min(minDepSec + SEARCH_WINDOW, 88140)); // 88140 = 24:29:00
+    const toHM   = secToHM(Math.min(minDepSec + SEARCH_WINDOW, 88140));
     let best = null;
     for (const dir of ["SB", "NB"]) {
       const trips = TTEngine.query({
@@ -203,26 +199,21 @@ const IZXRouter = (() => {
       });
       for (const trip of trips) {
   if (alightCode && !trip.stops[alightCode]) {
-    // FIX: skip volontario da conditionalStops (alternate/direct/punohai)
     const line = IZX_LINES[lineId];
     const svc = line && line.SVC[trip.svcId];
     const cond = svc && svc.conditionalStops && svc.conditionalStops[alightCode];
     if (cond) continue;
 
-    // FIX: alightCode assente — capire se è un treno corto o un'anomalia dati
     const precedes = _terminusPrecedesAlight(trip, lineId, alightCode);
           if (precedes === true) {
-            // Treno corto: termina prima di alightCode — skip silenzioso (corretto)
             continue;
           } else if (precedes === false) {
-            // Anomalia dati: terminus è oltre alightCode ma la fermata manca
             console.warn(
               `[IZXRouter] Trip ${trip._uid}: terminus ${trip.terminus} is beyond` +
               ` alightCode ${alightCode} but stop is missing from trip.stops.` +
               ` Possible data error in TT/${svcId}.`
             );
           }
-          // In entrambi i casi non possiamo usare questo trip
           continue;
         }
         const boardStop  = trip.stops[boardCode];
@@ -241,19 +232,6 @@ const IZXRouter = (() => {
     return best;
   }
 
-  /* ----------------------------------------------------------------
-   * _diagnoseBuildLeg(lineId, svcId, boardCode, alightCode, minDepSec)
-   *                                                           FIX 11
-   * Chiamato quando buildLeg restituisce null. Cerca il prossimo
-   * trip del servizio ignorando alightCode per capire se il miss
-   * è dovuto a SHORT_WORKING (tutti i trip terminano prima di
-   * alightCode) o a un'assenza vera di servizio.
-   *
-   * Restituisce:
-   *   { reason: 'short_working', terminus: <code> }  — treno corto
-   *   { reason: 'no_service' }                        — nessun viaggio
-   *   null                                            — non diagnosticabile
-   * ---------------------------------------------------------------- */
   function _diagnoseBuildLeg(lineId, svcId, boardCode, alightCode, minDepSec) {
     const { hmToSec, secToHM } = TTEngine;
     const fromHM = secToHM(minDepSec);
@@ -281,11 +259,9 @@ const IZXRouter = (() => {
         if (!trip.stops[alightCode]) {
           const precedes = _terminusPrecedesAlight(trip, lineId, alightCode);
           if (precedes === true && trip.terminus) {
-            // Tutti i trip in questa finestra terminano prima di alightCode
             shortWorkingTerminus = trip.terminus;
           }
         } else {
-          // Almeno un trip raggiunge alightCode: non è short-working
           return null;
         }
       }
@@ -339,7 +315,7 @@ const IZXRouter = (() => {
       boardDep:    boardStop.dep,
       boardDepSec: boardSec,
       alightCode,
-      alightName:  stationName(alightCode),
+      alightName:   stationName(alightCode),
       alightArr:   alightStop?.arr ?? alightStop?.dep ?? "--:--",
       alightArrSec: alightSec,
       km:           legKm,
@@ -352,7 +328,6 @@ const IZXRouter = (() => {
 
     const seen   = new Set();
     const unique = journeys.filter(j => {
-      // I journey noService non partecipano alla deduplicazione normale
       if (j.noService) return true;
       const key = j.legs.map(l =>
         `${l.lineId}:${l.svcId}:${l.boardDep}:${l.alightArr}`
@@ -362,14 +337,13 @@ const IZXRouter = (() => {
     });
 
     unique.sort((a, b) => {
-      // I journey noService vanno in fondo
       if (a.noService && !b.noService) return 1;
       if (!a.noService && b.noService) return -1;
       const da = hmToSec(a.arrivalTime),   db = hmToSec(b.arrivalTime);
       if (da !== db) return da - db;
       const ta = a.transfers ?? 0,         tb = b.transfers ?? 0;
       if (ta !== tb) return ta - tb;
-      return hmToSec(b.departureTime) - hmToSec(a.departureTime);
+      return hmToSec(b.departureTime) - _hmToSec(a.departureTime);
     });
 
     const kept = [];
@@ -401,7 +375,6 @@ const IZXRouter = (() => {
     const journeys    = [];
     const lineAllowed = _lineFilter(opts);
 
-    // FIX 11: traccia eventuali miss per short-working nella fase diretta
     const shortWorkingMisses = [];
 
     for (const [lineId, line] of Object.entries(IZX_LINES)) {
@@ -410,10 +383,9 @@ const IZXRouter = (() => {
       const hasTo   = line.ST[to]   !== undefined;
       if (!hasFrom || !hasTo) continue;
       for (const svcId of Object.keys(line.SVC)) {
-        if (!line.TT[svcId]) continue;
+        if (lineId !== 'RY' && !line.TT[svcId]) continue;
         const leg = buildLeg(lineId, svcId, from, to, depSec);
         if (!leg) {
-          // FIX 11: diagnostica il miss
           const diag = _diagnoseBuildLeg(lineId, svcId, from, to, depSec);
           if (diag && diag.reason === 'short_working') {
             shortWorkingMisses.push({
@@ -454,12 +426,12 @@ const IZXRouter = (() => {
               if (lineAllowed && !lineAllowed.has(lineId1)) continue;
               if (!line1.ST[from] || !line1.ST[midNode]) continue;
               for (const svcId1 of Object.keys(line1.SVC)) {
-                if (!line1.TT[svcId1]) continue;
+                if (lineId1 !== 'RY' && !line1.TT[svcId1]) continue;
                 const leg1 = buildLeg(lineId1, svcId1, from, midNode, depSec);
                 if (!leg1) continue;
                 const transferReadySec = leg1.alightArrSec + TRANSFER_SEC;
                 for (const svcId2 of Object.keys(line2.SVC)) {
-                  if (!line2.TT[svcId2]) continue;
+                  if (lineId2 !== 'RY' && !line2.TT[svcId2]) continue;
                   if (lineId1 === lineId2 && svcId1 === svcId2 && midNode === partnerNode) continue;
                   const leg2 = buildLeg(lineId2, svcId2, partnerNode, to, transferReadySec);
                   if (!leg2) continue;
@@ -485,10 +457,6 @@ const IZXRouter = (() => {
       }
     }
 
-    // FIX 11: se non ci sono journey normali e ci sono miss short-working,
-    // emetti journey sintetici noService per ogni miss distinto.
-    // Se ci sono già journey validi, i noService vengono soppressi
-    // (la rotta esiste comunque, ad es. via cambio).
     const normalJourneys = journeys.filter(j => !j.noService);
     if (normalJourneys.length === 0 && shortWorkingMisses.length > 0) {
       const seen = new Set();
