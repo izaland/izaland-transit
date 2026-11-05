@@ -189,16 +189,16 @@ const RY_SVC = {
 
 /* ---- SEIBU NAERYUKU BRANCH (SA) — nuova numerazione ---- */
 const SA_ST = {
-  SA00: { n:"Riyatoma",              k:"追庥",       b:"sa", km:0      },
-  SA01: { n:"Sayaize",               k:"餝拭",       b:"sa", km:38.87  },
-  SA02: { n:"Haðohano-Chunðouuni",   k:"鮪種・椒潟", b:"sa", km:69.59  },
-  SA03: { n:"Mirayama-Hattsuma",     k:"水良倉発維", b:"sa", km:97.21  },
-  SA04: { n:"Poridake",              k:"登館",       b:"sa", km:140.00 },
-  SA05: { n:"Hakosakki",             k:"元端",       b:"sa", km:172.60 },
-  SA06: { n:"Pakkutanma",            k:"赤谷",       b:"sa", km:195.67 },
-  SA07: { n:"Yamagata",              k:"倉泉",       b:"sa", km:217.40 },
-  SA08: { n:"Tentosamo",             k:"犬山",       b:"sa", km:255.11 },
-  SA09: { n:"Shin-Fudoasamo",        k:"新皿山",     b:"sa", km:286.28 },
+  SA00: { n:"Riyatoma",            k:"追庥",       b:"sa", km:369.19 },
+  SA01: { n:"Sayaize",             k:"餝拭",       b:"sa", km:408.06 },
+  SA02: { n:"Haðohano-Chunðouuni", k:"鮪種・椒潟", b:"sa", km:438.78 },
+  SA03: { n:"Mirayama-Hattsuma",   k:"水良倉発維", b:"sa", km:466.40 },
+  SA04: { n:"Poridake",            k:"登館",       b:"sa", km:509.19 },
+  SA05: { n:"Hakosakki",           k:"元端",       b:"sa", km:541.79 },
+  SA06: { n:"Pakkutanma",          k:"赤谷",       b:"sa", km:564.86 },
+  SA07: { n:"Yamagata",            k:"倉泉",       b:"sa", km:586.59 },
+  SA08: { n:"Tentosamo",           k:"犬山",       b:"sa", km:624.30 },
+  SA09: { n:"Shin-Fudoasamo",      k:"新皿山",     b:"sa", km:655.47 },
 };
 
 const SA_CANONICAL_ORDER = [
