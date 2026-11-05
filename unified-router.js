@@ -1,12 +1,12 @@
 /* ================================================================
    UNIFIED-ROUTER.JS — Izaland Cross-Network Journey Planner
    ================================================================
-   FIX 20:
-     - La prima gamba (j1) può usare i cambi interni alla rete di
-       partenza: necessario per percorsi come R19 → R13 → SA04.
-     - Corretto il riferimento midSt → midSt1 nella ricerca a 3 cambi.
-     - directOnly dell'utente viene rispettato; non è più forzato
-       sulle gambe iniziali.
+   FIX 21:
+     - j1list (Fasi 2 e 3) passa da maxResults 2 a 6: con piu' corse
+       per servizio, i 2 slot erano occupati da corse dello stesso
+       servizio i cui transfer erano dominati dalle dirette.
+     - _nextLegs: maxResults 2 -> 3 per la gamba successiva.
+     - MAX_JOURNEYS 5 -> 10 per non tagliare i transfer sopravvissuti.
 ================================================================ */
 
 (function (root, factory) {
@@ -15,7 +15,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  const MAX_JOURNEYS       = 5;
+  const MAX_JOURNEYS       = 10;
   const CROSS_TRANSFER_MIN = 10;
   const CROSS_TRANSFER_SEC = CROSS_TRANSFER_MIN * 60;
 
@@ -368,7 +368,7 @@
     if (partner.thru) {
       const readyHM = _secToHM(arr + partner.thruSec);
       const list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
-        { ...opts, maxResults: 2, directOnly: true });
+        { ...opts, maxResults: 3, directOnly: true });
       const first = list[0];
       if (first) {
         const gap = ((_hmToSec(first.departureTime) - arr + 86400) % 86400) / 60;
@@ -380,11 +380,11 @@
     const readyHM = _secToHM(arr + tSec);
 
     let list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
-      { ...opts, maxResults: 2, directOnly: true });
+      { ...opts, maxResults: 3, directOnly: true });
 
     if (!list.length) {
       list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
-        { ...opts, maxResults: 2 });
+        { ...opts, maxResults: 3 });
     }
 
     return list.map(j2 => ({ j2, thru: false }));
@@ -543,7 +543,7 @@
         const j1list = _safeSearch(
           router1, fNode.networkId,
           fNode.code, midSt.code, depTime,
-          { ...opts, maxResults: 2, directOnly: !!opts.directOnly }
+          { ...opts, maxResults: 6, directOnly: !!opts.directOnly }
         );
         if (!j1list.length) continue;
 
@@ -585,7 +585,7 @@
         const j1list = _safeSearch(
           router1, fNode.networkId,
           fNode.code, midSt1.code, depTime,
-          { ...opts, maxResults: 2, directOnly: !!opts.directOnly }
+          { ...opts, maxResults: 6, directOnly: !!opts.directOnly }
         );
         if (!j1list.length) continue;
 
