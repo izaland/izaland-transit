@@ -74,8 +74,6 @@ const TTEngine = (() => {
   }
 
     const stops = dir === 'NB' ? [...activeStops].reverse() : activeStops;
-  );
-  const stops = dir === 'NB' ? [...stopsRaw].reverse() : stopsRaw;
 
   const offsets = {};
   offsets[stops[0]] = 0;
