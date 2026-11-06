@@ -68,8 +68,10 @@ def decode_js_string(raw):
     return raw.strip()
 
 
-def find_matching_brace(text, open_index):
-    """Trova la parentesi graffa di chiusura corrispondente, ignorando stringhe e commenti."""
+def find_matching_delimiter(text, open_index):
+    """Trova la chiusura corrispondente per {…} oppure […], ignorando stringhe e commenti."""
+    opening = text[open_index]
+    closing = {'{': '}', '[': ']'}[opening]
     depth = 0
     i = open_index
     quote = None
@@ -120,17 +122,16 @@ def find_matching_brace(text, open_index):
             i += 2
             continue
 
-        if char == "{":
+        if char == opening:
             depth += 1
-            if depth == 1:
-                open_index = i
-        elif char == "}":
+        elif char == closing:
             depth -= 1
             if depth == 0:
                 return i
+
         i += 1
 
-    raise ValueError("Parentesi graffa non bilanciata")
+    raise ValueError(f"Delimitatore {opening}…{closing} non bilanciato")
 
 
 def parse_js_value(text, start):
@@ -227,7 +228,7 @@ def extract_station_records(path):
         array_name = match.group(1)
         open_index = match.end() - 1
         try:
-            close_index = find_matching_brace(source, open_index)
+            close_index = find_matching_delimiter(source, open_index)
         except ValueError as exc:
             diagnostics.append({
                 "file": str(path), "location": array_name,
@@ -246,7 +247,7 @@ def extract_station_records(path):
                 continue
 
             try:
-                close = find_matching_brace(body, cursor)
+                close = find_matching_delimiter(body, cursor)
                 entries = parse_object_entries(body[cursor + 1: close])
             except (ValueError, IndexError) as exc:
                 diagnostics.append({
