@@ -31,6 +31,7 @@ const TTEngine = (() => {
     const rule = conditionalStops[code].rule;
     if (rule === 'peak') return peakNow;
     if (rule === 'alternate') return (tripIndex + (conditionalStops[code].phase ?? 0)) % 2 === 0;
+    if (rule === 'third') return (tripIndex + (conditionalStops[code].phase ?? 0)) % 3 === 0;
     if (rule === 'always') return true;
     if (rule === 'direct') return routeType !== 'punohai';
     if (rule === 'punohai') return routeType === 'punohai';
@@ -135,6 +136,10 @@ const TTEngine = (() => {
       const routeType = hasPunohaiRule
         ? (tripIndex % 2 === 0 ? 'direct' : 'punohai')
         : null;
+             const patternGroup = svc.patternGroup || null;
+      const patternIndex = patternGroup
+        ? Math.floor((cursor - SERVICE_START) / interval)
+        : tripIndex;
              if (lineId === 'RY') {
         const stopsRaw = svc.stops.filter(code =>
           code.startsWith('R') || code.startsWith('SA') || code.startsWith('SK')
@@ -145,7 +150,7 @@ const TTEngine = (() => {
           stopIsActive(
             st,
             svc.conditionalStops || null,
-            tripIndex,
+            patternIndex,
             peakNow,
             routeType
           )
@@ -189,8 +194,8 @@ const TTEngine = (() => {
       const tripStops = {};
       const conditionalStops = svc.conditionalStops || null;
 
-      for (const st of stops) {
-        if (!stopIsActive(st, conditionalStops, tripIndex, peakNow, routeType)) continue;
+            for (const st of stops) {
+        if (!stopIsActive(st, conditionalStops, patternIndex, peakNow, routeType)) continue;
         const rawOffset = tt[st];
         if (rawOffset === undefined) continue;
         const depSec = cursor + rawOffset;
