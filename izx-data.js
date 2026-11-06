@@ -193,7 +193,7 @@ const RY_SVC = {
     }
   },
   H: {coeff:1.15, name:"Kinbuku", cls:"svc-H", color:"#50938A",
-      stops:["R01","R02","R06","R10","R14","R15","R16","R17","R18","R19","R20","R21"]},
+      stops:["R01","R02","R06","R10","R13","R14","R15","R16","R17","R18","R19","R20","R21"]},
 };
 
 /* ---- SEIBU NAERYUKU BRANCH (SA) — nuova numerazione ---- */
