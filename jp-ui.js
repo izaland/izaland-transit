@@ -1,1 +1,1 @@
-<jp-ui.js completo con il blocco CL inserito in svcBadgeHTML>
+<jp-ui.js completo e reale con blocco CL>
