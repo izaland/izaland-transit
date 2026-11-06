@@ -8,12 +8,24 @@
    Frequenza: 30 min tutto il giorno; rinforzo a 20 min
    nelle punte mattutina e serale.
 
-   Interscambi: gestiti automaticamente dal cluster generator
-   (data/interchange-clusters.json + applyGeneratedInterchangeClusters).
+   Interscambi:
+     NKT01 Tsukuwa ↔ CO58 Tsukuwa
+     NKT05 Wodoriha IR ↔ K05 Wodoriha IR
+     NKT12 Eriraul ↔ K06 Shin-Eriraul
+     NKT39 Otsumi-Komishinan ↔ K08 Otsumi-Komishinan
+     NKT50 Kamahoraya ↔ K09 Kamahoraya
+   Altri interscambi saranno generati automaticamente dal
+   cluster generator quando il mapping CSV coprirà le stazioni NKT.
 ================================================================ */
 'use strict';
 
-const NKT_INTERCHANGE = {};
+const NKT_INTERCHANGE = {
+  NKT01: ['CO58'],
+  NKT05: ['K05'],
+  NKT12: ['K06'],
+  NKT39: ['K08'],
+  NKT50: ['K09'],
+};
 
 const NKT_LINES = {
   NKT: {
