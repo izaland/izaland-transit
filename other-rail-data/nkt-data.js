@@ -11,7 +11,6 @@
    Interscambi:
      NKT01 Tsukuwa ↔ CO58 Tsukuwa
      NKT05 Wodoriha IR ↔ K05 Wodoriha IR
-     NKT12 Eriraul ↔ K06 Shin-Eriraul
      NKT39 Otsumi-Komishinan ↔ K08 Otsumi-Komishinan
      NKT50 Kamahoraya ↔ K09 Kamahoraya
    Altri interscambi saranno generati automaticamente dal
@@ -22,7 +21,6 @@
 const NKT_INTERCHANGE = {
   NKT01: ['CO58'],
   NKT05: ['K05'],
-  NKT12: ['K06'],
   NKT39: ['K08'],
   NKT50: ['K09'],
 };
