@@ -527,20 +527,25 @@
       if (!router1 || typeof router1.allStations !== 'function') continue;
 
       for (const midSt of _bridgesOf(fNode.networkId)) {
+         let bridgeCount = 0;
         if (_timeUp()) break;
+         if (++bridgeCount > 15) break;
 
         const tNetSet = new Set(tNodes.map(t => t.networkId));
-        const cacheKey = midSt.code + '|' + [...tNetSet].join(',');
+const cacheKey = midSt.code + '|' + [...tNetSet].join(',');
 
-        let partners = _bridgePartnersCache.get(cacheKey);
-        if (!partners) {
-          partners = _partnersOf(midSt.code).filter(p => {
-            if (netFilter && !netFilter.has(p.networkId)) return false;
-            return tNetSet.has(p.networkId);
-          });
-          _bridgePartnersCache.set(cacheKey, partners);
-        }
-        if (!partners.length) continue;
+let partners = _bridgePartnersCache.get(cacheKey);
+if (!partners) {
+  partners = _partnersOf(midSt.code).filter(p => {
+    if (netFilter && !netFilter.has(p.networkId)) return false;
+    return tNetSet.has(p.networkId);
+  });
+  _bridgePartnersCache.set(cacheKey, partners);
+}
+
+if (partners.length > 6) partners = partners.slice(0, 6);
+
+if (!partners.length) continue;
 
         const j1list = _safeSearch(
           router1, fNode.networkId,
@@ -563,6 +568,7 @@
                 thru
               ));
           }
+              if (journeys.length >= (opts.maxResults ?? MAX_JOURNEYS)) break;        
         }
       }
     }
