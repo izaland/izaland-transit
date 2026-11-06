@@ -30,6 +30,8 @@
   let _bridgePartnersCache = new Map();
   let _deadline            = Infinity;
   let _truncated           = false;
+  let _searchCalls = 0;
+  const MAX_SEARCH_CALLS = 200;
 
   function _clearCaches() {
     _netCache.clear();
@@ -342,6 +344,7 @@
     const key = networkId + '|' + from + '|' + to + '|' + depTime + '|' +
       (opts.directOnly ? 1 : 0) + '|' + (opts.maxResults ?? '') + '|' +
       (opts.networks ? [].concat(opts.networks).join(',') : '');
+    if (++_searchCalls > MAX_SEARCH_CALLS) { _truncated = true; return []; }
     const hit = _memo.get(key);
     if (hit) return hit;
 
@@ -367,7 +370,7 @@
     if (partner.thru) {
       const readyHM = _secToHM(arr + partner.thruSec);
       const list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
-        { ...opts, maxResults: 2, directOnly: true });
+        { ...opts, maxResults: 1, directOnly: true });
       const first = list[0];
       if (first) {
         const gap = ((_hmToSec(first.departureTime) - arr + 86400) % 86400) / 60;
@@ -379,7 +382,7 @@
     const readyHM = _secToHM(arr + tSec);
 
     let list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
-      { ...opts, maxResults: 2, directOnly: true });
+      { ...opts, maxResults: 1, directOnly: true });
 
     if (!list.length) {
       list = _safeSearch(router, partner.networkId, partner.code, toCode, readyHM,
@@ -542,7 +545,7 @@
         const j1list = _safeSearch(
           router1, fNode.networkId,
           fNode.code, midSt.code, depTime,
-          { ...opts, maxResults: 4, directOnly: !!opts.directOnly }
+          { ...opts, maxResults: 2, directOnly: !!opts.directOnly }
         );
         if (!j1list.length) continue;
 
@@ -567,7 +570,7 @@
     /* ------------------------------------------------------------
        FASE 3 — due cambi cross-network
     ------------------------------------------------------------ */
-    const enough = opts.minBeforeThreeLeg ?? 3;
+    const enough = opts.minBeforeThreeLeg ?? 8;
     if (_dedup(journeys.slice()).length >= enough) return journeys;
 
     for (const fNode of fNodes) {
@@ -584,7 +587,7 @@
         const j1list = _safeSearch(
           router1, fNode.networkId,
           fNode.code, midSt1.code, depTime,
-          { ...opts, maxResults: 4, directOnly: !!opts.directOnly }
+          { ...opts, maxResults: 2, directOnly: !!opts.directOnly }
         );
         if (!j1list.length) continue;
 
@@ -650,6 +653,7 @@
     else _deadline = _batchDeadline = _now + (opts.timeBudgetMs ?? SEARCH_BUDGET_MS);
 
     const all = [];
+    _searchCalls = 0;
     try {
       for (const f of froms) {
         for (const t of tos) {
