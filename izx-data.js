@@ -138,26 +138,37 @@ const RY_SVC = {
       conditionalStops:{
         R03:{rule:"peak"}
       }},
-  G: {coeff:1.15, name:"Daihuku", cls:"svc-G", color:"#148466",
-      stops:["R01","R02","R06","R13","R14","R15","R16","R17","R18","R19","R20","R21"],
-      conditionalStops:{
-        R81:{rule:"alternate", phase:0},
-        R16:{rule:"alternate", phase:0},
-        R17:{rule:"alternate", phase:0},
-        R18:{rule:"alternate", phase:0},
-        R19:{rule:"alternate", phase:0},
-        R20:{rule:"alternate", phase:0},
-        R21:{rule:"always"}
-      }},
-  I: {
-    coeff:1.15, name:"Daid\u014dn Rapido", cls:"svc-I", color:"#1F6A39",
-    stops:["R01","R02","R06","R13","R14","R15",
-           "DI1","DI3","DI8","DI9","DI12","DI14"],
-    conditionalStops:{
-      R81:  {rule:"alternate", phase:0},
-      DI13: {rule:"direct"},
-      DI131:{rule:"punohai"},
-    }
+    G: {
+    coeff: 1.15,
+    name: "Daihuku",
+    cls: "svc-G",
+    color: "#148466",
+    patternGroup: "RY_DAIHUKU",
+    stops: [
+      "R01", "R02", "R06", "R81", "R13",
+      "R15", "R16", "R20", "R21"
+    ],
+    conditionalStops: {
+      R81: { rule: "third", phase: 0 },
+      R16: { rule: "third", phase: 0 },
+      R20: { rule: "third", phase: 0 },
+    },
+  },
+    I: {
+    coeff: 1.15,
+    name: "Daidōn Rapido",
+    cls: "svc-I",
+    color: "#1F6A39",
+    patternGroup: "RY_DAIHUKU",
+    stops: [
+      "R01", "R02", "R06", "R13", "R15",
+      "DI1", "DI3", "DI8", "DI9", "DI12", "DI14"
+    ],
+    conditionalStops: {
+      R81: { rule: "third", phase: 0 },
+      DI13: { rule: "direct" },
+      DI131: { rule: "punohai" },
+    },
   },
   IS: {
     coeff:1.12, name:"Daid\u014dn Semi", cls:"svc-IS", color:"#2E8B57",
