@@ -448,6 +448,49 @@ function _isThruNode(subCode, metroCode) {
     return _getInverseMap()[code] ?? code;
   }
 
+     /* ----------------------------------------------------------------
+   * applyGeneratedInterchangeClusters(payload)
+   * Collega i cluster generati da data/interchange-clusters.json
+   * a SUBURBAN_INTERCHANGE, senza sovrascrivere gli interscambi manuali.
+   * ---------------------------------------------------------------- */
+  function applyGeneratedInterchangeClusters(payload) {
+    const clusters = payload && payload.clusters;
+    if (!clusters) return 0;
+
+    let added = 0;
+
+    for (const cluster of Object.values(clusters)) {
+      const codes = cluster.codes || [];
+      const transferMin = cluster.transferMin ?? 5;
+
+      for (const a of codes) {
+        for (const b of codes) {
+          if (a === b) continue;
+
+          const list = SUBURBAN_INTERCHANGE[a] ?? (SUBURBAN_INTERCHANGE[a] = []);
+          const partnerCode = (typeof b === 'object' && b !== null) ? b.code : b;
+
+          const exists = list.some(p => {
+            const code = (typeof p === 'object' && p !== null) ? p.code : p;
+            return code === partnerCode;
+          });
+
+          if (!exists) {
+            list.push({ code: partnerCode, transferMin });
+            added++;
+          }
+        }
+      }
+    }
+
+    // Invalida le cache derivate da SUBURBAN_INTERCHANGE.
+    _suburbanCodeSet = null;
+    _suburbanPartnerMap = null;
+    _inverseMap = null;
+
+    return added;
+  }
+
    /* ----------------------------------------------------------------
  * _getEquivalentCodes(code)
  * Restituisce tutti i codici suburbani equivalenti a `code`
@@ -1343,8 +1386,25 @@ if (!directOnly) {
     allStations,
     buildLeg,
     register,
+    applyGeneratedInterchangeClusters,
     TRANSFER_MIN,
     transferMin,
   };
 
 })();
+
+/* Caricamento facoltativo dei cluster generati.
+   Se il file non è raggiungibile, il routing esistente resta intatto. */
+if (typeof window !== 'undefined' && typeof SuburbanRouter !== 'undefined') {
+  fetch('data/interchange-clusters.json')
+    .then(response => (response.ok ? response.json() : null))
+    .then(payload => {
+      if (payload) {
+        const added = SuburbanRouter.applyGeneratedInterchangeClusters(payload);
+        console.info(`Interchange clusters: ${added} collegamenti aggiunti`);
+      }
+    })
+    .catch(error => {
+      console.warn('Interchange clusters non caricati:', error);
+    });
+}
