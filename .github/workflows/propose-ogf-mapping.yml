@@ -1,0 +1,47 @@
+name: OGF station mapping review
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  propose-mapping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Rebuild station export
+        run: python scripts/build_json.py
+
+      - name: Generate mapping proposals
+        run: |
+          python scripts/propose_ogf_mapping.py \
+            --root . \
+            --out output/mapping-review.csv
+
+      - name: Upload review reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: ogf-mapping-review
+          path: |
+            output/mapping-review.csv
+            output/mapping-review.diagnostics.json
+          if-no-files-found: error
+          retention-days: 30
