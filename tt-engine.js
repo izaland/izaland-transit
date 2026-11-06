@@ -42,7 +42,7 @@ const TTEngine = (() => {
     return TRANSIT_STATIONS.has(code) ? 0 : 60;
   }
 
-  function buildRyOffsets(svc, dir) {
+  function buildRyOffsets(activeStops, dir) {
   const adj = {};
   for (const s of RY_SEGMENTS) {
     (adj[s.from] ??= []).push(s);
@@ -73,8 +73,7 @@ const TTEngine = (() => {
     return { sec, nodes };
   }
 
-  const stopsRaw = svc.stops.filter(code =>
-    code.startsWith('R') || code.startsWith('SA') || code.startsWith('SK')
+    const stops = dir === 'NB' ? [...activeStops].reverse() : activeStops;
   );
   const stops = dir === 'NB' ? [...stopsRaw].reverse() : stopsRaw;
 
@@ -102,32 +101,23 @@ const TTEngine = (() => {
     const peaks = line.PEAK;
     const offset = (line.OFFSETS?.[svcId] ?? 0) * 60;
 
-    let stops, tt;
-    if (lineId === 'RY') {
-      const built = buildRyOffsets(svc, dir);
-      stops = built.stops;
-      tt = built.offsets;
-    } else {
+        let stops, tt;
+
+    if (lineId !== 'RY') {
       const raw = line.TT[svcId];
       const stopsRaw = svc.stops.filter(s => raw[s] !== undefined);
       stops = dir === 'NB' ? [...stopsRaw].reverse() : stopsRaw;
+
       if (dir === 'NB') {
-        /* FIX: specchia gli offset per la direzione NB:
-           l'ultima fermata SB diventa la partenza (offset 0),
-           la prima SB diventa l'arrivo (offset = durata totale). */
         const total = Math.max(...stopsRaw.map(s => raw[s]));
         tt = {};
         for (const s of stopsRaw) tt[s] = total - raw[s];
       } else {
         tt = raw;
       }
+
+      if (stops.length < 2) return [];
     }
-
-    if (stops.length < 2) return [];
-
-    const totalDuration = tt[stops[stops.length - 1]];
-    const splits = dir === 'SB' ? (line.TERMINUS_SPLIT?.[svcId] ?? null) : null;
-    const nbTerminus = dir === 'NB' ? stops[stops.length - 1] : null;
 
     const SERVICE_START = hmToSec('06:00');
     const SERVICE_END = hmToSec('24:30');
@@ -147,6 +137,35 @@ const TTEngine = (() => {
       const routeType = hasPunohaiRule
         ? (tripIndex % 2 === 0 ? 'direct' : 'punohai')
         : null;
+             if (lineId === 'RY') {
+        const stopsRaw = svc.stops.filter(code =>
+          code.startsWith('R') || code.startsWith('SA') || code.startsWith('SK')
+        );
+        const ordered = dir === 'NB' ? [...stopsRaw].reverse() : stopsRaw;
+
+        const activeStops = ordered.filter(st =>
+          stopIsActive(
+            st,
+            svc.conditionalStops || null,
+            tripIndex,
+            peakNow,
+            routeType
+          )
+        );
+
+        if (activeStops.length < 2) {
+          cursor += interval;
+          continue;
+        }
+
+        const built = buildRyOffsets(activeStops, dir);
+        stops = built.stops;
+        tt = built.offsets;
+      }
+
+      const totalDuration = tt[stops[stops.length - 1]];
+      const splits = dir === 'SB' ? (line.TERMINUS_SPLIT?.[svcId] ?? null) : null;
+      const nbTerminus = dir === 'NB' ? stops[stops.length - 1] : null;
 
       let terminus = stops[stops.length - 1];
       if (nbTerminus) terminus = nbTerminus;
