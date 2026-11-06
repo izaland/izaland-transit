@@ -171,6 +171,9 @@ function svcPillHTML(svcDesc) {
       <img class="logo-dark" src="assets/img/logos/CL_logo-dark.svg" alt="CityLiner">
     </span>`;
   }
+       if (lineId === 'NKT') {
+  return `<span class="svc-badge-loc">LOC</span>`;
+}
 
   const isMetro = network === 'metro';
   if (isMetro) {
