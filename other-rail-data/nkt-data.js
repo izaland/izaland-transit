@@ -131,6 +131,16 @@ if (typeof SUBURBAN_LINES !== 'undefined') {
   Object.assign(SUBURBAN_LINES, NKT_LINES);
 }
 if (typeof SUBURBAN_INTERCHANGE !== 'undefined') {
+  // Airport hub: CK02 ↔ K03 (5 min), CK02 ↔ metro (7 min)
+  const ck = SUBURBAN_INTERCHANGE['CK02'] || (SUBURBAN_INTERCHANGE['CK02'] = []);
+  const addPartner = (p) => {
+    const code = typeof p === 'string' ? p : p.code;
+    if (!ck.some(e => (typeof e === 'string' ? e : e.code) === code)) ck.push(p);
+  };
+  addPartner('K03');
+  addPartner({ code: 'M1302', transferMin: 7 });
+  addPartner({ code: 'M1502', transferMin: 7 });
+
   for (const [code, partners] of Object.entries(NKT_INTERCHANGE)) {
     if (!SUBURBAN_INTERCHANGE[code]) SUBURBAN_INTERCHANGE[code] = [];
     for (const p of partners) {

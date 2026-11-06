@@ -5,6 +5,7 @@
                metro/*, cl-data.js, cl-tt.js, cityliner-router.js
    Caricare DOPO unified-router.js e cityliner-router.js.
 ================================================================ */
+
 (function(){
 
   /* ================================================================
@@ -25,12 +26,17 @@ if (typeof MetroRouter !== 'undefined')
   // IZX_LINES interchange
   for (const line of Object.values(IZX_LINES)) {
     if (line.INTERCHANGE) {
-      for (const [a, b] of Object.entries(line.INTERCHANGE))
-        pairs.push({ codeA: a, codeB: b });
+      for (const [a, b] of Object.entries(line.INTERCHANGE)) {
+        const arr = Array.isArray(b) ? b : [b];
+        for (const e of arr)
+          pairs.push({ codeA: a, codeB: e.code ?? e, transferMin: e.transferMin });
+      }
     }
     if (line.INTERCHANGE_EXTRA) {
       for (const [a, partners] of Object.entries(line.INTERCHANGE_EXTRA)) {
-        for (const b of partners) pairs.push({ codeA: a, codeB: b });
+        const arr = Array.isArray(partners) ? partners : [partners];
+        for (const e of arr)
+          pairs.push({ codeA: a, codeB: e.code ?? e, transferMin: e.transferMin });
       }
     }
   }
@@ -278,7 +284,6 @@ function svcPillHTML(svcDesc) {
       card.querySelectorAll('.leg-expand-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const target = card.querySelector('#' + btn.dataset.target);
-          if (!target) return;
           const open = target.classList.toggle('open');
           btn.textContent = open ? btn.textContent.replace('\u25b8', '\u25be') : btn.textContent.replace('\u25be', '\u25b8');
         });
@@ -366,7 +371,6 @@ function svcPillHTML(svcDesc) {
   document.getElementById('jp-earlier').addEventListener('click', () => {
     if (!_jpState.from) return;
     const anchor = _prevBefore(_jpState.all);
-    if (!anchor) return;
     const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly, _jpState.excludeIzx);
     const cutoff = _parseMins(_jpState.windowStart);
     const earlier = journeys.filter(j => _parseMins(j.departureTime) < cutoff);
@@ -383,7 +387,6 @@ function svcPillHTML(svcDesc) {
   document.getElementById('jp-later').addEventListener('click', () => {
     if (!_jpState.from) return;
     const anchor = _nextAfter(_jpState.all);
-    if (!anchor) return;
     const journeys = _runSearch(_jpState.from, _jpState.to, anchor, _jpState.lineF, _jpState.directOnly, _jpState.excludeIzx);
     if (!journeys.length) {
       const btn = document.getElementById('jp-later');
