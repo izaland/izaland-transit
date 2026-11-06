@@ -82,13 +82,7 @@ const TTEngine = (() => {
     const a = stops[i], b = stops[i + 1];
     const res = pathSec(a, b);
     if (!res) continue;
-    let dwell = 0;
-        for (const mid of res.nodes) {
-      if (mid !== a && stops.includes(mid)) {
-        dwell += RunTimeEngine.dwellSec(mid, RY_DWELL);
-      }
-    }
-    offsets[b] = offsets[a] + res.sec + dwell;
+        offsets[b] = offsets[a] + res.sec + RunTimeEngine.dwellSec(b, RY_DWELL);
   }
   return { stops, offsets };
 }
