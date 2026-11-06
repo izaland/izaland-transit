@@ -9,7 +9,7 @@
 const KE_ST = {
   K01:  {n:"Sainðaul Central",        k:"\u4f5c\u5b89\u5d0e\u4e2d\u592e",  b:"main",   km:0},
   K02:  {n:"Niji-Sainðaul",            k:"\u897f\u4f5c\u5b89\u5d0e",      b:"main",   km:11.4},
-  K03:  {n:"Asunahama Int'l Airport",     k:"\u5929\u5cf6\u570b\u969b\u7a7a\u6e2f", b:"main", km:35.4},
+  K03:  {n:"Asunahama International Airport",     k:"\u5929\u5cf6\u570b\u969b\u7a7a\u6e2f", b:"main", km:35.4},
   K31:  {n:"Pyanuza",                     k:"",                              b:"cprime"},
   K32:  {n:"Nagayamatsu",                 k:"",                              b:"cprime"},
   K33:  {n:"Keishunneul",                 k:"",                              b:"cprime"},
