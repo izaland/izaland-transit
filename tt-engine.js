@@ -111,7 +111,16 @@ const TTEngine = (() => {
       const raw = line.TT[svcId];
       const stopsRaw = svc.stops.filter(s => raw[s] !== undefined);
       stops = dir === 'NB' ? [...stopsRaw].reverse() : stopsRaw;
-      tt = raw;
+      if (dir === 'NB') {
+        /* FIX: specchia gli offset per la direzione NB:
+           l'ultima fermata SB diventa la partenza (offset 0),
+           la prima SB diventa l'arrivo (offset = durata totale). */
+        const total = Math.max(...stopsRaw.map(s => raw[s]));
+        tt = {};
+        for (const s of stopsRaw) tt[s] = total - raw[s];
+      } else {
+        tt = raw;
+      }
     }
 
     if (stops.length < 2) return [];
