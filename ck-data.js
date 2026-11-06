@@ -14,8 +14,8 @@
    ix: codici equivalenti su altre reti (interscambi cross-network)
 ---------------------------------------------------------------- */
 const CK_ST = {
-  CK01: { n: 'Asunahama Airport Terminal 4',   k: '',                km:  0.00, ix: ['AX00'] },
-  CK02: { n: 'Sainðaul International Airport', k: '作安崎國際空港',  km:  3.11, ix: ['AX01', 'KE03'] },
+   CK01: { n: 'Asunahama Airport Terminal 4',   k: '天島國際空港T4',                km:  0.00, ix: ['AX00'] },
+  CK02: { n: 'Asunahama International Airport', k: '天島國際空港',  km:  3.11, ix: ['AX01', 'KE03'] },
   CK03: { n: 'Shinseibijān',                   k: '新整備場',        km:  5.56, ix: [] },
   CK04: { n: 'Rinkūn City',                    k: 'રિન્ઝેંપ ટાઠા',  km:  8.21, ix: ['AX02'] },
   CK05: { n: 'Ikisawa',                        k: '琴空',            km:  9.46, ix: [] },
