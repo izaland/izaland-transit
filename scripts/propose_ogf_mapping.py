@@ -8,7 +8,8 @@ Parser strutturale:
 - riconosce oggetti stazione e array `stations`;
 - decodifica stringhe JS (\\uXXXX, \\xXX, escape standard);
 - conserva `ogfId`, `nodeId`, `osmId` se presenti;
-- separa stazioni, servizi e metadati.
+- separa stazioni, servizi e metadati;
+- distingue le mappature presenti e quelle in attesa di un export OGF aggiornato.
 
 Uso:
   python scripts/propose_ogf_mapping.py --root . --out output/mapping-review.csv
@@ -31,7 +32,6 @@ SERVICE_HINTS = (
     "rapid", "local", "all-stop", "allstop", "line", "route", "direction"
 )
 
-# Chiavi che identificano con buona probabilità una stazione reale.
 STATION_HINTS = ("km", "lat", "lon", "latlon", "coord", "transfer", "interchange")
 
 
@@ -214,11 +214,12 @@ def looks_like_service(entries):
     return any(hint in joined for hint in SERVICE_HINTS)
 
 
-def extract_station_records(path):
+def extract_station_records(path, root):
     """Estrae record stazione da un file *-data.js, con provenienza e diagnostica."""
     source = path.read_text(encoding="utf-8", errors="replace")
     records = []
     diagnostics = []
+    relative_path = str(path.relative_to(root))
 
     station_array_pattern = re.compile(
         r"(?:const|let|var)?\s*([A-Za-z_$][\w$]*)\s*=\s*\[", re.MULTILINE
@@ -231,7 +232,7 @@ def extract_station_records(path):
             close_index = find_matching_delimiter(source, open_index)
         except ValueError as exc:
             diagnostics.append({
-                "file": str(path), "location": array_name,
+                "file": relative_path, "location": array_name,
                 "severity": "error", "message": str(exc)
             })
             continue
@@ -251,7 +252,7 @@ def extract_station_records(path):
                 entries = parse_object_entries(body[cursor + 1: close])
             except (ValueError, IndexError) as exc:
                 diagnostics.append({
-                    "file": str(path), "location": f"{array_name}[{cursor}]",
+                    "file": relative_path, "location": f"{array_name}[{cursor}]",
                     "severity": "warning", "message": str(exc)
                 })
                 cursor += 1
@@ -259,7 +260,7 @@ def extract_station_records(path):
 
             if looks_like_station(entries) and not looks_like_service(entries):
                 records.append({
-                    "file": str(path),
+                    "file": relative_path,
                     "container": array_name,
                     "entries": entries,
                 })
@@ -316,8 +317,14 @@ def build_review_rows(records, nodes):
         existing_id = extract_station_id(entries)
 
         if existing_id:
-            candidates = [by_id[existing_id]] if existing_id in by_id else []
-            status = "explicit_id" if candidates else "explicit_id_not_in_export"
+            if existing_id in by_id:
+                candidates = [by_id[existing_id]]
+                status = "explicit_id"
+                sync_state = "in_export"
+            else:
+                candidates = []
+                status = "explicit_id_pending_export_sync"
+                sync_state = "pending_export_sync"
         else:
             candidates = list(by_name.get(normalize_name(name), {}).values())
             if len(candidates) == 1:
@@ -326,6 +333,7 @@ def build_review_rows(records, nodes):
                 status = "ambiguous"
             else:
                 status = "unmatched"
+            sync_state = "needs_mapping"
 
         for candidate in candidates or [None]:
             rows.append({
@@ -344,6 +352,7 @@ def build_review_rows(records, nodes):
                     str(item["relId"]) for item in candidate.get("lines", [])
                 })) if candidate else "",
                 "approved_ogf_id": "",
+                "sync_state": sync_state,
             })
 
     return rows
@@ -354,7 +363,7 @@ def write_csv(rows, output_path):
     fields = [
         "file", "container", "code", "planner_name", "status", "candidate_count",
         "existing_id", "candidate_ogf_id", "ogf_name", "lat", "lon",
-        "relation_ids", "approved_ogf_id",
+        "relation_ids", "approved_ogf_id", "sync_state",
     ]
 
     with output_path.open("w", newline="", encoding="utf-8-sig") as handle:
@@ -385,7 +394,7 @@ def main():
         relative = path.relative_to(root)
         if any(part in (".git", "node_modules", "output") for part in relative.parts):
             continue
-        records, diagnostics = extract_station_records(path)
+        records, diagnostics = extract_station_records(path, root)
         all_records.extend(records)
         all_diagnostics.extend(diagnostics)
 
