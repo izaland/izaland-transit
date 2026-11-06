@@ -83,8 +83,8 @@ const TTEngine = (() => {
     const res = pathSec(a, b);
     if (!res) continue;
     let dwell = 0;
-    for (const mid of res.nodes) {
-      if (mid !== a && mid !== b && stops.includes(mid)) {
+        for (const mid of res.nodes) {
+      if (mid !== a && stops.includes(mid)) {
         dwell += RunTimeEngine.dwellSec(mid, RY_DWELL);
       }
     }
