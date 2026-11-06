@@ -48,7 +48,7 @@
 
 const M13_ST = {
   M1301: { n: 'SAIA Cargo Center',                     k: '',                  nodeId: 229660683, km:  0.00 },
-  M1302: { n: 'Sainðaul Asunahama International Airport', k: '作安崎天島國際空港', nodeId: 126754752, km:  1.65 },
+  M1302: { n: 'Asunahama International Airport', k: '天島國際空港', nodeId: 126754752, km:  1.65 },
   M1303: { n: 'Asunahama Airport Terminal 2',          k: '天島空港第２旅客棟', nodeId: 328799085, km:  3.02 },
   M1304: { n: 'Asunahama Seagate',                     k: '',                  nodeId: 183244867, km:  4.85 },
   M1305: { n: 'Bibaisone',                             k: '尾梅幕',            nodeId: 126754751, km:  7.67 },
