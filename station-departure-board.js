@@ -54,7 +54,10 @@ time.value=clock(selected);day.value=String(Math.floor(selected/1440));host.quer
 visibleRows=rows.filter(r=>r.pos<r.seq.length-1&&r.dep>=selected).slice(0,10);
 list.innerHTML=visibleRows.length?visibleRows.map(r=>{
 const platform=resolvePlatform(stationKey,r),color=/^#[0-9a-f]{3,8}$/i.test(r.line.color||'')?r.line.color:'#99bbff';
-return `<article class="lcd-row"><div class="lcd-dep">${clock(r.dep)}${r.dep>=1440?' <small>+1d</small>':''}</div><div><span class="lcd-badge" style="background:${color}">${esc(r.line.id)}</span><small>${esc(r.id!==r.line.id?r.id:'')} ${esc(direction(r))}${r.line.estimated?' ≈':''}</small></div><div class="lcd-destination"><strong></strong><div class="lcd-marquee" tabindex="0"><span></span></div></div><div class="lcd-wait"></div><div class="lcd-platform" title="${platform.simulated?'Simulated platform':'Registered platform'}">${esc(platform.value)}${platform.simulated?'<small>*</small>':''}</div></article>`;
+const badge=r.line.id==='CL'
+  ?`<img class="lcd-logo" src="logos/CL_logo-dark.svg" alt="CL">`
+  :`<span class="lcd-badge" style="background:${color}">${esc(r.line.id)}</span>`;
+return `<article class="lcd-row"><div class="lcd-dep">${clock(r.dep)}${r.dep>=1440?' <small>+1d</small>':''}</div><div>${badge}<small>${esc(r.id!==r.line.id?r.id:'')} ${esc(direction(r))}${r.line.estimated?' ≈':''}</small></div><div class="lcd-destination"><strong></strong><div class="lcd-marquee" tabindex="0"><span></span></div></div><div class="lcd-wait"></div><div class="lcd-platform" title="${platform.simulated?'Simulated platform':'Registered platform'}">${esc(platform.value)}${platform.simulated?'<small>*</small>':''}</div></article>`;
 }).join(''):'<p class="lcd-empty">No further departures in the loaded service day. Choose an earlier time or adjust the line filters.</p>';
 applyLanguage(true);
 list.querySelectorAll('.lcd-marquee').forEach((el,i)=>el.firstElementChild.addEventListener('animationiteration',event=>{
@@ -75,7 +78,7 @@ seconds.addEventListener('change',()=>{const v=Number(seconds.value);interval=Nu
 const observer=new MutationObserver(()=>{if(!host.isConnected){cleanup();return;}if(!isVisible()){if(timer!==null){clearTimeout(timer);timer=null;}}else if(timer===null)schedule();});
 function visibility(){schedule();}
 function resize(){list.querySelectorAll('.lcd-marquee').forEach((el,i)=>marquee(el,visibleRows[i],active));}
-function cleanup(){if(dead)return;dead=true;if(timer!==null)clearTimeout(timer);observer.disconnect();document.removeEventListener('visibilitychange',visibility);window.removeEventListener('resize',resize);if(dispose===cleanup)dispose=null;}
+function cleanup(){if(dead)return;dead=true;if(timer!==null){clearTimeout(timer);timer=null;}observer.disconnect();document.removeEventListener('visibilitychange',visibility);window.removeEventListener('resize',resize);if(dispose===cleanup)dispose=null;}
 dispose=cleanup;
 draw();observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden']});document.addEventListener('visibilitychange',visibility);window.addEventListener('resize',resize);schedule();
 }
