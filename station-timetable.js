@@ -33,6 +33,8 @@
     const others=[typeof HD_LINES!=='undefined'?HD_LINES:null,typeof WI_LINES!=='undefined'?WI_LINES:null,typeof SHX_LINES!=='undefined'?SHX_LINES:null,typeof SSK_LINES!=='undefined'?SSK_LINES:null];
     for(const source of others)if(source)for(const [id,l]of Object.entries(source))if(l.services?.length)add(l,l.services,id);
     if(typeof AX_LINES!=='undefined'&&AX_LINES.AX){const l=AX_LINES.AX;out.set('AX',{id:'AX',native:true,color:l.color,stations:Object.entries(l.ST).map(([code,s])=>({code,name:s.n,km:s.km}))});}
+        if(typeof CL_ST!=='undefined'&&typeof CL32_TIMETABLE!=='undefined'){out.set('CL',{id:'CL',native:true,source:'cl',color:CL_LINE.color,stations:Object.entries(CL_ST).map(([code,s])=>({code,name:s.n,km:s.km}))});}
+    if(typeof IZX_LINES!=='undefined')for(const [id,l]of Object.entries(IZX_LINES)){if(id==='AX')continue;out.set(id,{id,native:true,source:'izx',color:l.color,stations:Object.entries(l.ST).map(([code,s])=>({code,name:s.n,km:s.km}))});}
     return [...out.values()];
   }
   function resolve(){
@@ -87,6 +89,31 @@
       }
     }return rows;
   }
+    function clRows(l,codes){
+    const rows=[],seen=new Set();
+    for(const [pattern,tt]of Object.entries(CL32_TIMETABLE)){
+      for(const trip of[...tt.down,...tt.up]){
+        const stops=trip.arrivals.filter(s=>s.arrival!=null);
+        const pos=stops.findIndex(s=>codes.has(s.code));if(pos<0)continue;
+        const key=trip.pattern+'-'+trip.departure+'-'+trip.from+'-'+trip.to;
+        if(seen.has(key))continue;seen.add(key);
+        const seq=stops.map(s=>({code:s.code,name:CL_ST[s.code]?.n||s.code}));
+        rows.push({line:l,id:'CL32',description:CL32.name,direction:trip.from==='CL321'?'down':'up',train:'CL32',seq,pos,dep:min(stops[pos].arrival),times:stops.map(s=>min(s.arrival)),arrivals:stops.map(s=>min(s.arrival)),native:true});
+      }
+    }return rows;
+  }
+
+  function izxRows(l,codes,E){
+    const rows=[],seen=new Set();
+    for(const station of l.stations.filter(s=>codes.has(s.code))){
+      const trips=E.query({lines:[l.id],station:station.code,fromTime:'00:00',toTime:'48:00'});
+      for(const t of trips){if(seen.has(t._uid))continue;seen.add(t._uid);
+        const stops=Object.entries(t.stops),pos=stops.findIndex(([c])=>c===station.code);if(pos<0)continue;
+        const seq=stops.map(([code])=>({code,name:l.ST[code]?.n||code}));
+        rows.push({line:l,id:t.svcId,description:t.name,direction:t.direction,train:t.trainNumber,seq,pos,dep:min(t.stops[station.code].dep),times:stops.map(([,s])=>min(s.dep)),arrivals:stops.map(([,s])=>min(s.arr)),native:true});
+      }
+    }return rows;
+  }
   function panel(){let p=document.getElementById('timetable-panel');if(!p){p=document.createElement('section');p.id='timetable-panel';p.style.cssText='margin:24px 0;padding:16px;background:#161616;border:1px solid #333;border-radius:6px';document.getElementById('results')?.after(p);if(!p.isConnected)document.body.append(p);}return p;}
   function boardModule(){
     if(boardPromise)return boardPromise;
@@ -119,7 +146,14 @@
     for(const l of lines)if(!filters.has(l.id))filters.set(l.id,true);
     let E,error='';
     if(lines.some(l=>l.native&&filters.get(l.id))){p.textContent='Loading AX timetable…';try{E=await engine();}catch(e){error=e.message;}if(token!==revision)return;}
-    const rows=[];for(const l of lines)if(filters.get(l.id)){if(l.native){if(E)try{rows.push(...nativeRows(l,codes,E));}catch(e){error='AX: '+e.message;}}else rows.push(...suburbanRows(l,codes));}
+        const rows=[];for(const l of lines)if(filters.get(l.id)){
+      if(l.native){
+        if(l.source==='cl'){rows.push(...clRows(l,codes));}
+        else if(l.source==='izx'){if(E)try{rows.push(...izxRows(l,codes,E));}catch(e){error=l.id+': '+e.message;}}
+        else if(E)try{rows.push(...nativeRows(l,codes,E));}catch(e){error='AX: '+e.message;}
+      }
+      else rows.push(...suburbanRows(l,codes));
+    }
     rows.sort((a,b)=>a.dep-b.dep||a.line.id.localeCompare(b.line.id));
     const name=lines.flatMap(l=>l.stations).find(s=>s.code===code)?.name||document.querySelector('#results .station-name')?.textContent||code;
     p.innerHTML=`<h2 style="font-size:1rem">${esc(name)}</h2><p style="color:#999">${esc([...codes].join(' · '))} — ${rows.length} departures</p>${error?`<p role="alert" style="color:#ff9800">${esc(error)} — AX unavailable; other lines remain visible.</p>`:''}<div><button type="button" data-all="true">All</button> <button type="button" data-all="false">None</button>${lines.map(l=>`<label style="display:inline-flex;gap:6px;padding:6px"><input type="checkbox" data-line="${esc(l.id)}" ${filters.get(l.id)?'checked':''}>${esc(l.id)}</label>`).join('')}</div><div id="tt-trips"></div>`;
