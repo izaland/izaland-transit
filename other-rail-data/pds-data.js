@@ -88,6 +88,8 @@ const PDS_SERVICES = [
   },
 ];
 
+PDS_LINES.PDS.services = PDS_SERVICES;
+
 if (typeof SUBURBAN_LINES !== 'undefined') {
   Object.assign(SUBURBAN_LINES, PDS_LINES);
 }
