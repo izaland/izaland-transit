@@ -55,7 +55,7 @@ visibleRows=rows.filter(r=>r.pos<r.seq.length-1&&r.dep>=selected).slice(0,10);
 list.innerHTML=visibleRows.length?visibleRows.map(r=>{
 const platform=resolvePlatform(stationKey,r),color=/^#[0-9a-f]{3,8}$/i.test(r.line.color||'')?r.line.color:'#99bbff';
 const badge=r.line.id==='CL'
-  ?`<img class="lcd-logo" src="logos/CL_logo-dark.svg" alt="CL">`
+  ?`<img class="lcd-logo" src="assets/img/logos/CL_logo-dark.svg" alt="CL">`
   :`<span class="lcd-badge" style="background:${color}">${esc(r.line.id)}</span>`;
 return `<article class="lcd-row"><div class="lcd-dep">${clock(r.dep)}${r.dep>=1440?' <small>+1d</small>':''}</div><div>${badge}<small>${esc(r.id!==r.line.id?r.id:'')} ${esc(direction(r))}${r.line.estimated?' ≈':''}</small></div><div class="lcd-destination"><strong></strong><div class="lcd-marquee" tabindex="0"><span></span></div></div><div class="lcd-wait"></div><div class="lcd-platform" title="${platform.simulated?'Simulated platform':'Registered platform'}">${esc(platform.value)}${platform.simulated?'<small>*</small>':''}</div></article>`;
 }).join(''):'<p class="lcd-empty">No further departures in the loaded service day. Choose an earlier time or adjust the line filters.</p>';
