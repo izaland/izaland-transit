@@ -604,6 +604,31 @@ function _getEquivalentCodes(code) {
     const hiIdx    = skipDestCheck ? iFrom : Math.max(iFrom, iTo);
     const allTrips = [];
 
+           /* FIX 16 — partenze esplicite (rinforzi) */
+      if (Array.isArray(svc.extraDepartures)) {
+        for (const dep of svc.extraDepartures) {
+          const extraSec = _hmToSec(dep);
+
+          /* considera solo le corse nella finestra di ricerca */
+          if (extraSec < depSec || extraSec > depSec + SEARCH_WINDOW) continue;
+
+          /* evita duplicati se la partenza è già stata generata */
+          const already = allTrips.some(t =>
+            t.sec === extraSec &&
+            (t.svcId ?? t.svcLogical) === (svc.id ?? svc.svcLogical)
+          );
+          if (already) continue;
+
+          allTrips.push({
+            sec: extraSec,
+            svcId: svc.id,
+            svcDesc: svc.desc,
+            stops: svc.stops ?? [],
+            svc,
+          });
+        }
+      }
+
        for (const svc of services) {
       const svcFromIdx = stCodes.indexOf(svc.fromCode);
       const svcToIdx   = stCodes.indexOf(svc.toCode);
