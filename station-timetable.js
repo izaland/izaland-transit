@@ -5,7 +5,7 @@
   window.__IZX_STATION_TIMETABLE__=true;
   const filters=new Map();
   const base=new URL('.',document.currentScript?.src||document.baseURI);
-  let enginePromise,revision=0,boardPromise,mode='debug';
+  let enginePromise,revision=0,boardPromise,mode='debug',lastStation=null;
   const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const min=x=>{const [h,m]=String(x).split(':').map(Number);return h*60+m;};
   const clock=t=>{const v=((Math.floor(t)%1440)+1440)%1440;return String(Math.floor(v/60)).padStart(2,'0')+':'+String(v%60).padStart(2,'0')+(t>=1440?' +'+Math.floor(t/1440)+'d':'');};
@@ -143,7 +143,9 @@
     show(mode);
   }
   async function render(){
-    const token=++revision,p=panel(),code=resolve(),codes=aliases(code),lines=entries().filter(l=>l.stations.some(s=>codes.has(s.code)));p.style.display='block';
+    const token=++revision,p=panel(),code=resolve(),codes=aliases(code);
+    if(code!==lastStation){filters.clear();lastStation=code;}
+    const lines=entries().filter(l=>l.stations.some(s=>codes.has(s.code)));p.style.display='block';
     if(!lines.length){p.textContent='No timetable data available for '+code;return;}
     for(const l of lines)if(!filters.has(l.id))filters.set(l.id,true);
     let E,error='';
