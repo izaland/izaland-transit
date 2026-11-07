@@ -82,10 +82,11 @@
     const rows=[],seen=new Set();
     for(const station of l.stations.filter(s=>codes.has(s.code))){
       const trips=E.query({lines:['AX'],station:station.code,fromTime:'00:00',toTime:'48:00'});
-      for(const t of trips){if(seen.has(t._uid))continue;seen.add(t._uid);
+            for(const t of trips){if(seen.has(t._uid))continue;seen.add(t._uid);
         const stops=Object.entries(t.stops),pos=stops.findIndex(([c])=>c===station.code);if(pos<0)continue;
-        const seq=stops.map(([code])=>({code,name:AX_LINES.AX.ST[code]?.n||code}));
-        rows.push({line:l,id:t.svcId,description:t.name,direction:t.direction,train:t.trainNumber,seq,pos,dep:min(t.stops[station.code].dep),times:stops.map(([,s])=>min(s.dep)),arrivals:stops.map(([,s])=>min(s.arr)),native:true});
+        const stop=t.stops[station.code];if(!stop)continue;
+        const seq=stops.map(([code])=>({code,name:l.ST[code]?.n||code}));
+        rows.push({line:l,id:t.svcId,description:t.name,direction:t.direction,train:t.trainNumber,seq,pos,dep:min(stop.dep),times:stops.map(([,s])=>min(s.dep)),arrivals:stops.map(([,s])=>min(s.arr)),native:true});
       }
     }return rows;
   }
