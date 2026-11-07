@@ -630,8 +630,6 @@ const SUBURBAN_LINES = {
     ],
   },
 
-   
-
   /* ────────────────────────────────────────────────
      SK — Seishaku Line · 盛石線
      58 stazioni · 105.15 km
@@ -706,6 +704,41 @@ const SUBURBAN_LINES = {
       { code: 'SK58', name: 'Shakusa',               kanji: '—',          km: 105.15 },
     ],
   },
+
+   /* ────────────────────────────────────────────────
+   SO — Sabuon Line · ટરૃે૮૾પ્線
+   18 stazioni · 21,66 km
+──────────────────────────────────────────────── */
+SO: {
+  id: 'SO',
+  name: 'Sabuon Line',
+  nameJa: 'ટરૃે૮૾પ્線',
+  color: '#FF6666',
+  circular: false,
+  headwayPeak: 20,
+  headwayOffPeak: 30,
+  totalKm: 21.66,
+  stations: [
+    { code:'SO01', name:'Sabullan',         kanji:'ટરૃેધ્ધપ્', nodeId:1266664960, km: 0.00 },
+    { code:'SO02', name:'Kamuragi',         kanji:'',          nodeId:1354416272, km: 2.12 },
+    { code:'SO03', name:'Somerawa',         kanji:'',          nodeId:1354415704, km: 4.37 },
+    { code:'SO04', name:'Shin-Tsukaso',     kanji:'新鷸蘇',     nodeId:1266664986, km: 6.10 },
+    { code:'SO05', name:'Nari-Osenude',     kanji:'東防斉',     nodeId:2077572226, km: 6.89 },
+    { code:'SO06', name:'Osenude',          kanji:'防斉',       nodeId:1264977098, km: 8.49 },
+    { code:'SO07', name:'Niji-Osenude',     kanji:'西防斉',     nodeId:1242954549, km: 9.45 },
+    { code:'SO08', name:'Bukunomatsu',      kanji:'粐頭',       nodeId:1242954550, km:10.52 },
+    { code:'SO09', name:'Kōmeitsān',        kanji:'公明倉',     nodeId:1242954560, km:11.64 },
+    { code:'SO10', name:'Yakishino',        kanji:'少史見',     nodeId:1242954570, km:12.70 },
+    { code:'SO11', name:'Sasakuma',         kanji:'',          nodeId:1242954660, km:13.77 },
+    { code:'SO12', name:'Tomiganei',        kanji:'庭ヶ汢',     nodeId:1240660810, km:15.59 },
+    { code:'SO13', name:'Tagashiga',        kanji:'浚藻',       nodeId:1240660820, km:16.31 },
+    { code:'SO14', name:'Oiseharu',         kanji:'粕墾',       nodeId:1240660830, km:17.22 },
+    { code:'SO15', name:'Herubori',         kanji:'杏登',       nodeId:1240660840, km:18.28 },
+    { code:'SO16', name:'Ōbakura',          kanji:'大砌',       nodeId:1240660850, km:19.38 },
+    { code:'SO17', name:'Aketsue',          kanji:'薫都衛',     nodeId:1240660860, km:20.39 },
+    { code:'SO18', name:'Sainðaul Central', kanji:'作安崎中央', nodeId:2296564940, km:21.66 },
+  ],
+},
 
   /* ────────────────────────────────────────────────
      KS — Kawasabu Line · 嘉夬苫線
