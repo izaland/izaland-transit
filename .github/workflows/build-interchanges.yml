@@ -1,0 +1,56 @@
+name: Rebuild interchange clusters
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-clusters:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Rebuild station export
+        run: python scripts/build_json.py
+
+      - name: Generate mapping review
+        run: |
+          python scripts/propose_ogf_mapping.py \
+            --root . \
+            --out output/mapping-review.csv
+
+      - name: Rebuild interchange clusters
+        run: |
+          python scripts/build_interchanges.py \
+            --review output/mapping-review.csv \
+            --overrides data/interchange-overrides.json \
+            --out data/interchange-clusters.json
+
+      - name: Commit updated clusters
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/interchange-clusters.json
+          if git diff --cached --quiet; then
+            echo "No changes to interchange clusters."
+          else
+            git commit -m "Rebuild interchange clusters"
+            git push
+          fi
