@@ -490,20 +490,28 @@
          + `<span style="font-size:0.8rem;color:#888;margin-right:12px">${lineName}</span>`;
   }
 
+    function normalizeSearch(value) {
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
   /* ── Autocomplete ────────────────────────────────────────────────────── */
   const qEl   = document.getElementById('query');
   const sugEl = document.getElementById('suggestions');
 
   qEl.addEventListener('input', () => {
-    const q = qEl.value.trim().toLowerCase();
+    const q = normalizeSearch(qEl.value);
     sugEl.innerHTML = '';
     if (q.length < 2) { sugEl.style.display = 'none'; return; }
 
     const rawHits = ALL_STATIONS.filter(s =>
-      s.code.toLowerCase().includes(q) ||
-      s.name.toLowerCase().includes(q) ||
-      (s.kanji && s.kanji.includes(q))
-    );
+  normalizeSearch(s.code).includes(q) ||
+  normalizeSearch(s.name).includes(q) ||
+  (s.kanji && s.kanji.includes(q))
+);
 
     const grouped = [];
     const seenNames = new Set();
