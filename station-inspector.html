@@ -346,7 +346,7 @@
       for (const [code, st] of Object.entries(line.ST || {})) {
         if (ALL_STATIONS.find(s => s.code === code)) continue;
         ALL_STATIONS.push({ code, name: st.n || code, kanji: st.k || '',
-          network: 'ax', lineId, lineColor: line.META?.color || '#888', lineName: line.META?.name || lineId });
+          network: 'ax', lineId, lineColor: line.color || line.META?.color || '#888', lineName: line.label || line.META?.name || lineId });
       }
     }
   }
