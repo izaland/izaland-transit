@@ -486,6 +486,7 @@ const IZX_LINES = {
       K03: ['AX01', 'CK02', { code: 'M1302', transferMin: 7 }, { code: 'M1502', transferMin: 7 }],
       K04: ['CO55'],
       K05: ['NKT05'],
+      K07: ['NKT26'],
       K08: ['NKT39'],
       K09: ['NKT50'],
       K17: ['HD01'],
