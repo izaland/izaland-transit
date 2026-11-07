@@ -204,6 +204,7 @@
   <script src="other-rail-data/sbo-data.js"></script>
   <script src="other-rail-data/ibc-data.js"></script>
   <script src="other-rail-data/nkt-data.js"></script>
+  <script src="cl-data.js"></script>
   <script src="izx-data.js"></script>
   <script src="ax-data.js"></script>
 
@@ -348,6 +349,22 @@
         ALL_STATIONS.push({ code, name: st.n || code, kanji: st.k || '',
           network: 'ax', lineId, lineColor: line.color || line.META?.color || '#888', lineName: line.label || line.META?.name || lineId });
       }
+    }
+  }
+
+      /* CL — CityLiner */
+  if (typeof CL_ST !== 'undefined') {
+    for (const [code, st] of Object.entries(CL_ST)) {
+      if (ALL_STATIONS.find(s => s.code === code)) continue;
+      ALL_STATIONS.push({
+        code,
+        name: st.n || code,
+        kanji: st.k || '',
+        network: 'other',
+        lineId: 'CL',
+        lineColor: CL_LINE.color || '#9e9e9e',
+        lineName: CL_LINE.name || 'CityLiner'
+      });
     }
   }
 
