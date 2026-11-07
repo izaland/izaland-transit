@@ -13,6 +13,7 @@
      PDS01 Poridake ↔ CL326 / SA04 / SN05
      PDS09 Toramukada ↔ CL327
      PDS12 Umehte ↔ CL328
+     PDS15 Sumāra ↔ CL329
 ================================================================ */
 
 'use strict';
@@ -21,6 +22,7 @@ const PDS_INTERCHANGE = {
   PDS01: ['CL326', 'SA04', 'SN05'],
   PDS09: ['CL327'],
   PDS12: ['CL328'],
+  PDS15: ['CL329'],
 };
 
 const PDS_LINES = {
