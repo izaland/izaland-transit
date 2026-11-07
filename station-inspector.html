@@ -173,7 +173,7 @@
   <div id="no-result">No station found.</div>
   <div id="results"></div>
 
-  <!-- ═══ DATA FILES ═════════════════════════════════════════════════════ -->
+  <!-- ═══ DATA FILES ═════════════════════════════════════════════════ -->
   <script src="metro/m1-data.js"></script>
   <script src="metro/m2-data.js"></script>
   <script src="metro/m3-data.js"></script>
@@ -335,7 +335,7 @@
       for (const [code, st] of Object.entries(line.ST || {})) {
         if (ALL_STATIONS.find(s => s.code === code)) continue;
         ALL_STATIONS.push({ code, name: st.n || code, kanji: st.k || '',
-          network: 'izx', lineId, lineColor: line.META?.color || '#888', lineName: line.META?.name || lineId });
+          network: 'izx', lineId, lineColor: line.color || line.META?.color || '#888', lineName: line.label || line.META?.name || lineId });
       }
     }
   }
@@ -641,7 +641,7 @@
 
     if (!station) {
       resultsEl.style.display = 'none';
-      noResult.style.display  = 'block';
+      noResult.style.display = 'block';
       return;
     }
     noResult.style.display = 'none';
@@ -670,11 +670,11 @@
       let html = `<div class="section"><div class="section-title">${title}</div>`;
       items.forEach(ix => {
         const otherCode = getOtherCode(ix);
-        const otherNet  = getNetwork(ix);
-        const st2    = ALL_STATIONS.find(s => s.code === otherCode);
+        const otherNet = getNetwork(ix);
+        const st2 = ALL_STATIONS.find(s => s.code === otherCode);
         const status = otherNet === 'ibaches' ? 'ok' : reach(otherCode);
         const dotCls = status === 'ok' ? 'dot-ok' : status === 'missing' ? 'dot-err' : 'dot-warn';
-        const txtCls = status === 'ok' ? 'ok'     : status === 'missing' ? 'err'     : 'warn';
+        const txtCls = status === 'ok' ? 'ok' : status === 'missing' ? 'err' : 'warn';
         html += `
           <div class="interchange-row">
             <div class="irow-top">
@@ -710,7 +710,7 @@
     html += renderInterchangeSection(
       'Metro Interchanges', metroInterchanges,
       ix => ix.metroCode === station.code ? ix.partnerCode : ix.metroCode,
-      ix => ix.metroCode === station.code ? ix.network     : 'metro',
+      ix => ix.metroCode === station.code ? ix.network : 'metro',
       ix => ix.note, ix => ix.transferMin
     );
 
@@ -718,11 +718,11 @@
       html += `<div class="section"><div class="section-title">Suburban Interchanges</div>`;
       subInterchanges.forEach(ix => {
         const otherCode = ix.from === station.code ? ix.to : ix.from;
-        const st2  = ALL_STATIONS.find(s => s.code === otherCode);
+        const st2 = ALL_STATIONS.find(s => s.code === otherCode);
         const net2 = st2?.network || '?';
         const status = reach(otherCode);
         const dotCls = status === 'ok' ? 'dot-ok' : status === 'missing' ? 'dot-err' : 'dot-warn';
-        const txtCls = status === 'ok' ? 'ok'     : status === 'missing' ? 'err'     : 'warn';
+        const txtCls = status === 'ok' ? 'ok' : status === 'missing' ? 'err' : 'warn';
         html += `
           <div class="interchange-row">
             <div class="irow-top">
