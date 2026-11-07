@@ -604,36 +604,30 @@ function _getEquivalentCodes(code) {
     const hiIdx    = skipDestCheck ? iFrom : Math.max(iFrom, iTo);
     const allTrips = [];
 
-           /* FIX 16 — partenze esplicite (rinforzi) */
-      if (Array.isArray(svc.extraDepartures)) {
-        for (const dep of svc.extraDepartures) {
-          const extraSec = _hmToSec(dep);
+for (const svc of services) {
+  const svcFromIdx = stCodes.indexOf(svc.fromCode);
+  const svcToIdx   = stCodes.indexOf(svc.toCode);
+  if (svcFromIdx === -1 || svcToIdx === -1) continue;
 
-          /* considera solo le corse nella finestra di ricerca */
-          if (extraSec < depSec || extraSec > depSec + SEARCH_WINDOW) continue;
-
-          /* evita duplicati se la partenza è già stata generata */
-          const already = allTrips.some(t =>
-            t.sec === extraSec &&
-            (t.svcId ?? t.svcLogical) === (svc.id ?? svc.svcLogical)
-          );
-          if (already) continue;
-
-          allTrips.push({
-            sec: extraSec,
-            svcId: svc.id,
-            svcDesc: svc.desc,
-            stops: svc.stops ?? [],
-            svc,
-          });
-        }
-      }
-
-       for (const svc of services) {
-      const svcFromIdx = stCodes.indexOf(svc.fromCode);
-      const svcToIdx   = stCodes.indexOf(svc.toCode);
-      if (svcFromIdx === -1 || svcToIdx === -1) continue;
-
+  /* FIX 16 — partenze esplicite (rinforzi) */
+  if (Array.isArray(svc.extraDepartures)) {
+    for (const dep of svc.extraDepartures) {
+      const extraSec = _hmToSec(dep);
+      if (extraSec < depSec || extraSec > depSec + SEARCH_WINDOW) continue;
+      const already = allTrips.some(t =>
+        t.sec === extraSec &&
+        (t.svcId ?? t.svcLogical) === (svc.id ?? svc.svcLogical)
+      );
+      if (already) continue;
+      allTrips.push({
+        sec: extraSec,
+        svcId: svc.id,
+        svcDesc: svc.desc,
+        stops: svc.stops ?? [],
+        svc,
+      });
+    }
+  }
       /* FIX 15: servizi con svc.explicitDir = true sono definiti
          esplicitamente in entrambe le direzioni (es. SHX). Gli altri
          (SK, KS, ...) mantengono la logica storica: NB derivato da SB. */
