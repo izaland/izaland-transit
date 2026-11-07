@@ -47,6 +47,7 @@
     function edge(a,b){if(typeof a!=='string'||typeof b!=='string')return;if(!graph.has(a))graph.set(a,new Set());if(!graph.has(b))graph.set(b,new Set());graph.get(a).add(b);graph.get(b).add(a);}
     function ingest(map){for(const [a,items]of Object.entries(map||{}))for(const b of Array.isArray(items)?items:[items])edge(a,typeof b==='string'?b:b?.code);}
     if(typeof SUBURBAN_INTERCHANGE!=='undefined')ingest(SUBURBAN_INTERCHANGE);
+    if(typeof CL_INTERCHANGE!=='undefined')ingest(CL_INTERCHANGE);
     if(typeof METRO_INTERCHANGE_MAP!=='undefined')for(const m of Object.values(METRO_INTERCHANGE_MAP))ingest(m);
     if(typeof AX_INTERCHANGE!=='undefined')ingest(AX_INTERCHANGE);
     if(typeof AX_LINES!=='undefined')for(const l of Object.values(AX_LINES)){ingest(l.INTERCHANGE);ingest(l.INTERCHANGE_EXTRA);ingest(l.INTERCHANGE_NETWORK);}
