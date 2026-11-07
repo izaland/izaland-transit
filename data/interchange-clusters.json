@@ -4,104 +4,177 @@
   "clusters": {
     "229656494": {
       "ogfId": 229656494,
-      "codes": ["CO18", "TS13"],
-      "networks": ["suburban"],
+      "codes": [
+        "CO18",
+        "TS13"
+      ],
+      "networks": [
+        "suburban"
+      ],
       "transferMin": 5,
       "thruService": false,
       "source": "automatic"
     },
     "229656493": {
       "ogfId": 229656493,
-      "codes": ["CO19", "TS12"],
-      "networks": ["suburban"],
+      "codes": [
+        "CO19",
+        "TS12"
+      ],
+      "networks": [
+        "suburban"
+      ],
       "transferMin": 5,
       "thruService": false,
       "source": "automatic"
     },
     "368583226": {
       "ogfId": 368583226,
-      "codes": ["CO23", "TS15"],
-      "networks": ["suburban"],
+      "codes": [
+        "CO23",
+        "TS15"
+      ],
+      "networks": [
+        "suburban"
+      ],
       "transferMin": 5,
       "thruService": false,
       "source": "automatic"
     },
     "127914807": {
       "ogfId": 127914807,
-      "codes": ["CO24", "TS16"],
-      "networks": ["suburban"],
+      "codes": [
+        "CO24",
+        "TS16"
+      ],
+      "networks": [
+        "suburban"
+      ],
       "transferMin": 5,
       "thruService": false,
       "source": "automatic"
     },
     "136187246": {
       "ogfId": 136187246,
-      "codes": ["CO27", "TS17"],
-      "networks": ["suburban"],
+      "codes": [
+        "CO27",
+        "TS17"
+      ],
+      "networks": [
+        "suburban"
+      ],
       "transferMin": 5,
       "thruService": false,
       "source": "automatic"
     },
     "126754741": {
       "ogfId": 126754741,
-      "codes": ["CO28", "RI05"],
-      "networks": ["izx", "suburban"],
+      "codes": [
+        "CO28",
+        "RI05"
+      ],
+      "networks": [
+        "izx",
+        "suburban"
+      ],
       "transferMin": 5,
       "thruService": false,
       "source": "automatic"
     },
     "126754742": {
       "ogfId": 126754742,
-      "codes": ["CO29", "RI04"],
-      "networks": ["izx", "suburban"],
+      "codes": [
+        "CO29",
+        "RI04"
+      ],
+      "networks": [
+        "izx",
+        "suburban"
+      ],
       "transferMin": 5,
       "thruService": false,
       "source": "automatic"
     },
     "126754743": {
       "ogfId": 126754743,
-      "codes": ["CO30", "RI03"],
-      "networks": ["izx", "suburban"],
+      "codes": [
+        "CO30",
+        "RI03"
+      ],
+      "networks": [
+        "izx",
+        "suburban"
+      ],
       "transferMin": 5,
       "thruService": false,
       "source": "automatic"
     },
     "126754744": {
       "ogfId": 126754744,
-      "codes": ["CO31", "RI02"],
-      "networks": ["izx", "suburban"],
+      "codes": [
+        "CO31",
+        "RI02"
+      ],
+      "networks": [
+        "izx",
+        "suburban"
+      ],
       "transferMin": 5,
       "thruService": false,
       "source": "automatic"
     },
     "126754745": {
       "ogfId": 126754745,
-      "codes": ["CO32", "RI01"],
-      "networks": ["izx", "suburban"],
+      "codes": [
+        "CO32",
+        "RI01"
+      ],
+      "networks": [
+        "izx",
+        "suburban"
+      ],
       "transferMin": 5,
       "thruService": false,
       "source": "automatic"
     },
     "123393772": {
       "ogfId": 123393772,
-      "codes": ["RI08", "TS18"],
-      "networks": ["izx", "suburban"],
+      "codes": [
+        "RI08",
+        "TS18"
+      ],
+      "networks": [
+        "izx",
+        "suburban"
+      ],
       "transferMin": 5,
       "thruService": false,
       "source": "automatic"
     },
     "123393771": {
       "ogfId": 123393771,
-      "codes": ["RI10", "TS19"],
-      "networks": ["izx", "suburban"],
+      "codes": [
+        "RI10",
+        "TS19"
+      ],
+      "networks": [
+        "izx",
+        "suburban"
+      ],
       "transferMin": 5,
       "thruService": false,
       "source": "automatic"
     },
     "136187238": {
       "ogfId": 136187238,
-      "codes": ["RI14", "TS20"],
-      "networks": ["izx", "suburban"],
+      "codes": [
+        "RI14",
+        "TS20"
+      ],
+      "networks": [
+        "izx",
+        "suburban"
+      ],
       "transferMin": 5,
       "thruService": false,
       "source": "automatic"
